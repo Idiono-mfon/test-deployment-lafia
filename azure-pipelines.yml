@@ -4,7 +4,11 @@
 # https://aka.ms/yaml
 
 trigger:
-- main
+ branches:
+    include:
+      - main
+    exclude:
+      - dev
 
 pool:
   vmImage: ubuntu-latest
