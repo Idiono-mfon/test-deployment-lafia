@@ -1,6 +1,6 @@
 // Update with your config settings.
-import { Knex } from "knex";
-import { Env } from "./src/app/config";
+import { Knex } from 'knex';
+import { Env } from './src/app/config';
 
 const env = Env.all();
 
@@ -12,7 +12,7 @@ interface IKnexConfig {
 }
 
 const config = {
-  client: "postgresql",
+  client: 'postgresql',
   connection: {
     host: env.pg_host,
     user: env.pg_user,
@@ -24,12 +24,12 @@ const config = {
     max: 10
   },
   migrations: {
-    directory: "./database/migrations",
-    tableName: "lafia_service_migrations"
+    directory: './database/migrations',
+    tableName: 'lafia_service_migrations',
   },
   seeds: {
-    directory: "./database/seeds"
-  }
+    directory: './database/seeds',
+  },
 };
 
 const knexConfiguration: IKnexConfig = {

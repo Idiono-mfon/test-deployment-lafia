@@ -26,5 +26,6 @@ module.exports = {
     'no-param-reassign': 0,
     'no-console': 0,
     'no-shadow': 0,
+    'comma-dangle': 0
   },
 };
