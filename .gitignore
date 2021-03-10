@@ -1,4 +1,4 @@
 node_modules/
 dist/
-../.idea/
-lafia-service/.env
+.idea/
+.env
