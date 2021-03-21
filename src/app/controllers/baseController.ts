@@ -4,7 +4,7 @@ import Joi from 'joi';
 
 @injectable()
 export abstract class BaseController {
-  protected async validateRequest(
+  protected validateRequest(
     requestBody: any,
     validationSchema: Joi.Schema,
   ) {
@@ -15,7 +15,7 @@ export abstract class BaseController {
     }
   }
 
-  protected async success(
+  protected success(
     res: Response,
     data: any = [],
     message: string = '',
@@ -28,15 +28,13 @@ export abstract class BaseController {
     });
   }
 
-  protected async error(
+  protected error(
     res: Response,
-    code: string,
+    code: number,
     message: string,
-    httpStatus: number = 400,
   ) {
-    return res.status(httpStatus).send({
+    return res.status(code).send({
       status: 'error',
-      code,
       message,
     });
   }
