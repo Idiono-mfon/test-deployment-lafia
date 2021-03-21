@@ -1,7 +1,9 @@
 import { Container } from 'inversify';
+import 'reflect-metadata';
 import { HealthController } from '../controllers';
+import { UserRepository } from '../repository';
+import { UserService } from '../services';
 import TYPES from './types';
-// import { PostgresConnection } from './db';
 
 const container = new Container();
 
@@ -12,13 +14,15 @@ container
   .inSingletonScope();
 
 // services
+container
+  .bind<UserService>(TYPES.UserService)
+  .to(UserService)
+  .inSingletonScope();
 
 // repositories
-
-// database
-// container
-//   .bind<PostgresConnection>(TYPES.DatabaseConnection)
-//   .to(PostgresConnection)
-//   .inSingletonScope();
+container
+  .bind<UserRepository>(TYPES.UserRepository)
+  .to(UserRepository)
+  .inSingletonScope();
 
 export default container;
