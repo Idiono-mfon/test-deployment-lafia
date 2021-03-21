@@ -3,13 +3,12 @@ const TYPES = {
   HealthController: Symbol('HealthController'),
 
   // service
+  UserService: Symbol('UserService'),
 
   // repositories
+  UserRepository: Symbol('UserRepository'),
 
   // models
-
-  // database
-  DatabaseConnection: Symbol('DatabaseConnection'),
 };
 
 export default TYPES;
