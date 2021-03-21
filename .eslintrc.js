@@ -42,5 +42,12 @@ module.exports = {
     'comma-dangle': 0,
     'lines-between-class-members': 0,
     'prettier/prettier': 0,
+    '@typescript-eslint/no-inferrable-types': 0,
+    '@typescript-eslint/no-explicit-any': 0,
+    '@typescript-eslint/explicit-module-boundary-types': 0,
+    '@typescript-eslint/no-unsafe-assignment': 0,
+    '@typescript-eslint/no-var-requires': 0,
+    '@typescript-eslint/no-unsafe-member-access': 0,
+    '@typescript-eslint/no-unsafe-call': 0,
   },
 };
