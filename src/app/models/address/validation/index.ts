@@ -20,7 +20,7 @@ export const AddressValidator: JSONSchema = {
       required: ['start'],
       properties: {
         id: { type: 'string' },
-        start: { type: 'date-time' },
+        start: { format: 'date-time' },
         end: { type: 'date-time' }
       }
     }
