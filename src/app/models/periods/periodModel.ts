@@ -1,3 +1,4 @@
+import { JSONSchema, RelationMappings } from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
 import { IPeriod } from './interfaces';
@@ -12,11 +13,11 @@ export class PeriodModel extends BaseModel implements IPeriod {
     return `${Schema.lafiaService}.${Table.periods}`;
   }
 
-  static get jsonSchema() {
+  static get jsonSchema(): JSONSchema {
     return PeriodValidator;
   }
 
-  static get relationMappings() {
+  static get relationMappings(): RelationMappings {
     return {
       address: {
         relation: BaseModel.HasOneRelation,

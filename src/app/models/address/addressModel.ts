@@ -1,3 +1,4 @@
+import { JSONSchema, RelationMappings } from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
 import { IAddress } from './interfaces';
@@ -16,15 +17,15 @@ export class AddressModel extends BaseModel implements IAddress {
   district!: IAddress['district'];
   postal_code!: IAddress['postal_code'];
 
-  static get tableName() {
+  static get tableName(): string {
     return `${Schema.lafiaService}.${Table.address}`;
   }
 
-  static get jsonSchema() {
+  static get jsonSchema(): JSONSchema {
     return AddressValidator;
   }
 
-  static get relationMappings() {
+  static get relationMappings(): RelationMappings {
     return {
       period: {
         relation: BaseModel.BelongsToOneRelation,
