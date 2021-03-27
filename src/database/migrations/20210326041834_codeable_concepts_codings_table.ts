@@ -17,6 +17,7 @@ export async function up(knex: Knex): Promise<void> {
                   .uuid('id')
                   .unique()
                   .notNullable()
+                  .defaultTo(knex.raw('gen_random_uuid()'))
                   .primary(`${Table.codeable_concepts_codings}_id`);
                 tableBuilder
                   .uuid('codeable_concept_id')
