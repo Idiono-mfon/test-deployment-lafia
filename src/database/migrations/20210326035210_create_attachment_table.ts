@@ -35,8 +35,8 @@ export async function up(knex: Knex): Promise<void> {
                 tableBuilder
                   .string('title');
                 tableBuilder
-                  .dateTime('creation')
-                  .defaultTo(new Date());
+                  .timestamp('creation')
+                  .defaultTo(knex.fn.now());
               });
           }
         }))
