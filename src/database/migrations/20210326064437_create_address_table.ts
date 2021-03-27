@@ -26,10 +26,19 @@ export async function up(knex: Knex): Promise<void> {
                   .enum('type', ['postal', 'physical', 'both'])
                   .notNullable();
                 tableBuilder
-                  .string('system');
+                  .text('text');
                 tableBuilder
-                  .string('value')
-                  .unique();
+                  .text('line');
+                tableBuilder
+                  .text('city');
+                tableBuilder
+                  .text('district');
+                tableBuilder
+                  .text('state');
+                tableBuilder
+                  .text('postal_code');
+                tableBuilder
+                  .text('country');
                 tableBuilder
                   .uuid('period_id')
                   .unique()
