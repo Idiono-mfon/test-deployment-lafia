@@ -49,5 +49,8 @@ module.exports = {
     '@typescript-eslint/no-var-requires': 0,
     '@typescript-eslint/no-unsafe-member-access': 0,
     '@typescript-eslint/no-unsafe-call': 0,
+    'global-require': 0,
+    '@typescript-eslint/ban-ts-comment': 0,
+    'prefer-const': 0,
   },
 };
