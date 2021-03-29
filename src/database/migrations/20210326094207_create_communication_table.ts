@@ -24,6 +24,8 @@ export async function up(knex: Knex): Promise<void> {
                   .comment('language');
                 tableBuilder
                   .boolean('preferred');
+                tableBuilder
+                  .timestamps(true, true);
 
                 // Set foreign key
                 tableBuilder

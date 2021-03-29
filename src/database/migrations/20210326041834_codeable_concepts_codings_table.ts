@@ -16,16 +16,12 @@ export async function up(knex: Knex): Promise<void> {
                 tableBuilder
                   .uuid('id')
                   .unique()
-                  .notNullable()
                   .defaultTo(knex.raw('gen_random_uuid()'))
                   .primary(`${Table.codeable_concepts_codings}_id`);
                 tableBuilder
-                  .uuid('codeable_concept_id')
-                  .notNullable();
+                  .uuid('codeable_concept_id');
                 tableBuilder
-                  .uuid('coding_id')
-                  .notNullable()
-                  .unique();
+                  .uuid('coding_id');
                 tableBuilder
                   .timestamps(true, true);
 
@@ -34,11 +30,13 @@ export async function up(knex: Knex): Promise<void> {
                 tableBuilder
                   .foreign('codeable_concept_id')
                   .references('id')
-                  .inTable(`${Schema.lafiaService}.${Table.codeable_concepts_codings}`);
+                  .inTable(`${Schema.lafiaService}.${Table.codeable_concepts}`)
+                  .onUpdate('CASCADE');
                 tableBuilder
                   .foreign('coding_id')
                   .references('id')
-                  .inTable(`${Schema.lafiaService}.${Table.codings}`);
+                  .inTable(`${Schema.lafiaService}.${Table.codings}`)
+                  .onUpdate('CASCADE');
               });
           }
         }))

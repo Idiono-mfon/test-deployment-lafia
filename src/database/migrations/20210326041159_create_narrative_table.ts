@@ -26,6 +26,8 @@ export async function up(knex: Knex): Promise<void> {
                 tableBuilder
                   .text('div')
                   .notNullable();
+                tableBuilder
+                  .timestamps(true, true);
               });
           }
         }))

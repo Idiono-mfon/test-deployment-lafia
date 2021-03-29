@@ -20,14 +20,17 @@ export async function up(knex: Knex): Promise<void> {
                   .defaultTo(knex.raw('gen_random_uuid()'))
                   .primary(`${Table.references}_id`);
                 tableBuilder
-                  .string('reference')
+                  .string('reference');
+                tableBuilder
+                  .string('type')
                   .notNullable();
                 tableBuilder
-                  .string('type');
-                tableBuilder
-                  .uuid('identifier_id');
+                  .uuid('identifier_id')
+                  .comment('identifier');
                 tableBuilder
                   .string('display');
+                tableBuilder
+                  .timestamps(true, true);
 
                 // Set foreign key
                 tableBuilder

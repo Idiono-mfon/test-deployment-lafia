@@ -43,6 +43,8 @@ export async function up(knex: Knex): Promise<void> {
                   .uuid('period_id')
                   .unique()
                   .comment('period');
+                tableBuilder
+                  .timestamps(true, true);
 
                 // Set foreign key
                 tableBuilder

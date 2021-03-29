@@ -47,6 +47,8 @@ export async function up(knex: Knex): Promise<void> {
                 tableBuilder
                   .uuid('reference_id')
                   .comment('managing_organization');
+                tableBuilder
+                  .timestamps(true, true);
 
                 // Setup foreign keys
                 tableBuilder

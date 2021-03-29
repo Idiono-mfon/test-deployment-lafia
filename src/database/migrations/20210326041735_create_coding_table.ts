@@ -29,6 +29,8 @@ export async function up(knex: Knex): Promise<void> {
                   .string('display');
                 tableBuilder
                   .boolean('user_selected');
+                tableBuilder
+                  .timestamps(true, true);
               });
           }
         }))

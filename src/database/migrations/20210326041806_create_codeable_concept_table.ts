@@ -21,6 +21,8 @@ export async function up(knex: Knex): Promise<void> {
                   .primary(`${Table.codeable_concepts}_id`);
                 tableBuilder
                   .string('text');
+                tableBuilder
+                  .timestamps(true, true);
               });
           }
         }))

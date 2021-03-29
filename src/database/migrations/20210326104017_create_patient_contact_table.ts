@@ -34,6 +34,8 @@ export async function up(knex: Knex): Promise<void> {
                 tableBuilder
                   .uuid('period_id')
                   .comment('period');
+                tableBuilder
+                  .timestamps(true, true);
               });
           }
         }))

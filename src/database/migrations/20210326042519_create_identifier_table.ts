@@ -20,7 +20,7 @@ export async function up(knex: Knex): Promise<void> {
                   .defaultTo(knex.raw('gen_random_uuid()'))
                   .primary(`${Table.identifiers}_id`);
                 tableBuilder
-                  .enum('use', ['usual', 'official', 'temp', 'secondary', 'old',])
+                  .enum('use', ['usual', 'official', 'temp', 'secondary', 'old'])
                   .notNullable();
                 tableBuilder
                   .uuid('codeable_concept_id')
@@ -32,7 +32,10 @@ export async function up(knex: Knex): Promise<void> {
                   .unique();
                 tableBuilder
                   .uuid('period_id')
+                  .comment('period')
                   .unique();
+                tableBuilder
+                  .timestamps(true, true);
 
                 // Set foreign key
                 tableBuilder
