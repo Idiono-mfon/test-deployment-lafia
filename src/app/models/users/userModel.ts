@@ -1,15 +1,13 @@
 import { Schema, Table } from '../../../database';
-// noinspection ES6PreferShortImport
-import { Model } from '../../config/db';
+import { BaseModel } from '../base';
+import { CreateUser } from './interfaces';
 
-export class UserModel extends Model {
-  id!: string;
-  first_name!: string;
-  last_name!: string;
-  email!: string;
-  password!: string;
-  created_at!: string;
-  updated_at!: string;
+export class UserModel extends BaseModel implements CreateUser {
+  id!: CreateUser['id'];
+  first_name!: CreateUser['first_name'];
+  last_name!: CreateUser['last_name'];
+  email!: CreateUser['email'];
+  password!: CreateUser['password'];
 
   static get tableName() {
     return `${Schema.lafiaService}.${Table.users}`;
