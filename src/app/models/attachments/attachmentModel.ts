@@ -2,10 +2,9 @@ import { JSONSchema } from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
 import { IAttachment } from './interfaces';
-import { attachmentValidator } from './validation';
+import { AttachmentValidation } from './validation';
 
 export class AttachmentModel extends BaseModel implements IAttachment {
-  id!: IAttachment['id'];
   url!: IAttachment['url'];
   data!: IAttachment['data'];
   hash!: IAttachment['hash'];
@@ -20,6 +19,6 @@ export class AttachmentModel extends BaseModel implements IAttachment {
   }
 
   static get jsonSchema(): JSONSchema {
-    return attachmentValidator;
+    return AttachmentValidation;
   }
 }

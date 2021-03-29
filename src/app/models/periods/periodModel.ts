@@ -2,10 +2,9 @@ import { JSONSchema, RelationMappings } from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
 import { IPeriod } from './interfaces';
-import { PeriodValidator } from './validation';
+import { PeriodValidation } from './validation';
 
 export class PeriodModel extends BaseModel implements IPeriod {
-  id!: IPeriod['id'];
   start!: IPeriod['start'];
   end!: IPeriod['end'];
 
@@ -14,7 +13,7 @@ export class PeriodModel extends BaseModel implements IPeriod {
   }
 
   static get jsonSchema(): JSONSchema {
-    return PeriodValidator;
+    return PeriodValidation;
   }
 
   static get relationMappings(): RelationMappings {
@@ -26,7 +25,43 @@ export class PeriodModel extends BaseModel implements IPeriod {
           from: `${Schema.lafiaService}.${Table.periods}.id`,
           to: `${Schema.lafiaService}.${Table.address}.period_id`
         }
-      }
+      },
+
+      contact_points: {
+        relation: BaseModel.HasOneRelation,
+        modelClass: '../contactPoints',
+        join: {
+          from: `${Schema.lafiaService}.${Table.periods}.id`,
+          to: `${Schema.lafiaService}.${Table.contact_points}.period_id`
+        }
+      },
+
+      human_name: {
+        relation: BaseModel.HasOneRelation,
+        modelClass: '../humanNames',
+        join: {
+          from: `${Schema.lafiaService}.${Table.periods}.id`,
+          to: `${Schema.lafiaService}.${Table.human_names}.period_id`
+        }
+      },
+
+      identifier: {
+        relation: BaseModel.HasOneRelation,
+        modelClass: '../identifiers',
+        join: {
+          from: `${Schema.lafiaService}.${Table.periods}.id`,
+          to: `${Schema.lafiaService}.${Table.identifiers}.period_id`
+        }
+      },
+
+      patient_contact: {
+        relation: BaseModel.HasOneRelation,
+        modelClass: '../patientContacts',
+        join: {
+          from: `${Schema.lafiaService}.${Table.periods}.id`,
+          to: `${Schema.lafiaService}.${Table.patient_contacts}.period_id`
+        }
+      },
     }
   }
 }

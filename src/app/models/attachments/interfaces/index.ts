@@ -1,5 +1,6 @@
-export interface IAttachment {
-  id?: string;
+import { IBase } from '../../base';
+
+export interface IAttachment extends IBase {
   content_type: string;
   language?: string;
   data?: Buffer;

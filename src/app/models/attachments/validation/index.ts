@@ -1,7 +1,8 @@
 import { JSONSchema } from 'objection';
 
-export const attachmentValidator: JSONSchema = {
+export const AttachmentValidation: JSONSchema = {
   type: 'object',
+  title: 'Attachment Schema Validation',
   required: ['content_type', 'creation'],
   properties: {
     content_type: { type: 'string' },

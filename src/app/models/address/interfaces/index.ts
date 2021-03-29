@@ -1,7 +1,7 @@
+import { IBase } from '../../base';
 import { IPeriod } from '../../periods';
 
-export interface IAddress {
-  id?: string;
+export interface IAddress extends IBase {
   use: string;
   type: string;
   text?: string;
