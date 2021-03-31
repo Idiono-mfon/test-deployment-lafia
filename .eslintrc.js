@@ -52,5 +52,8 @@ module.exports = {
     'global-require': 0,
     '@typescript-eslint/ban-ts-comment': 0,
     'prefer-const': 0,
+    '@typescript-eslint/restrict-plus-operands': 0,
+    'prefer-template': 0,
+    'no-underscore-dangle': 0,
   },
 };
