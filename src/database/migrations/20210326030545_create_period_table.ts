@@ -20,8 +20,7 @@ export async function up(knex: Knex): Promise<void> {
                   .defaultTo(knex.raw('gen_random_uuid()'))
                   .primary(`${Table.periods}_id`);
                 tableBuilder
-                  .dateTime('start')
-                  .notNullable();
+                  .dateTime('start');
                 tableBuilder
                   .dateTime('end');
                 tableBuilder
