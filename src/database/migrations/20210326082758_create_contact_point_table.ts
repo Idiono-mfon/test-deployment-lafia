@@ -28,8 +28,7 @@ export async function up(knex: Knex): Promise<void> {
                 tableBuilder
                   .string('value');
                 tableBuilder
-                  .enum('rank', [0, 1])
-                  .unique();
+                  .enum('rank', [0, 1]);
                 tableBuilder
                   .uuid('period_id')
                   .comment('period')
