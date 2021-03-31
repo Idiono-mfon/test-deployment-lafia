@@ -13,5 +13,5 @@ export interface IPatientContact extends IBase {
   organization?: IReference;
   period?: IPeriod;
   relationship: ICodeableConcept;
-  telecom: IContactPoint;
+  telecom: IContactPoint | IContactPoint[];
 }

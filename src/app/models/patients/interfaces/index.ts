@@ -17,7 +17,7 @@ export interface IPatient extends IBase {
   text?: INarrative;
   active: boolean;
   gender: string;
-  birth_date?: Date;
+  birth_date?: Date | string;
   deceased_boolean?: boolean;
   deceased_date_time?: Date;
   codeable_concept_id?: string;
