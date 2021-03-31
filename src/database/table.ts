@@ -9,6 +9,7 @@ export class Table {
   public static attachments = 'attachments';
   public static identifiers = 'identifiers';
   public static human_names = 'human_names';
+  public static code_systems = 'code_systems';
   public static organizations = 'organizations';
   public static patient_links = 'patient_links';
   public static communications = 'communications';
