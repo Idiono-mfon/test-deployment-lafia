@@ -10,8 +10,10 @@
     "mg:latest": "knex migrate:latest",
     "mg:up": "knex migrate:up",
     "mg:rollback": "knex migrate:rollback",
+    "mg:down": "knex migrate:down",
     "mg:make": "knex migrate:make",
     "seed:run": "knex seed:run",
+    "seed:make": "knex seed:make",
     "tsc": "tsc"
   },
   "jest": {
