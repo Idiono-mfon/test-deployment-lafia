@@ -21,4 +21,12 @@ export class CodeSystemRepository {
   public async addCodeSystem(data: ICodeSystem): Promise<ICodeSystem> {
     return CodeSystemModel.query().insertAndFetch(data);
   }
+
+  public async getCodeSystemByCode(code: string): Promise<ICodeSystem> {
+    try {
+      return CodeSystemModel.query().where({ code }).first();
+    } catch (e) {
+      throw new InternalServerError(e.message);
+    }
+  }
 }

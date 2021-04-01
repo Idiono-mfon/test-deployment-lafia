@@ -15,4 +15,8 @@ export class CodeSystemService {
   public async addCodeSystem(data: ICodeSystem): Promise<ICodeSystem> {
     return this.codeSystemRepo.addCodeSystem(data);
   }
+
+  public async getCodeSystemByCode(code: string): Promise<ICodeSystem> {
+    return this.codeSystemRepo.getCodeSystemByCode(code);
+  }
 }
