@@ -20,7 +20,7 @@ export class CodeSystemController extends BaseController {
   public async getMaritalStatus(@request() req: Request, @response() res: Response): Promise<void> {
     try {
       const type = 'marital_status';
-      const maritalStatus: ICodeSystem[] = await this.codeSystemService.getCodeSystem(type);
+      const maritalStatus: ICodeSystem[] = await this.codeSystemService.getCodeSystemByType(type);
 
       this.success(res, maritalStatus, 'Request Successful');
     } catch (e) {
@@ -32,7 +32,7 @@ export class CodeSystemController extends BaseController {
   public async getLanguages(@request() req: Request, @response() res: Response): Promise<void> {
     try {
       const type = 'language';
-      const languages: ICodeSystem[] = await this.codeSystemService.getCodeSystem(type);
+      const languages: ICodeSystem[] = await this.codeSystemService.getCodeSystemByType(type);
 
       this.success(res, languages, 'Request Successful');
     } catch (e) {
@@ -44,7 +44,7 @@ export class CodeSystemController extends BaseController {
   public async getRelationships(@request() req: Request, @response() res: Response): Promise<void> {
     try {
       const type = 'relationship';
-      const relationships: ICodeSystem[] = await this.codeSystemService.getCodeSystem(type);
+      const relationships: ICodeSystem[] = await this.codeSystemService.getCodeSystemByType(type);
 
       this.success(res, relationships, 'Request Successful');
     } catch (e) {

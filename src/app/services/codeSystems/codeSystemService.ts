@@ -8,7 +8,7 @@ export class CodeSystemService {
   @inject(TYPES.CodeSystemRepository)
   private readonly codeSystemRepo: CodeSystemRepository;
 
-  public async getCodeSystem(type: string): Promise<ICodeSystem[]> {
+  public async getCodeSystemByType(type: string): Promise<ICodeSystem[]> {
     return this.codeSystemRepo.getCodeSystemByType(type);
   }
 
