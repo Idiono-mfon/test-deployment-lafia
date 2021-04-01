@@ -4,7 +4,7 @@ import { InternalServerError } from '../../utils';
 
 @injectable()
 export class CodeSystemRepository {
-  public async getCodeSystem(codeType?: string): Promise<ICodeSystem[]> {
+  public async getCodeSystemByType(codeType: string): Promise<ICodeSystem[]> {
     try {
       let codeSystems = CodeSystemModel.query();
 
