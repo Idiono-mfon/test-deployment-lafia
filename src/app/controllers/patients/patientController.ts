@@ -24,7 +24,7 @@ export class PatientController extends BaseController {
 
       this.success(res, patient, 'Patient registration successful', HttpStatusCode.CREATED);
     } catch (e) {
-      this.error(res, e.code, e.message);
+      this.error(res, e);
     }
   }
 }
