@@ -2,13 +2,14 @@ import { Request, Response } from 'express';
 import { inject } from 'inversify';
 import {
   controller,
-  httpGet,
+  httpGet, httpPost,
   request,
   response
 } from 'inversify-express-utils';
 import TYPES from '../../config/types';
 import { ICodeSystem } from '../../models/codeSystems';
 import { CodeSystemService } from '../../services/codeSystems';
+import { HttpStatusCode } from '../../utils';
 import { BaseController } from '../baseController';
 
 @controller('/systems')
@@ -23,7 +24,7 @@ export class CodeSystemController extends BaseController {
       const maritalStatus: ICodeSystem[] = await this.codeSystemService.getCodeSystemByType(type);
 
       this.success(res, maritalStatus, 'Request Successful');
-    } catch (e) {
+    } catch(e) {
       this.error(res, e);
     }
   }
@@ -35,7 +36,7 @@ export class CodeSystemController extends BaseController {
       const languages: ICodeSystem[] = await this.codeSystemService.getCodeSystemByType(type);
 
       this.success(res, languages, 'Request Successful');
-    } catch (e) {
+    } catch(e) {
       this.error(res, e);
     }
   }
@@ -47,7 +48,19 @@ export class CodeSystemController extends BaseController {
       const relationships: ICodeSystem[] = await this.codeSystemService.getCodeSystemByType(type);
 
       this.success(res, relationships, 'Request Successful');
-    } catch (e) {
+    } catch(e) {
+      this.error(res, e);
+    }
+  }
+
+  @httpPost('/systems')
+  public async addCodeSystem(@request() req: Request, @response() res: Response): Promise<void> {
+    try {
+      const data: ICodeSystem = req.body;
+      const codeSystem: ICodeSystem = await this.codeSystemService.addCodeSystem(data);
+
+      this.success(res, codeSystem, 'Code system successfully added', HttpStatusCode.CREATED);
+    } catch(e) {
       this.error(res, e);
     }
   }
