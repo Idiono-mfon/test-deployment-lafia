@@ -1,14 +1,17 @@
 import { Container } from 'inversify';
 import 'reflect-metadata';
-import { HealthController } from '../controllers';
+import { HealthController, PatientController } from '../controllers';
+import { CodeSystemController } from '../controllers/codeSystems';
 import {
   UserRepository,
   PatientRepository
 } from '../repository';
+import { CodeSystemRepository } from '../repository/codeSystems';
 import {
   UserService,
   PatientService
 } from '../services';
+import { CodeSystemService } from '../services/codeSystems';
 import TYPES from './types';
 
 const container = new Container();
@@ -17,6 +20,14 @@ const container = new Container();
 container
   .bind<HealthController>(TYPES.HealthController)
   .to(HealthController)
+  .inSingletonScope();
+container
+  .bind<PatientController>(TYPES.PatientController)
+  .to(PatientController)
+  .inSingletonScope();
+container
+  .bind<CodeSystemController>(TYPES.CodeSystemController)
+  .to(CodeSystemController)
   .inSingletonScope();
 
 // services
@@ -28,6 +39,10 @@ container
   .bind<PatientService>(TYPES.PatientService)
   .to(PatientService)
   .inSingletonScope();
+container
+  .bind<CodeSystemService>(TYPES.CodeSystemService)
+  .to(CodeSystemService)
+  .inSingletonScope();
 
 // repositories
 container
@@ -37,6 +52,10 @@ container
 container
   .bind<PatientRepository>(TYPES.PatientRepository)
   .to(PatientRepository)
+  .inSingletonScope();
+container
+  .bind<CodeSystemRepository>(TYPES.CodeSystemRepository)
+  .to(CodeSystemRepository)
   .inSingletonScope();
 
 export default container;
