@@ -1,80 +1,124 @@
 import { inject, injectable } from 'inversify';
 import _ from 'lodash';
 import TYPES from '../../config/types';
-import { IAddress } from '../../models/address';
-import { ICodeableConcept } from '../../models/codeableConcepts';
+import { ICodeSystem, ICodeType } from '../../models/codeSystems';
 import { ICoding } from '../../models/codings';
-import { ICommunication } from '../../models/communications';
-import { IContactPoint } from '../../models/contactPoints';
-import { IHumanName } from '../../models/humanNames';
-import { IPatientContact } from '../../models/patientContacts';
-import { IPatient } from '../../models/patients';
 import { IPeriod } from '../../models/periods';
+import { IAddress } from '../../models/address';
+import { IPatient } from '../../models/patients';
+import { CodeSystemService } from '../codeSystems';
+import { IHumanName } from '../../models/humanNames';
 import { PatientRepository } from '../../repository';
-import { InternalServerError } from '../../utils';
+import { IContactPoint } from '../../models/contactPoints';
+import { ICommunication } from '../../models/communications';
+import { IPatientContact } from '../../models/patientContacts';
+import { ICodeableConcept } from '../../models/codeableConcepts';
+import {
+  codeType,
+  error, forWho, GenericResponseError,
+  InternalServerError, throwError
+} from '../../utils';
+
+const { badRequest } = error;
 
 @injectable()
 export class PatientService {
   @inject(TYPES.PatientRepository)
   private readonly patientRepo: PatientRepository;
 
-  private static extractHumanName(data: any, type: string): IHumanName {
-    const firstName = `${type}_first_name`;
-    const lastName = `${type}_last_name`;
-    const otherName = `${type}_other_name`;
-    const nameSince = `${type}_name_since`;
-    const namePrefix = `${type}_name_prefix`;
-    const nameUse = `${type}_name_use`;
-    const dob = `${type}_date_of_birth`;
-    const DEFAULT_NAME_USE = 'official';
+  @inject(TYPES.CodeSystemService)
+  private readonly codeSystemService: CodeSystemService;
 
-    const nameExtract = _.pick(data,
-      [
-        firstName,
-        lastName,
-        otherName,
-        nameSince,
-        namePrefix,
-        nameUse,
-        dob
-      ]
-    );
-
-    const givenName = [nameExtract[firstName]];
-
-    if (nameExtract[otherName]) {
-      givenName.push(nameExtract[otherName]);
-    }
-
-    const fullName = nameExtract[firstName] + ' ' +
-      nameExtract[lastName] + ' ' + nameExtract[otherName];
-
-    return {
-      use: nameExtract[nameUse] ?? DEFAULT_NAME_USE,
-      text: fullName,
-      family: nameExtract[lastName],
-      given: givenName,
-      prefix: [nameExtract[namePrefix]],
-      period: {
-        start: nameExtract[nameSince] ?
-          new Date(nameExtract[nameSince]) :
-          new Date(nameExtract[dob]),
+  private static extractDateOfBirth(data: any): string {
+    const patientDateOfBirth: any = data.patient_date_of_birth;
+    try {
+      if (!patientDateOfBirth) {
+        throwError('Provide a valid value for dateOfBirth', badRequest);
       }
-    };
+
+      const newDate = new Date(patientDateOfBirth);
+      const year = newDate.getFullYear();
+      let month: string | number = newDate.getMonth() + 1;
+      const day = newDate.getDate();
+
+      month = month < 10 ? `0${month}` : month;
+
+      return `${year}-${month}-${day}`;
+    } catch(e) {
+      throw new GenericResponseError(e.message, e.code);
+    }
   }
 
-  private static extractAddress(data: any, type: string): IAddress {
-    const country = `${type}_country`;
-    const city = `${type}_city`;
-    const state = `${type}_state`;
-    const postalCode = `${type}_postal_code`;
-    const addressType = `${type}_address_type`;
-    const addressUse = `${type}_address_use`;
-    const addressSince = `${type}_address_since`;
+  private static extractName(data: any, forWho: string): IHumanName {
+    try {
+      const firstName = `${forWho}_first_name`;
+      const lastName = `${forWho}_last_name`;
+      const otherName = `${forWho}_other_name`;
+      const nameSince = `${forWho}_name_since`;
+      const namePrefix = `${forWho}_name_prefix`;
+      const nameUse = `${forWho}_name_use`;
+      const DEFAULT_NAME_USE = 'official';
+      const dob = PatientService.extractDateOfBirth(data);
+
+      if (!firstName || !lastName) {
+        throwError('first_name and last_name fields are required', badRequest);
+      }
+
+      if (!dob) {
+        throwError('date_of_birth is required', badRequest);
+      }
+
+      const nameExtract = _.pick(data,
+        [
+          firstName,
+          lastName,
+          otherName,
+          nameSince,
+          namePrefix,
+          nameUse,
+          dob
+        ]
+      );
+
+      const givenName = [nameExtract[firstName]];
+
+      if (nameExtract[otherName]) {
+        givenName.push(nameExtract[otherName]);
+      }
+
+      const fullName = nameExtract[firstName] + ' ' +
+        nameExtract[lastName] + ' ' + nameExtract[otherName];
+
+      return {
+        use: nameExtract[nameUse] ?? DEFAULT_NAME_USE,
+        text: fullName,
+        family: nameExtract[lastName],
+        given: givenName,
+        prefix: [nameExtract[namePrefix]],
+        period: {
+          start: nameExtract[nameSince] ?
+            new Date(nameExtract[nameSince]) :
+            new Date(nameExtract[dob]),
+        }
+      };
+    } catch(e) {
+      throw new GenericResponseError(e.message, e.code);
+    }
+  }
+
+  private static extractAddress(data: any, forWho: string): IAddress {
+    const country = `${forWho}_country`;
+    const city = `${forWho}_city`;
+    const state = `${forWho}_state`;
+    const postalCode = `${forWho}_postal_code`;
+    const addressType = `${forWho}_address_type`;
+    const addressUse = `${forWho}_address_use`;
+    const addressSince = `${forWho}_address_since`;
+    const address = `${forWho}_address`;
 
     const addressExtract = _.pick(data,
       [
-        country, city, state,
+        country, city, state, address,
         postalCode, addressType,
         addressUse, addressSince
       ]
@@ -95,101 +139,106 @@ export class PatientService {
       state: addressExtract[state],
       postal_code: addressExtract[postalCode],
       country: addressExtract[country],
+      text: addressExtract[address],
       period
     };
   }
 
-  private static extractCoding(): ICoding | any {
-    const maritalStatus: ICoding = {
-      system: 'http://terminology.hl7.org/CodeSystem/v3-MaritalStatus',
-      version: '4.0.1',
-      code: 'M',
-      display: 'Married',
-      user_selected: false,
-    };
+  private async getCoding(code: string): Promise<ICoding> {
+    try {
+      const codeSystem: ICodeSystem = await this.codeSystemService.getCodeSystemByCode(code);
 
-    const language: ICoding = {
-      system: 'urn:ietf:bcp:47',
-      version: '4.0.1',
-      code: 'en',
-      display: 'English',
-      user_selected: false,
-    };
+      if (!codeSystem) {
+        throwError('Provide the correct code for ', badRequest);
+      }
 
-    const relationship: ICoding = {
-      system: 'http://hl7.org/fhir/relationship',
-      version: '4.0.1',
-      code: '1',
-      display: 'Self',
-      user_selected: false,
-    };
+      const { code: systemCode, system, display } = codeSystem;
 
-    return {
-      maritalStatus,
-      language,
-      relationship,
-    };
-
+      return {
+        code: systemCode,
+        system,
+        display
+      }
+    } catch(e) {
+      throw new GenericResponseError(e.message, e.code);
+    }
   }
 
-  private static extractCodeableConcept(data: any, type: string): ICodeableConcept {
-    const coding = PatientService.extractCoding();
-    return {
-      coding: coding[type],
-      text: coding[type].display,
-    };
+  private async extractCodeableConcept(data: any, forWho: string, codeType: string): Promise<ICodeableConcept> {
+    try {
+      const code = data[`${forWho}_${codeType}`];
+      const coding = await this.getCoding(code);
+      return {
+        coding: [coding],
+        text: coding.display,
+      };
+    } catch(e) {
+      throw new GenericResponseError(e.message + codeType, e.code);
+    }
   }
 
-  private static extractContactPoint(data: any, type: string): IContactPoint[] {
-    const phone = data[`${type}_phone`];
-    const email = data[`${type}_email`];
+  private static extractContactPoint(data: any, forWho: string): IContactPoint[] {
+    try {
+      const phone = data[`${forWho}_phone`];
+      const email = data[`${forWho}_email`];
+      const use = data[`${forWho}_use`];
 
-    return [
-      {
-        system: 'phone',
-        use: 'mobile',
-        rank: 1,
-        value: phone
-      },
-      {
-        system: 'email',
-        use: 'home',
-        rank: 0,
-        value: email
-      },
-    ];
+      if (!phone) {
+        throwError('Phone fields are required', badRequest);
+      }
+
+      if (!email) {
+        throwError('Email fields are required', badRequest);
+      }
+
+      return [
+        {
+          system: 'phone',
+          use: use ?? 'mobile',
+          rank: 1,
+          value: phone
+        },
+        {
+          system: 'email',
+          use: use ?? 'home',
+          rank: 0,
+          value: email
+        },
+      ];
+    } catch (e) {
+      throw new GenericResponseError(e.message, e.code);
+    }
   }
 
-  private static extractDateOfBirth(data: any): string {
-    const newDate = new Date(data.patient_date_of_birth);
-    const year = newDate.getFullYear();
-    let month: string | number = newDate.getMonth() + 1;
-    const day = newDate.getDate();
+  private async getContact(data: any, forWho: string, codeType: ICodeType): Promise<IPatientContact> {
+    try {
+      const relationship: ICodeableConcept = await this.extractCodeableConcept(data, forWho, codeType.relationship);
+      const name: IHumanName = PatientService.extractName(data, forWho);
+      const telecom: IContactPoint[] = PatientService.extractContactPoint(data, forWho);
+      const address: IAddress = PatientService.extractAddress(data, forWho);
+      const gender: string = data[`${forWho}_gender`];
 
-    month = month < 10 ? `0${month}` : month;
-
-    return `${year}-${month}-${day}`;
-
+      return {
+        relationship,
+        name,
+        telecom,
+        address,
+        gender,
+      }
+    } catch(e) {
+      throw new GenericResponseError(e.message, e.code);
+    }
   }
-
-  // private getContact(data: any): IPatientContact {
-  //
-  // }
 
   public async registerPatient(data: any): Promise<IPatient> {
     try {
-      const patientName = PatientService.extractHumanName(data, 'patient');
-      const patientAddress = PatientService.extractAddress(data, 'patient');
-      const patientContact: IPatientContact = {
-        name: PatientService.extractHumanName(data, 'patient_ref'),
-        address: PatientService.extractAddress(data, 'patient_ref'),
-        relationship: PatientService.extractCodeableConcept(data, 'relationship'),
-        gender: data.patient_ref_gender,
-        telecom: PatientService.extractContactPoint(data, 'patient_ref'),
-      }
-
+      const dob = PatientService.extractDateOfBirth(data);
+      const maritalStatus: ICodeableConcept = await this.extractCodeableConcept(data, forWho.patient, codeType.maritalStatus);
+      const patientName = PatientService.extractName(data, forWho.patient);
+      const patientAddress = PatientService.extractAddress(data, forWho.patient);
+      const patientContact: IPatientContact = await this.getContact(data, forWho.patientContact, codeType)
       const patientCommunication: ICommunication = {
-        language: PatientService.extractCodeableConcept(data, 'language'),
+        language: await this.extractCodeableConcept(data, forWho.patient, codeType.language),
         preferred: true
       }
 
@@ -197,7 +246,8 @@ export class PatientService {
         active: true,
         resource_type: 'Patient',
         gender: data.patient_gender,
-        birth_date: PatientService.extractDateOfBirth(data),
+        birth_date: dob,
+        marital_status: maritalStatus,
         name: patientName,
         address: patientAddress,
         contact: patientContact,

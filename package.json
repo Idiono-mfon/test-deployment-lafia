@@ -9,7 +9,7 @@
     "test": "NODE_ENV=test jest --config jest.config.js",
     "mg:latest": "knex migrate:latest",
     "mg:up": "knex migrate:up",
-    "mg:rollback": "knex migrate:rollback",
+    "mg:rollback": "knex migrate:rollback --all",
     "mg:down": "knex migrate:down",
     "mg:make": "knex migrate:make",
     "seed:run": "knex seed:run",

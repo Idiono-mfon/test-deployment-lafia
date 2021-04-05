@@ -34,7 +34,8 @@ export async function up(knex: Knex): Promise<void> {
                 tableBuilder
                   .date('birth_date');
                 tableBuilder
-                  .boolean('deceased_boolean');
+                  .boolean('deceased_boolean')
+                  .defaultTo(false);
                 tableBuilder
                   .dateTime('deceased_date_time');
                 tableBuilder

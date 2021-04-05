@@ -6,3 +6,9 @@ export interface ICodeSystem extends IBase {
   display?: string;
   type: string;
 }
+
+export interface ICodeType {
+  relationship: string,
+  language: string,
+  maritalStatus: string,
+}
