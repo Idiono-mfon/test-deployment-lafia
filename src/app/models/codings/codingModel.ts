@@ -1,4 +1,9 @@
-import { JSONSchema, RelationMappings } from 'objection';
+import {
+  JSONSchema,
+  Modifiers,
+  QueryBuilder,
+  RelationMappings
+} from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
 import { ICoding } from './interfaces';
@@ -17,6 +22,20 @@ export class CodingModel extends BaseModel implements ICoding {
 
   static get jsonSchema(): JSONSchema {
     return CodingValidation;
+  }
+
+  static get modifiers(): Modifiers {
+    return {
+      defaultSelects(builder: QueryBuilder<any, any[]>) {
+        builder.select(
+          'system',
+          'version',
+          'code',
+          'display',
+          'user_selected'
+        );
+      }
+    }
   }
 
   static get relationMappings(): RelationMappings {

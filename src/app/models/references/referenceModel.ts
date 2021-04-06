@@ -1,4 +1,9 @@
-import { JSONSchema, RelationMappings } from 'objection';
+import {
+  JSONSchema,
+  Modifiers,
+  QueryBuilder,
+  RelationMappings
+} from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
 import { IReference } from './interfaces';
@@ -16,6 +21,14 @@ export class ReferenceModel extends BaseModel implements IReference {
 
   static get jsonSchema(): JSONSchema {
     return ReferenceValidation;
+  }
+
+  static get modifiers(): Modifiers {
+    return {
+      defaultSelects(builder: QueryBuilder<any, any[]>) {
+        builder.select('reference', 'type', 'display');
+      }
+    }
   }
 
   static get relationMappings(): RelationMappings {

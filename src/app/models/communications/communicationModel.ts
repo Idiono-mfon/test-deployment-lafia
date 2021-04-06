@@ -1,4 +1,9 @@
-import { JSONSchema, RelationMappings } from 'objection';
+import {
+  JSONSchema,
+  Modifiers,
+  QueryBuilder,
+  RelationMappings
+} from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
 import { ICommunication } from './interfaces';
@@ -14,6 +19,14 @@ export class CommunicationModel extends BaseModel implements ICommunication {
 
   static get jsonSchema(): JSONSchema {
     return CommunicationValidation;
+  }
+
+  static get modifiers(): Modifiers {
+    return {
+      defaultSelects(builder: QueryBuilder<any, any[]>) {
+        builder.select('preferred');
+      }
+    }
   }
 
   static get relationMappings(): RelationMappings {

@@ -1,4 +1,9 @@
-import { JSONSchema, RelationMappings } from 'objection';
+import {
+  JSONSchema,
+  Modifiers,
+  QueryBuilder,
+  RelationMappings
+} from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
 import { IPatientLink } from './interfaces';
@@ -14,6 +19,14 @@ export class PatientLinkModel extends BaseModel implements IPatientLink {
 
   static get jsonSchema(): JSONSchema {
     return PatientLinkValidation;
+  }
+
+  static get modifiers(): Modifiers {
+    return {
+      defaultSelects(builder: QueryBuilder<any, any[]>) {
+        builder.select('type');
+      }
+    }
   }
 
   static get relationMappings(): RelationMappings {

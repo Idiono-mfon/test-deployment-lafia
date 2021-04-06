@@ -1,4 +1,9 @@
-import { JSONSchema, RelationMappings } from 'objection';
+import {
+  JSONSchema,
+  Modifiers,
+  QueryBuilder,
+  RelationMappings
+} from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
 import { IAddress } from './interfaces';
@@ -22,6 +27,24 @@ export class AddressModel extends BaseModel implements IAddress {
 
   static get jsonSchema(): JSONSchema {
     return AddressValidation;
+  }
+
+  static get modifiers(): Modifiers {
+    return {
+      defaultSelects(builder: QueryBuilder<any, any[]>) {
+        builder.select(
+          'use',
+          'type',
+          'text',
+          'line',
+          'city',
+          'district',
+          'state',
+          'postal_code',
+          'country',
+        );
+      }
+    }
   }
 
   static get relationMappings(): RelationMappings {

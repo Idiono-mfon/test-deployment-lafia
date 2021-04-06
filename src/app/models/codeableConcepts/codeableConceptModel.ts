@@ -1,4 +1,9 @@
-import { JSONSchema, RelationMappings } from 'objection';
+import {
+  JSONSchema,
+  Modifiers,
+  QueryBuilder,
+  RelationMappings
+} from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
 import { ICodeableConcept } from './interfaces';
@@ -14,6 +19,14 @@ export class CodeableConceptModel extends BaseModel implements ICodeableConcept 
 
   static get jsonSchema(): JSONSchema {
     return CodeableConceptValidation;
+  }
+
+  static get modifiers(): Modifiers {
+    return {
+      defaultSelects(builder: QueryBuilder<any, any[]>) {
+        builder.select('text');
+      }
+    }
   }
 
   static get relationMappings(): RelationMappings {

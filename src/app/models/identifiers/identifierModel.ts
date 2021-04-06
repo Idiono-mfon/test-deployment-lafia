@@ -1,4 +1,9 @@
-import { JSONSchema, RelationMappings } from 'objection';
+import {
+  JSONSchema,
+  Modifiers,
+  QueryBuilder,
+  RelationMappings
+} from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
 import { IIdentifier } from './interfaces';
@@ -18,6 +23,14 @@ export class IdentifierModel extends BaseModel implements IIdentifier {
 
   static get jsonSchema(): JSONSchema {
     return IdentifierValidation;
+  }
+
+  static get modifiers(): Modifiers {
+    return {
+      defaultSelects(builder: QueryBuilder<any, any[]>) {
+        builder.select('use', 'value', 'system');
+      }
+    }
   }
 
   static get relationMappings(): RelationMappings {

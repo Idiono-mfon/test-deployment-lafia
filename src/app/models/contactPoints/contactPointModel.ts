@@ -1,4 +1,9 @@
-import { JSONSchema, RelationMappings } from 'objection';
+import {
+  JSONSchema,
+  Modifiers,
+  QueryBuilder,
+  RelationMappings
+} from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
 import { IContactPoint } from './interfaces';
@@ -17,6 +22,14 @@ export class ContactPointModel extends BaseModel implements IContactPoint {
 
   static get jsonSchema(): JSONSchema {
     return ContactPointValidation;
+  }
+
+  static get modifiers(): Modifiers {
+    return {
+      defaultSelects(builder: QueryBuilder<any, any[]>) {
+        builder.select('use', 'rank', 'system', 'value');
+      }
+    }
   }
 
   static get relationMappings(): RelationMappings {

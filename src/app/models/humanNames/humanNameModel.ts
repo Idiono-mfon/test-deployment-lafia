@@ -1,4 +1,9 @@
-import { JSONSchema, RelationMappings } from 'objection';
+import {
+  JSONSchema,
+  Modifiers,
+  QueryBuilder,
+  RelationMappings
+} from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
 import { IHumanName } from './interfaces';
@@ -19,6 +24,21 @@ export class HumanNameModel extends BaseModel implements IHumanName {
 
   static get jsonSchema(): JSONSchema {
     return HumanNameValidation;
+  }
+
+  static get modifiers(): Modifiers {
+    return {
+      defaultSelects(builder: QueryBuilder<any, any[]>) {
+        builder.select(
+          'use',
+          'text',
+          'given',
+          'family',
+          'prefix',
+          'suffix'
+        );
+      }
+    }
   }
 
   static get relationMappings(): RelationMappings {

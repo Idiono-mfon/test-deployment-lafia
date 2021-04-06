@@ -1,4 +1,9 @@
-import { JSONSchema, RelationMappings } from 'objection';
+import {
+  JSONSchema,
+  Modifiers,
+  QueryBuilder,
+  RelationMappings
+} from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
 import { IPatient } from './interfaces';
@@ -37,6 +42,23 @@ export class PatientModel extends BaseModel implements IPatient {
     return PatientValidation;
   }
 
+  static get modifiers(): Modifiers {
+    return {
+      defaultSelects(builder: QueryBuilder<any, any[]>) {
+        builder.select(
+          'resource_type',
+          'active',
+          'gender',
+          'birth_date',
+          'deceased_boolean',
+          'deceased_date_time',
+          'multiple_birth_boolean',
+          'multiple_birth_integer'
+        );
+      }
+    }
+  }
+
   static get relationMappings(): RelationMappings {
     return {
       text: {
@@ -72,9 +94,9 @@ export class PatientModel extends BaseModel implements IPatient {
         join: {
           from: `${Schema.lafiaService}.${Table.patients}.id`,
           through: {
-            modelClass: '../patientsReferences',
-            from: `${Schema.lafiaService}.${Table.patients_references}.patient_id`,
-            to: `${Schema.lafiaService}.${Table.patients_references}.identifier_id`
+            modelClass: '../patientsIdentifiers',
+            from: `${Schema.lafiaService}.${Table.patients_identifiers}.patient_id`,
+            to: `${Schema.lafiaService}.${Table.patients_identifiers}.identifier_id`
           },
           to: `${Schema.lafiaService}.${Table.identifiers}.id`
         }
@@ -130,7 +152,7 @@ export class PatientModel extends BaseModel implements IPatient {
           through: {
             modelClass: '../patientsAttachments',
             from: `${Schema.lafiaService}.${Table.patients_attachments}.patient_id`,
-            to: `${Schema.lafiaService}.${Table.patients_attachments}.attachments_id`
+            to: `${Schema.lafiaService}.${Table.patients_attachments}.attachment_id`
           },
           to: `${Schema.lafiaService}.${Table.attachments}.id`
         }

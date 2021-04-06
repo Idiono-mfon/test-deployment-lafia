@@ -1,4 +1,9 @@
-import { JSONSchema, RelationMappings } from 'objection';
+import {
+  JSONSchema,
+  Modifiers,
+  QueryBuilder,
+  RelationMappings
+} from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
 import { IPeriod } from './interfaces';
@@ -14,6 +19,14 @@ export class PeriodModel extends BaseModel implements IPeriod {
 
   static get jsonSchema(): JSONSchema {
     return PeriodValidation;
+  }
+
+  static get modifiers(): Modifiers {
+    return {
+      defaultSelects(builder: QueryBuilder<any, any[]>) {
+        builder.select('start', 'end');
+      }
+    }
   }
 
   static get relationMappings(): RelationMappings {
