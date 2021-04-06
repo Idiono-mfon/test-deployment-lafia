@@ -28,10 +28,10 @@ export interface IPatient extends IBase {
   managing_organization?: IReference;
   identifier?: IIdentifier;
   name?: IHumanName;
-  telecom?: IContactPoint;
+  telecom?: IContactPoint | IContactPoint[];
   address?: IAddress;
   photo?: IAttachment;
-  contact: IPatientContact;
+  contact: IPatientContact | IPatientContact[];
   communication?: ICommunication;
   general_practitioner?: IReference;
   link?: IPatientLink;
