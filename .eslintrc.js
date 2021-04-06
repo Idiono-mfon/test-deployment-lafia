@@ -55,5 +55,9 @@ module.exports = {
     '@typescript-eslint/restrict-plus-operands': 0,
     'prefer-template': 0,
     'no-underscore-dangle': 0,
+    '@typescript-eslint/no-floating-promises': 0,
+    'no-plusplus': 0,
+    'no-restricted-syntax': 0,
+    'no-await-in-loop': 0,
   },
 };
