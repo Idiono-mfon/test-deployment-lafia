@@ -46,6 +46,7 @@ export class PatientModel extends BaseModel implements IPatient {
     return {
       defaultSelects(builder: QueryBuilder<any, any[]>) {
         builder.select(
+          'id',
           'resource_type',
           'active',
           'gender',

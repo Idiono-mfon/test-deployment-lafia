@@ -21,7 +21,11 @@ export class CodeSystemModel extends BaseModel implements ICodeSystem {
   static get modifiers(): Modifiers {
     return {
       defaultSelects(builder: QueryBuilder<any, any[]>) {
-        builder.select('code', 'display', 'system');
+        builder.select(
+          'code',
+          'display',
+          'system'
+        );
       }
     }
   }

@@ -6,7 +6,8 @@ import { InternalServerError } from '../../utils';
 export class CodeSystemRepository {
   public async getCodeSystemByType(codeType: string): Promise<ICodeSystem[]> {
     try {
-      let codeSystems = CodeSystemModel.query();
+      let codeSystems = CodeSystemModel.query()
+        .modify('defaultSelects');
 
       if (codeType) {
         codeSystems = codeSystems.where({ type: codeType });
@@ -24,7 +25,10 @@ export class CodeSystemRepository {
 
   public async getCodeSystemByCode(code: string): Promise<ICodeSystem> {
     try {
-      return CodeSystemModel.query().where({ code }).first();
+      return CodeSystemModel.query()
+        .modify('defaultSelects')
+        .where({ code })
+        .first();
     } catch (e) {
       throw new InternalServerError(e.message);
     }
