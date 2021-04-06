@@ -4,9 +4,10 @@ import {
   controller,
   httpPost,
   response,
-  request
+  request, httpGet
 } from 'inversify-express-utils';
 import TYPES from '../../config/types';
+import { IPatient } from '../../models/patients';
 import { PatientService } from '../../services';
 import { HttpStatusCode } from '../../utils';
 import { BaseController } from '../baseController';
@@ -24,6 +25,18 @@ export class PatientController extends BaseController {
 
       this.success(res, patient, 'Patient registration successful', HttpStatusCode.CREATED);
     } catch (e) {
+      this.error(res, e);
+    }
+  }
+
+  @httpGet('/:id')
+  public async findPatientById(@request() req: Request, @response() res: Response) {
+    try {
+      const { id } = req.params;
+      const patient: IPatient = await this.patientService.findPatientById(id);
+
+      this.success(res, patient, 'Request completed');
+    } catch(e) {
       this.error(res, e);
     }
   }

@@ -241,6 +241,7 @@ export class PatientService {
         language: await this.extractCodeableConcept(data, forWho.patient, codeType.language),
         preferred: true
       }
+      const telecom: IContactPoint[] = PatientService.extractContactPoint(data, forWho.patient);
 
       const patient: IPatient = {
         active: true,
@@ -250,6 +251,7 @@ export class PatientService {
         marital_status: maritalStatus,
         name: patientName,
         address: patientAddress,
+        telecom,
         contact: patientContact,
         communication: patientCommunication
       };
@@ -260,5 +262,9 @@ export class PatientService {
     } catch (e) {
       throw new InternalServerError(e.message);
     }
+  }
+
+  public async findPatientById(id: string): Promise<IPatient> {
+    return this.patientRepo.findPatientById(id);
   }
 }
