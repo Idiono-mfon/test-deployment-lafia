@@ -21,10 +21,23 @@ export class BaseModel extends Model implements IBase {
   created_at!: IBase['created_at'];
   updated_at!: IBase['updated_at'];
 
+  // Set timestamps before creating new data in the db
+  $beforeInsert() {
+    this.created_at = new Date();
+    this.updated_at = new Date();
+  }
+
+  // Update the updated_at timestamp for the affected rows
+  $beforeUpdate() {
+    this.updated_at = new Date();
+  }
+
+  // Set the default path for all the models
   static get modelPaths(): string[] {
     return [__dirname];
   }
 
+  // Convert column properties from snake_case to camelCase
   static get columnNameMappers() {
     return snakeCaseMappers();
   }
