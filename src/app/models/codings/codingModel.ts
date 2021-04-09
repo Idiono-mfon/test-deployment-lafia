@@ -1,7 +1,5 @@
 import {
   JSONSchema,
-  Modifiers,
-  QueryBuilder,
   RelationMappings
 } from 'objection';
 import { Schema, Table } from '../../../database';
@@ -24,23 +22,13 @@ export class CodingModel extends BaseModel implements ICoding {
     return CodingValidation;
   }
 
-  static get modifiers(): Modifiers {
-    return {
-      defaultSelects(builder: QueryBuilder<any, any[]>) {
-        builder.select(
-          'system',
-          'version',
-          'code',
-          'display',
-          'user_selected'
-        );
-      }
-    }
+  static get hidden(): string[] {
+    return ['updatedAt', 'createdAt'];
   }
 
   static get relationMappings(): RelationMappings {
     return {
-      codeable_concept: {
+      codeableConcept: {
         relation: BaseModel.ManyToManyRelation,
         modelClass: '../codeableConcepts',
         join: {

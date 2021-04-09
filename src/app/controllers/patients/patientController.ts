@@ -4,7 +4,7 @@ import {
   controller,
   httpPost,
   response,
-  request, httpGet
+  request, httpGet, httpPut
 } from 'inversify-express-utils';
 import TYPES from '../../config/types';
 import { IPatient } from '../../models/patients';
@@ -17,13 +17,17 @@ export class PatientController extends BaseController {
   @inject(TYPES.PatientService)
   private readonly patientService: PatientService;
 
-  @httpPost('')
-  public async registerPatient(@request() req: Request, @response() res: Response) {
+  @httpPut(':id')
+  public async updatePatient(@request() req: Request, @response() res: Response) {
     try {
-      console.log('Hello Patient')
-      const patient = await this.patientService.registerPatient(req.body);
+      const { id: patientId } = req.params;
+      const patientData: IPatient = req.body;
 
-      this.success(res, patient, 'Patient registration successful', HttpStatusCode.CREATED);
+      patientData.id = patientId;
+
+      const patient = await this.patientService.updatePatient(patientData);
+
+      this.success(res, patient, 'Patient profile successfully updated');
     } catch (e) {
       this.error(res, e);
     }
@@ -36,6 +40,18 @@ export class PatientController extends BaseController {
       const patient: IPatient = await this.patientService.findPatientById(id);
 
       this.success(res, patient, 'Request completed');
+    } catch(e) {
+      this.error(res, e);
+    }
+  }
+
+  @httpPost('')
+  public async createPatient(@request() req: Request, @response() res: Response) {
+    try {
+      const patientData: any = req.body;
+      const patient: IPatient = await this.patientService.createPatient(patientData);
+
+      this.success(res, patient, 'Patient registration successful', HttpStatusCode.CREATED);
     } catch(e) {
       this.error(res, e);
     }

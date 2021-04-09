@@ -1,7 +1,5 @@
 import {
   JSONSchema,
-  Modifiers,
-  QueryBuilder,
   RelationMappings
 } from 'objection';
 import { Schema, Table } from '../../../database';
@@ -26,19 +24,8 @@ export class HumanNameModel extends BaseModel implements IHumanName {
     return HumanNameValidation;
   }
 
-  static get modifiers(): Modifiers {
-    return {
-      defaultSelects(builder: QueryBuilder<any, any[]>) {
-        builder.select(
-          'use',
-          'text',
-          'given',
-          'family',
-          'prefix',
-          'suffix'
-        );
-      }
-    }
+  static get hidden(): string[] {
+    return ['updatedAt', 'createdAt', 'periodId'];
   }
 
   static get relationMappings(): RelationMappings {
@@ -52,7 +39,7 @@ export class HumanNameModel extends BaseModel implements IHumanName {
         }
       },
 
-      patient_contact: {
+      patientContact: {
         relation: BaseModel.HasOneRelation,
         modelClass: '../patientContacts',
         join: {

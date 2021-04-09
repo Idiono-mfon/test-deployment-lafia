@@ -44,7 +44,7 @@ export class PatientService {
       month = month < 10 ? `0${month}` : month;
 
       return `${year}-${month}-${day}`;
-    } catch(e) {
+    } catch (e) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
@@ -101,7 +101,7 @@ export class PatientService {
             new Date(nameExtract[dob]),
         }
       };
-    } catch(e) {
+    } catch (e) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
@@ -158,8 +158,8 @@ export class PatientService {
         code: systemCode,
         system,
         display
-      }
-    } catch(e) {
+      };
+    } catch (e) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
@@ -172,7 +172,7 @@ export class PatientService {
         coding: [coding],
         text: coding.display,
       };
-    } catch(e) {
+    } catch (e) {
       throw new GenericResponseError(e.message + codeType, e.code);
     }
   }
@@ -224,23 +224,23 @@ export class PatientService {
         telecom,
         address,
         gender,
-      }
-    } catch(e) {
+      };
+    } catch (e) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
 
-  public async registerPatient(data: any): Promise<IPatient> {
+  public async updatePatient(data: any): Promise<IPatient> {
     try {
       const dob = PatientService.extractDateOfBirth(data);
       const maritalStatus: ICodeableConcept = await this.extractCodeableConcept(data, forWho.patient, codeType.maritalStatus);
       const patientName = PatientService.extractName(data, forWho.patient);
       const patientAddress = PatientService.extractAddress(data, forWho.patient);
-      const patientContact: IPatientContact = await this.getContact(data, forWho.patientContact, codeType)
+      const patientContact: IPatientContact = await this.getContact(data, forWho.patientContact, codeType);
       const patientCommunication: ICommunication = {
         language: await this.extractCodeableConcept(data, forWho.patient, codeType.language),
         preferred: true
-      }
+      };
       const telecom: IContactPoint[] = PatientService.extractContactPoint(data, forWho.patient);
 
       const patient: IPatient = {
@@ -256,9 +256,7 @@ export class PatientService {
         communication: patientCommunication
       };
 
-      console.log('Patient:', patient);
-
-      return await this.patientRepo.registerPatient(patient);
+      return await this.patientRepo.updatePatient(patient);
     } catch (e) {
       throw new InternalServerError(e.message);
     }
@@ -266,5 +264,38 @@ export class PatientService {
 
   public async findPatientById(id: string): Promise<IPatient> {
     return this.patientRepo.findPatientById(id);
+  }
+
+  public async createPatient(data: any): Promise<IPatient> {
+    const {
+      gender,
+      first_name,
+      last_name,
+      email,
+      password
+    } = data;
+
+    // Todo: Create the user in our platform sdk
+
+    const patientData: IPatient = {
+      active: true,
+      gender,
+      name: {
+        use: 'official',
+        text: `${first_name} ${last_name}`,
+        family: last_name,
+        given: [first_name]
+      },
+      telecom: [
+        {
+          system: 'email',
+          use: 'home',
+          rank: 0,
+          value: email
+        }
+      ],
+    };
+
+    return await this.patientRepo.createPatient(patientData);
   }
 }

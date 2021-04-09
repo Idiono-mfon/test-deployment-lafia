@@ -1,7 +1,5 @@
 import {
   JSONSchema,
-  Modifiers,
-  QueryBuilder,
   RelationMappings
 } from 'objection';
 import { Schema, Table } from '../../../database';
@@ -21,12 +19,8 @@ export class PeriodModel extends BaseModel implements IPeriod {
     return PeriodValidation;
   }
 
-  static get modifiers(): Modifiers {
-    return {
-      defaultSelects(builder: QueryBuilder<any, any[]>) {
-        builder.select('start', 'end');
-      }
-    }
+  static get hidden(): string[] {
+    return ['updatedAt', 'createdAt'];
   }
 
   static get relationMappings(): RelationMappings {
@@ -40,7 +34,7 @@ export class PeriodModel extends BaseModel implements IPeriod {
         }
       },
 
-      contact_points: {
+      contactPoints: {
         relation: BaseModel.HasOneRelation,
         modelClass: '../contactPoints',
         join: {
@@ -49,7 +43,7 @@ export class PeriodModel extends BaseModel implements IPeriod {
         }
       },
 
-      human_name: {
+      humanName: {
         relation: BaseModel.HasOneRelation,
         modelClass: '../humanNames',
         join: {
@@ -67,7 +61,7 @@ export class PeriodModel extends BaseModel implements IPeriod {
         }
       },
 
-      patient_contact: {
+      patientContact: {
         relation: BaseModel.HasOneRelation,
         modelClass: '../patientContacts',
         join: {

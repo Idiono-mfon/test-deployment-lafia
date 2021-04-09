@@ -1,4 +1,4 @@
-import { JSONSchema, Modifiers, QueryBuilder } from 'objection';
+import { JSONSchema } from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
 import { IAttachment } from './interfaces';
@@ -22,20 +22,7 @@ export class AttachmentModel extends BaseModel implements IAttachment {
     return AttachmentValidation;
   }
 
-  static get modifiers(): Modifiers {
-    return {
-      defaultSelects(builder: QueryBuilder<any, any[]>) {
-        builder.select(
-          'content_type',
-          'language',
-          'data',
-          'url',
-          'size',
-          'hash',
-          'title',
-          'creation'
-        );
-      }
-    }
+  static get hidden(): string[] {
+    return ['updatedAt', 'createdAt'];
   }
 }

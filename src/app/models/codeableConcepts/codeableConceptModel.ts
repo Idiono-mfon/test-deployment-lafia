@@ -1,7 +1,5 @@
 import {
   JSONSchema,
-  Modifiers,
-  QueryBuilder,
   RelationMappings
 } from 'objection';
 import { Schema, Table } from '../../../database';
@@ -21,12 +19,8 @@ export class CodeableConceptModel extends BaseModel implements ICodeableConcept 
     return CodeableConceptValidation;
   }
 
-  static get modifiers(): Modifiers {
-    return {
-      defaultSelects(builder: QueryBuilder<any, any[]>) {
-        builder.select('text');
-      }
-    }
+  static get hidden(): string[] {
+    return ['updatedAt'];
   }
 
   static get relationMappings(): RelationMappings {
@@ -63,7 +57,7 @@ export class CodeableConceptModel extends BaseModel implements ICodeableConcept 
         }
       },
 
-      patient_contact: {
+      patientContact: {
         relation: BaseModel.ManyToManyRelation,
         modelClass: '../patientContacts',
         join: {

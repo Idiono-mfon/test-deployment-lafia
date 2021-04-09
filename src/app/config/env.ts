@@ -13,6 +13,9 @@ interface IEnv {
   pg_test_password: string;
   pg_test_user: string;
   pg_test_dbname: string;
+  rmq_connection: string;
+  rmq_pub_queue: string;
+  rmq_sub_queue: string;
 }
 
 const config: IEnv = {
@@ -28,6 +31,9 @@ const config: IEnv = {
   pg_test_host: process.env.POSTGRES_TEST_HOST as string,
   pg_test_dbname: process.env.POSTGRES_TEST_DBNAME as string,
   pg_test_user: process.env.POSTGRES_TEST_USER as string,
+  rmq_connection: process.env.RMQ_CONNECTION as string,
+  rmq_pub_queue: process.env.RMQ_PUB_QUEUE as string,
+  rmq_sub_queue: process.env.RMQ_SUB_QUEUE as string,
 };
 
 export class Env {

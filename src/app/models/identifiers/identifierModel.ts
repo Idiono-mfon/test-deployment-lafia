@@ -1,7 +1,5 @@
 import {
   JSONSchema,
-  Modifiers,
-  QueryBuilder,
   RelationMappings
 } from 'objection';
 import { Schema, Table } from '../../../database';
@@ -25,12 +23,8 @@ export class IdentifierModel extends BaseModel implements IIdentifier {
     return IdentifierValidation;
   }
 
-  static get modifiers(): Modifiers {
-    return {
-      defaultSelects(builder: QueryBuilder<any, any[]>) {
-        builder.select('use', 'value', 'system');
-      }
-    }
+  static get hidden(): string[] {
+    return ['updatedAt', 'createdAt', 'periodId', 'codeableConceptId'];
   }
 
   static get relationMappings(): RelationMappings {

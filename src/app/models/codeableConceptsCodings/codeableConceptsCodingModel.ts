@@ -27,7 +27,7 @@ export class CodeableConceptsCodingModel extends BaseModel implements ICodeableC
         }
       },
 
-      codeable_concept: {
+      codeableConcept: {
         relation: BaseModel.BelongsToOneRelation,
         modelClass: '../codeableConcepts',
         join: {

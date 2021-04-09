@@ -1,7 +1,5 @@
 import {
   JSONSchema,
-  Modifiers,
-  QueryBuilder,
   RelationMappings
 } from 'objection';
 import { Schema, Table } from '../../../database';
@@ -21,12 +19,8 @@ export class CommunicationModel extends BaseModel implements ICommunication {
     return CommunicationValidation;
   }
 
-  static get modifiers(): Modifiers {
-    return {
-      defaultSelects(builder: QueryBuilder<any, any[]>) {
-        builder.select('preferred');
-      }
-    }
+  static get hidden(): string[] {
+    return ['updatedAt', 'createdAt', 'codeableConceptId'];
   }
 
   static get relationMappings(): RelationMappings {

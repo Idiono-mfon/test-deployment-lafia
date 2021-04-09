@@ -1,7 +1,5 @@
 import {
   JSONSchema,
-  Modifiers,
-  QueryBuilder,
   RelationMappings
 } from 'objection';
 import { Schema, Table } from '../../../database';
@@ -21,12 +19,8 @@ export class PatientLinkModel extends BaseModel implements IPatientLink {
     return PatientLinkValidation;
   }
 
-  static get modifiers(): Modifiers {
-    return {
-      defaultSelects(builder: QueryBuilder<any, any[]>) {
-        builder.select('type');
-      }
-    }
+  static get hidden(): string[] {
+    return ['updatedAt', 'createdAt', 'referenceId'];
   }
 
   static get relationMappings(): RelationMappings {

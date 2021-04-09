@@ -18,7 +18,7 @@ export class PatientContactsContactPointModel extends BaseModel implements IPati
 
   static get relationships(): RelationMappings {
     return {
-      patient_contact: {
+      patientContact: {
         relation: BaseModel.BelongsToOneRelation,
         modelClass: '../patientContacts',
         join: {
@@ -27,7 +27,7 @@ export class PatientContactsContactPointModel extends BaseModel implements IPati
         }
       },
 
-      contact_point: {
+      contactPoint: {
         relation: BaseModel.BelongsToOneRelation,
         modelClass: '../contactPoints',
         join: {

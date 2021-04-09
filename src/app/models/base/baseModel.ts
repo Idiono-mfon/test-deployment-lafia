@@ -1,4 +1,5 @@
 import { JSONSchema, Model, snakeCaseMappers } from 'objection';
+import visibilityPlugin from 'objection-visibility'
 import { PostgresConnection } from '../../config';
 import { IBase } from './interfaces';
 import { BaseValidation } from './validation';
@@ -16,7 +17,7 @@ Model.knex(PostgresConnection.getDb());
 * @description: Set general configuration for
 * all other models
 */
-export class BaseModel extends Model implements IBase {
+export class BaseModel extends visibilityPlugin(Model) implements IBase {
   id!: IBase['id'];
   created_at!: IBase['created_at'];
   updated_at!: IBase['updated_at'];

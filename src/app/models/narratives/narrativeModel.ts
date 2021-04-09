@@ -1,4 +1,4 @@
-import { JSONSchema, Modifiers, QueryBuilder } from 'objection';
+import { JSONSchema } from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
 import { INarrative } from './interfaces';
@@ -16,11 +16,7 @@ export class NarrativeModel extends BaseModel implements INarrative {
     return NarrativeValidation;
   }
 
-  static get modifiers(): Modifiers {
-    return {
-      defaultSelects(builder: QueryBuilder<any, any[]>) {
-        builder.select('status', 'div');
-      }
-    }
+  static get hidden(): string[] {
+    return ['updatedAt', 'createdAt'];
   }
 }

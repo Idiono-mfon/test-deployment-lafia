@@ -1,4 +1,4 @@
-import { JSONSchema, Modifiers, QueryBuilder } from 'objection';
+import { JSONSchema } from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
 import { ICodeSystem } from './interfaces';
@@ -18,15 +18,7 @@ export class CodeSystemModel extends BaseModel implements ICodeSystem {
     return CodeSystemValidation;
   }
 
-  static get modifiers(): Modifiers {
-    return {
-      defaultSelects(builder: QueryBuilder<any, any[]>) {
-        builder.select(
-          'code',
-          'display',
-          'system'
-        );
-      }
-    }
+  static get hidden(): string[] {
+    return ['updatedAt', 'createdAt', 'type'];
   }
 }

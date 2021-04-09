@@ -18,7 +18,7 @@ export class PatientContactsCodeableConceptModel extends BaseModel implements IP
 
   static get relationMappings(): RelationMappings {
     return {
-      patient_contact: {
+      patientContact: {
         relation: BaseModel.BelongsToOneRelation,
         modelClass: '../patientContacts',
         join: {
@@ -27,7 +27,7 @@ export class PatientContactsCodeableConceptModel extends BaseModel implements IP
         }
       },
 
-      codeable_concept: {
+      codeableConcept: {
         relation: BaseModel.BelongsToOneRelation,
         modelClass: '../codeableConcepts',
         join: {

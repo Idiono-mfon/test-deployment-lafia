@@ -1,7 +1,5 @@
 import {
   JSONSchema,
-  Modifiers,
-  QueryBuilder,
   RelationMappings
 } from 'objection';
 import { Schema, Table } from '../../../database';
@@ -29,22 +27,8 @@ export class AddressModel extends BaseModel implements IAddress {
     return AddressValidation;
   }
 
-  static get modifiers(): Modifiers {
-    return {
-      defaultSelects(builder: QueryBuilder<any, any[]>) {
-        builder.select(
-          'use',
-          'type',
-          'text',
-          'line',
-          'city',
-          'district',
-          'state',
-          'postal_code',
-          'country',
-        );
-      }
-    }
+  static get hidden(): string[] {
+    return ['updatedAt', 'createdAt', 'periodId'];
   }
 
   static get relationMappings(): RelationMappings {
@@ -58,7 +42,7 @@ export class AddressModel extends BaseModel implements IAddress {
         }
       },
 
-      patient_contact: {
+      patientContact: {
         relation: BaseModel.HasOneRelation,
         modelClass: '../patientContacts',
         join: {

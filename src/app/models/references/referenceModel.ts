@@ -1,7 +1,5 @@
 import {
   JSONSchema,
-  Modifiers,
-  QueryBuilder,
   RelationMappings
 } from 'objection';
 import { Schema, Table } from '../../../database';
@@ -23,12 +21,8 @@ export class ReferenceModel extends BaseModel implements IReference {
     return ReferenceValidation;
   }
 
-  static get modifiers(): Modifiers {
-    return {
-      defaultSelects(builder: QueryBuilder<any, any[]>) {
-        builder.select('reference', 'type', 'display');
-      }
-    }
+  static get hidden(): string[] {
+    return ['updatedAt', 'createdAt', 'identifierId'];
   }
 
   static get relationMappings(): RelationMappings {
@@ -42,7 +36,7 @@ export class ReferenceModel extends BaseModel implements IReference {
         }
       },
 
-      patient_link: {
+      patientLink: {
         relation: BaseModel.HasOneRelation,
         modelClass: '../patientLinks',
         join: {
@@ -51,7 +45,7 @@ export class ReferenceModel extends BaseModel implements IReference {
         }
       },
 
-      patient_contact: {
+      patientContact: {
         relation: BaseModel.HasOneRelation,
         modelClass: '../patientContacts',
         join: {

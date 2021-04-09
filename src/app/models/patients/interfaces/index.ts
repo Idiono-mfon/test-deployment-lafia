@@ -31,7 +31,7 @@ export interface IPatient extends IBase {
   telecom?: IContactPoint | IContactPoint[];
   address?: IAddress;
   photo?: IAttachment;
-  contact: IPatientContact | IPatientContact[];
+  contact?: IPatientContact | IPatientContact[];
   communication?: ICommunication;
   general_practitioner?: IReference;
   link?: IPatientLink;

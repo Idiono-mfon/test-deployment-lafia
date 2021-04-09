@@ -1,7 +1,5 @@
 import {
   JSONSchema,
-  Modifiers,
-  QueryBuilder,
   RelationMappings
 } from 'objection';
 import { Schema, Table } from '../../../database';
@@ -42,22 +40,8 @@ export class PatientModel extends BaseModel implements IPatient {
     return PatientValidation;
   }
 
-  static get modifiers(): Modifiers {
-    return {
-      defaultSelects(builder: QueryBuilder<any, any[]>) {
-        builder.select(
-          'id',
-          'resource_type',
-          'active',
-          'gender',
-          'birth_date',
-          'deceased_boolean',
-          'deceased_date_time',
-          'multiple_birth_boolean',
-          'multiple_birth_integer'
-        );
-      }
-    }
+  static get hidden(): string[] {
+    return ['updatedAt', 'createdAt', 'narrativeId', 'codeableConceptId', 'referenceId', ''];
   }
 
   static get relationMappings(): RelationMappings {
@@ -71,7 +55,7 @@ export class PatientModel extends BaseModel implements IPatient {
         }
       },
 
-      marital_status: {
+      maritalStatus: {
         relation: BaseModel.BelongsToOneRelation,
         modelClass: '../codeableConcepts',
         join: {
@@ -80,7 +64,7 @@ export class PatientModel extends BaseModel implements IPatient {
         }
       },
 
-      managing_organization: {
+      managingOrganization: {
         relation: BaseModel.BelongsToOneRelation,
         modelClass: '../references',
         join: {
@@ -187,7 +171,7 @@ export class PatientModel extends BaseModel implements IPatient {
         }
       },
 
-      general_practitioner: {
+      generalPractitioner: {
         relation: BaseModel.ManyToManyRelation,
         modelClass: '../references',
         join: {

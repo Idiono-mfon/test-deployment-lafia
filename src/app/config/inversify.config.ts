@@ -12,6 +12,7 @@ import {
   PatientService
 } from '../services';
 import { CodeSystemService } from '../services/codeSystems';
+import { MessageBroker } from '../services/messageBroker';
 import TYPES from './types';
 
 const container = new Container();
@@ -42,6 +43,10 @@ container
 container
   .bind<CodeSystemService>(TYPES.CodeSystemService)
   .to(CodeSystemService)
+  .inSingletonScope();
+container
+  .bind<MessageBroker>(TYPES.MessageBroker)
+  .to(MessageBroker)
   .inSingletonScope();
 
 // repositories

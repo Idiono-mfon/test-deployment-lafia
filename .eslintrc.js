@@ -59,5 +59,8 @@ module.exports = {
     'no-plusplus': 0,
     'no-restricted-syntax': 0,
     'no-await-in-loop': 0,
+    '@typescript-eslint/restrict-template-expressions': 0,
+    'no-return-await': 0,
+    '@typescript-eslint/no-misused-promises': 0,
   },
 };

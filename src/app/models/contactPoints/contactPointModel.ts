@@ -1,7 +1,5 @@
 import {
   JSONSchema,
-  Modifiers,
-  QueryBuilder,
   RelationMappings
 } from 'objection';
 import { Schema, Table } from '../../../database';
@@ -24,12 +22,8 @@ export class ContactPointModel extends BaseModel implements IContactPoint {
     return ContactPointValidation;
   }
 
-  static get modifiers(): Modifiers {
-    return {
-      defaultSelects(builder: QueryBuilder<any, any[]>) {
-        builder.select('use', 'rank', 'system', 'value');
-      }
-    }
+  static get hidden(): string[] {
+    return ['updatedAt', 'createdAt', 'periodId'];
   }
 
   static get relationMappings(): RelationMappings {
@@ -43,7 +37,7 @@ export class ContactPointModel extends BaseModel implements IContactPoint {
         }
       },
 
-      patient_contact: {
+      patientContact: {
         relation: BaseModel.ManyToManyRelation,
         modelClass: '../patientContacts',
         join: {
