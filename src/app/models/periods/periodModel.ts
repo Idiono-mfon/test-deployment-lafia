@@ -1,5 +1,5 @@
 import {
-  JSONSchema,
+  JSONSchema, Modifiers, QueryBuilder,
   RelationMappings
 } from 'objection';
 import { Schema, Table } from '../../../database';
@@ -21,6 +21,16 @@ export class PeriodModel extends BaseModel implements IPeriod {
 
   static get hidden(): string[] {
     return ['updatedAt', 'createdAt'];
+  }
+
+  static get modifiers(): Modifiers {
+    return {
+      selectId(builder: QueryBuilder<any, any[]>) {
+        builder.select(
+          `${Schema.lafiaService}.${Table.periods}.id`
+        );
+      },
+    };
   }
 
   static get relationMappings(): RelationMappings {

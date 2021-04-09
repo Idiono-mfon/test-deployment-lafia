@@ -12,7 +12,7 @@ export class PatientRepository {
   public async updatePatient(data: IPatient): Promise<IPatient> {
     try {
       return await transaction(PatientModel, async (PatientModel) => {
-        return PatientModel.query().insertGraphAndFetch(data);
+        return PatientModel.query().upsertGraphAndFetch(data, { relate: true, unrelate: true});
       });
     } catch (e) {
       console.error(e);
@@ -54,6 +54,51 @@ export class PatientRepository {
                 '],' +
                 'generalPractitioner,' +
                 'link,' +
+              ']'
+            )
+            .skipUndefined()
+            .first();
+        });
+    } catch (e) {
+      throw new InternalServerError(e.message);
+    }
+  }
+
+  public async getIds(id: string): Promise<any> {
+    try {
+      return await transaction(PatientModel, async(PatientModel) => {
+          return PatientModel.query()
+            .modify('selectId')
+            .where({ id })
+            .withGraphFetched(
+              '[' +
+                'text(selectId), ' +
+                'maritalStatus(selectId).[' +
+                  'coding(selectId)' +
+                '],' +
+                'managingOrganization(selectId),' +
+                'identifier(selectId).[' +
+                  'type(selectId),' +
+                  'period(selectId),' +
+                  'assigner(selectId),' +
+                '],' +
+                'name(selectId).[period(selectId)],' +
+                'telecom(selectId).[period(selectId)],' +
+                'address(selectId).[period(selectId)],' +
+                'photo(selectId),' +
+                'contact(selectId).[' +
+                  'name(selectId), ' +
+                  'address(selectId).[' +
+                    'period(selectId)' +
+                  ']' +
+                '],' +
+                'communication(selectId).[' +
+                  'language(selectId).[' +
+                    'coding(selectId)' +
+                  ']' +
+                '],' +
+                'generalPractitioner(selectId),' +
+                'link(selectId),' +
               ']'
             )
             .skipUndefined()

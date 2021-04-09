@@ -5,8 +5,8 @@ import { IPatientContactsCodeableConcept } from './interfaces';
 import { PatientContactsCodeableConceptValidation } from './validation';
 
 export class PatientContactsCodeableConceptModel extends BaseModel implements IPatientContactsCodeableConcept {
-  patient_contact_id!: IPatientContactsCodeableConcept['patient_contact_id'];
-  codeable_concept_id!: IPatientContactsCodeableConcept['codeable_concept_id'];
+  patientContactId!: IPatientContactsCodeableConcept['patientContactId'];
+  codeableConceptId!: IPatientContactsCodeableConcept['codeableConceptId'];
 
   static get tableName(): string {
     return `${Schema.lafiaService}.${Table.patient_contacts_codeable_concepts}`;

@@ -1,5 +1,5 @@
 import {
-  JSONSchema,
+  JSONSchema, Modifiers, QueryBuilder,
   RelationMappings
 } from 'objection';
 import { Schema, Table } from '../../../database';
@@ -17,20 +17,20 @@ export class PatientModel extends BaseModel implements IPatient {
   address!: IPatient['address'];
   contact!: IPatient['contact'];
   telecom!: IPatient['telecom'];
-  birth_date!: IPatient['birth_date'];
+  birthDate!: IPatient['birthDate'];
   identifier!: IPatient['identifier'];
-  narrative_id!: IPatient['narrative_id'];
-  reference_id!: IPatient['reference_id'];
+  narrativeId!: IPatient['narrativeId'];
+  referenceId!: IPatient['referenceId'];
   communication!: IPatient['communication'];
-  resource_type!: IPatient['resource_type'];
-  marital_status!: IPatient['marital_status'];
-  deceased_boolean!: IPatient['deceased_boolean'];
-  deceased_date_time!: IPatient['deceased_date_time'];
-  codeable_concept_id!: IPatient['codeable_concept_id'];
-  general_practitioner!: IPatient['general_practitioner'];
-  managing_organization!: IPatient['managing_organization'];
-  multiple_birth_boolean!: IPatient['multiple_birth_boolean'];
-  multiple_birth_integer!: IPatient['multiple_birth_integer'];
+  resourceType!: IPatient['resourceType'];
+  maritalStatus!: IPatient['maritalStatus'];
+  deceasedBoolean!: IPatient['deceasedBoolean'];
+  deceasedDateTime!: IPatient['deceasedDateTime'];
+  codeableConceptId!: IPatient['codeableConceptId'];
+  generalPractitioner!: IPatient['generalPractitioner'];
+  managingOrganization!: IPatient['managingOrganization'];
+  multipleBirthBoolean!: IPatient['multipleBirthBoolean'];
+  multipleBirthInteger!: IPatient['multipleBirthInteger'];
 
   static get tableName(): string {
     return `${Schema.lafiaService}.${Table.patients}`;
@@ -42,6 +42,16 @@ export class PatientModel extends BaseModel implements IPatient {
 
   static get hidden(): string[] {
     return ['updatedAt', 'createdAt', 'narrativeId', 'codeableConceptId', 'referenceId', ''];
+  }
+
+  static get modifiers(): Modifiers {
+    return {
+      selectId(builder: QueryBuilder<any, any[]>) {
+        builder.select(
+          `${Schema.lafiaService}.${Table.patients}.id`
+        );
+      },
+    };
   }
 
   static get relationMappings(): RelationMappings {

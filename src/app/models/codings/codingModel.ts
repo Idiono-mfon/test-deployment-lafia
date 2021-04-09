@@ -1,5 +1,5 @@
 import {
-  JSONSchema,
+  JSONSchema, Modifiers, QueryBuilder,
   RelationMappings
 } from 'objection';
 import { Schema, Table } from '../../../database';
@@ -12,7 +12,7 @@ export class CodingModel extends BaseModel implements ICoding {
   version!: ICoding['version'];
   code!: ICoding['code'];
   display!: ICoding['display'];
-  user_selected!: ICoding['user_selected'];
+  userSelected!: ICoding['userSelected'];
 
   static get tableName(): string {
     return `${Schema.lafiaService}.${Table.codings}`;
@@ -24,6 +24,16 @@ export class CodingModel extends BaseModel implements ICoding {
 
   static get hidden(): string[] {
     return ['updatedAt', 'createdAt'];
+  }
+
+  static get modifiers(): Modifiers {
+    return {
+      selectId(builder: QueryBuilder<any, any[]>) {
+        builder.select(
+          `${Schema.lafiaService}.${Table.codings}.id`
+        );
+      },
+    };
   }
 
   static get relationMappings(): RelationMappings {

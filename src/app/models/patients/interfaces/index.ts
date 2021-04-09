@@ -12,20 +12,20 @@ import { IPatientContact } from '../../patientContacts';
 import { ICodeableConcept } from '../../codeableConcepts';
 
 export interface IPatient extends IBase {
-  resource_type?: string;
-  narrative_id?: string;
+  resourceType?: string;
+  narrativeId?: string;
   text?: INarrative;
   active: boolean;
   gender: string;
-  birth_date?: Date | string;
-  deceased_boolean?: boolean;
-  deceased_date_time?: Date;
-  codeable_concept_id?: string;
-  marital_status?: ICodeableConcept;
-  multiple_birth_boolean?: boolean;
-  multiple_birth_integer?: number;
-  reference_id?: string;
-  managing_organization?: IReference;
+  birthDate?: Date | string;
+  deceasedBoolean?: boolean;
+  deceasedDateTime?: Date;
+  codeableConceptId?: string;
+  maritalStatus?: ICodeableConcept;
+  multipleBirthBoolean?: boolean;
+  multipleBirthInteger?: number;
+  referenceId?: string;
+  managingOrganization?: IReference;
   identifier?: IIdentifier;
   name?: IHumanName;
   telecom?: IContactPoint | IContactPoint[];
@@ -33,6 +33,6 @@ export interface IPatient extends IBase {
   photo?: IAttachment;
   contact?: IPatientContact | IPatientContact[];
   communication?: ICommunication;
-  general_practitioner?: IReference;
+  generalPractitioner?: IReference;
   link?: IPatientLink;
 }

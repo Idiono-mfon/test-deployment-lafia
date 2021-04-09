@@ -137,7 +137,7 @@ export class PatientService {
       type: addressExtract[addressType],
       city: addressExtract[city],
       state: addressExtract[state],
-      postal_code: addressExtract[postalCode],
+      postalCode: addressExtract[postalCode],
       country: addressExtract[country],
       text: addressExtract[address],
       period
@@ -230,7 +230,7 @@ export class PatientService {
     }
   }
 
-  public async updatePatient(data: any): Promise<IPatient> {
+  public async updatePatient(id: string, data: any): Promise<IPatient> {
     try {
       const dob = PatientService.extractDateOfBirth(data);
       const maritalStatus: ICodeableConcept = await this.extractCodeableConcept(data, forWho.patient, codeType.maritalStatus);
@@ -243,18 +243,29 @@ export class PatientService {
       };
       const telecom: IContactPoint[] = PatientService.extractContactPoint(data, forWho.patient);
 
-      const patient: IPatient = {
+      let patient: IPatient = {
         active: true,
-        resource_type: 'Patient',
+        resourceType: 'Patient',
         gender: data.patient_gender,
-        birth_date: dob,
-        marital_status: maritalStatus,
+        birthDate: dob,
+        maritalStatus,
         name: patientName,
         address: patientAddress,
         telecom,
         contact: patientContact,
         communication: patientCommunication
       };
+
+
+      const patientOldData = await this.getPatientObjectIdsById(id);
+
+      for (let prop in patientOldData) {
+        if (!patientOldData[prop] || patientOldData[prop].length === 0) {
+          delete patientOldData[prop];
+        }
+      }
+
+      patient = _.merge(patient, patientOldData);
 
       return await this.patientRepo.updatePatient(patient);
     } catch (e) {
@@ -297,5 +308,9 @@ export class PatientService {
     };
 
     return await this.patientRepo.createPatient(patientData);
+  }
+
+  private async getPatientObjectIdsById(id: string): Promise<any> {
+    return this.patientRepo.getIds(id);
   }
 }

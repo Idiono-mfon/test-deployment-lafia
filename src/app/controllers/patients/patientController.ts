@@ -17,15 +17,13 @@ export class PatientController extends BaseController {
   @inject(TYPES.PatientService)
   private readonly patientService: PatientService;
 
-  @httpPut(':id')
+  @httpPut('/:id')
   public async updatePatient(@request() req: Request, @response() res: Response) {
     try {
       const { id: patientId } = req.params;
       const patientData: IPatient = req.body;
 
-      patientData.id = patientId;
-
-      const patient = await this.patientService.updatePatient(patientData);
+      const patient = await this.patientService.updatePatient(patientId, patientData);
 
       this.success(res, patient, 'Patient profile successfully updated');
     } catch (e) {

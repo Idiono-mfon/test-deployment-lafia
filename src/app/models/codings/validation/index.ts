@@ -8,6 +8,6 @@ export const CodingValidation: JSONSchema = {
     version: { type: 'string' },
     code: { type: 'string' },
     display: { type: 'string' },
-    user_selected: { type: 'boolean' }
+    userSelected: { type: 'boolean' }
   }
 };

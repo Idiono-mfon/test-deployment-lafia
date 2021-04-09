@@ -1,5 +1,5 @@
 import {
-  JSONSchema,
+  JSONSchema, Modifiers, QueryBuilder,
   RelationMappings
 } from 'objection';
 import { Schema, Table } from '../../../database';
@@ -21,6 +21,16 @@ export class CodeableConceptModel extends BaseModel implements ICodeableConcept 
 
   static get hidden(): string[] {
     return ['updatedAt'];
+  }
+
+  static get modifiers(): Modifiers {
+    return {
+      selectId(builder: QueryBuilder<any, any[]>) {
+        builder.select(
+          `${Schema.lafiaService}.${Table.codeable_concepts}.id`
+        );
+      },
+    };
   }
 
   static get relationMappings(): RelationMappings {

@@ -9,7 +9,7 @@ export interface IAddress extends IBase {
   city?: string;
   district?: string;
   state?: string;
-  postal_code?: string;
+  postalCode?: string;
   country?: string;
   period?: IPeriod;
 }

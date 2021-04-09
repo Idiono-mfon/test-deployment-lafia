@@ -13,7 +13,7 @@ export const AddressValidation: JSONSchema = {
     city: { type: 'string' },
     district: { type: 'string' },
     state: { type: 'string' },
-    postal_code: { type: 'string' },
+    postalCode: { type: 'string' },
     country: { type: 'string' },
     period: {
       ...PeriodValidation

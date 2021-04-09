@@ -26,7 +26,6 @@ export class CodeSystemRepository {
   public async getCodeSystemByCode(code: string): Promise<ICodeSystem> {
     try {
       return CodeSystemModel.query()
-        .modify('defaultSelects')
         .where({ code })
         .first();
     } catch (e) {

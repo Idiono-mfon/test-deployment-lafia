@@ -5,8 +5,8 @@ import { ICodeableConceptsCodings } from './interfaces';
 import { CodeableConceptsCodingsValidation } from './validation';
 
 export class CodeableConceptsCodingModel extends BaseModel implements ICodeableConceptsCodings {
-  coding_id!: ICodeableConceptsCodings['coding_id'];
-  codeable_concept_id!: ICodeableConceptsCodings['codeable_concept_id'];
+  codingId!: ICodeableConceptsCodings['codingId'];
+  codeableConceptId!: ICodeableConceptsCodings['codeableConceptId'];
 
   static get tableName(): string {
     return `${Schema.lafiaService}.${Table.codeable_concepts_codings}`;

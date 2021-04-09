@@ -16,11 +16,11 @@ export const PatientValidation: JSONSchema = {
   title: 'Patient Schema Validation',
   required: ['active', 'gender'],
   properties: {
-    resource_type: {
+    resourceType: {
       type: 'string',
       default: 'Patient'
     },
-    narrative_id: { format: 'uuid' },
+    narrativeId: { format: 'uuid' },
     text: {
       ...NarrativeValidation
     },
@@ -29,17 +29,17 @@ export const PatientValidation: JSONSchema = {
       type: 'string',
       enum: ['male', 'female', 'other', 'unknown']
     },
-    birth_date: { format: 'date' },
-    deceased_boolean: { type: 'boolean' },
-    deceased_date_time: { format: 'date-time' },
-    codeable_concept_id: { format: 'uuid' },
-    marital_status: {
+    birthDate: { format: 'date' },
+    deceasedBoolean: { type: 'boolean' },
+    deceasedDateTime: { format: 'date-time' },
+    codeableConceptId: { format: 'uuid' },
+    maritalStatus: {
       ...CodeableConceptValidation
     },
-    multiple_birth_boolean: { type: 'boolean' },
-    multiple_birth_integer: { type: 'integer' },
-    reference_id: { format: 'uuid' },
-    managing_organization: {
+    multipleBirthBoolean: { type: 'boolean' },
+    multipleBirthInteger: { type: 'integer' },
+    referenceId: { format: 'uuid' },
+    managingOrganization: {
       ...ReferenceValidation
     },
     identifier: {
@@ -63,7 +63,7 @@ export const PatientValidation: JSONSchema = {
     communication: {
       ...CommunicationValidation
     },
-    general_practitioner: {
+    generalPractitioner: {
       ...ReferenceValidation
     },
     link: {

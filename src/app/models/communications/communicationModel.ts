@@ -1,5 +1,5 @@
 import {
-  JSONSchema,
+  JSONSchema, Modifiers, QueryBuilder,
   RelationMappings
 } from 'objection';
 import { Schema, Table } from '../../../database';
@@ -21,6 +21,16 @@ export class CommunicationModel extends BaseModel implements ICommunication {
 
   static get hidden(): string[] {
     return ['updatedAt', 'createdAt', 'codeableConceptId'];
+  }
+
+  static get modifiers(): Modifiers {
+    return {
+      selectId(builder: QueryBuilder<any, any[]>) {
+        builder.select(
+          `${Schema.lafiaService}.${Table.communications}.id`
+        );
+      },
+    };
   }
 
   static get relationMappings(): RelationMappings {

@@ -1,4 +1,4 @@
-import { JSONSchema } from 'objection';
+import { JSONSchema, Modifiers, QueryBuilder } from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
 import { IAttachment } from './interfaces';
@@ -12,7 +12,7 @@ export class AttachmentModel extends BaseModel implements IAttachment {
   title!: IAttachment['title'];
   language!: IAttachment['language'];
   creation!: IAttachment['creation'];
-  content_type!: IAttachment['content_type'];
+  contentType!: IAttachment['contentType'];
 
   static get tableName(): string {
     return `${Schema.lafiaService}.${Table.attachments}`
@@ -24,5 +24,15 @@ export class AttachmentModel extends BaseModel implements IAttachment {
 
   static get hidden(): string[] {
     return ['updatedAt', 'createdAt'];
+  }
+
+  static get modifiers(): Modifiers {
+    return {
+      selectId(builder: QueryBuilder<any, any[]>) {
+        builder.select(
+          `${Schema.lafiaService}.${Table.attachments}.id`
+        );
+      },
+    };
   }
 }

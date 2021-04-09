@@ -1,5 +1,5 @@
 import {
-  JSONSchema,
+  JSONSchema, Modifiers, QueryBuilder,
   RelationMappings
 } from 'objection';
 import { Schema, Table } from '../../../database';
@@ -26,6 +26,16 @@ export class HumanNameModel extends BaseModel implements IHumanName {
 
   static get hidden(): string[] {
     return ['updatedAt', 'createdAt', 'periodId'];
+  }
+
+  static get modifiers(): Modifiers {
+    return {
+      selectId(builder: QueryBuilder<any, any[]>) {
+        builder.select(
+          `${Schema.lafiaService}.${Table.human_names}.id`
+        );
+      },
+    };
   }
 
   static get relationMappings(): RelationMappings {

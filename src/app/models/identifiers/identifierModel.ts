@@ -1,5 +1,5 @@
 import {
-  JSONSchema,
+  JSONSchema, Modifiers, QueryBuilder,
   RelationMappings
 } from 'objection';
 import { Schema, Table } from '../../../database';
@@ -25,6 +25,16 @@ export class IdentifierModel extends BaseModel implements IIdentifier {
 
   static get hidden(): string[] {
     return ['updatedAt', 'createdAt', 'periodId', 'codeableConceptId'];
+  }
+
+  static get modifiers(): Modifiers {
+    return {
+      selectId(builder: QueryBuilder<any, any[]>) {
+        builder.select(
+          `${Schema.lafiaService}.${Table.identifiers}.id`
+        );
+      },
+    };
   }
 
   static get relationMappings(): RelationMappings {

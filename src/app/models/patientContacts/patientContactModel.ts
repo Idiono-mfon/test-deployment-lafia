@@ -1,5 +1,5 @@
 import {
-  JSONSchema,
+  JSONSchema, Modifiers, QueryBuilder,
   RelationMappings
 } from 'objection';
 import { Schema, Table } from '../../../database';
@@ -35,6 +35,16 @@ export class PatientContactModel extends BaseModel implements IPatientContact {
       'addressId',
       'referenceId'
     ];
+  }
+
+  static get modifiers(): Modifiers {
+    return {
+      selectId(builder: QueryBuilder<any, any[]>) {
+        builder.select(
+          `${Schema.lafiaService}.${Table.patient_contacts}.id`
+        );
+      },
+    };
   }
 
   static get relationMappings(): RelationMappings {
