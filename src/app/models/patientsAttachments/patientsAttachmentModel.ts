@@ -5,8 +5,8 @@ import { JSONSchema, RelationMappings } from 'objection';
 import { PatientsAttachmentValidation } from './validation';
 
 export class PatientsAttachmentModel extends BaseModel implements IPatientsAttachment {
-  patient_id!: IPatientsAttachment['patient_id'];
-  attachment_id!: IPatientsAttachment['attachment_id'];
+  patientId!: IPatientsAttachment['patientId'];
+  attachmentId!: IPatientsAttachment['attachmentId'];
 
   static get tableName(): string {
     return `${Schema.lafiaService}.${Table.patients_attachments}`;

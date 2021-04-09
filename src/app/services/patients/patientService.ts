@@ -1,11 +1,14 @@
 import { inject, injectable } from 'inversify';
 import _ from 'lodash';
 import TYPES from '../../config/types';
+import { AttachmentModel, IAttachment } from '../../models/attachments';
 import { ICodeSystem, ICodeType } from '../../models/codeSystems';
 import { ICoding } from '../../models/codings';
+import { PatientsAttachmentModel } from '../../models/patientsAttachments';
 import { IPeriod } from '../../models/periods';
 import { IAddress } from '../../models/address';
 import { IPatient } from '../../models/patients';
+import { S3Service } from '../awsS3';
 import { CodeSystemService } from '../codeSystems';
 import { IHumanName } from '../../models/humanNames';
 import { PatientRepository } from '../../repository';
@@ -28,6 +31,9 @@ export class PatientService {
 
   @inject(TYPES.CodeSystemService)
   private readonly codeSystemService: CodeSystemService;
+
+  @inject(TYPES.S3Service)
+  private readonly s3Service: S3Service;
 
   private static extractDateOfBirth(data: any): string {
     const patientDateOfBirth: any = data.patient_date_of_birth;
@@ -312,5 +318,45 @@ export class PatientService {
 
   private async getPatientObjectIdsById(id: string): Promise<any> {
     return this.patientRepo.getIds(id);
+  }
+
+  public async uploadAttachment(patientId: string, file: Express.Multer.File): Promise<IAttachment> {
+    try {
+      const patient: any = await this.findPatientById(patientId);
+
+      if (!patient) {
+        throwError('No User Record. Confirm the user id', error.notFound);
+      }
+
+      const fileLink = await this.s3Service.uploadFile(file);
+
+      const {
+        size,
+        originalname,
+        mimetype,
+      } = file;
+
+      const attachmentData: IAttachment = {
+        contentType: mimetype,
+        size,
+        title: originalname,
+        url: fileLink,
+        creation: new Date(),
+      };
+
+
+      const attachment: IAttachment = await AttachmentModel.query()
+        .insertAndFetch(attachmentData);
+
+      await PatientsAttachmentModel.query()
+        .insert({
+          patientId: patient?.id,
+          attachmentId: attachment?.id
+        });
+
+      return attachment;
+    } catch(e) {
+      throw new InternalServerError(e.message);
+    }
   }
 }

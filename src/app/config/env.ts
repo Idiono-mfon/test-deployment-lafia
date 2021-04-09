@@ -16,6 +16,11 @@ interface IEnv {
   rmq_connection: string;
   rmq_pub_queue: string;
   rmq_sub_queue: string;
+  aws_access_key_id: string;
+  aws_secret_access_Key: string;
+  aws_region: string;
+  aws_bucket: string;
+  jwt_secrete_key: string;
 }
 
 const config: IEnv = {
@@ -34,6 +39,11 @@ const config: IEnv = {
   rmq_connection: process.env.RMQ_CONNECTION as string,
   rmq_pub_queue: process.env.RMQ_PUB_QUEUE as string,
   rmq_sub_queue: process.env.RMQ_SUB_QUEUE as string,
+  aws_access_key_id: process.env.AWS_ACCESS_KEY_ID as string,
+  aws_secret_access_Key: process.env.AWS_SECRET_ACCESS_KEY as string,
+  aws_region: process.env.AWS_REGION as string,
+  aws_bucket: process.env.AWS_BUCKET as string,
+  jwt_secrete_key: process.env.JWT_SECRETE_KEY as string,
 };
 
 export class Env {

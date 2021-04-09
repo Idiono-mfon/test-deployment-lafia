@@ -9,7 +9,7 @@ import {
 import { CodeSystemRepository } from '../repository/codeSystems';
 import {
   UserService,
-  PatientService
+  PatientService, S3Service
 } from '../services';
 import { CodeSystemService } from '../services/codeSystems';
 import { MessageBroker } from '../services/messageBroker';
@@ -47,6 +47,10 @@ container
 container
   .bind<MessageBroker>(TYPES.MessageBroker)
   .to(MessageBroker)
+  .inSingletonScope();
+container
+  .bind<S3Service>(TYPES.S3Service)
+  .to(S3Service)
   .inSingletonScope();
 
 // repositories

@@ -7,6 +7,8 @@ import {
   request, httpGet, httpPut
 } from 'inversify-express-utils';
 import TYPES from '../../config/types';
+import { uploadFile } from '../../middlewares';
+import { IAttachment } from '../../models/attachments';
 import { IPatient } from '../../models/patients';
 import { PatientService } from '../../services';
 import { HttpStatusCode } from '../../utils';
@@ -50,6 +52,18 @@ export class PatientController extends BaseController {
       const patient: IPatient = await this.patientService.createPatient(patientData);
 
       this.success(res, patient, 'Patient registration successful', HttpStatusCode.CREATED);
+    } catch(e) {
+      this.error(res, e);
+    }
+  }
+
+  @httpPost('/:id/attachments', uploadFile.single('file'))
+  public async uploadAttachment(@request() req: Request, @response() res: Response) {
+    try {
+      const { id: patientId } = req.params;
+      const attachment: IAttachment = await this.patientService.uploadAttachment(patientId, req.file);
+
+      this.success(res, attachment, 'Request completed successfully');
     } catch(e) {
       this.error(res, e);
     }

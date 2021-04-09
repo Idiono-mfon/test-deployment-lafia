@@ -9,6 +9,7 @@ const TYPES = {
   PatientService: Symbol('PatientService'),
   CodeSystemService: Symbol('CodeSystemService'),
   MessageBroker: Symbol('MessageBroker'),
+  S3Service: Symbol('S3Service'),
 
   // repositories
   UserRepository: Symbol('UserRepository'),

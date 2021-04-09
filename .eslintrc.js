@@ -62,5 +62,7 @@ module.exports = {
     '@typescript-eslint/restrict-template-expressions': 0,
     'no-return-await': 0,
     '@typescript-eslint/no-misused-promises': 0,
+    'no-use-before-define': 0,
+    '@typescript-eslint/no-unused-vars': 0,
   },
 };
