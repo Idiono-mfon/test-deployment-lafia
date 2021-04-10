@@ -30,4 +30,14 @@ export class Table {
   public static patients_patient_contacts = 'patients_patient_contacts';
   public static patient_contacts_contact_points = 'patient_contacts_contact_points';
   public static patient_contacts_codeable_concepts = 'patient_contacts_codeable_concepts';
+  public static practitioners = 'practitioners';
+  public static practitioners_identifiers = 'practitioners_identifiers';
+  public static practitioners_human_names = 'practitioners_human_names';
+  public static practitioners_contact_points = 'practitioners_contact_points';
+  public static practitioners_address = 'practitioners_address';
+  public static practitioners_attachments = 'practitioners_attachments';
+  public static practitioners_communications = 'practitioners_communications';
+  public static qualifications = 'qualifications';
+  public static qualifications_identifiers = 'qualifications_identifiers';
+  public static practitioners_qualifications = 'practitioners_qualifications';
 }
