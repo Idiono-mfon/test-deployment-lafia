@@ -74,6 +74,7 @@
     "reflect-metadata": "^0.1.13",
     "short-uuid": "^4.1.0",
     "uuid": "^8.3.2",
+    "ws": "3.3.2",
     "yarn": "^1.22.10"
   },
   "devDependencies": {
