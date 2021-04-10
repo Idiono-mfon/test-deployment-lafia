@@ -1,5 +1,7 @@
 import {
-  JSONSchema, Modifiers, QueryBuilder,
+  JSONSchema,
+  Modifiers,
+  QueryBuilder,
   RelationMappings
 } from 'objection';
 import { Schema, Table } from '../../../database';
@@ -41,7 +43,7 @@ export class PatientModel extends BaseModel implements IPatient {
   }
 
   static get hidden(): string[] {
-    return ['updatedAt', 'createdAt', 'narrativeId', 'codeableConceptId', 'referenceId', ''];
+    return ['updatedAt', 'createdAt', 'narrativeId', 'codeableConceptId', 'referenceId'];
   }
 
   static get modifiers(): Modifiers {
