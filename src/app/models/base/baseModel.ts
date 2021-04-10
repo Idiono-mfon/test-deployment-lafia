@@ -1,5 +1,6 @@
 import { JSONSchema, Model, snakeCaseMappers } from 'objection';
-import visibilityPlugin from 'objection-visibility'
+import visibilityPlugin from 'objection-visibility';
+import { v4 as uuid } from 'uuid';
 import { PostgresConnection } from '../../config';
 import { IBase } from './interfaces';
 import { BaseValidation } from './validation';
@@ -24,6 +25,7 @@ export class BaseModel extends visibilityPlugin(Model) implements IBase {
 
   // Set timestamps before creating new data in the db
   $beforeInsert() {
+    this.id = uuid();
     this.created_at = new Date();
     this.updated_at = new Date();
   }

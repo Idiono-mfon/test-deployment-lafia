@@ -20,7 +20,8 @@ export async function up(knex: Knex): Promise<void> {
                   .defaultTo(knex.raw('gen_random_uuid()'))
                   .primary(`${Table.patients}_id`);
                 tableBuilder
-                  .string('resource_type');
+                  .string('resource_type')
+                  .defaultTo('Patient');
                 tableBuilder
                   .uuid('narrative_id')
                   .comment('text');
