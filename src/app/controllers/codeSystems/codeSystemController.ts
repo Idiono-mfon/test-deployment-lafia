@@ -53,6 +53,18 @@ export class CodeSystemController extends BaseController {
     }
   }
 
+  @httpGet('/qualifications')
+  public async getQualifications(@request() req: Request, @response() res: Response): Promise<void> {
+    try {
+      const type = 'qualification';
+      const qualifications: ICodeSystem[] = await this.codeSystemService.getCodeSystemByType(type);
+
+      this.success(res, qualifications, 'Request Successful');
+    } catch(e) {
+      this.error(res, e);
+    }
+  }
+
   @httpPost('/systems')
   public async addCodeSystem(@request() req: Request, @response() res: Response): Promise<void> {
     try {
