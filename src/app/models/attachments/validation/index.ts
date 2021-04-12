@@ -3,9 +3,9 @@ import { JSONSchema } from 'objection';
 export const AttachmentValidation: JSONSchema = {
   type: 'object',
   title: 'Attachment Schema Validation',
-  required: ['content_type', 'creation'],
+  required: ['contentType', 'creation'],
   properties: {
-    content_type: { type: 'string' },
+    contentType: { type: 'string' },
     language: { type: 'string' },
     data: { type: 'string' },
     url: { type: 'string' },

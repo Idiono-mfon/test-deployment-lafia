@@ -1,4 +1,7 @@
-import { JSONSchema, RelationMappings } from 'objection';
+import {
+  JSONSchema, Modifiers, QueryBuilder,
+  RelationMappings
+} from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
 import { IReference } from './interfaces';
@@ -18,6 +21,20 @@ export class ReferenceModel extends BaseModel implements IReference {
     return ReferenceValidation;
   }
 
+  static get hidden(): string[] {
+    return ['updatedAt', 'createdAt', 'identifierId'];
+  }
+
+  static get modifiers(): Modifiers {
+    return {
+      selectId(builder: QueryBuilder<any, any[]>) {
+        builder.select(
+          `${Schema.lafiaService}.${Table.references}.id`
+        );
+      },
+    };
+  }
+
   static get relationMappings(): RelationMappings {
     return {
       identifier: {
@@ -29,7 +46,7 @@ export class ReferenceModel extends BaseModel implements IReference {
         }
       },
 
-      patient_link: {
+      patientLink: {
         relation: BaseModel.HasOneRelation,
         modelClass: '../patientLinks',
         join: {
@@ -38,7 +55,7 @@ export class ReferenceModel extends BaseModel implements IReference {
         }
       },
 
-      patient_contact: {
+      patientContact: {
         relation: BaseModel.HasOneRelation,
         modelClass: '../patientContacts',
         join: {

@@ -9,9 +9,11 @@
     "test": "NODE_ENV=test jest --config jest.config.js",
     "mg:latest": "knex migrate:latest",
     "mg:up": "knex migrate:up",
-    "mg:rollback": "knex migrate:rollback",
+    "mg:rollback": "knex migrate:rollback --all",
+    "mg:down": "knex migrate:down",
     "mg:make": "knex migrate:make",
     "seed:run": "knex seed:run",
+    "seed:make": "knex seed:make",
     "tsc": "tsc"
   },
   "jest": {
@@ -30,7 +32,9 @@
     "erpnest",
     "platform-sdk",
     "lafia.io",
-    "lafia"
+    "lafia",
+    "carenow",
+    "carenow broadcast"
   ],
   "author": {
     "name": "Shedrack Ajaegbu",
@@ -47,6 +51,8 @@
   },
   "homepage": "https://github.com/parallelscore/lafia-service#readme",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.11.0",
+    "amqplib": "0.7.0",
     "axios": "^0.21.1",
     "bcryptjs": "^2.4.3",
     "chai": "^4.2.0",
@@ -59,14 +65,20 @@
     "joi": "^17.4.0",
     "jsonwebtoken": "^8.5.1",
     "knex": "0.21.15",
+    "lodash": "^4.17.21",
+    "multer": "^1.4.2",
     "objection": "^2.2.15",
+    "objection-visibility": "^1.1.0",
     "pg": "8.5.1",
     "pm2": "^4.5.5",
     "reflect-metadata": "^0.1.13",
+    "short-uuid": "^4.1.0",
     "uuid": "^8.3.2",
+    "ws": "3.3.2",
     "yarn": "^1.22.10"
   },
   "devDependencies": {
+    "@types/amqplib": "^0.5.17",
     "@types/bcryptjs": "^2.4.2",
     "@types/chai": "^4.2.7",
     "@types/chai-http": "^4.2.0",
@@ -75,6 +87,8 @@
     "@types/hapi__joi": "^16.0.11",
     "@types/jest": "^25.1.2",
     "@types/jsonwebtoken": "^8.3.6",
+    "@types/lodash": "^4.14.168",
+    "@types/multer": "^1.4.5",
     "@types/node": "12.12.6",
     "@types/supertest": "^2.0.8",
     "@types/uuid": "^3.4.6",

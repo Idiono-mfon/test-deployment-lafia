@@ -5,5 +5,5 @@ export interface ICoding extends IBase {
   version?: string;
   code: string;
   display?: string;
-  user_selected?: boolean;
+  userSelected?: boolean;
 }

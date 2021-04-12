@@ -27,7 +27,7 @@ export class PatientsPatientLinkModel extends BaseModel implements IPatientsPati
         }
       },
 
-      patient_link: {
+      patientLink: {
         relation: BaseModel.BelongsToOneRelation,
         modelClass: '../patientLinks',
         join: {

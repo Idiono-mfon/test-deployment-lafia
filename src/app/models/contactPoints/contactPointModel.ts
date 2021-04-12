@@ -1,4 +1,7 @@
-import { JSONSchema, RelationMappings } from 'objection';
+import {
+  JSONSchema, Modifiers, QueryBuilder,
+  RelationMappings
+} from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
 import { IContactPoint } from './interfaces';
@@ -19,6 +22,20 @@ export class ContactPointModel extends BaseModel implements IContactPoint {
     return ContactPointValidation;
   }
 
+  static get hidden(): string[] {
+    return ['updatedAt', 'createdAt', 'periodId'];
+  }
+
+  static get modifiers(): Modifiers {
+    return {
+      selectId(builder: QueryBuilder<any, any[]>) {
+        builder.select(
+          `${Schema.lafiaService}.${Table.contact_points}.id`
+        );
+      },
+    };
+  }
+
   static get relationMappings(): RelationMappings {
     return {
       period: {
@@ -30,7 +47,7 @@ export class ContactPointModel extends BaseModel implements IContactPoint {
         }
       },
 
-      patient_contact: {
+      patientContact: {
         relation: BaseModel.ManyToManyRelation,
         modelClass: '../patientContacts',
         join: {

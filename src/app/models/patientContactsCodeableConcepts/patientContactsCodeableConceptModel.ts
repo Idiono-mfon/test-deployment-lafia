@@ -5,8 +5,8 @@ import { IPatientContactsCodeableConcept } from './interfaces';
 import { PatientContactsCodeableConceptValidation } from './validation';
 
 export class PatientContactsCodeableConceptModel extends BaseModel implements IPatientContactsCodeableConcept {
-  patient_contact_id!: IPatientContactsCodeableConcept['patient_contact_id'];
-  codeable_concept_id!: IPatientContactsCodeableConcept['codeable_concept_id'];
+  patientContactId!: IPatientContactsCodeableConcept['patientContactId'];
+  codeableConceptId!: IPatientContactsCodeableConcept['codeableConceptId'];
 
   static get tableName(): string {
     return `${Schema.lafiaService}.${Table.patient_contacts_codeable_concepts}`;
@@ -18,7 +18,7 @@ export class PatientContactsCodeableConceptModel extends BaseModel implements IP
 
   static get relationMappings(): RelationMappings {
     return {
-      patient_contact: {
+      patientContact: {
         relation: BaseModel.BelongsToOneRelation,
         modelClass: '../patientContacts',
         join: {
@@ -27,7 +27,7 @@ export class PatientContactsCodeableConceptModel extends BaseModel implements IP
         }
       },
 
-      codeable_concept: {
+      codeableConcept: {
         relation: BaseModel.BelongsToOneRelation,
         modelClass: '../codeableConcepts',
         join: {

@@ -20,7 +20,7 @@ export class UserController extends BaseController {
 
       this.success(res, newUser, 'User created', HttpStatusCode.CREATED);
     } catch (e) {
-      this.error(res, e.code, e.message);
+      this.error(res, e);
     }
   }
 }

@@ -27,7 +27,7 @@ export class PatientsHumanNameModel extends BaseModel implements IPatientsHumanN
         }
       },
 
-      human_name: {
+      humanName: {
         relation: BaseModel.BelongsToOneRelation,
         modelClass: '../humanNames',
         join: {

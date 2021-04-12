@@ -12,6 +12,6 @@ export interface IPatientContact extends IBase {
   gender: string;
   organization?: IReference;
   period?: IPeriod;
-  relationship: ICodeableConcept;
-  telecom: IContactPoint;
+  relationship: ICodeableConcept | ICodeableConcept[];
+  telecom: IContactPoint | IContactPoint[];
 }

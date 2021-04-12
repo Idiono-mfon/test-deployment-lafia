@@ -1,4 +1,7 @@
-import { JSONSchema, RelationMappings } from 'objection';
+import {
+  JSONSchema, Modifiers, QueryBuilder,
+  RelationMappings
+} from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
 import { ICodeableConcept } from './interfaces';
@@ -14,6 +17,20 @@ export class CodeableConceptModel extends BaseModel implements ICodeableConcept 
 
   static get jsonSchema(): JSONSchema {
     return CodeableConceptValidation;
+  }
+
+  static get hidden(): string[] {
+    return ['updatedAt'];
+  }
+
+  static get modifiers(): Modifiers {
+    return {
+      selectId(builder: QueryBuilder<any, any[]>) {
+        builder.select(
+          `${Schema.lafiaService}.${Table.codeable_concepts}.id`
+        );
+      },
+    };
   }
 
   static get relationMappings(): RelationMappings {
@@ -50,7 +67,7 @@ export class CodeableConceptModel extends BaseModel implements ICodeableConcept 
         }
       },
 
-      patient_contact: {
+      patientContact: {
         relation: BaseModel.ManyToManyRelation,
         modelClass: '../patientContacts',
         join: {
@@ -61,6 +78,15 @@ export class CodeableConceptModel extends BaseModel implements ICodeableConcept 
             to: `${Schema.lafiaService}.${Table.patient_contacts_codeable_concepts}.patient_contact_id`
           },
           to: `${Schema.lafiaService}.${Table.patient_contacts}.id`
+        }
+      },
+
+      qualification: {
+        relation: BaseModel.HasOneRelation,
+        modelClass: '../qualifications',
+        join: {
+          from: `${Schema.lafiaService}.${Table.codeable_concepts}.id`,
+          to: `${Schema.lafiaService}.${Table.qualifications}.id`
         }
       },
     }

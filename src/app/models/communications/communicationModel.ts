@@ -1,4 +1,7 @@
-import { JSONSchema, RelationMappings } from 'objection';
+import {
+  JSONSchema, Modifiers, QueryBuilder,
+  RelationMappings
+} from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
 import { ICommunication } from './interfaces';
@@ -14,6 +17,20 @@ export class CommunicationModel extends BaseModel implements ICommunication {
 
   static get jsonSchema(): JSONSchema {
     return CommunicationValidation;
+  }
+
+  static get hidden(): string[] {
+    return ['updatedAt', 'createdAt', 'codeableConceptId'];
+  }
+
+  static get modifiers(): Modifiers {
+    return {
+      selectId(builder: QueryBuilder<any, any[]>) {
+        builder.select(
+          `${Schema.lafiaService}.${Table.communications}.id`
+        );
+      },
+    };
   }
 
   static get relationMappings(): RelationMappings {
