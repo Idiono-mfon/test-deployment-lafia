@@ -15,6 +15,12 @@ RUN apt-get install nodejs -y && \
 
 RUN npm install -g yarn
 
+RUN curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
+
+RUN source ~/.profile
+
+RUN nvm install 12 && nvm use 12
+
 RUN yarn global add pm2 knex
 #
 RUN mkdir -p /home/lafia-service
