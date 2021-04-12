@@ -30,4 +30,4 @@ RUN yarn tsc
 
 EXPOSE 9000
 
-CMD ['yarn', 'start']
+CMD ['node', 'dist/src/app/index.js']
