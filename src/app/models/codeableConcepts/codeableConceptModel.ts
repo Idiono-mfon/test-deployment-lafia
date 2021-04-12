@@ -80,6 +80,15 @@ export class CodeableConceptModel extends BaseModel implements ICodeableConcept 
           to: `${Schema.lafiaService}.${Table.patient_contacts}.id`
         }
       },
+
+      qualification: {
+        relation: BaseModel.HasOneRelation,
+        modelClass: '../qualifications',
+        join: {
+          from: `${Schema.lafiaService}.${Table.codeable_concepts}.id`,
+          to: `${Schema.lafiaService}.${Table.qualifications}.id`
+        }
+      },
     }
   }
 }

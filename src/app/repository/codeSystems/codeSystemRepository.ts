@@ -9,7 +9,9 @@ export class CodeSystemRepository {
       let codeSystems = CodeSystemModel.query();
 
       if (codeType) {
-        codeSystems = codeSystems.where({ type: codeType });
+        codeSystems = codeSystems
+          .where({ type: codeType })
+          .skipUndefined();
       }
 
       return codeSystems;
@@ -26,6 +28,7 @@ export class CodeSystemRepository {
     try {
       return CodeSystemModel.query()
         .where({ code })
+        .skipUndefined()
         .first();
     } catch (e) {
       throw new InternalServerError(e.message);
