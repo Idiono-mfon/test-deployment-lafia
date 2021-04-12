@@ -22,7 +22,7 @@ RUN curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | ba
 
 RUN touch ~/.profile
 
-RUN "source ~/.profile"
+RUN source ~/.profile
 
 RUN nvm install 12 && nvm use 12
 
