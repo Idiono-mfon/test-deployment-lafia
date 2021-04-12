@@ -10,7 +10,7 @@ RUN mkdir -p /home/lafia-service
 
 # COPY package*.json ./
 #
-COPY .. /home/lafia-service
+COPY . /home/lafia-service
 
 WORKDIR /home/lafia-service
 
