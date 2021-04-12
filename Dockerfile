@@ -17,7 +17,7 @@ RUN npm install -g yarn
 
 RUN curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
 
-RUN source ~/.profile
+RUN /bin/bash -c "source ~/.profile"
 
 RUN nvm install 12 && nvm use 12
 
