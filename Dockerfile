@@ -3,14 +3,14 @@ FROM node:10.16-alpine
 RUN apk update && apk upgrade && \
     apk add --no-cache --virtual .build-deps \
     ca-certificates \
+    bash git curl openssh make python \
+    busybox-extras \
     wget \
     tar && \
     cd /usr/local/bin && \
     wget https://yarnpkg.com/latest.tar.gz && \
     tar zvxf latest.tar.gz && \
     ln -s /usr/local/bin/dist/bin/yarn.js /usr/local/bin/yarn.js && \
-    bash git curl openssh make python \
-    busybox-extras \
     apk del .build-deps
 
 
