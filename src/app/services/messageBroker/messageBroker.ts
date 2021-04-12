@@ -31,9 +31,7 @@ export class MessageBroker {
       console.log(' [x] Sent Date: %s', new Date().toString());
       console.log(' [x] Sent Data: %s', msg);
     } catch (e) {
-
       console.log('error:', e.message);
-      throw new GenericResponseError(e.message, e.code || 500);
     }
   }
 
@@ -74,8 +72,6 @@ export class MessageBroker {
         data: e.message,
       }
       await this.rmqPublish(subError);
-
-      throw new GenericResponseError(e.message, e.code || 500);
     }
   }
 }
