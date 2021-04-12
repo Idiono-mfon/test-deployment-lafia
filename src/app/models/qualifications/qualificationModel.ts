@@ -63,7 +63,7 @@ export class QualificationModel extends BaseModel implements IQualification {
         relation: BaseModel.BelongsToOneRelation,
         modelClass: '../codeableConcepts',
         join: {
-          from: `${Schema.lafiaService}.${Table.qualifications}.id`,
+          from: `${Schema.lafiaService}.${Table.qualifications}.codeable_concept_id`,
           to: `${Schema.lafiaService}.${Table.codeable_concepts}.id`
         }
       },
@@ -72,7 +72,7 @@ export class QualificationModel extends BaseModel implements IQualification {
         relation: BaseModel.BelongsToOneRelation,
         modelClass: '../periods',
         join: {
-          from: `${Schema.lafiaService}.${Table.qualifications}.id`,
+          from: `${Schema.lafiaService}.${Table.qualifications}.period_id`,
           to: `${Schema.lafiaService}.${Table.periods}.id`
         }
       },
@@ -81,14 +81,14 @@ export class QualificationModel extends BaseModel implements IQualification {
         relation: BaseModel.BelongsToOneRelation,
         modelClass: '../references',
         join: {
-          from: `${Schema.lafiaService}.${Table.qualifications}.id`,
+          from: `${Schema.lafiaService}.${Table.qualifications}.reference_id`,
           to: `${Schema.lafiaService}.${Table.references}.id`
         }
       },
 
       practitioner: {
         relation: BaseModel.ManyToManyRelation,
-        modelClass: '../qualifications',
+        modelClass: '../practitioners',
         join: {
           from: `${Schema.lafiaService}.${Table.qualifications}.id`,
           through: {
