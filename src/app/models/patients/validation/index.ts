@@ -14,7 +14,6 @@ import { PatientContactValidation } from '../../patientContacts';
 export const PatientValidation: JSONSchema = {
   type: 'object',
   title: 'Patient Schema Validation',
-  required: ['active', 'gender'],
   properties: {
     resourceType: {
       type: 'string',
