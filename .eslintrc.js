@@ -64,5 +64,6 @@ module.exports = {
     '@typescript-eslint/no-misused-promises': 0,
     'no-use-before-define': 0,
     '@typescript-eslint/no-unused-vars': 0,
+    'guard-for-in': 0,
   },
 };
