@@ -1,4 +1,7 @@
 FROM ubuntu:18.04
+
+SHELL ["/bin/bash", "-c"]
+
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y  software-properties-common && \
@@ -17,7 +20,7 @@ RUN npm install -g yarn
 
 RUN curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
 
-RUN /bin/bash -c "source ~/.profile"
+RUN "source ~/.profile"
 
 RUN nvm install 12 && nvm use 12
 
