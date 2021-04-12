@@ -95,3 +95,25 @@ export class UnsupportedMediaTypeError extends Error {
     super(message);
   }
 }
+
+interface ErrorConstructor {
+  new(message: string, code?: number): Error;
+}
+
+export const error = {
+  notFound: NotFoundError,
+  internalServer: InternalServerError,
+  unauthorized: UnauthorizedError,
+  badRequest: BadRequestError,
+  forbidden: ForbiddenError,
+  conflict: ConflictError,
+  serviceUnavailable: ServiceUnavailableError,
+  badGateway: BadGatewayError,
+  paymentRequired: PaymentRequiredError,
+  unsupportedMediaType: UnsupportedMediaTypeError,
+
+}
+
+export function throwError(message: string, ErrorType: ErrorConstructor) {
+  throw new ErrorType(message);
+}

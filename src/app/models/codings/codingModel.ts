@@ -1,4 +1,7 @@
-import { JSONSchema, RelationMappings } from 'objection';
+import {
+  JSONSchema, Modifiers, QueryBuilder,
+  RelationMappings
+} from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
 import { ICoding } from './interfaces';
@@ -9,7 +12,7 @@ export class CodingModel extends BaseModel implements ICoding {
   version!: ICoding['version'];
   code!: ICoding['code'];
   display!: ICoding['display'];
-  user_selected!: ICoding['user_selected'];
+  userSelected!: ICoding['userSelected'];
 
   static get tableName(): string {
     return `${Schema.lafiaService}.${Table.codings}`;
@@ -19,9 +22,23 @@ export class CodingModel extends BaseModel implements ICoding {
     return CodingValidation;
   }
 
+  static get hidden(): string[] {
+    return ['updatedAt', 'createdAt'];
+  }
+
+  static get modifiers(): Modifiers {
+    return {
+      selectId(builder: QueryBuilder<any, any[]>) {
+        builder.select(
+          `${Schema.lafiaService}.${Table.codings}.id`
+        );
+      },
+    };
+  }
+
   static get relationMappings(): RelationMappings {
     return {
-      codeable_concept: {
+      codeableConcept: {
         relation: BaseModel.ManyToManyRelation,
         modelClass: '../codeableConcepts',
         join: {

@@ -1,4 +1,7 @@
-import { JSONSchema, RelationMappings } from 'objection';
+import {
+  JSONSchema, Modifiers, QueryBuilder,
+  RelationMappings
+} from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
 import { IPatientContact } from './interfaces';
@@ -21,6 +24,27 @@ export class PatientContactModel extends BaseModel implements IPatientContact {
 
   static get jsonSchema(): JSONSchema {
     return PatientContactValidation;
+  }
+
+  static get hidden(): string[] {
+    return [
+      'updatedAt',
+      'createdAt',
+      'periodId',
+      'humanNameId',
+      'addressId',
+      'referenceId'
+    ];
+  }
+
+  static get modifiers(): Modifiers {
+    return {
+      selectId(builder: QueryBuilder<any, any[]>) {
+        builder.select(
+          `${Schema.lafiaService}.${Table.patient_contacts}.id`
+        );
+      },
+    };
   }
 
   static get relationMappings(): RelationMappings {

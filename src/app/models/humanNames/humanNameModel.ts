@@ -1,4 +1,7 @@
-import { JSONSchema, RelationMappings } from 'objection';
+import {
+  JSONSchema, Modifiers, QueryBuilder,
+  RelationMappings
+} from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
 import { IHumanName } from './interfaces';
@@ -21,6 +24,20 @@ export class HumanNameModel extends BaseModel implements IHumanName {
     return HumanNameValidation;
   }
 
+  static get hidden(): string[] {
+    return ['updatedAt', 'createdAt', 'periodId'];
+  }
+
+  static get modifiers(): Modifiers {
+    return {
+      selectId(builder: QueryBuilder<any, any[]>) {
+        builder.select(
+          `${Schema.lafiaService}.${Table.human_names}.id`
+        );
+      },
+    };
+  }
+
   static get relationMappings(): RelationMappings {
     return {
       period: {
@@ -32,7 +49,7 @@ export class HumanNameModel extends BaseModel implements IHumanName {
         }
       },
 
-      patient_contact: {
+      patientContact: {
         relation: BaseModel.HasOneRelation,
         modelClass: '../patientContacts',
         join: {

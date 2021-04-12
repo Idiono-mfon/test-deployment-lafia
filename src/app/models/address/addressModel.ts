@@ -1,4 +1,7 @@
-import { JSONSchema, RelationMappings } from 'objection';
+import {
+  JSONSchema, Modifiers, QueryBuilder,
+  RelationMappings
+} from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
 import { IAddress } from './interfaces';
@@ -14,7 +17,7 @@ export class AddressModel extends BaseModel implements IAddress {
   period!: IAddress['period'];
   country!: IAddress['country'];
   district!: IAddress['district'];
-  postal_code!: IAddress['postal_code'];
+  postalCode!: IAddress['postalCode'];
 
   static get tableName(): string {
     return `${Schema.lafiaService}.${Table.address}`;
@@ -22,6 +25,20 @@ export class AddressModel extends BaseModel implements IAddress {
 
   static get jsonSchema(): JSONSchema {
     return AddressValidation;
+  }
+
+  static get hidden(): string[] {
+    return ['updatedAt', 'createdAt', 'periodId'];
+  }
+
+  static get modifiers(): Modifiers {
+    return {
+      selectId(builder: QueryBuilder<any, any[]>) {
+        builder.select(
+          `${Schema.lafiaService}.${Table.address}.id`
+        );
+      },
+    };
   }
 
   static get relationMappings(): RelationMappings {
@@ -35,7 +52,7 @@ export class AddressModel extends BaseModel implements IAddress {
         }
       },
 
-      patient_contact: {
+      patientContact: {
         relation: BaseModel.HasOneRelation,
         modelClass: '../patientContacts',
         join: {

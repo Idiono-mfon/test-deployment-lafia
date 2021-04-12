@@ -1,4 +1,4 @@
-import { JSONSchema } from 'objection';
+import { JSONSchema, Modifiers, QueryBuilder } from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
 import { INarrative } from './interfaces';
@@ -14,5 +14,19 @@ export class NarrativeModel extends BaseModel implements INarrative {
 
   static get jsonSchema(): JSONSchema {
     return NarrativeValidation;
+  }
+
+  static get hidden(): string[] {
+    return ['updatedAt', 'createdAt'];
+  }
+
+  static get modifiers(): Modifiers {
+    return {
+      selectId(builder: QueryBuilder<any, any[]>) {
+        builder.select(
+          `${Schema.lafiaService}.${Table.narratives}.id`
+        );
+      },
+    };
   }
 }

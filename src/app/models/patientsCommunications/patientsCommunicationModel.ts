@@ -31,7 +31,7 @@ export class PatientsCommunicationModel extends BaseModel implements IPatientsCo
         relation: BaseModel.BelongsToOneRelation,
         modelClass: '../communications',
         join: {
-          from: `${Schema.lafiaService}.${Table.patients_attachments}.communication_id`,
+          from: `${Schema.lafiaService}.${Table.patients_communications}.communication_id`,
           to: `${Schema.lafiaService}.${Table.communications}.id`
         }
       },

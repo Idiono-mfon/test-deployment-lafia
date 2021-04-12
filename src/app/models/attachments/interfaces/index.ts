@@ -1,7 +1,7 @@
 import { IBase } from '../../base';
 
 export interface IAttachment extends IBase {
-  content_type: string;
+  contentType: string;
   language?: string;
   data?: Buffer;
   url?: string;
