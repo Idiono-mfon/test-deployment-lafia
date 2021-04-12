@@ -1,18 +1,19 @@
-FROM node:10.16-alpine
+FROM ubuntu:18.04
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y  software-properties-common && \
+    apt-get -y install curl && \
+    apt-get clean
 
-RUN apk update && apk upgrade && \
-    apk add --no-cache --virtual .build-deps \
-    ca-certificates \
-    bash git curl openssh make python \
-    busybox-extras \
-    wget \
-    tar && \
-    cd /usr/local/bin && \
-    wget https://yarnpkg.com/latest.tar.gz && \
-    tar zvxf latest.tar.gz && \
-    ln -s /usr/local/bin/dist/bin/yarn.js /usr/local/bin/yarn.js && \
-    apk del .build-deps
 
+RUN curl -sL https://deb.nodesource.com/setup_8.x |  bash  -
+
+
+RUN apt-get install nodejs -y && \
+    apt-get install -y libaio1 && \
+    apt-get clean
+
+RUN npm install -g yarn
 
 RUN yarn global add pm2 knex
 #
