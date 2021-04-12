@@ -36,6 +36,8 @@ export const PractitionerValidation: JSONSchema = {
     telecom: {
       ...ContactPointValidation
     },
+    referenceId: { format: 'uuid' },
+    codeableConceptId: { format: 'uuid' },
     photo: {
       ...AttachmentValidation
     },

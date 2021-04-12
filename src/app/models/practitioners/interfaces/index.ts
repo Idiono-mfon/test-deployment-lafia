@@ -1,8 +1,8 @@
 import { IAddress } from '../../address';
 import { IAttachment } from '../../attachments';
 import { IBase } from '../../base';
-import { ICodeableConcept } from '../../codeableConcepts';
 import { ICommunication } from '../../communications';
+import { IContactPoint } from '../../contactPoints';
 import { IHumanName } from '../../humanNames';
 import { IIdentifier } from '../../identifiers';
 import { INarrative } from '../../narratives';
@@ -15,8 +15,10 @@ export interface IPractitioner extends IBase {
   active: boolean;
   gender: string;
   birthDate?: Date | string;
+  referenceId?: string;
+  codeableConceptId?: string;
   name?: IHumanName | IHumanName[];
-  telecom?: ICodeableConcept | ICodeableConcept[];
+  telecom?: IContactPoint | IContactPoint[];
   address?: IAddress | IAddress[];
   photo?: IAttachment | IAttachment[];
   communication?: ICommunication | ICommunication[];
