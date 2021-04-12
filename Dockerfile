@@ -14,10 +14,10 @@ COPY . /home/lafia-service
 
 WORKDIR /home/lafia-service
 
+RUN yarn
+
+RUN yarn tsc
+
 EXPOSE 9000
-#
-ADD docker-entrypoint.sh /usr/local/bin/
-#
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-#
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+
+CMD ['yarn', 'start']
