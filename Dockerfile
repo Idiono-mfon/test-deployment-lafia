@@ -9,7 +9,7 @@ RUN apt-get update && \
     apt-get clean
 
 
-RUN curl -sL https://deb.nodesource.com/setup_8.x |  bash  -
+RUN curl -sL https://deb.nodesource.com/setup_12.x |  bash  -
 
 
 RUN apt-get install nodejs -y && \
@@ -17,14 +17,6 @@ RUN apt-get install nodejs -y && \
     apt-get clean
 
 RUN npm install -g yarn
-
-RUN curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
-
-RUN touch ~/.profile
-
-RUN source ~/.profile
-
-RUN nvm install 12 && nvm use 12
 
 RUN yarn global add pm2 knex
 #
