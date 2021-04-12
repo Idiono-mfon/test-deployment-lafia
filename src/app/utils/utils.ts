@@ -218,15 +218,15 @@ class UtilityService {
   public checkForRequiredFields(data: any) {
     try {
       const { email } = data;
-      const { gender } = data;
+      // const { gender } = data;
 
       if (!email) {
         throwError('Email is required!', badRequest);
       }
 
-      if (!gender) {
-        throwError('Gender is required!', badRequest);
-      }
+      // if (!gender) {
+      //   throwError('Gender is required!', badRequest);
+      // }
     } catch (e) {
       throw new GenericResponseError(e.message, e.code);
     }

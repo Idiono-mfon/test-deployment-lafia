@@ -14,7 +14,7 @@ COPY . /home/lafia-service
 
 WORKDIR /home/lafia-service
 
-EXPOSE 4020
+EXPOSE 9000
 #
 ADD docker-entrypoint.sh /usr/local/bin/
 #
