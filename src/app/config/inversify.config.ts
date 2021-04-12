@@ -1,18 +1,26 @@
 import { Container } from 'inversify';
 import 'reflect-metadata';
-import { HealthController, PatientController } from '../controllers';
+import {
+  HealthController,
+  PatientController,
+  PractitionerController
+} from '../controllers';
 import { CodeSystemController } from '../controllers/codeSystems';
 import {
   UserRepository,
-  PatientRepository
+  PatientRepository,
+  PractitionerRepository
 } from '../repository';
 import { CodeSystemRepository } from '../repository/codeSystems';
 import {
   UserService,
-  PatientService, S3Service
+  PatientService,
+  PractitionerService,
+  S3Service
 } from '../services';
 import { CodeSystemService } from '../services/codeSystems';
 import { MessageBroker } from '../services/messageBroker';
+import { UtilityService } from '../utils';
 import TYPES from './types';
 
 const container = new Container();
@@ -25,6 +33,10 @@ container
 container
   .bind<PatientController>(TYPES.PatientController)
   .to(PatientController)
+  .inSingletonScope();
+container
+  .bind<PractitionerController>(TYPES.PractitionerController)
+  .to(PractitionerController)
   .inSingletonScope();
 container
   .bind<CodeSystemController>(TYPES.CodeSystemController)
@@ -41,6 +53,10 @@ container
   .to(PatientService)
   .inSingletonScope();
 container
+  .bind<PractitionerService>(TYPES.PractitionerService)
+  .to(PractitionerService)
+  .inSingletonScope();
+container
   .bind<CodeSystemService>(TYPES.CodeSystemService)
   .to(CodeSystemService)
   .inSingletonScope();
@@ -52,6 +68,10 @@ container
   .bind<S3Service>(TYPES.S3Service)
   .to(S3Service)
   .inSingletonScope();
+container
+  .bind<UtilityService>(TYPES.UtilityService)
+  .to(UtilityService)
+  .inSingletonScope();
 
 // repositories
 container
@@ -61,6 +81,10 @@ container
 container
   .bind<PatientRepository>(TYPES.PatientRepository)
   .to(PatientRepository)
+  .inSingletonScope();
+container
+  .bind<PractitionerRepository>(TYPES.PractitionerRepository)
+  .to(PractitionerRepository)
   .inSingletonScope();
 container
   .bind<CodeSystemRepository>(TYPES.CodeSystemRepository)
