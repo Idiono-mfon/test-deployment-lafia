@@ -22,14 +22,11 @@ export async function up(knex: Knex): Promise<void> {
                 tableBuilder
                   .uuid('codeable_concept_id')
                   .comment('code')
-                  .notNullable();
                 tableBuilder
                   .uuid('reference_id')
                   .comment('issuer')
-                  .notNullable();
                 tableBuilder
                   .uuid('period_id')
-                  .unique()
                   .comment('period');
                 tableBuilder
                   .timestamps(true, true);

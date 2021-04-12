@@ -22,8 +22,7 @@ export async function up(knex: Knex): Promise<void> {
                 tableBuilder
                   .uuid('practitioner_id');
                 tableBuilder
-                  .uuid('qualification_id')
-                  .unique();
+                  .uuid('qualification_id');
                 tableBuilder
                   .timestamps(true, true);
 
