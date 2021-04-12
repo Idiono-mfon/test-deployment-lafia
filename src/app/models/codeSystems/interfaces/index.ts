@@ -8,7 +8,8 @@ export interface ICodeSystem extends IBase {
 }
 
 export interface ICodeType {
-  relationship: string,
-  language: string,
-  maritalStatus: string,
+  relationship: string;
+  language: string;
+  maritalStatus: string;
+  qualification: string;
 }
