@@ -88,8 +88,7 @@ export class PatientService {
         email,
       } = data;
 
-      let signupOnThePlatform: any;
-      signupOnThePlatform = await this.platformSdkService.userSignup(data);
+      await this.platformSdkService.userSignup(data);
 
       const patientData: IPatient = {
         active: true,
