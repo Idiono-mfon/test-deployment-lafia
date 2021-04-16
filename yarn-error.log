@@ -1,5 +1,5 @@
 Arguments: 
-  /Users/theshedman/.nvm/versions/node/v15.11.0/bin/node /usr/local/bin/yarn add -D @types/short-uuid
+  /Users/theshedman/.nvm/versions/node/v15.11.0/bin/node /usr/local/bin/yarn add -D @types/platform-admin-sdk
 
 PATH: 
   /Users/theshedman/.nvm/versions/node/v15.11.0/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/theshedman/Documents/GitHub/ParallelScore/lafia-service/node_modules/.bin
@@ -14,7 +14,7 @@ Platform:
   darwin x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/@types%2fshort-uuid: Not found
+  Error: https://registry.yarnpkg.com/@types%2fplatform-admin-sdk: Not found
       at Request.params.callback [as _callback] (/usr/local/lib/node_modules/yarn/lib/cli.js:66988:18)
       at Request.self.callback (/usr/local/lib/node_modules/yarn/lib/cli.js:140662:22)
       at Request.emit (node:events:378:20)
@@ -99,10 +99,12 @@ npm manifest:
       "objection": "^2.2.15",
       "objection-visibility": "^1.1.0",
       "pg": "8.5.1",
+      "platform-admin-sdk": "^1.5.0",
       "pm2": "^4.5.5",
       "reflect-metadata": "^0.1.13",
       "short-uuid": "^4.1.0",
       "uuid": "^8.3.2",
+      "ws": "3.3.2",
       "yarn": "^1.22.10"
     },
     "devDependencies": {
@@ -2810,7 +2812,7 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/colorette/-/colorette-1.2.2.tgz#cbcc79d5e99caea2dbf10eb3a26fd8b3e6acfa94"
     integrity sha512-MKGMzyfeuutC/ZJ1cba9NqcNpfeqMUcYmyF1ZFY6/Cn7CNSAKx6a+s48sqLqyAiZuaP2TcqMhoo+dlwFnVxT9w==
   
-  combined-stream@^1.0.6, combined-stream@~1.0.6:
+  combined-stream@^1.0.6, combined-stream@^1.0.8, combined-stream@~1.0.6:
     version "1.0.8"
     resolved "https://registry.yarnpkg.com/combined-stream/-/combined-stream-1.0.8.tgz"
     integrity sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==
@@ -4186,6 +4188,15 @@ Lockfile:
     dependencies:
       asynckit "^0.4.0"
       combined-stream "^1.0.6"
+      mime-types "^2.1.12"
+  
+  form-data@^4.0.0:
+    version "4.0.0"
+    resolved "https://registry.yarnpkg.com/form-data/-/form-data-4.0.0.tgz#93919daeaf361ee529584b9b31664dc12c9fa452"
+    integrity sha512-ETEklSGi5t0QMZuiXoA/Q6vcnxcLQP5vdugSpuAyi6SVGi2clPPp+xgEhuMaHC+zGgn31Kd235W35f7Hykkaww==
+    dependencies:
+      asynckit "^0.4.0"
+      combined-stream "^1.0.8"
       mime-types "^2.1.12"
   
   form-data@~2.3.2:
@@ -6863,6 +6874,15 @@ Lockfile:
     dependencies:
       find-up "^4.0.0"
   
+  platform-admin-sdk@^1.5.0:
+    version "1.5.0"
+    resolved "https://registry.yarnpkg.com/platform-admin-sdk/-/platform-admin-sdk-1.5.0.tgz#c21800ac16b2b31bf097a4cb7c7d7b050074f751"
+    integrity sha512-+Ba5kvQdOv6lngKZhElunQ99+kjSEaphRPiI0JKj1wLU86jnTPX9TYBwPZIeE3w2xTo/qa0Ic2UIO4CFbmXaCw==
+    dependencies:
+      axios "^0.21.1"
+      form-data "^4.0.0"
+      lodash "^4.17.21"
+  
   pluralize@^8.0.0:
     version "8.0.0"
     resolved "https://registry.yarnpkg.com/pluralize/-/pluralize-8.0.0.tgz#1a6fa16a38d12a1901e0320fa017051c539ce3b1"
@@ -8538,6 +8558,11 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.2.3.tgz#39062d8019912d43726298f09493d598048c1ce3"
     integrity sha512-qOcYwxaByStAWrBf4x0fibwZvMRG+r4cQoTjbPtUlrWjBHbmCAww1i448U0GJ+3cNNEtebDteo/cHOR3xJ4wEw==
   
+  ultron@~1.1.0:
+    version "1.1.1"
+    resolved "https://registry.yarnpkg.com/ultron/-/ultron-1.1.1.tgz#9fe1536a10a664a65266a1e3ccf85fd36302bc9c"
+    integrity sha512-UIEXBNeYmKptWH6z8ZnqTeS8fV74zG0/eRU9VGkpzz+LIJNs8W/zM/L+7ctCkRrgbNnnR0xxw4bKOr0cW0N0Og==
+  
   unbox-primitive@^1.0.0:
     version "1.0.0"
     resolved "https://registry.npmjs.org/unbox-primitive/-/unbox-primitive-1.0.0.tgz"
@@ -8853,6 +8878,15 @@ Lockfile:
       is-typedarray "^1.0.0"
       signal-exit "^3.0.2"
       typedarray-to-buffer "^3.1.5"
+  
+  ws@3.3.2:
+    version "3.3.2"
+    resolved "https://registry.yarnpkg.com/ws/-/ws-3.3.2.tgz#96c1d08b3fefda1d5c1e33700d3bfaa9be2d5608"
+    integrity sha512-t+WGpsNxhMR4v6EClXS8r8km5ZljKJzyGhJf7goJz9k5Ye3+b5Bvno5rjqPuIBn5mnn5GBb7o8IrIWHxX1qOLQ==
+    dependencies:
+      async-limiter "~1.0.0"
+      safe-buffer "~5.1.0"
+      ultron "~1.1.0"
   
   ws@^6.0.0:
     version "6.2.1"

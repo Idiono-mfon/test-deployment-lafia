@@ -22,6 +22,7 @@ interface IEnv {
   aws_bucket: string;
   jwt_secrete_key: string;
   platform_admin_key: number;
+  platform_app_namespace: string;
 }
 
 const config: IEnv = {
@@ -46,6 +47,7 @@ const config: IEnv = {
   aws_bucket: process.env.AWS_BUCKET as string,
   jwt_secrete_key: process.env.JWT_SECRETE_KEY as string,
   platform_admin_key: Number(process.env.PLATFORM_ADMIN_KEY),
+  platform_app_namespace: process.env.PLATFORM_APP_NAMESPACE as string,
 };
 
 export class Env {
