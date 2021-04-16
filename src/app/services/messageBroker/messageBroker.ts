@@ -4,6 +4,7 @@ import { Env } from '../../config/env';
 import TYPES from '../../config/types';
 import { IPatient } from '../../models/patients';
 import { IPractitioner } from '../../models/practitioners';
+import { forWho } from '../../utils';
 import { PatientService } from '../patients';
 import { PractitionerService } from '../practitioners';
 import { initRMQ } from './rmqSetup';
@@ -16,6 +17,7 @@ export class MessageBroker {
   private readonly patientService: PatientService;
   @inject(TYPES.PractitionerService)
   private readonly practitionerService: PractitionerService;
+
   private readonly pubQueue: string;
   private readonly subQueue: string;
 
@@ -83,12 +85,36 @@ export class MessageBroker {
               return;
             }
 
-            if (resource_type?.toLowerCase() === 'patient') {
-              resource = await this.patientService.createPatient(data);
+            if (resource_type?.toLowerCase() === forWho.patient) {
+              try {
+                resource = await this.patientService.createPatient(data);
+              } catch(e) {
+                const rmqPubMsg = {
+                  status: 'error',
+                  resource_type,
+                  message: e.message,
+                  id: null
+                }
+                await this.rmqPublish(JSON.stringify(rmqPubMsg));
+
+                return;
+              }
             }
 
-            if (resource_type?.toLowerCase() === 'practitioner') {
-              resource = await this.practitionerService.createPractitioner(data);
+            if (resource_type?.toLowerCase() === forWho.practitioner) {
+              try {
+                resource = await this.practitionerService.createPractitioner(data);
+              } catch(e) {
+                const rmqPubMsg = {
+                  status: 'error',
+                  resource_type,
+                  message: e.message,
+                  id: null
+                }
+                await this.rmqPublish(JSON.stringify(rmqPubMsg));
+
+                return;
+              }
             }
 
             const rmqPubMsg = {
