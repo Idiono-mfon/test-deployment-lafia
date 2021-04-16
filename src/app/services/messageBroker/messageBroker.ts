@@ -3,8 +3,9 @@ import _ from 'lodash';
 import { Env } from '../../config/env';
 import TYPES from '../../config/types';
 import { IPatient } from '../../models/patients';
-import { error, GenericResponseError, throwError } from '../../utils';
+import { IPractitioner } from '../../models/practitioners';
 import { PatientService } from '../patients';
+import { PractitionerService } from '../practitioners';
 import { initRMQ } from './rmqSetup';
 
 const env = Env.all();
@@ -13,6 +14,8 @@ const env = Env.all();
 export class MessageBroker {
   @inject(TYPES.PatientService)
   private readonly patientService: PatientService;
+  @inject(TYPES.PractitionerService)
+  private readonly practitionerService: PractitionerService;
   private readonly pubQueue: string;
   private readonly subQueue: string;
 
@@ -46,30 +49,71 @@ export class MessageBroker {
           rmqChannel.ack(msg);
 
           const msgString = msg.content.toString();
-          const msgJson = JSON.parse(msgString);
+          let msgJson: any = {};
+          try {
+            msgJson = JSON.parse(msgString);
+          } catch (e) {
+            const rmqPubMsg = {
+              status: 'error',
+              message: 'The payload is not a valid JSON. Did you remember to stringify it?',
+              id: null
+            }
+            await this.rmqPublish(JSON.stringify(rmqPubMsg));
+
+            return;
+          }
 
           console.log(' [x] Received Date: %s', new Date().toString());
           console.log(' [x] Received Data: %s', msgString);
 
-          const { data } = msgJson;
+          const { data, resource_type } = msgJson;
 
           if (data || !_.isEmpty(data)) {
-            const patient: IPatient = await this.patientService.createPatient(data);
+            let resource: IPatient | IPractitioner | any = {};
+
+            if (!resource_type) {
+              const rmqPubMsg = {
+                status: 'error',
+                resource_type,
+                message: 'Unable to create resource: resource_type is required!',
+                id: null
+              }
+              await this.rmqPublish(JSON.stringify(rmqPubMsg));
+
+              return;
+            }
+
+            if (resource_type?.toLowerCase() === 'patient') {
+              resource = await this.patientService.createPatient(data);
+            }
+
+            if (resource_type?.toLowerCase() === 'practitioner') {
+              resource = await this.practitionerService.createPractitioner(data);
+            }
 
             const rmqPubMsg = {
               status: 'success',
-              data: patient?.id,
+              resource_type,
+              message: 'Resource created successfully',
+              id: resource?.id
             }
             await this.rmqPublish(JSON.stringify(rmqPubMsg));
           } else {
-            throwError('Invalid payload received', error.badRequest);
+            const rmqPubMsg = {
+              status: 'error',
+              resource_type,
+              message: 'Unable to create resource',
+              id: null
+            }
+            await this.rmqPublish(JSON.stringify(rmqPubMsg));
           }
         }
       });
     } catch (e) {
       const subError = {
         status: 'error',
-        data: e.message,
+        message: e.message,
+        id: null
       }
       await this.rmqPublish(subError);
     }
