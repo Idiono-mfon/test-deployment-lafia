@@ -12,15 +12,20 @@ export function initRMQ(): Promise<amqp.Channel> {
         reject(err.message || 'Connection to RabbitMQ failed!');
       }
 
-      // Create a channel
-      connection.createChannel((err, channel) => {
-        if (err) {
-          reject(err.message || 'RabbitMQ not able to create channel!');
-        }
+      try {
+        // Create a channel
+        connection.createChannel((err, channel) => {
+          if (err) {
+            reject(err.message || 'RabbitMQ not able to create channel!');
+          }
 
-        // Return the connection and channel
-        resolve(channel);
-      });
+          // Return the connection and channel
+          resolve(channel);
+        });
+      } catch(e) {
+        console.log('Could not create a channel!');
+        reject(e.message);
+      }
     });
   });
 }
