@@ -16,6 +16,7 @@ import {
   InternalServerError,
   throwError, UtilityService
 } from '../../utils';
+import { PlatformSdkService } from '../platformSDK';
 
 @injectable()
 export class PractitionerService {
@@ -30,6 +31,9 @@ export class PractitionerService {
 
   @inject(TYPES.UtilityService)
   private readonly utilService: UtilityService;
+
+  @inject(TYPES.PlatformSdkService)
+  private readonly platformSdkService: PlatformSdkService;
 
   public async updatePractitioner(id: string, data: any): Promise<IPractitioner> {
     try {
@@ -78,7 +82,9 @@ export class PractitionerService {
       first_name,
       last_name,
       email,
-      password
+      password,
+      department,
+      birth_date: birthDate,
     } = data;
 
     // Todo: Create the user in our platform sdk
@@ -86,6 +92,7 @@ export class PractitionerService {
     const practitionerData: IPractitioner = {
       active: true,
       gender,
+      birthDate,
       name: {
         use: 'official',
         text: `${first_name} ${last_name}`,
