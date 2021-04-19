@@ -32,6 +32,8 @@ RUN yarn
 
 RUN yarn tsc
 
+RUN yarn mg:latest && yarn seed:run
+
 EXPOSE 9000
 
 CMD ["node", "dist/src/app/index.js"]
