@@ -121,7 +121,8 @@ export class MessageBroker {
               status: 'success',
               resource_type,
               message: 'Resource created successfully',
-              id: resource?.id
+              id: resource?.id,
+              email: data?.email,
             }
             await this.rmqPublish(JSON.stringify(rmqPubMsg));
           } else {
