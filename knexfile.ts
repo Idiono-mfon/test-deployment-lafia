@@ -10,6 +10,7 @@ const {
 } = Env.all();
 
 console.log('pg_host:', process.env.POSTGRES_HOST);
+console.log('pg_host:', process.env);
 console.log('pg_host:', pg_host);
 console.log('pg_port:', pg_port);
 
