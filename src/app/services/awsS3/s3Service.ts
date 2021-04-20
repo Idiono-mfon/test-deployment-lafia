@@ -2,7 +2,12 @@ import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { injectable } from 'inversify';
 import short from 'short-uuid';
 import { Env } from '../../config/env';
-import { GenericResponseError } from '../../utils';
+import {
+  error,
+  GenericResponseError,
+  HttpStatusCode,
+  throwError
+} from '../../utils';
 
 const env = Env.all();
 
@@ -24,6 +29,14 @@ export class S3Service {
   }
 
   public async uploadFile(file: Express.Multer.File): Promise<string> {
+    try {
+      if (!file) {
+        throwError('File upload failed!', error.internalServer);
+      }
+    } catch (e) {
+      throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
+    }
+
     const { buffer: fileBuffer, mimetype } = file;
 
     // Extract file extension
