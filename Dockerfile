@@ -19,16 +19,15 @@ RUN apt-get install nodejs -y && \
 RUN npm install -g yarn
 
 RUN yarn global add pm2 knex
-#
-RUN mkdir -p /home/lafia-service
 
-# COPY package*.json ./
-#
-COPY . /home/lafia-service
-
+# Create App Directory
 WORKDIR /home/lafia-service
 
+COPY package*.json ./
+
 RUN yarn
+
+COPY . .
 
 RUN yarn tsc
 
