@@ -11,9 +11,10 @@ import { IContactPoint } from '../../models/contactPoints';
 import { ICommunication } from '../../models/communications';
 import { IPatientContact } from '../../models/patientContacts';
 import { ICodeableConcept } from '../../models/codeableConcepts';
+import { PlatformSdkService } from '../platformSDK';
 import {
   codeType, error,
-  forWho,
+  forWho, GenericResponseError,
   InternalServerError,
   throwError, UtilityService
 } from '../../utils';
@@ -31,6 +32,9 @@ export class PatientService {
 
   @inject(TYPES.UtilityService)
   private readonly utilService: UtilityService;
+
+  @inject(TYPES.PlatformSdkService)
+  private readonly platformSdkService: PlatformSdkService;
 
   public async updatePatient(id: string, data: any): Promise<IPatient> {
     try {
@@ -74,38 +78,41 @@ export class PatientService {
   }
 
   public async createPatient(data: any): Promise<IPatient> {
-    this.utilService.checkForRequiredFields(data);
+    try {
+      this.utilService.checkForRequiredFields(data);
 
-    const {
-      gender,
-      first_name,
-      last_name,
-      email,
-      password
-    } = data;
+      const {
+        gender,
+        first_name,
+        last_name,
+        email,
+      } = data;
 
-    // Todo: Create the user in our platform sdk
+      await this.platformSdkService.userSignup(data);
 
-    const patientData: IPatient = {
-      active: true,
-      gender,
-      name: {
-        use: 'official',
-        text: `${first_name} ${last_name}`,
-        family: last_name,
-        given: [first_name]
-      },
-      telecom: [
-        {
-          system: 'email',
-          use: 'home',
-          rank: 0,
-          value: email
-        }
-      ],
-    };
+      const patientData: IPatient = {
+        active: true,
+        gender,
+        name: {
+          use: 'official',
+          text: `${first_name} ${last_name}`,
+          family: last_name,
+          given: [first_name]
+        },
+        telecom: [
+          {
+            system: 'email',
+            use: 'home',
+            rank: 0,
+            value: email
+          }
+        ],
+      };
 
-    return await this.patientRepo.createPatient(patientData);
+      return await this.patientRepo.createPatient(patientData);
+    } catch (e) {
+      throw new GenericResponseError(e.message, e.code);
+    }
   }
 
   private async getPatientObjectIdsById(id: string): Promise<any> {
@@ -147,7 +154,7 @@ export class PatientService {
         });
 
       return attachment;
-    } catch(e) {
+    } catch (e) {
       throw new InternalServerError(e.message);
     }
   }

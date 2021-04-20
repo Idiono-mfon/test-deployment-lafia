@@ -20,6 +20,7 @@ import {
 } from '../services';
 import { CodeSystemService } from '../services/codeSystems';
 import { MessageBroker } from '../services/messageBroker';
+import { PlatformSdkService } from '../services/platformSDK';
 import { UtilityService } from '../utils';
 import TYPES from './types';
 
@@ -71,6 +72,10 @@ container
 container
   .bind<UtilityService>(TYPES.UtilityService)
   .to(UtilityService)
+  .inSingletonScope();
+container
+  .bind<PlatformSdkService>(TYPES.PlatformSdkService)
+  .to(PlatformSdkService)
   .inSingletonScope();
 
 // repositories

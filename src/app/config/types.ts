@@ -13,6 +13,7 @@ const TYPES = {
   MessageBroker: Symbol('MessageBroker'),
   S3Service: Symbol('S3Service'),
   UtilityService: Symbol('UtilityService'),
+  PlatformSdkService: Symbol('PlatformSdkService'),
 
   // repositories
   UserRepository: Symbol('UserRepository'),
