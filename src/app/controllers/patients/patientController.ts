@@ -51,8 +51,7 @@ export class PatientController extends BaseController {
       const patientData: any = req.body;
 
       // todo: delete the code below
-      console.log('TransactionId:', patientData.transaction_id);
-      delete patientData.transaction_id;
+      console.log('TransactionId:', patientData);
       // todo: delete the code above
 
       const patient: IPatient = await this.patientService.createPatient(patientData);
