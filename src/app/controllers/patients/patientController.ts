@@ -49,6 +49,12 @@ export class PatientController extends BaseController {
   public async createPatient(@request() req: Request, @response() res: Response) {
     try {
       const patientData: any = req.body;
+
+      // todo: delete the code below
+      console.log('TransactionId:', patientData.transaction_id);
+      delete patientData.transaction_id;
+      // todo: delete the code above
+
       const patient: IPatient = await this.patientService.createPatient(patientData);
 
       this.success(res, patient, 'Patient registration successful', HttpStatusCode.CREATED);
