@@ -8,8 +8,7 @@ import {
 } from 'inversify-express-utils';
 import TYPES from '../../config/types';
 import { uploadFile } from '../../middlewares';
-import { IAttachment } from '../../models/attachments';
-import { IPatient } from '../../models/patients';
+import { IAttachment, IPatient } from '../../models';
 import { PatientService } from '../../services';
 import { HttpStatusCode } from '../../utils';
 import { BaseController } from '../baseController';
