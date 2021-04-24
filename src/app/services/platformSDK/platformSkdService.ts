@@ -1,6 +1,7 @@
 // @ts-ignore
 import { PlatformConnection } from 'platform-admin-sdk';
 import { injectable } from 'inversify';
+import jwt from 'jsonwebtoken';
 import { Env } from '../../config/env';
 import {
   error,
@@ -8,6 +9,7 @@ import {
   HttpStatusCode,
   throwError
 } from '../../utils';
+import { IJwtPayload } from './interfaces';
 
 const env = Env.all();
 
@@ -59,5 +61,31 @@ export class PlatformSdkService {
     }
   }
 
-  // Todo: add logout, updatePassword
+  public generateJwtToken(data: IJwtPayload): string {
+    try {
+      const { id } = data;
+      delete data.id;
+      return jwt.sign(data, env.jwt_secrete_key, {
+        audience: id,
+      });
+    } catch (e) {
+      if (typeof e.code === 'string' || !e.code) {
+        e.code = HttpStatusCode.INTERNAL_SERVER_ERROR;
+      }
+      throw new GenericResponseError(e.message, e.code);
+    }
+  }
+
+  public verifyJwtToken(token: string): any {
+    try {
+      return jwt.verify(token, env.jwt_secrete_key, {
+        maxAge: '1hr'
+      });
+    } catch (e) {
+      if (typeof e.code === 'string' || !e.code) {
+        e.code = HttpStatusCode.INTERNAL_SERVER_ERROR;
+      }
+      throw new GenericResponseError(e.message, e.code);
+    }
+  }
 }
