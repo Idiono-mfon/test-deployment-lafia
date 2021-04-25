@@ -8,8 +8,7 @@ import {
 } from 'inversify-express-utils';
 import TYPES from '../../config/types';
 import { uploadFile } from '../../middlewares';
-import { IAttachment } from '../../models/attachments';
-import { IPatient } from '../../models/patients';
+import { IAttachment, IPatient } from '../../models';
 import { PatientService } from '../../services';
 import { HttpStatusCode } from '../../utils';
 import { BaseController } from '../baseController';
@@ -50,13 +49,22 @@ export class PatientController extends BaseController {
     try {
       const patientData: any = req.body;
 
-      // todo: delete the code below
-      console.log('TransactionId:', patientData);
-      // todo: delete the code above
-
       const patient: IPatient = await this.patientService.createPatient(patientData);
 
       this.success(res, patient, 'Patient registration successful', HttpStatusCode.CREATED);
+    } catch(e) {
+      this.error(res, e);
+    }
+  }
+
+  @httpPost('/login')
+  public async patientLogin(@request() req: Request, @response() res: Response) {
+    try {
+      const { email, password } = req.body;
+
+      const patient: IPatient = await this.patientService.patientLogin(email, password);
+
+      this.success(res, patient, 'Login successful', HttpStatusCode.CREATED);
     } catch(e) {
       this.error(res, e);
     }
@@ -66,7 +74,9 @@ export class PatientController extends BaseController {
   public async uploadAttachment(@request() req: Request, @response() res: Response) {
     try {
       const { id: patientId } = req.params;
-      const attachment: IAttachment = await this.patientService.uploadAttachment(patientId, req.file);
+      const { file } = req;
+
+      const attachment: IAttachment = await this.patientService.uploadAttachment(patientId, file);
 
       this.success(res, attachment, 'Request completed successfully');
     } catch(e) {

@@ -62,6 +62,7 @@
     "express": "^4.17.1",
     "inversify": "^5.0.5",
     "inversify-express-utils": "^6.3.2",
+    "ioredis": "^4.27.1",
     "joi": "^17.4.0",
     "jsonwebtoken": "^8.5.1",
     "knex": "0.21.15",
@@ -74,6 +75,7 @@
     "pm2": "^4.5.5",
     "reflect-metadata": "^0.1.13",
     "short-uuid": "^4.1.0",
+    "socket.io-redis": "^6.1.0",
     "uuid": "^8.3.2",
     "ws": "3.3.2",
     "yarn": "^1.22.10"
