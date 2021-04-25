@@ -19,17 +19,17 @@ export async function up(knex: Knex): Promise<void> {
                   .defaultTo(knex.raw('gen_random_uuid()'))
                   .primary(`${Table.users}_id`);
                 tableBuilder
-                  .string('first_name')
-                  .notNullable();
-                tableBuilder
-                  .string('last_name')
-                  .notNullable();
-                tableBuilder
                   .string('email')
                   .unique()
                   .notNullable();
                 tableBuilder
-                  .string('password').notNullable();
+                  .string('resource_type');
+                tableBuilder
+                  .string('resource_id')
+                  .unique();
+                tableBuilder
+                  .string('token')
+                  .notNullable();
                 tableBuilder
                   .timestamps(true, true);
               });
