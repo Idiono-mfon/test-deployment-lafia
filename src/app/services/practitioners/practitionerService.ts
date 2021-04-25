@@ -1,22 +1,27 @@
 import { inject, injectable } from 'inversify';
 import _ from 'lodash';
 import TYPES from '../../config/types';
-import { AttachmentModel, IAttachment } from '../../models/attachments';
-import { PractitionersAttachmentModel } from '../../models/practitionersAttachments';
-import { IPractitioner } from '../../models/practitioners';
-import { IQualification } from '../../models/qualifications';
+import {
+  AttachmentModel,
+  IAttachment,
+  PractitionersAttachmentModel,
+  IPractitioner,
+  IQualification,
+  IContactPoint,
+  ICommunication
+} from '../../models';
+import { IUserLoginParams } from '../Auth';
 import { S3Service } from '../awsS3';
 import { CodeSystemService } from '../codeSystems';
 import { PractitionerRepository } from '../../repository';
-import { IContactPoint } from '../../models/contactPoints';
-import { ICommunication } from '../../models/communications';
 import {
   codeType, error,
-  forWho,
+  forWho, GenericResponseError,
   InternalServerError,
   throwError, UtilityService
 } from '../../utils';
 import { PlatformSdkService } from '../platformSDK';
+import { UserService } from '../users';
 
 @injectable()
 export class PractitionerService {
@@ -34,6 +39,9 @@ export class PractitionerService {
 
   @inject(TYPES.PlatformSdkService)
   private readonly platformSdkService: PlatformSdkService;
+
+  @inject(TYPES.UserService)
+  private readonly userService: UserService;
 
   public async updatePractitioner(id: string, data: any): Promise<IPractitioner> {
     try {
@@ -110,6 +118,17 @@ export class PractitionerService {
     };
 
     return await this.practitionerRepo.createPractitioner(practitionerData);
+  }
+
+  public async practitionerLogin(data: IUserLoginParams): Promise<any> {
+    try {
+      const { user, token } = data;
+      await this.userService.updateUser(user.resourceId!, {...user, token});
+
+      return await this.practitionerRepo.findPractitionerById(user.resourceId!);
+    } catch (e) {
+      throw new GenericResponseError(e.message, e.code);
+    }
   }
 
   private async getPractitionerObjectIdsById(id: string): Promise<any> {

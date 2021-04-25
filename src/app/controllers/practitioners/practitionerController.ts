@@ -10,8 +10,10 @@ import {
 } from 'inversify-express-utils';
 import TYPES from '../../config/types';
 import { uploadFile } from '../../middlewares';
-import { IAttachment } from '../../models/attachments';
-import { IPractitioner } from '../../models/practitioners';
+import {
+  IAttachment,
+  IPractitioner
+} from '../../models';
 import { PractitionerService } from '../../services';
 import { HttpStatusCode } from '../../utils';
 import { BaseController } from '../baseController';

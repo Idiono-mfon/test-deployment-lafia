@@ -12,6 +12,7 @@ import {
   IPatientContact,
   ICodeableConcept
 } from '../../models';
+import { IUserLoginParams } from '../Auth';
 import { S3Service } from '../awsS3';
 import { CodeSystemService } from '../codeSystems';
 import { PatientRepository } from '../../repository';
@@ -142,32 +143,14 @@ export class PatientService {
     }
   }
 
-  public async patientLogin(email: string, password: string): Promise<any> {
+  public async patientLogin(data: IUserLoginParams): Promise<any> {
     try {
-      const user = await this.userService.getOneUser({ email });
-
-      if (!user) {
-        throwError('Invalid email or password', error.badRequest);
-      }
-
-      const platformLogin = await this.platformSdkService.userLogin(email, password);
-
-      if (platformLogin.code >= error.badRequest) {
-        throwError(platformLogin.messages, platformLogin.code);
-      }
-
-      const token = this.platformSdkService.generateJwtToken({email, id: user.resourceId})
-
+      const { user, token } = data;
       await this.userService.updateUser(user.resourceId!, {...user, token});
 
-      const patient = await this.patientRepo.findPatientById(user.resourceId!);
-
-      return {
-        user: patient,
-        auth_token: token
-      }
+      return await this.patientRepo.findPatientById(user.resourceId!);
     } catch (e) {
-      throw new GenericResponseError('Invalid email or password', e.code);
+      throw new GenericResponseError(e.message, e.code);
     }
   }
 
