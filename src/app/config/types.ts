@@ -4,6 +4,7 @@ const TYPES = {
   PatientController: Symbol('PatientController'),
   PractitionerController: Symbol('PractitionerController'),
   CodeSystemController: Symbol('CodeSystemController'),
+  AuthController: Symbol('AuthController'),
 
   // service
   UserService: Symbol('UserService'),
@@ -14,14 +15,13 @@ const TYPES = {
   S3Service: Symbol('S3Service'),
   UtilityService: Symbol('UtilityService'),
   PlatformSdkService: Symbol('PlatformSdkService'),
+  AuthService: Symbol('AuthService'),
 
   // repositories
   UserRepository: Symbol('UserRepository'),
   PractitionerRepository: Symbol('PractitionerRepository'),
   PatientRepository: Symbol('PatientRepository'),
   CodeSystemRepository: Symbol('CodeSystemRepository'),
-
-  // models
 };
 
 export default TYPES;

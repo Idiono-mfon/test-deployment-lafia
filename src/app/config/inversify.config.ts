@@ -1,6 +1,7 @@
 import { Container } from 'inversify';
 import 'reflect-metadata';
 import {
+  AuthController,
   HealthController,
   PatientController,
   PractitionerController
@@ -16,7 +17,7 @@ import {
   UserService,
   PatientService,
   PractitionerService,
-  S3Service
+  S3Service, AuthService
 } from '../services';
 import { CodeSystemService } from '../services/codeSystems';
 import { MessageBroker } from '../services/messageBroker';
@@ -42,6 +43,10 @@ container
 container
   .bind<CodeSystemController>(TYPES.CodeSystemController)
   .to(CodeSystemController)
+  .inSingletonScope();
+container
+  .bind<AuthController>(TYPES.AuthController)
+  .to(AuthController)
   .inSingletonScope();
 
 // services
@@ -76,6 +81,10 @@ container
 container
   .bind<PlatformSdkService>(TYPES.PlatformSdkService)
   .to(PlatformSdkService)
+  .inSingletonScope();
+container
+  .bind<AuthService>(TYPES.AuthService)
+  .to(AuthService)
   .inSingletonScope();
 
 // repositories
