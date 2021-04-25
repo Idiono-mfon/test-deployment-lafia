@@ -8,7 +8,7 @@ import {
   IPractitioner,
   IQualification,
   IContactPoint,
-  ICommunication
+  ICommunication, IUser
 } from '../../models';
 import { IUserLoginParams } from '../auth';
 import { S3Service } from '../awsS3';
@@ -82,7 +82,7 @@ export class PractitionerService {
     return this.practitionerRepo.findPractitionerById(id);
   }
 
-  public async createPractitioner(data: any): Promise<IPractitioner> {
+  public async createPractitioner(data: any): Promise<any> {
     this.utilService.checkForRequiredFields(data);
 
     const {
@@ -90,12 +90,16 @@ export class PractitionerService {
       first_name,
       last_name,
       email,
-      password,
-      department,
       birth_date: birthDate,
     } = data;
 
-    // Todo: Create the user in our platform sdk
+    const existingUser: IUser = await this.userService.getOneUser({ email });
+
+    if (existingUser) {
+      throwError('User already exists!', error.badRequest);
+    }
+
+    await this.platformSdkService.userSignup(data);
 
     const practitionerData: IPractitioner = {
       active: true,
@@ -117,7 +121,20 @@ export class PractitionerService {
       ],
     };
 
-    return await this.practitionerRepo.createPractitioner(practitionerData);
+    const practitioner = await this.practitionerRepo.createPractitioner(practitionerData);
+    const token = this.platformSdkService.generateJwtToken({ email, id: practitioner.id });
+    const userData: IUser = {
+      email,
+      token,
+      resource_id: practitioner.id,
+      resource_type: forWho.practitioner,
+    }
+    await this.userService.createUser(userData);
+
+    return {
+      user: practitioner,
+      auth_token: token,
+    }
   }
 
   public async practitionerLogin(data: IUserLoginParams): Promise<any> {
