@@ -1,16 +1,20 @@
 import { inject, injectable } from 'inversify';
 import _ from 'lodash';
 import TYPES from '../../config/types';
-import { AttachmentModel, IAttachment } from '../../models/attachments';
-import { PatientsAttachmentModel } from '../../models/patientsAttachments';
-import { IPatient } from '../../models/patients';
+import {
+  IUser,
+  AttachmentModel,
+  IAttachment,
+  PatientsAttachmentModel,
+  IPatient,
+  IContactPoint,
+  ICommunication,
+  IPatientContact,
+  ICodeableConcept
+} from '../../models';
 import { S3Service } from '../awsS3';
 import { CodeSystemService } from '../codeSystems';
 import { PatientRepository } from '../../repository';
-import { IContactPoint } from '../../models/contactPoints';
-import { ICommunication } from '../../models/communications';
-import { IPatientContact } from '../../models/patientContacts';
-import { ICodeableConcept } from '../../models/codeableConcepts';
 import { PlatformSdkService } from '../platformSDK';
 import {
   codeType, error,
@@ -18,6 +22,7 @@ import {
   InternalServerError,
   throwError, UtilityService
 } from '../../utils';
+import { UserService } from '../users';
 
 @injectable()
 export class PatientService {
@@ -35,6 +40,9 @@ export class PatientService {
 
   @inject(TYPES.PlatformSdkService)
   private readonly platformSdkService: PlatformSdkService;
+
+  @inject(TYPES.UserService)
+  private readonly userService: UserService;
 
   public async updatePatient(id: string, data: any): Promise<IPatient> {
     try {
@@ -77,7 +85,7 @@ export class PatientService {
     return this.patientRepo.findPatientById(id);
   }
 
-  public async createPatient(data: any): Promise<IPatient> {
+  public async createPatient(data: any): Promise<any> {
     try {
       this.utilService.checkForRequiredFields(data);
 
@@ -87,6 +95,12 @@ export class PatientService {
         last_name,
         email,
       } = data;
+
+      const existingUser: IUser = await this.userService.getOneUser({ email });
+
+      if (existingUser) {
+        throwError('User already exists!', error.badRequest);
+      }
 
       await this.platformSdkService.userSignup(data);
 
@@ -109,7 +123,20 @@ export class PatientService {
         ],
       };
 
-      return await this.patientRepo.createPatient(patientData);
+      const patient = await this.patientRepo.createPatient(patientData);
+      const token = this.platformSdkService.generateJwtToken({ email, id: patient.id });
+      const userData: IUser = {
+        email,
+        token,
+        resource_id: patient.id,
+        resource_type: forWho.patient,
+      }
+      await this.userService.createUser(userData);
+
+      return {
+        user: patient,
+        auth_token: token,
+      }
     } catch (e) {
       throw new GenericResponseError(e.message, e.code);
     }
