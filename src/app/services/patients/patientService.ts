@@ -12,7 +12,7 @@ import {
   IPatientContact,
   ICodeableConcept
 } from '../../models';
-import { IUserLoginParams } from '../Auth';
+import { IUserLoginParams } from '../auth';
 import { S3Service } from '../awsS3';
 import { CodeSystemService } from '../codeSystems';
 import { PatientRepository } from '../../repository';
