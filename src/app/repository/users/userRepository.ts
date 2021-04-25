@@ -19,14 +19,6 @@ export class UserRepository {
     }
   }
 
-  public async userLogin(email: string, password: string): Promise<any> {
-    try {
-      return await this.platformSdkService.userLogin(email, password);
-    } catch (e) {
-      throw new InternalServerError(e.message);
-    }
-  }
-
   public async getOneUser(data: IUser): Promise<IUser> {
     try {
       return await UserModel.query().findOne(data);
@@ -38,9 +30,7 @@ export class UserRepository {
   public async updateUser(id: string, data: IUser): Promise<any> {
     try {
       return await UserModel.query()
-        .where({ id })
-        .orWhere({ resource_id: id })
-        .patchAndFetch(data);
+        .patchAndFetchById(id, data);
     } catch (e) {
       throw new InternalServerError(e.message);
     }

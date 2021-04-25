@@ -57,6 +57,19 @@ export class PatientController extends BaseController {
     }
   }
 
+  @httpPost('/login')
+  public async patientLogin(@request() req: Request, @response() res: Response) {
+    try {
+      const { email, password } = req.body;
+
+      const patient: IPatient = await this.patientService.patientLogin(email, password);
+
+      this.success(res, patient, 'Login successful', HttpStatusCode.CREATED);
+    } catch(e) {
+      this.error(res, e);
+    }
+  }
+
   @httpPost('/:id/attachments', uploadFile.single('file'))
   public async uploadAttachment(@request() req: Request, @response() res: Response) {
     try {

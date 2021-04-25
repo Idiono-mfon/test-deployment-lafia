@@ -142,6 +142,35 @@ export class PatientService {
     }
   }
 
+  public async patientLogin(email: string, password: string): Promise<any> {
+    try {
+      const user = await this.userService.getOneUser({ email });
+
+      if (!user) {
+        throwError('Invalid email or password', error.badRequest);
+      }
+
+      const platformLogin = await this.platformSdkService.userLogin(email, password);
+
+      if (platformLogin.code >= error.badRequest) {
+        throwError(platformLogin.messages, platformLogin.code);
+      }
+
+      const token = this.platformSdkService.generateJwtToken({email, id: user.resourceId})
+
+      await this.userService.updateUser(user.resourceId!, {...user, token});
+
+      const patient = await this.patientRepo.findPatientById(user.resourceId!);
+
+      return {
+        user: patient,
+        auth_token: token
+      }
+    } catch (e) {
+      throw new GenericResponseError('Invalid email or password', e.code);
+    }
+  }
+
   private async getPatientObjectIdsById(id: string): Promise<any> {
     return this.patientRepo.getIds(id);
   }

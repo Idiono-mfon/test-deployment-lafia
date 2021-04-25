@@ -21,10 +21,6 @@ export class UserService {
     return await this.userRepository.createUser(data);
   }
 
-  public async UserLogin(email: string, password: string): Promise<any> {
-    return await this.userRepository.userLogin(email, password);
-  }
-
   public async getOneUser(data: IUser): Promise<IUser> {
     return await this.userRepository.getOneUser(data);
   }
