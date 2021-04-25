@@ -52,6 +52,7 @@
   "homepage": "https://github.com/parallelscore/lafia-service#readme",
   "dependencies": {
     "@aws-sdk/client-s3": "^3.11.0",
+    "@types/ioredis": "^4.26.0",
     "amqplib": "0.7.0",
     "axios": "^0.21.1",
     "bcryptjs": "^2.4.3",
@@ -75,6 +76,7 @@
     "pm2": "^4.5.5",
     "reflect-metadata": "^0.1.13",
     "short-uuid": "^4.1.0",
+    "socket.io": "^4.0.1",
     "socket.io-redis": "^6.1.0",
     "uuid": "^8.3.2",
     "ws": "3.3.2",
