@@ -59,6 +59,8 @@ export class SignallingServerService {
   }
 
   private static async onConnection(socket: Socket) {
+    console.log(`User connected: ${socket.id}`);
+
     const { user } = socket.handshake.auth;
     await redisStore.saveOnlineUser(user);
 
@@ -125,6 +127,8 @@ export class SignallingServerService {
     await redisStore.removeUserBY(user?.userId);
 
     socket.on('disconnect', async () => {
+      console.log(`User disconnected: ${socket.id}`);
+
       await SignallingServerService.onOnlineUsers(socket);
     })
   }
