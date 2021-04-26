@@ -23,6 +23,9 @@ interface IEnv {
   jwt_secrete_key: string;
   platform_admin_key: number;
   platform_app_namespace: string;
+  redis_port: number;
+  redis_host: string;
+  redis_password: string;
 }
 
 const config: IEnv = {
@@ -48,6 +51,9 @@ const config: IEnv = {
   jwt_secrete_key: process.env.JWT_SECRETE_KEY as string,
   platform_admin_key: Number(process.env.PLATFORM_ADMIN_KEY),
   platform_app_namespace: process.env.PLATFORM_APP_NAMESPACE as string,
+  redis_host: process.env.REDIS_HOST as string,
+  redis_password: process.env.REDIS_PASSWORD as string,
+  redis_port: Number(process.env.REDIS_PORT),
 };
 
 export class Env {

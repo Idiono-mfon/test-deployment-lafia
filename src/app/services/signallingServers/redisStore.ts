@@ -1,0 +1,217 @@
+import { IPatient, IPractitioner } from '../../models';
+import { forWho, GenericResponseError, HttpStatusCode } from '../../utils';
+import { PatientService } from '../patients';
+import { PractitionerService } from '../practitioners';
+import { IBroadcastStatus, IOnlineUser } from './interfaces';
+
+const patientService = new PatientService();
+const practitionerService = new PractitionerService();
+
+export class RedisStore {
+  private readonly redisClient: any;
+  private readonly onlineUsersKey: string;
+  private readonly broadcastStatusKey: string;
+
+  constructor(redisClient: any) {
+    this.redisClient = redisClient;
+    this.onlineUsersKey = 'onlineUsers';
+    this.broadcastStatusKey = 'broadcastStatus';
+  }
+
+  private static encodeBase64(data: any): string {
+    // Create buffer object, specifying utf8 as encoding
+    const bufferObj = Buffer.from(data, 'utf8');
+
+    // Encode the Buffer as a base64 string
+    return bufferObj.toString('base64');
+  }
+
+  private static decodeBase64(base64Str: string): any {
+    // Create a buffer from the string
+    const bufferObj = Buffer.from(base64Str, 'base64');
+
+    // Encode the Buffer as a utf8 string
+    return bufferObj.toString('utf8');
+  }
+
+  public async getOnlineUsers(): Promise<IOnlineUser[]> {
+    try {
+      const encodedOnlineUsers = await this.redisClient.get(this.onlineUsersKey);
+
+      if (!encodedOnlineUsers) {
+        return [];
+      }
+
+      // Decode data
+      const onlineUsersStr = RedisStore.decodeBase64(encodedOnlineUsers);
+
+      return JSON.parse(onlineUsersStr);
+    } catch (e) {
+      throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  public async getUserById(userId: string): Promise<IOnlineUser | any> {
+    try {
+      // Get All Online Users
+      let onlineUsers: IOnlineUser[] | any = await this.getOnlineUsers();
+
+      if (!onlineUsers) {
+        return;
+      }
+
+      let onlineUser: IOnlineUser | any = {};
+      for (let user of onlineUsers) {
+        if (user?.userId === userId) {
+          onlineUser = user;
+          break;
+        }
+      }
+
+      return onlineUser;
+    } catch (e) {
+      throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  public async removeUserBY(userId: string): Promise<void> {
+    try {
+      // Get All Online Users
+      let onlineUsers: IOnlineUser[] | any = await this.getOnlineUsers();
+
+      if (!onlineUsers) {
+        return;
+      }
+
+      // eslint-disable-next-line array-callback-return
+      onlineUsers = onlineUsers.map((user: IOnlineUser) => {
+        if (user?.userId !== userId) {
+          return user;
+        }
+      });
+
+      const base64Str = RedisStore.encodeBase64(JSON.stringify(onlineUsers));
+
+      await this.redisClient.set(this.onlineUsersKey, base64Str);
+    } catch (e) {
+      throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  public async saveOnlineUser(user: IOnlineUser): Promise<void> {
+    try {
+      // Get All Online Users
+      let onlineUsers: IOnlineUser[] = await this.getOnlineUsers();
+
+      if (!onlineUsers) {
+        onlineUsers = [];
+      }
+
+      const existingUser = await this.getUserById(user?.userId);
+
+      if (existingUser) {
+        return;
+      }
+
+      let username: string = '';
+      if (user?.resourceType?.toLowerCase() === forWho.patient) {
+        const patient: IPatient = await patientService.findPatientById(user?.userId);
+
+        // @ts-ignore
+        username = patient?.name[0]?.text;
+      }
+
+      if (user?.resourceType?.toLowerCase() === forWho.practitioner) {
+        const practitioner: IPractitioner = await practitionerService.findPractitionerById(user?.userId);
+
+        // @ts-ignore
+        username = practitioner?.name[0]?.text;
+      }
+
+      if (username) {
+        user.username = username;
+      }
+
+      // Update with the new users
+      onlineUsers.push(user);
+
+      // Transform object to Base64 String
+      const base64Str = RedisStore.encodeBase64(JSON.stringify(onlineUsers));
+
+      // Save online user
+      const saved = await this.redisClient.set(this.onlineUsersKey, base64Str);
+
+      console.log(saved);
+    } catch (e) {
+      throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  public async getAllBroadcasts(): Promise<IBroadcastStatus[]> {
+    try {
+      const encodedBroadcast = await this.redisClient.get(this.broadcastStatusKey);
+
+      if (!encodedBroadcast) {
+        return [];
+      }
+
+      // Decode data
+      const onlineUsersStr = RedisStore.decodeBase64(encodedBroadcast);
+
+      return JSON.parse(onlineUsersStr);
+    } catch (e) {
+      throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  public async getBroadcastByVideoUrl(videoUrl: string): Promise<IBroadcastStatus | any> {
+    try {
+      // Get All Online Users
+      let broadcastStatus: IBroadcastStatus[] | any = await this.getAllBroadcasts();
+
+      if (!broadcastStatus) {
+        return;
+      }
+
+      let broadCast: IBroadcastStatus | any = {};
+      for (let status of broadcastStatus) {
+        if (status?.videoUrl === videoUrl) {
+          broadCast = status;
+          break;
+        }
+      }
+
+      return broadCast;
+    } catch (e) {
+      throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  public async saveBroadcast(broadcast: IBroadcastStatus): Promise<void> {
+    try {
+      // Get All Online Users
+      let broadcastStatus: IBroadcastStatus[] = await this.getAllBroadcasts();
+
+      if (!broadcastStatus) {
+        broadcastStatus = [];
+      }
+
+      const existingBroadcast = await this.getBroadcastByVideoUrl(broadcast?.videoUrl);
+
+      if (existingBroadcast) {
+        return;
+      }
+
+      // Update with the new users
+      broadcastStatus.push(broadcast);
+
+      // Transform object to Base64 String
+      const base64Str = RedisStore.encodeBase64(JSON.stringify(broadcastStatus));
+
+      // Save online user
+      await this.redisClient.set(this.broadcastStatusKey, base64Str);
+    } catch (e) {
+      throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
+    }
+  }
+}
