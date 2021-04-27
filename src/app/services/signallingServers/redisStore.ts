@@ -4,18 +4,19 @@ import { PatientService } from '../patients';
 import { PractitionerService } from '../practitioners';
 import { IBroadcastStatus, IOnlineUser } from './interfaces';
 
-const patientService = new PatientService();
-const practitionerService = new PractitionerService();
-
 export class RedisStore {
   private readonly redisClient: any;
   private readonly onlineUsersKey: string;
   private readonly broadcastStatusKey: string;
+  private readonly patientService: PatientService;
+  private readonly practitionerService: PractitionerService;
 
-  constructor(redisClient: any) {
+  constructor(redisClient: any, patientService: PatientService, practitionerService: PractitionerService) {
     this.redisClient = redisClient;
     this.onlineUsersKey = 'onlineUsers';
     this.broadcastStatusKey = 'broadcastStatus';
+    this.patientService = patientService;
+    this.practitionerService = practitionerService;
   }
 
   private static encodeBase64(data: any): string {
@@ -119,16 +120,16 @@ export class RedisStore {
       }
 
       let username: string = '';
-      if (user?.resourceType?.toLowerCase() === forWho.patient) {
-        const patient: IPatient = await patientService.findPatientById(user.userId);
+      if (user?.resourceType === forWho.patient) {
+        const patient: IPatient = await this.patientService.findPatientById(user.userId);
 
         console.log('patient block');
         // @ts-ignore
         username = patient?.name[0]?.text;
       }
 
-      if (user?.resourceType?.toLowerCase() === forWho.practitioner) {
-        const practitioner: IPractitioner = await practitionerService.findPractitionerById(user.userId);
+      if (user?.resourceType === forWho.practitioner) {
+        const practitioner: IPractitioner = await this.practitionerService.findPractitionerById(user.userId);
 
         console.log('practitioner block');
         // @ts-ignore

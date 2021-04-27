@@ -3,6 +3,8 @@ import { createAdapter } from 'socket.io-redis';
 import Redis from 'ioredis';
 import { Env } from '../../config/env';
 import { forWho } from '../../utils';
+import { PatientService } from '../patients';
+import { PractitionerService } from '../practitioners';
 import { ICareUpdate, INewCare, IOnlineUser } from './interfaces';
 import { RedisStore } from './redisStore';
 
@@ -14,8 +16,6 @@ const pubClient = new Redis({
   password: env.redis_password,
 });
 const subClient = pubClient.duplicate();
-
-const redisStore = new RedisStore(pubClient);
 
 
 /*
@@ -33,8 +33,10 @@ const redisStore = new RedisStore(pubClient);
 
 export class SignallingServerService {
   private readonly io: any;
+  private static redisStore: RedisStore;
 
-  constructor(appServer: any) {
+  constructor(appServer: any, patientService: PatientService, practitionerService: PractitionerService) {
+    SignallingServerService.redisStore = new RedisStore(pubClient, patientService, practitionerService);
     this.io = new Server(appServer, {
       cors: {
         origin: '*',
@@ -69,7 +71,7 @@ export class SignallingServerService {
 
     console.log('User:', user);
 
-    await redisStore.saveOnlineUser(user);
+    await SignallingServerService.redisStore.saveOnlineUser(user);
 
     if (user.resourceType === forWho.practitioner) {
       socket.join('online');
@@ -79,19 +81,19 @@ export class SignallingServerService {
   }
 
   private static async onOnlineUsers(socket: Socket) {
-    const onlineUsers = await redisStore.getOnlineUsers();
+    const onlineUsers = await SignallingServerService.redisStore.getOnlineUsers();
 
     socket.to('online').emit('onlineUsers', onlineUsers);
   }
 
   private static onNewVideoBroadcast(socket: Socket) {
     socket.on('newVideoBroadcast', async (newBroadcast) => {
-      await redisStore.saveBroadcast(newBroadcast);
+      await SignallingServerService.redisStore.saveBroadcast(newBroadcast);
       const {
         patientId,
         videoUrl,
         initiateCare
-      } = await redisStore
+      } = await this.redisStore
         .getBroadcastByVideoUrl(newBroadcast?.videoUrl);
 
       const newCareBroadCast = { patientId, initiateCare, videoUrl };
@@ -106,7 +108,7 @@ export class SignallingServerService {
 
   private static onAcceptCare(socket: Socket) {
     socket.on('acceptCare', async(acceptCare) => {
-      const existingCare = await redisStore.getBroadcastByVideoUrl(acceptCare?.videoUrl);
+      const existingCare = await SignallingServerService.redisStore.getBroadcastByVideoUrl(acceptCare?.videoUrl);
 
       if (existingCare?.status) {
          SignallingServerService.onCareUpdate(socket, {
@@ -123,7 +125,7 @@ export class SignallingServerService {
       acceptCare.status = acceptCare.initiateCare;
       acceptCare.acceptedDate = new Date();
 
-      await redisStore.saveBroadcast(acceptCare);
+      await SignallingServerService.redisStore.saveBroadcast(acceptCare);
     });
   }
 
@@ -133,7 +135,7 @@ export class SignallingServerService {
 
   private static async onDisconnect(socket: Socket) {
     const { user } = socket.handshake.auth;
-    await redisStore.removeUserBY(user?.userId);
+    await SignallingServerService.redisStore.removeUserBY(user?.userId);
 
     socket.on('disconnect', async () => {
       console.log(`User disconnected: ${socket.id}`);

@@ -6,6 +6,7 @@ import container from './config/inversify.config';
 import { InversifyExpressServer } from 'inversify-express-utils';
 import { Env } from './config/env';
 import TYPES from './config/types';
+import { PatientService, PractitionerService } from './services';
 import { MessageBroker } from './services/messageBroker';
 import { SignallingServerService } from './services/signallingServers';
 
@@ -14,6 +15,8 @@ dotConfig();
 const app = express();
 const server = new InversifyExpressServer(container, null, null, app);
 const messageBroker = container.get<MessageBroker>(TYPES.MessageBroker);
+const patientService = container.get<PatientService>(TYPES.PatientService);
+const practitionerService = container.get<PractitionerService>(TYPES.PractitionerService);
 
 server.setConfig((app) => {
   app.use(express.json());
@@ -30,7 +33,7 @@ appServer.listen(PORT, () => {
   console.log(`Listening on port: ${PORT}`);
 });
 
-const signallingServer  = new SignallingServerService(appServer);
+const signallingServer  = new SignallingServerService(appServer, patientService, practitionerService);
 signallingServer.initialize();
 
 export { app };
