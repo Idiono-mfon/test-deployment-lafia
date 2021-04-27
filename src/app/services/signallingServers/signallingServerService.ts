@@ -96,12 +96,15 @@ export class SignallingServerService {
 
       const newCareBroadCast = { patientId, initiateCare, videoUrl };
 
+      console.log('newCareBroadcast:', newCareBroadCast);
+
       SignallingServerService.onNewCare(socket, newCareBroadCast);
     });
   }
 
   private static onNewCare(socket: Socket, newCareBroadcast: INewCare) {
     socket.emit('newCare', newCareBroadcast);
+    console.log('newCare:', newCareBroadcast);
   }
 
   private static onAcceptCare(socket: Socket) {
