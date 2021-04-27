@@ -183,7 +183,7 @@ export class RedisStore {
         return;
       }
 
-      let broadCast: IBroadcastStatus | any = {};
+      let broadCast: IBroadcastStatus | any;
       for (let status of broadcastStatus) {
         if (status?.videoUrl === videoUrl) {
           broadCast = status;
