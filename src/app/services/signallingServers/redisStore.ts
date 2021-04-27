@@ -101,7 +101,6 @@ export class RedisStore {
     try {
       // Get All Online Users
       let onlineUsers: IOnlineUser[] = await this.getOnlineUsers();
-      console.log('OnlineUsersExist:', onlineUsers);
 
       if (!onlineUsers) {
         onlineUsers = [];
