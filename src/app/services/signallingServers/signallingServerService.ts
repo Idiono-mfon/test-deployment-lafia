@@ -86,6 +86,12 @@ export class SignallingServerService {
 
   private static onNewVideoBroadcast(socket: Socket) {
     socket.on('newVideoBroadcast', async (newBroadcast) => {
+      newBroadcast = {
+        ...newBroadcast,
+        status: newBroadcast.initiateCare,
+        practitionerId: null,
+        acceptedDate: null,
+      }
       await SignallingServerService.redisStore.saveBroadcast(newBroadcast);
       const {
         patientId,
