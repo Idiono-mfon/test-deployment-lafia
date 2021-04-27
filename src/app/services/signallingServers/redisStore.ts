@@ -60,7 +60,7 @@ export class RedisStore {
         return;
       }
 
-      let onlineUser: IOnlineUser | any = {};
+      let onlineUser: IOnlineUser | any;
       for (let user of onlineUsers) {
         if (user?.userId === userId) {
           onlineUser = user;
