@@ -134,8 +134,14 @@ export class SignallingServerService {
   }
 
   private static async onDisconnect(socket: Socket) {
-    const { user } = socket.handshake.auth;
-    await SignallingServerService.redisStore.removeUserBY(user?.userId);
+    let { userId, resourceType } = socket.handshake.query;
+    resourceType = resourceType as unknown as string;
+    resourceType = resourceType.toLowerCase();
+    const user: IOnlineUser = { userId, resourceType } as IOnlineUser;
+
+    console.log('DisconnectedUser:', user);
+
+    await SignallingServerService.redisStore.removeUserBY(user.userId);
 
     socket.on('disconnect', async () => {
       console.log(`User disconnected: ${socket.id}`);
