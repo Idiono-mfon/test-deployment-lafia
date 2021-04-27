@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { IPatient, IPractitioner } from '../../models';
 import { forWho, GenericResponseError, HttpStatusCode } from '../../utils';
 import { PatientService } from '../patients';
@@ -43,14 +44,6 @@ export class RedisStore {
         return [];
       }
 
-      if (encodedOnlineUsers.length === 0 && encodedOnlineUsers[0] === null) {
-        return [];
-      }
-
-      if (encodedOnlineUsers.length === 0 && encodedOnlineUsers[0] === 'null') {
-        return [];
-      }
-
       // Decode data
       const onlineUsersStr = RedisStore.decodeBase64(encodedOnlineUsers);
 
@@ -86,19 +79,14 @@ export class RedisStore {
   public async removeUserBY(userId: string): Promise<void> {
     try {
       // Get All Online Users
-      let onlineUsers: IOnlineUser[] | any = await this.getOnlineUsers();
+      const onlineUsers: IOnlineUser[] | any = await this.getOnlineUsers();
 
       if (!onlineUsers) {
         return;
       }
 
-      // eslint-disable-next-line array-callback-return
-      onlineUsers = onlineUsers.map((user: IOnlineUser | any) => {
-        if (user !== null || user !== 'null') {
-          if (user?.userId !== userId) {
-            return user;
-          }
-        }
+      _.remove(onlineUsers, (user: IOnlineUser | any) => {
+        return user?.userId === userId;
       });
 
       const base64Str = RedisStore.encodeBase64(JSON.stringify(onlineUsers));
@@ -173,14 +161,6 @@ export class RedisStore {
       const encodedBroadcast = await this.redisClient.get(this.broadcastStatusKey);
 
       if (!encodedBroadcast) {
-        return [];
-      }
-
-      if (encodedBroadcast.length === 0 && encodedBroadcast[0] === null) {
-        return [];
-      }
-
-      if (encodedBroadcast.length === 0 && encodedBroadcast[0] === 'null') {
         return [];
       }
 
