@@ -61,8 +61,12 @@ export class SignallingServerService {
   private static async onConnection(socket: Socket) {
     console.log(`User connected: ${socket.id}`);
 
-    const { user } = socket.handshake.auth;
-    await redisStore.saveOnlineUser(user);
+    const user = socket.handshake.query;
+
+    console.log('Query:', socket.handshake.query);
+    console.log('Query Data:', user);
+
+    // await redisStore.saveOnlineUser(user);
 
     socket.join('online');
 
