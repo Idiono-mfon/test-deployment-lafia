@@ -2,7 +2,8 @@ import { Server, Socket } from 'socket.io';
 import { createAdapter } from 'socket.io-redis';
 import Redis from 'ioredis';
 import { Env } from '../../config/env';
-import { ICareUpdate, INewCare } from './interfaces';
+import { forWho } from '../../utils';
+import { ICareUpdate, INewCare, IOnlineUser } from './interfaces';
 import { RedisStore } from './redisStore';
 
 const env = Env.all();
@@ -61,14 +62,16 @@ export class SignallingServerService {
   private static async onConnection(socket: Socket) {
     console.log(`User connected: ${socket.id}`);
 
-    const user = socket.handshake.query;
+    const { userId, resourceType } = socket.handshake.query;
+    const user: IOnlineUser = { userId, resourceType } as IOnlineUser;
 
-    console.log('Query:', socket.handshake.query);
-    console.log('Query Data:', user);
+    console.log('User:', user);
 
-    // await redisStore.saveOnlineUser(user);
+    await redisStore.saveOnlineUser(user);
 
-    socket.join('online');
+    if (user.resourceType === forWho.practitioner) {
+      socket.join('online');
+    }
 
     await SignallingServerService.onOnlineUsers(socket);
   }
