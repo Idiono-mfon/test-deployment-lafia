@@ -107,11 +107,7 @@ export class RedisStore {
         onlineUsers = [];
       }
 
-      console.log('userId', user.userId);
-      console.log('userType:', user.resourceType);
-
       const existingUser = await this.getUserById(user.userId);
-      console.log('existingUser:', existingUser);
 
       if (existingUser) {
         return;
@@ -121,7 +117,6 @@ export class RedisStore {
       if (user?.resourceType === forWho.patient) {
         const patient: IPatient = await this.patientService.findPatientById(user.userId);
 
-        console.log('patient block');
         // @ts-ignore
         username = patient?.name[0]?.text;
       }
@@ -129,7 +124,6 @@ export class RedisStore {
       if (user?.resourceType === forWho.practitioner) {
         const practitioner: IPractitioner = await this.practitionerService.findPractitionerById(user.userId);
 
-        console.log('practitioner block');
         // @ts-ignore
         username = practitioner?.name[0]?.text;
       }
@@ -138,19 +132,14 @@ export class RedisStore {
         user.username = username;
       }
 
-      console.log('username:', username);
-
       // Update with the new users
       onlineUsers.push(user);
-      console.log('pushedOnlineUsers:', onlineUsers);
 
       // Transform object to Base64 String
       const base64Str = RedisStore.encodeBase64(JSON.stringify(onlineUsers));
 
       // Save online user
-      const savedUser = await this.redisClient.set(this.onlineUsersKey, base64Str);
-
-      console.log('savedUser:', savedUser);
+      await this.redisClient.set(this.onlineUsersKey, base64Str);
     } catch (e) {
       throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
     }

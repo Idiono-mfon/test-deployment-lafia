@@ -69,8 +69,6 @@ export class SignallingServerService {
     resourceType = resourceType.toLowerCase();
     const user: IOnlineUser = { userId, resourceType } as IOnlineUser;
 
-    console.log('User:', user);
-
     await SignallingServerService.redisStore.saveOnlineUser(user);
 
     if (user.resourceType === forWho.practitioner) {
