@@ -93,9 +93,11 @@ export class RedisStore {
       }
 
       // eslint-disable-next-line array-callback-return
-      onlineUsers = onlineUsers.map((user: IOnlineUser) => {
-        if (user?.userId !== userId) {
-          return user;
+      onlineUsers = onlineUsers.map((user: IOnlineUser | any) => {
+        if (user !== null || user !== 'null') {
+          if (user?.userId !== userId) {
+            return user;
+          }
         }
       });
 
