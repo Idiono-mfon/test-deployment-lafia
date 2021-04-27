@@ -3,19 +3,21 @@ import { IPatient, IPractitioner } from '../../models';
 import { forWho, GenericResponseError, HttpStatusCode } from '../../utils';
 import { PatientService } from '../patients';
 import { PractitionerService } from '../practitioners';
-import { IBroadcastStatus, IOnlineUser } from './interfaces';
+import { IBroadcastStatus, IOnlineUser, IRoom, IRooms } from './interfaces';
 
 export class RedisStore {
   private readonly redisClient: any;
   private readonly onlineUsersKey: string;
   private readonly broadcastStatusKey: string;
+  private readonly roomKey: string;
   private readonly patientService: PatientService;
   private readonly practitionerService: PractitionerService;
 
   constructor(redisClient: any, patientService: PatientService, practitionerService: PractitionerService) {
-    this.redisClient = redisClient;
+    this.roomKey = 'rooms';
     this.onlineUsersKey = 'onlineUsers';
     this.broadcastStatusKey = 'broadcastStatus';
+    this.redisClient = redisClient;
     this.patientService = patientService;
     this.practitionerService = practitionerService;
   }
@@ -134,7 +136,7 @@ export class RedisStore {
       // Update with the new users
       onlineUsers.push(user);
 
-      // Transform object to Base64 String
+      // Encode to Base64
       const base64Str = RedisStore.encodeBase64(JSON.stringify(onlineUsers));
 
       // Save online user
@@ -153,9 +155,9 @@ export class RedisStore {
       }
 
       // Decode data
-      const onlineUsersStr = RedisStore.decodeBase64(encodedBroadcast);
+      const decodedBroadcast = RedisStore.decodeBase64(encodedBroadcast);
 
-      return JSON.parse(onlineUsersStr);
+      return JSON.parse(decodedBroadcast);
     } catch (e) {
       throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
     }
@@ -163,7 +165,7 @@ export class RedisStore {
 
   public async getBroadcastByVideoUrl(videoUrl: string): Promise<IBroadcastStatus | any> {
     try {
-      // Get All Online Users
+      // Get All Broadcast
       let broadcastStatus: IBroadcastStatus[] | any = await this.getAllBroadcasts();
 
       if (!broadcastStatus) {
@@ -186,7 +188,7 @@ export class RedisStore {
 
   public async saveBroadcast(broadcast: IBroadcastStatus): Promise<void> {
     try {
-      // Get All Online Users
+      // Get All Broadcast
       let broadcastStatus: IBroadcastStatus[] = await this.getAllBroadcasts();
 
       if (!broadcastStatus) {
@@ -199,14 +201,95 @@ export class RedisStore {
         return;
       }
 
-      // Update with the new users
+      // Update Broadcast
       broadcastStatus.push(broadcast);
 
-      // Transform object to Base64 String
+      // Encode to Base64
       const base64Str = RedisStore.encodeBase64(JSON.stringify(broadcastStatus));
 
-      // Save online user
+      // Update Redis Data
       await this.redisClient.set(this.broadcastStatusKey, base64Str);
+    } catch (e) {
+      throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  public async getAllRooms(): Promise<IRooms> {
+    try {
+      const encodedRoom = await this.redisClient.get(this.roomKey);
+
+      if (!encodedRoom) {
+        return {};
+      }
+
+      // Decode data
+      const decodedRoom = RedisStore.decodeBase64(encodedRoom);
+
+      return JSON.parse(decodedRoom);
+    } catch (e) {
+      throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  public async getRoomById(id: string): Promise<IRoom> {
+    try {
+      // Get All Rooms
+      let rooms = await this.getAllRooms();
+
+      if (!rooms) {
+        return;
+      }
+
+      let room: string[] = [];
+      for (let roomId in rooms) {
+        if (Object.prototype.hasOwnProperty.call(rooms, id) && id === roomId) {
+          room.concat(...rooms[id]);
+          break;
+        }
+      }
+
+      return room;
+    } catch (e) {
+      throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  public async deleteRoomById(roomId: string): Promise<void> {
+    try {
+      // Get All Rooms
+      const rooms: IRooms = await this.getAllRooms();
+
+      // Do nothing if the room is empty
+      if (!rooms || _.isEmpty(rooms)) {
+        return;
+      }
+
+      // Remove the room
+      delete rooms[roomId];
+
+      // Encode to Base64
+      const base64Str = RedisStore.encodeBase64(JSON.stringify(rooms));
+
+      // Update Redis data
+      await this.redisClient.set(this.roomKey, base64Str);
+    } catch (e) {
+      throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  public async addRoom(roomId: string, room: IRoom): Promise<void> {
+    try {
+      // Get All Rooms
+      let rooms: IRooms = await this.getAllRooms();
+
+      // Add room to the rooms
+      rooms[roomId] = room;
+
+      // Encode to Base64
+      const base64Str = RedisStore.encodeBase64(JSON.stringify(rooms));
+
+      // Update Redis data
+      await this.redisClient.set(this.roomKey, base64Str);
     } catch (e) {
       throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
     }

@@ -11,12 +11,16 @@ export interface IBroadcastStatus {
   patientId: string;
 }
 
-export type IAcceptCare = IBroadcastStatus
-
 export interface INewCare {
   patientId: string;
   videoUrl: string;
   initiateCare: boolean;
 }
 
+export interface IRooms {
+  [key: string]: string[];
+}
+
+export type IRoom = string[];
+export type IAcceptCare = IBroadcastStatus
 export type INewBroadcast = INewCare;
