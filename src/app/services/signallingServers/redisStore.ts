@@ -108,6 +108,9 @@ export class RedisStore {
         onlineUsers = [];
       }
 
+      console.log('userId', user.userId);
+      console.log('userType:', user.resourceType);
+
       const existingUser = await this.getUserById(user.userId);
       console.log('existingUser:', existingUser);
 
@@ -119,6 +122,7 @@ export class RedisStore {
       if (user?.resourceType?.toLowerCase() === forWho.patient) {
         const patient: IPatient = await patientService.findPatientById(user.userId);
 
+        console.log('patient block');
         // @ts-ignore
         username = patient?.name[0]?.text;
       }
@@ -126,6 +130,7 @@ export class RedisStore {
       if (user?.resourceType?.toLowerCase() === forWho.practitioner) {
         const practitioner: IPractitioner = await practitionerService.findPractitionerById(user.userId);
 
+        console.log('practitioner block');
         // @ts-ignore
         username = practitioner?.name[0]?.text;
       }
@@ -138,6 +143,7 @@ export class RedisStore {
 
       // Update with the new users
       onlineUsers.push(user);
+      console.log('pushedOnlineUsers:', onlineUsers);
 
       // Transform object to Base64 String
       const base64Str = RedisStore.encodeBase64(JSON.stringify(onlineUsers));
