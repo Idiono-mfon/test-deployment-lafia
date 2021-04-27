@@ -62,7 +62,9 @@ export class SignallingServerService {
   private static async onConnection(socket: Socket) {
     console.log(`User connected: ${socket.id}`);
 
-    const { userId, resourceType } = socket.handshake.query;
+    let { userId, resourceType } = socket.handshake.query;
+    resourceType = resourceType as unknown as string;
+    resourceType = resourceType.toLowerCase();
     const user: IOnlineUser = { userId, resourceType } as IOnlineUser;
 
     console.log('User:', user);
