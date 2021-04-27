@@ -43,6 +43,14 @@ export class RedisStore {
         return [];
       }
 
+      if (encodedOnlineUsers.length === 0 && encodedOnlineUsers[0] === null) {
+        return [];
+      }
+
+      if (encodedOnlineUsers.length === 0 && encodedOnlineUsers[0] === 'null') {
+        return [];
+      }
+
       // Decode data
       const onlineUsersStr = RedisStore.decodeBase64(encodedOnlineUsers);
 
@@ -163,6 +171,14 @@ export class RedisStore {
       const encodedBroadcast = await this.redisClient.get(this.broadcastStatusKey);
 
       if (!encodedBroadcast) {
+        return [];
+      }
+
+      if (encodedBroadcast.length === 0 && encodedBroadcast[0] === null) {
+        return [];
+      }
+
+      if (encodedBroadcast.length === 0 && encodedBroadcast[0] === 'null') {
         return [];
       }
 

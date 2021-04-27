@@ -57,7 +57,7 @@ export class SignallingServerService {
 
       SignallingServerService.onAcceptCare(socket);
 
-      await SignallingServerService.onDisconnect(socket);
+      SignallingServerService.onDisconnect(socket);
     });
   }
 
@@ -107,11 +107,11 @@ export class SignallingServerService {
   }
 
   private static onAcceptCare(socket: Socket) {
-    socket.on('acceptCare', async(acceptCare) => {
+    socket.on('acceptCare', async (acceptCare) => {
       const existingCare = await SignallingServerService.redisStore.getBroadcastByVideoUrl(acceptCare?.videoUrl);
 
       if (existingCare?.status) {
-         SignallingServerService.onCareUpdate(socket, {
+        SignallingServerService.onCareUpdate(socket, {
           patientId: existingCare.patientId,
           videoUrl: existingCare.videoUrl,
           status: {
@@ -133,20 +133,19 @@ export class SignallingServerService {
     socket.emit('newCare', careUpdate);
   }
 
-  private static async onDisconnect(socket: Socket) {
+  private static onDisconnect(socket: Socket) {
     let { userId, resourceType } = socket.handshake.query;
     resourceType = resourceType as unknown as string;
     resourceType = resourceType.toLowerCase();
     const user: IOnlineUser = { userId, resourceType } as IOnlineUser;
 
-    console.log('DisconnectedUser:', user);
-
-    await SignallingServerService.redisStore.removeUserBY(user.userId);
 
     socket.on('disconnect', async () => {
+      await SignallingServerService.redisStore.removeUserBY(user.userId);
+
       console.log(`User disconnected: ${socket.id}`);
 
       await SignallingServerService.onOnlineUsers(socket);
-    })
+    });
   }
 }
