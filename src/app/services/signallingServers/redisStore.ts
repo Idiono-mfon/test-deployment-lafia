@@ -102,12 +102,14 @@ export class RedisStore {
     try {
       // Get All Online Users
       let onlineUsers: IOnlineUser[] = await this.getOnlineUsers();
+      console.log('OnlineUsersExist:', onlineUsers);
 
       if (!onlineUsers) {
         onlineUsers = [];
       }
 
-      const existingUser = await this.getUserById(user?.userId);
+      const existingUser = await this.getUserById(user.userId);
+      console.log('existingUser:', existingUser);
 
       if (existingUser) {
         return;
@@ -115,14 +117,14 @@ export class RedisStore {
 
       let username: string = '';
       if (user?.resourceType?.toLowerCase() === forWho.patient) {
-        const patient: IPatient = await patientService.findPatientById(user?.userId);
+        const patient: IPatient = await patientService.findPatientById(user.userId);
 
         // @ts-ignore
         username = patient?.name[0]?.text;
       }
 
       if (user?.resourceType?.toLowerCase() === forWho.practitioner) {
-        const practitioner: IPractitioner = await practitionerService.findPractitionerById(user?.userId);
+        const practitioner: IPractitioner = await practitionerService.findPractitionerById(user.userId);
 
         // @ts-ignore
         username = practitioner?.name[0]?.text;
@@ -132,6 +134,8 @@ export class RedisStore {
         user.username = username;
       }
 
+      console.log('username:', username);
+
       // Update with the new users
       onlineUsers.push(user);
 
@@ -139,9 +143,9 @@ export class RedisStore {
       const base64Str = RedisStore.encodeBase64(JSON.stringify(onlineUsers));
 
       // Save online user
-      const saved = await this.redisClient.set(this.onlineUsersKey, base64Str);
+      const savedUser = await this.redisClient.set(this.onlineUsersKey, base64Str);
 
-      console.log(saved);
+      console.log('savedUser:', savedUser);
     } catch (e) {
       throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
     }
@@ -196,7 +200,7 @@ export class RedisStore {
         broadcastStatus = [];
       }
 
-      const existingBroadcast = await this.getBroadcastByVideoUrl(broadcast?.videoUrl);
+      const existingBroadcast = await this.getBroadcastByVideoUrl(broadcast.videoUrl);
 
       if (existingBroadcast) {
         return;
