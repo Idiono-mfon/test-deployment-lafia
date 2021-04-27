@@ -5,7 +5,7 @@ import { Env } from '../../config/env';
 import { forWho } from '../../utils';
 import { PatientService } from '../patients';
 import { PractitionerService } from '../practitioners';
-import { ICareUpdate, INewCare, IOnlineUser } from './interfaces';
+import { IAcceptCare, INewCare, IOnlineUser } from './interfaces';
 import { RedisStore } from './redisStore';
 
 const env = Env.all();
@@ -34,9 +34,12 @@ const subClient = pubClient.duplicate();
 export class SignallingServerService {
   private readonly io: any;
   private static redisStore: RedisStore;
+  private static onlinePractitionerRoom: string;
 
   constructor(appServer: any, patientService: PatientService, practitionerService: PractitionerService) {
     SignallingServerService.redisStore = new RedisStore(pubClient, patientService, practitionerService);
+    SignallingServerService.onlinePractitionerRoom = 'onlinePractitioners';
+
     this.io = new Server(appServer, {
       cors: {
         origin: '*',
@@ -72,7 +75,7 @@ export class SignallingServerService {
     await SignallingServerService.redisStore.saveOnlineUser(user);
 
     if (user.resourceType === forWho.practitioner) {
-      socket.join('online');
+      socket.join(SignallingServerService.onlinePractitionerRoom);
     }
 
     await SignallingServerService.onOnlineUsers(socket);
@@ -81,7 +84,7 @@ export class SignallingServerService {
   private static async onOnlineUsers(socket: Socket) {
     const onlineUsers = await SignallingServerService.redisStore.getOnlineUsers();
 
-    socket.to('online').emit('onlineUsers', onlineUsers);
+    socket.to('onlineUsers').emit('onlineUsers', onlineUsers);
   }
 
   private static onNewVideoBroadcast(socket: Socket) {
@@ -109,35 +112,23 @@ export class SignallingServerService {
   }
 
   private static onNewCare(socket: Socket, newCareBroadcast: INewCare) {
-    socket.emit('newCare', newCareBroadcast);
+    socket.to(SignallingServerService.onlinePractitionerRoom)
+      .emit('newCare', newCareBroadcast);
     console.log('newCare:', newCareBroadcast);
   }
 
   private static onAcceptCare(socket: Socket) {
-    socket.on('acceptCare', async (acceptCare) => {
-      const existingCare = await SignallingServerService.redisStore.getBroadcastByVideoUrl(acceptCare?.videoUrl);
+    socket.on('acceptCare', async (acceptCare: IAcceptCare, cb) => {
+      const existingCare = await SignallingServerService.redisStore.getBroadcastByVideoUrl(acceptCare.videoUrl);
 
-      if (existingCare?.status) {
-        SignallingServerService.onCareUpdate(socket, {
-          patientId: existingCare.patientId,
-          videoUrl: existingCare.videoUrl,
-          status: {
-            alreadyMatched: existingCare.status,
-            practitionerId: existingCare.practitionerId,
-            acceptedDate: existingCare.acceptedDate,
-          }
-        });
+      if (existingCare?.initiateCare) {
+        return cb({ status: true });
       }
 
-      acceptCare.status = acceptCare.initiateCare;
-      acceptCare.acceptedDate = new Date();
-
       await SignallingServerService.redisStore.saveBroadcast(acceptCare);
-    });
-  }
 
-  private static onCareUpdate(socket: Socket, careUpdate: ICareUpdate) {
-    socket.emit('newCare', careUpdate);
+      return cb({ status: false });
+    });
   }
 
   private static onDisconnect(socket: Socket) {
