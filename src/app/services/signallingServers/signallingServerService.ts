@@ -60,11 +60,12 @@ export class SignallingServerService {
   public initialize(): void {
     this.io.on('connection', async (socket: any) => {
       await SignallingServerService.onConnection(socket);
-
       SignallingServerService.onNewVideoBroadcast(socket);
-
       SignallingServerService.onAcceptCare(socket);
-
+      SignallingServerService.onJoinRoom(socket);
+      SignallingServerService.onOffer(socket);
+      SignallingServerService.onAnswer(socket);
+      SignallingServerService.onIceCandidate(socket);
       SignallingServerService.onDisconnect(socket);
     });
   }
@@ -130,6 +131,42 @@ export class SignallingServerService {
     });
   }
 
+  private static onJoinRoom(socket: Socket) {
+    socket.on('joinRoom', async (roomId: string) => {
+      const room = await SignallingServerService.redisStore.getRoomById(roomId);
+      console.log('Room:', room);
+
+      room.push(socket.id);
+
+      await SignallingServerService.redisStore.addRoom(roomId, room)
+
+      const otherUser = room.find(id => id !== socket.id);
+
+      if (otherUser) {
+        socket.emit('otherUser', otherUser);
+        socket.to(otherUser).emit('userJoined', socket.id);
+      }
+    });
+  }
+
+  private static onOffer(socket: Socket) {
+    socket.on('offer', payload => {
+      socket.to(payload.target).emit('offer', payload);
+    });
+  }
+
+  private static onAnswer(socket: Socket) {
+    socket.on('answer', payload => {
+      socket.to(payload.target).emit('answer', payload);
+    })
+  }
+
+  private static onIceCandidate(socket: Socket) {
+    socket.on('iceCandidate', incoming => {
+      socket.to(incoming.target).emit('iceCandidate', incoming.candidate);
+    });
+  }
+
   private static onDisconnect(socket: Socket) {
     let { userId, resourceType } = socket.handshake.query;
     resourceType = resourceType as unknown as string;
@@ -139,6 +176,8 @@ export class SignallingServerService {
 
     socket.on('disconnect', async () => {
       await SignallingServerService.redisStore.removeUserBY(user.userId);
+
+      // Todo: delete room when any of the sockets disconnects
 
       console.log(`User disconnected: ${socket.id}`);
 
