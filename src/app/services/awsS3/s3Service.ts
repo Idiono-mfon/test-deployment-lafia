@@ -1,6 +1,6 @@
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { injectable } from 'inversify';
-import short from 'short-uuid';
+import { v4 as uuidV4 } from 'uuid';
 import { Env } from '../../config/env';
 import {
   error,
@@ -14,11 +14,9 @@ const env = Env.all();
 @injectable()
 export class S3Service {
   private s3: any;
-  private readonly filename: string;
 
   constructor() {
     // Setup S3 credentials
-    this.filename = short.generate();
     this.s3 = new S3Client({
       region: env.aws_region,
       credentials: {
@@ -45,7 +43,7 @@ export class S3Service {
     // Set S3 params
     const uploadParams = {
       Bucket: `${env.aws_bucket}`,
-      Key: `videos/${this.filename}.${ext}`,
+      Key: `videos/${uuidV4()}.${ext}`,
       Body: fileBuffer,
       ACL: 'public-read'
     };
