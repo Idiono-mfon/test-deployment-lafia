@@ -274,7 +274,7 @@ export class RedisStore {
       let rooms = await this.getAllRooms();
 
       if (!rooms) {
-        return;
+        return [];
       }
 
       let room: string[] = [];
