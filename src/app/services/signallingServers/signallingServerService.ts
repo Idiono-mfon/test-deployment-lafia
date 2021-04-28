@@ -5,7 +5,12 @@ import { Env } from '../../config/env';
 import { forWho } from '../../utils';
 import { PatientService } from '../patients';
 import { PractitionerService } from '../practitioners';
-import { IAcceptCare, INewCare, IOnlineUser } from './interfaces';
+import {
+  IAcceptCare,
+  INewBroadcast,
+  INewCare,
+  IOnlineUser
+} from './interfaces';
 import { RedisStore } from './redisStore';
 
 const env = Env.all();
@@ -88,20 +93,14 @@ export class SignallingServerService {
   }
 
   private static onNewVideoBroadcast(socket: Socket) {
-    socket.on('newVideoBroadcast', async (newBroadcast) => {
-      newBroadcast = {
-        ...newBroadcast,
-        status: newBroadcast.initiateCare,
-        practitionerId: null,
-        acceptedDate: null,
-      }
+    socket.on('newVideoBroadcast', async (newBroadcast: INewBroadcast) => {
       await SignallingServerService.redisStore.saveBroadcast(newBroadcast);
       const {
         patientId,
         videoUrl,
         initiateCare
       } = await this.redisStore
-        .getBroadcastByVideoUrl(newBroadcast?.videoUrl);
+        .getBroadcastByVideoUrl(newBroadcast.videoUrl);
 
       const newCareBroadCast = { patientId, initiateCare, videoUrl };
 
