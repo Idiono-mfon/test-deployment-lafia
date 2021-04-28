@@ -129,7 +129,7 @@ export class SignallingServerService {
         return cb({ status: false, description: 'Care already initiated by another practitioner' });
       }
 
-      await SignallingServerService.redisStore.saveBroadcast(acceptCare);
+      await SignallingServerService.redisStore.updateBroadcast(acceptCare);
 
       return cb({ status: true, description: 'You accepted to give care to the patient' });
     });

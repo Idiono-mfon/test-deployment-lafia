@@ -198,7 +198,9 @@ export class RedisStore {
       const existingBroadcast = await this.getBroadcastByVideoUrl(broadcast.videoUrl);
 
       if (existingBroadcast) {
-        return;
+        _.remove(broadcastStatus, (bs: IBroadcastStatus | any) => {
+          return bs.videoUrl === broadcast.videoUrl;
+        });
       }
 
       const patient: IPatient = await this.patientService.findPatientById(broadcast.patientId);
@@ -208,6 +210,36 @@ export class RedisStore {
 
       // Update Broadcast
       broadcastStatus.push({ ...broadcast, patientName });
+
+      // Encode to Base64
+      const base64Str = RedisStore.encodeBase64(JSON.stringify(broadcastStatus));
+
+      // Update Redis Data
+      await this.redisClient.set(this.broadcastStatusKey, base64Str);
+    } catch (e) {
+      throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  public async updateBroadcast(broadcast: IBroadcastStatus): Promise<void> {
+    try {
+      // Get All Broadcast
+      let broadcastStatus: IBroadcastStatus[] = await this.getAllBroadcasts();
+
+      if (!broadcastStatus) {
+        broadcastStatus = [];
+      }
+
+      const existingBroadcast = await this.getBroadcastByVideoUrl(broadcast.videoUrl);
+
+      if (existingBroadcast) {
+        _.remove(broadcastStatus, (bs: IBroadcastStatus | any) => {
+          return bs.videoUrl === broadcast.videoUrl;
+        });
+      }
+
+      // Update Broadcast
+      broadcastStatus.push(broadcast);
 
       // Encode to Base64
       const base64Str = RedisStore.encodeBase64(JSON.stringify(broadcastStatus));
