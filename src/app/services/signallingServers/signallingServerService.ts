@@ -58,7 +58,7 @@ export class SignallingServerService {
   }
 
   public initialize(): void {
-    this.io.on('connection', async (socket: any) => {
+    this.io.on('connection', async (socket: Socket) => {
       await SignallingServerService.onConnection(socket);
       SignallingServerService.onNewVideoBroadcast(socket);
       SignallingServerService.onAcceptCare(socket);
