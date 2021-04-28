@@ -140,7 +140,7 @@ export class SignallingServerService {
 
       await SignallingServerService.redisStore.addRoom(roomId, room)
 
-      const otherUser = room.find(id => id !== socket.id);
+      const otherUser = room.find((id: string) => id !== socket.id);
 
       if (otherUser) {
         socket.emit('otherUser', otherUser);
