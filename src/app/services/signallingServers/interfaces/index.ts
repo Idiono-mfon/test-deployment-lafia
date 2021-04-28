@@ -6,7 +6,7 @@ export interface IOnlineUser {
 
 export interface IBroadcastStatus {
   videoUrl: string;
-  practitionerId: string;
+  practitionerId?: string;
   initiateCare: boolean;
   patientId: string;
 }
@@ -23,4 +23,4 @@ export interface IRooms {
 
 export type IRoom = string[];
 export type IAcceptCare = IBroadcastStatus
-export type INewBroadcast = INewCare;
+export type INewBroadcast = IBroadcastStatus;
