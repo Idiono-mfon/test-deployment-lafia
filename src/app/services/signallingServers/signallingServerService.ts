@@ -137,7 +137,7 @@ export class SignallingServerService {
 
   private static onJoinRoom(socket: Socket) {
     socket.on('joinRoom', async (roomId: string) => {
-      const room = await SignallingServerService.redisStore.getRoomById(roomId);
+      let room = await SignallingServerService.redisStore.getRoomById(roomId);
       console.log('Room:', room);
 
       room.push(socket.id);
@@ -147,6 +147,9 @@ export class SignallingServerService {
       await SignallingServerService.redisStore.addRoom(roomId, room)
 
       const otherUser = room.find((id: string) => id !== socket.id);
+
+      room = await SignallingServerService.redisStore.getRoomById(roomId);
+      console.log('Room:', room);
 
       if (otherUser) {
         socket.emit('otherUser', otherUser);
