@@ -201,8 +201,13 @@ export class RedisStore {
         return;
       }
 
+      const patient: IPatient = await this.patientService.findPatientById(broadcast.patientId);
+
+      // @ts-ignore
+      const patientName = patient?.name[0]?.text;
+
       // Update Broadcast
-      broadcastStatus.push(broadcast);
+      broadcastStatus.push({ ...broadcast, patientName });
 
       // Encode to Base64
       const base64Str = RedisStore.encodeBase64(JSON.stringify(broadcastStatus));

@@ -9,10 +9,12 @@ export interface IBroadcastStatus {
   practitionerId?: string;
   initiateCare: boolean;
   patientId: string;
+  patientName: string;
 }
 
 export interface INewCare {
   patientId: string;
+  patientName: string;
   videoUrl: string;
   initiateCare: boolean;
 }

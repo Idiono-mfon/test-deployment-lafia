@@ -99,11 +99,12 @@ export class SignallingServerService {
       const {
         patientId,
         videoUrl,
-        initiateCare
+        initiateCare,
+        patientName
       } = await this.redisStore
         .getBroadcastByVideoUrl(newBroadcast.videoUrl);
 
-      const newCareBroadCast = { patientId, initiateCare, videoUrl };
+      const newCareBroadCast = { patientId, initiateCare, videoUrl, patientName };
 
       console.log('newCareBroadcast:', newCareBroadCast);
 
