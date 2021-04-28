@@ -231,7 +231,7 @@ export class RedisStore {
     }
   }
 
-  public async getRoomById(id: string): Promise<IRoom> {
+  public async getRoomById(id: string): Promise<IRoom | any> {
     try {
       // Get All Rooms
       let rooms = await this.getAllRooms();
