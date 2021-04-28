@@ -79,6 +79,11 @@ export class SignallingServerService {
     const user: IOnlineUser = { userId, resourceType } as IOnlineUser;
 
     await SignallingServerService.redisStore.saveOnlineUser(user);
+    const loggedInUser = await SignallingServerService.redisStore.getUserById(userId as string);
+
+    loggedInUser.socketId = socket.id;
+
+    console.log('ConnectedUser:', loggedInUser);
 
     if (user.resourceType === forWho.practitioner) {
       socket.join(SignallingServerService.onlinePractitionerRoom);
