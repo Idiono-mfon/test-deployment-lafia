@@ -177,6 +177,7 @@ export class SignallingServerService {
   }
 
   private static emitCallMadeEvent(socket: Socket, data: any) {
+    console.log('data:', data);
     socket.to(data.to).emit('callMade', {
       offer: data.offer,
       practitionerName: data.practitionerName,
