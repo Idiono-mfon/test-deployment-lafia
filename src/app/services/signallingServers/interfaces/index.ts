@@ -2,6 +2,7 @@ export interface IOnlineUser {
   userId: string;
   resourceType: string;
   username?: string;
+  socketId: string;
 }
 
 export interface IBroadcastStatus {

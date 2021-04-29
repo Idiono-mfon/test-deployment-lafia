@@ -59,44 +59,41 @@ export class SignallingServerService {
 
   public initialize(): void {
     this.io.on('connection', async (socket: Socket) => {
-      await SignallingServerService.onConnection(socket);
-      SignallingServerService.onNewVideoBroadcast(socket);
-      SignallingServerService.onAcceptCare(socket);
+      await SignallingServerService.listenForConnectionEvent(socket);
+      SignallingServerService.listenForNewVideoBroadcastEvent(socket);
+      SignallingServerService.listenForAcceptCareEvent(socket);
       SignallingServerService.onJoinRoom(socket);
       SignallingServerService.onOffer(socket);
       SignallingServerService.onAnswer(socket);
       SignallingServerService.onIceCandidate(socket);
-      SignallingServerService.onDisconnect(socket);
+      SignallingServerService.listenForDisconnectEvent(socket);
     });
   }
 
-  private static async onConnection(socket: Socket) {
+  private static async listenForConnectionEvent(socket: Socket) {
     let { userId, resourceType } = socket.handshake.query;
     resourceType = resourceType as unknown as string;
     resourceType = resourceType.toLowerCase();
     const user: IOnlineUser = { userId, resourceType } as IOnlineUser;
 
-    await SignallingServerService.redisStore.saveOnlineUser(user);
-    const loggedInUser = await SignallingServerService.redisStore.getUserById(userId as string);
+    await SignallingServerService.redisStore.saveOnlineUser({ ...user, socketId: socket.id });
 
-    loggedInUser.socketId = socket.id;
-
-    console.log('ConnectedUser:', loggedInUser);
+    console.log('ConnectedUser:', user);
 
     if (user.resourceType === forWho.practitioner) {
       socket.join(SignallingServerService.onlinePractitionerRoom);
     }
 
-    await SignallingServerService.onOnlineUsers(socket);
+    await SignallingServerService.emitOnlineUsersEvent(socket);
   }
 
-  private static async onOnlineUsers(socket: Socket) {
+  private static async emitOnlineUsersEvent(socket: Socket) {
     const onlineUsers = await SignallingServerService.redisStore.getOnlineUsers();
 
     socket.to('onlineUsers').emit('onlineUsers', onlineUsers);
   }
 
-  private static onNewVideoBroadcast(socket: Socket) {
+  private static listenForNewVideoBroadcastEvent(socket: Socket) {
     socket.on('newVideoBroadcast', async (newBroadcast: INewBroadcast) => {
       await SignallingServerService.redisStore.saveBroadcast(newBroadcast);
       const {
@@ -111,17 +108,17 @@ export class SignallingServerService {
 
       console.log('newCareBroadcast:', newCareBroadCast);
 
-      SignallingServerService.onNewCare(socket, newCareBroadCast);
+      SignallingServerService.emitNewCareEven(socket, newCareBroadCast);
     });
   }
 
-  private static onNewCare(socket: Socket, newCareBroadcast: INewCare) {
+  private static emitNewCareEven(socket: Socket, newCareBroadcast: INewCare) {
     socket.to(SignallingServerService.onlinePractitionerRoom)
       .emit('newCare', newCareBroadcast);
     console.log('newCare:', newCareBroadcast);
   }
 
-  private static onAcceptCare(socket: Socket) {
+  private static listenForAcceptCareEvent(socket: Socket) {
     socket.on('acceptCare', async (acceptCare: IAcceptCare, cb) => {
       const existingCare = await SignallingServerService.redisStore.getBroadcastByVideoUrl(acceptCare.videoUrl);
 
@@ -176,7 +173,7 @@ export class SignallingServerService {
     });
   }
 
-  private static onDisconnect(socket: Socket) {
+  private static listenForDisconnectEvent(socket: Socket) {
     let { userId, resourceType } = socket.handshake.query;
     resourceType = resourceType as unknown as string;
     resourceType = resourceType.toLowerCase();
@@ -190,7 +187,7 @@ export class SignallingServerService {
 
       console.log(`User disconnected: ${socket.id}`);
 
-      await SignallingServerService.onOnlineUsers(socket);
+      await SignallingServerService.emitOnlineUsersEvent(socket);
     });
   }
 }
