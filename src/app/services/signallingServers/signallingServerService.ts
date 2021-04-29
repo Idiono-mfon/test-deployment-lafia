@@ -67,6 +67,7 @@ export class SignallingServerService {
       SignallingServerService.onAnswer(socket);
       SignallingServerService.onIceCandidate(socket);
       SignallingServerService.listenForDisconnectEvent(socket);
+      SignallingServerService.listenForPatientOnlineStatusEvent(socket);
     });
   }
 
@@ -76,7 +77,10 @@ export class SignallingServerService {
     resourceType = resourceType.toLowerCase();
     const user: IOnlineUser = { userId, resourceType } as IOnlineUser;
 
-    await SignallingServerService.redisStore.saveOnlineUser({ ...user, socketId: socket.id });
+    await SignallingServerService.redisStore.saveOnlineUser({
+      ...user,
+      socketId: socket.id
+    });
 
     console.log('ConnectedUser:', user);
 
@@ -104,7 +108,12 @@ export class SignallingServerService {
       } = await this.redisStore
         .getBroadcastByVideoUrl(newBroadcast.videoUrl);
 
-      const newCareBroadCast = { patientId, initiateCare, videoUrl, patientName };
+      const newCareBroadCast = {
+        patientId,
+        initiateCare,
+        videoUrl,
+        patientName
+      };
 
       console.log('newCareBroadcast:', newCareBroadCast);
 
@@ -123,12 +132,38 @@ export class SignallingServerService {
       const existingCare = await SignallingServerService.redisStore.getBroadcastByVideoUrl(acceptCare.videoUrl);
 
       if (existingCare?.initiateCare) {
-        return cb({ status: false, description: 'Care already initiated by another practitioner' });
+        return cb({
+          status: false,
+          description: 'Care already initiated by another practitioner'
+        });
       }
 
       await SignallingServerService.redisStore.updateBroadcast(acceptCare);
 
-      return cb({ status: true, description: 'You accepted to give care to the patient' });
+      return cb({
+        status: true,
+        description: 'You accepted to give care to the patient'
+      });
+    });
+  }
+
+  private static listenForPatientOnlineStatusEvent(socket: Socket) {
+    socket.on('patientOnlineStatus', async (data, cb) => {
+      const { socketId: patientSocketId } = await SignallingServerService
+        .redisStore
+        .getUserById(data.patientId);
+
+      if (!patientSocketId) {
+        return cb({
+          status: 'offline',
+          patientSocketId: null
+        });
+      }
+
+      return cb({
+        status: 'online',
+        patientSocketId
+      });
     });
   }
 
@@ -141,7 +176,7 @@ export class SignallingServerService {
 
       socket.to(socket.id).emit('joinRoom', roomId);
 
-      await SignallingServerService.redisStore.addRoom(roomId, room)
+      await SignallingServerService.redisStore.addRoom(roomId, room);
 
       const otherUser = room.find((id: string) => id !== socket.id);
 
@@ -164,7 +199,7 @@ export class SignallingServerService {
   private static onAnswer(socket: Socket) {
     socket.on('answer', payload => {
       socket.to(payload.target).emit('answer', payload);
-    })
+    });
   }
 
   private static onIceCandidate(socket: Socket) {
