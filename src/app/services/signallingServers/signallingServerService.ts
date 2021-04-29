@@ -152,19 +152,20 @@ export class SignallingServerService {
 
   private static listenForPatientOnlineStatusEvent(socket: Socket) {
     socket.on('patientOnlineStatus', async (data, cb) => {
-      const { socketId: patientSocketId } = await SignallingServerService
+      const userData: IOnlineUser = await SignallingServerService
         .redisStore
         .getUserById(data.patientId);
 
-      if (!patientSocketId) {
+      if (!userData?.socketId) {
         return cb({
           status: 'offline',
+          patientSocketId: null,
         });
       }
 
       return cb({
         status: 'online',
-        patientSocketId
+        patientSocketId: userData?.socketId,
       });
     });
   }
