@@ -273,7 +273,7 @@ export class RedisStore {
       // Get All Rooms
       let rooms = await this.getAllRooms();
 
-      if (!rooms) {
+      if (_.isEmpty(rooms)) {
         return [];
       }
 
