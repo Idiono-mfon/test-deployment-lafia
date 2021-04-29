@@ -285,8 +285,6 @@ export class RedisStore {
         }
       }
 
-      console.log("ROOM:", room);
-
       return room;
     } catch (e) {
       throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
