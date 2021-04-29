@@ -60,7 +60,7 @@ export class RedisStore {
       // Get All Online Users
       let onlineUsers: IOnlineUser[] | any = await this.getOnlineUsers();
 
-      if (!onlineUsers) {
+      if (!onlineUsers || _.isEmpty(onlineUsers)) {
         return;
       }
 
