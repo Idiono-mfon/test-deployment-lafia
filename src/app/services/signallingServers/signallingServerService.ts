@@ -62,14 +62,11 @@ export class SignallingServerService {
       await SignallingServerService.listenForConnectionEvent(socket);
       SignallingServerService.listenForNewVideoBroadcastEvent(socket);
       SignallingServerService.listenForAcceptCareEvent(socket);
-      SignallingServerService.onJoinRoom(socket);
-      SignallingServerService.onOffer(socket);
-      SignallingServerService.onAnswer(socket);
-      SignallingServerService.onIceCandidate(socket);
-      SignallingServerService.listenForDisconnectEvent(socket);
+      SignallingServerService.listenForIceCandidateEvent(socket);
       SignallingServerService.listenForPatientOnlineStatusEvent(socket);
       SignallingServerService.listenForCallUserEvent(socket);
       SignallingServerService.listenForMakeAnswerEvent(socket);
+      SignallingServerService.listenForDisconnectEvent(socket);
     });
   }
 
@@ -118,8 +115,6 @@ export class SignallingServerService {
         patientName
       };
 
-      console.log('newCareBroadcast:', newCareBroadCast);
-
       SignallingServerService.emitNewCareEven(socket, newCareBroadCast);
     });
   }
@@ -127,7 +122,6 @@ export class SignallingServerService {
   private static emitNewCareEven(socket: Socket, newCareBroadcast: INewCare) {
     socket.to(SignallingServerService.onlinePractitionerRoom)
       .emit('newCare', newCareBroadcast);
-    console.log('newCare:', newCareBroadcast);
   }
 
   private static listenForAcceptCareEvent(socket: Socket) {
@@ -177,7 +171,6 @@ export class SignallingServerService {
   }
 
   private static emitCallMadeEvent(socket: Socket, data: any) {
-    console.log('data:', data);
     socket.to(data.to).emit('callMade', {
       offer: data.offer,
       practitionerName: data.practitionerName,
@@ -198,44 +191,16 @@ export class SignallingServerService {
     });
   }
 
-  private static onJoinRoom(socket: Socket) {
-    socket.on('joinRoom', async (roomId: string) => {
-      let room = await SignallingServerService.redisStore.getRoomById(roomId);
-      console.log('Room:', room);
-
-      room.push(socket.id);
-
-      socket.to(socket.id).emit('joinRoom', roomId);
-
-      await SignallingServerService.redisStore.addRoom(roomId, room);
-
-      const otherUser = room.find((id: string) => id !== socket.id);
-
-      room = await SignallingServerService.redisStore.getRoomById(roomId);
-      console.log('Room:', room);
-
-      if (otherUser) {
-        socket.emit('otherUser', otherUser);
-        socket.to(otherUser).emit('userJoined', socket.id);
-      }
+  private static listenForIceCandidateEvent(socket: Socket) {
+    socket.on('iceCandidate', data => {
+      SignallingServerService.emitCandidateSharedEvent(socket, data);
     });
   }
 
-  private static onOffer(socket: Socket) {
-    socket.on('offer', payload => {
-      socket.to(payload.target).emit('offer', payload);
-    });
-  }
-
-  private static onAnswer(socket: Socket) {
-    socket.on('answer', payload => {
-      socket.to(payload.target).emit('answer', payload);
-    });
-  }
-
-  private static onIceCandidate(socket: Socket) {
-    socket.on('iceCandidate', incoming => {
-      socket.to(incoming.target).emit('iceCandidate', incoming.candidate);
+  private static emitCandidateSharedEvent(socket: Socket, data: any) {
+    socket.to(data.to).emit('candidateShared', {
+      candidate: data.candidate,
+      socket: socket.id,
     });
   }
 
@@ -245,11 +210,8 @@ export class SignallingServerService {
     resourceType = resourceType.toLowerCase();
     const user: IOnlineUser = { userId, resourceType } as IOnlineUser;
 
-
     socket.on('disconnect', async () => {
       await SignallingServerService.redisStore.removeUserBY(user.userId);
-
-      // Todo: delete room when any of the sockets disconnects
 
       console.log(`User disconnected: ${socket.id}`);
 
