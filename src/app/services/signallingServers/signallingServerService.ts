@@ -68,6 +68,8 @@ export class SignallingServerService {
       SignallingServerService.onIceCandidate(socket);
       SignallingServerService.listenForDisconnectEvent(socket);
       SignallingServerService.listenForPatientOnlineStatusEvent(socket);
+      SignallingServerService.listenForCallUserEvent(socket);
+      SignallingServerService.listenForMakeAnswerEvent(socket);
     });
   }
 
@@ -164,6 +166,32 @@ export class SignallingServerService {
         status: 'online',
         patientSocketId
       });
+    });
+  }
+
+  private static listenForCallUserEvent(socket: Socket) {
+    socket.on('callUser', data => {
+      SignallingServerService.emitCallMadeEvent(socket, data);
+    });
+  }
+
+  private static emitCallMadeEvent(socket: Socket, data: any) {
+    socket.to(data.to).emit('callMade', {
+      offer: data.offer,
+      socket: socket.id,
+    });
+  }
+
+  private static listenForMakeAnswerEvent(socket: Socket) {
+    socket.on('makeAnswer', data => {
+      SignallingServerService.emitAnswerMadeEvent(socket, data);
+    });
+  }
+
+  private static emitAnswerMadeEvent(socket: Socket, data: any) {
+    socket.to(data.to).emit('answerMade', {
+      socket: socket.id,
+      answer: data.answer,
     });
   }
 
