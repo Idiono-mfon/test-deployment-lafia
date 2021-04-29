@@ -159,7 +159,6 @@ export class SignallingServerService {
       if (!patientSocketId) {
         return cb({
           status: 'offline',
-          patientSocketId: null
         });
       }
 
