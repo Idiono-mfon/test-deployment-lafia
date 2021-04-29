@@ -77,12 +77,13 @@ export class SignallingServerService {
     let { userId, resourceType } = socket.handshake.query;
     resourceType = resourceType as unknown as string;
     resourceType = resourceType.toLowerCase();
-    const user: IOnlineUser = { userId, resourceType } as IOnlineUser;
-
-    await SignallingServerService.redisStore.saveOnlineUser({
-      ...user,
+    const user: IOnlineUser = {
+      userId,
+      resourceType,
       socketId: socket.id
-    });
+    } as IOnlineUser;
+
+    await SignallingServerService.redisStore.saveOnlineUser(user);
 
     console.log('ConnectedUser:', user);
 
