@@ -279,7 +279,7 @@ export class RedisStore {
 
       let room: string[] = [];
       for (let roomId in rooms) {
-        if (Object.prototype.hasOwnProperty.call(rooms, id) && id === roomId) {
+        if (id === roomId) {
           room.concat(...rooms[id]);
           break;
         }
