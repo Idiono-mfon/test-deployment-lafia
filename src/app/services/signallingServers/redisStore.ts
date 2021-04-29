@@ -281,7 +281,7 @@ export class RedisStore {
       for (let roomId in rooms) {
         if (id === roomId) {
           room.concat(rooms[id]);
-          break;
+          return room;
         }
       }
 
