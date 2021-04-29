@@ -272,6 +272,7 @@ export class RedisStore {
     try {
       // Get All Rooms
       let rooms = await this.getAllRooms();
+      console.log('rooms:', rooms);
 
       if (_.isEmpty(rooms)) {
         return [];
@@ -279,6 +280,8 @@ export class RedisStore {
 
       let room: string[] = [];
       for (let roomId in rooms) {
+        console.log('id:', id);
+        console.log('roomId:', roomId);
         if (id === roomId) {
           room.concat(...rooms[id]);
           break;
