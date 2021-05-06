@@ -36,3 +36,8 @@ export interface IPatient extends IBase {
   generalPractitioner?: IReference;
   link?: IPatientLink;
 }
+
+export interface IPatientWithToken {
+  user: IPatient;
+  auth_token: string;
+}

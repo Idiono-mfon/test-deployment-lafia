@@ -25,3 +25,8 @@ export interface IPractitioner extends IBase {
   identifier?: IIdentifier | IIdentifier[];
   qualification?: IQualification | IQualification[];
 }
+
+export interface IPractitionerWithToken {
+  user: IPractitioner;
+  auth_token: string;
+}

@@ -8,8 +8,9 @@ import {
 } from 'inversify-express-utils';
 import TYPES from '../../config/types';
 import { uploadFile } from '../../middlewares';
-import { IAttachment, IPatient } from '../../models';
+import { IAttachment, IPatient, IPatientWithToken } from '../../models';
 import { PatientService } from '../../services';
+import { MessageBroker } from '../../services/messageBroker';
 import { HttpStatusCode } from '../../utils';
 import { BaseController } from '../baseController';
 
@@ -17,6 +18,9 @@ import { BaseController } from '../baseController';
 export class PatientController extends BaseController {
   @inject(TYPES.PatientService)
   private readonly patientService: PatientService;
+
+  @inject(TYPES.MessageBroker)
+  private readonly messageBroker: MessageBroker;
 
   @httpPut('/:id')
   public async updatePatient(@request() req: Request, @response() res: Response) {
@@ -49,7 +53,15 @@ export class PatientController extends BaseController {
     try {
       const patientData: any = req.body;
 
-      const patient: IPatient = await this.patientService.createPatient(patientData);
+      const patient: IPatientWithToken = await this.patientService.createPatient(patientData);
+      const rmqPubMsg = {
+        status: 'success',
+        resource_type: patient?.user?.resourceType,
+        message: 'Resource created successfully',
+        id: patient?.user?.id,
+        email: patientData?.email,
+      }
+      await this.messageBroker.rmqPublish(JSON.stringify(rmqPubMsg));
 
       this.success(res, patient, 'Patient registration successful', HttpStatusCode.CREATED);
     } catch(e) {
