@@ -2,8 +2,7 @@ import { inject, injectable } from 'inversify';
 import _ from 'lodash';
 import { Env } from '../../config/env';
 import TYPES from '../../config/types';
-import { IPatient } from '../../models/patients';
-import { IPractitioner } from '../../models/practitioners';
+import { IPatient, IPractitioner } from '../../models';
 import { forWho } from '../../utils';
 import { PatientService } from '../patients';
 import { PractitionerService } from '../practitioners';
@@ -116,6 +115,8 @@ export class MessageBroker {
                 return;
               }
             }
+
+            console.log('Resource:', resource);
 
             const rmqPubMsg = {
               status: 'success',
