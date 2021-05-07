@@ -185,7 +185,7 @@ export class SignallingServerService {
       .twilioService
       .generateAccessToken(
         data.patientId,
-        data.rommId
+        data.roomId
       );
 
     socket.to(data.to).emit('callMade', {
