@@ -5,6 +5,7 @@ import { Env } from '../../config/env';
 import { forWho } from '../../utils';
 import { PatientService } from '../patients';
 import { PractitionerService } from '../practitioners';
+import { TwilioService } from '../twilio';
 import {
   IAcceptCare,
   INewBroadcast,
@@ -40,10 +41,12 @@ export class SignallingServerService {
   private readonly io: any;
   private static redisStore: RedisStore;
   private static onlinePractitionerRoom: string;
+  private static twilioService: any;
 
   constructor(appServer: any, patientService: PatientService, practitionerService: PractitionerService) {
     SignallingServerService.redisStore = new RedisStore(pubClient, patientService, practitionerService);
     SignallingServerService.onlinePractitionerRoom = 'onlinePractitioners';
+    SignallingServerService.twilioService = new TwilioService();
 
     this.io = new Server(appServer, {
       cors: {
@@ -115,11 +118,11 @@ export class SignallingServerService {
         patientName
       };
 
-      SignallingServerService.emitNewCareEven(socket, newCareBroadCast);
+      SignallingServerService.emitNewCareEvent(socket, newCareBroadCast);
     });
   }
 
-  private static emitNewCareEven(socket: Socket, newCareBroadcast: INewCare) {
+  private static emitNewCareEvent(socket: Socket, newCareBroadcast: INewCare) {
     socket.to(SignallingServerService.onlinePractitionerRoom)
       .emit('newCare', newCareBroadcast);
   }
@@ -137,7 +140,14 @@ export class SignallingServerService {
 
       await SignallingServerService.redisStore.updateBroadcast(acceptCare);
 
+      const roomId = await TwilioService.createRoom();
+      const token = await SignallingServerService.twilioService.generateAccessToken(
+        acceptCare?.practitionerId as string,
+        roomId
+      );
       return cb({
+        roomId,
+        token,
         status: true,
         description: 'You accepted to give care to the patient'
       });
@@ -171,8 +181,16 @@ export class SignallingServerService {
   }
 
   private static emitCallMadeEvent(socket: Socket, data: any) {
+    const token = SignallingServerService
+      .twilioService
+      .generateAccessToken(
+        data.patientId,
+        data.rommId
+      );
+
     socket.to(data.to).emit('callMade', {
-      offer: data.offer,
+      roomId: data.roomId,
+      token,
       practitionerName: data.practitionerName,
       socket: socket.id,
     });
