@@ -37,6 +37,8 @@ export class S3Service {
 
     const { buffer: fileBuffer, mimetype } = file;
 
+    console.log('File:', file);
+
     // Extract file extension
     const [type, ext] = mimetype.split('/');
 
