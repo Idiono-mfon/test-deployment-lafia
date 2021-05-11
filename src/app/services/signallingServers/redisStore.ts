@@ -78,7 +78,7 @@ export class RedisStore {
     }
   }
 
-  public async removeUserBY(userId: string): Promise<void> {
+  public async removeUserBYId(userId: string): Promise<void> {
     try {
       // Get All Online Users
       const onlineUsers: IOnlineUser[] | any = await this.getOnlineUsers();
