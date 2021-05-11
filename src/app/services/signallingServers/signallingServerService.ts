@@ -91,13 +91,20 @@ export class SignallingServerService {
       socket.join(SignallingServerService.onlinePractitionerRoom);
     }
 
-    await SignallingServerService.emitOnlineUsersEvent(socket);
+    await SignallingServerService.emitOnlinePractitionersEvent(socket);
   }
 
-  private static async emitOnlineUsersEvent(socket: Socket) {
+  private static async emitOnlinePractitionersEvent(socket: Socket) {
     const onlineUsers = await SignallingServerService.redisStore.getOnlineUsers();
+    let onlinePractitioners = [];
 
-    socket.to('onlineUsers').emit('onlineUsers', onlineUsers);
+    for (let user of onlineUsers) {
+      if (user.resourceType === forWho.practitioner) {
+        onlinePractitioners.push(user);
+      }
+    }
+
+    socket.to('onlineUsers').emit('onlinePractitioners', onlinePractitioners);
   }
 
   private static listenForNewVideoBroadcastEvent(socket: Socket) {
@@ -233,7 +240,7 @@ export class SignallingServerService {
 
       console.log(`User disconnected: ${socket.id}`);
 
-      await SignallingServerService.emitOnlineUsersEvent(socket);
+      await SignallingServerService.emitOnlinePractitionersEvent(socket);
     });
   }
 }
