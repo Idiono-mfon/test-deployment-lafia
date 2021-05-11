@@ -104,7 +104,10 @@ export class SignallingServerService {
       }
     }
 
-    socket.to('onlineUsers').emit('onlinePractitioners', onlinePractitioners);
+    console.log('OnlinePractitioners:', onlinePractitioners);
+    console.log('OnlineUsers:', onlineUsers);
+
+    socket.emit('onlinePractitioners', onlinePractitioners);
   }
 
   private static listenForNewVideoBroadcastEvent(socket: Socket) {
