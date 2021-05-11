@@ -113,6 +113,7 @@ export class SignallingServerService {
 
   private static listenForNewVideoBroadcastEvent(socket: Socket) {
     socket.on('newVideoBroadcast', async (newBroadcast: INewBroadcast) => {
+      await SignallingServerService.emitOnlinePractitionersEvent(socket);
       await SignallingServerService.redisStore.saveBroadcast(newBroadcast);
       const {
         patientId,
@@ -140,6 +141,7 @@ export class SignallingServerService {
 
   private static listenForAcceptCareEvent(socket: Socket) {
     socket.on('acceptCare', async (acceptCare: IAcceptCare, cb) => {
+      await SignallingServerService.emitOnlinePractitionersEvent(socket);
       const existingCare = await SignallingServerService.redisStore.getBroadcastByVideoUrl(acceptCare.videoUrl);
 
       if (existingCare?.initiateCare) {
@@ -177,6 +179,7 @@ export class SignallingServerService {
           patientSocketId: null,
         });
       }
+      await SignallingServerService.emitOnlinePractitionersEvent(socket);
 
       return cb({
         status: 'online',
@@ -186,12 +189,14 @@ export class SignallingServerService {
   }
 
   private static listenForCallUserEvent(socket: Socket) {
-    socket.on('callUser', data => {
-      SignallingServerService.emitCallMadeEvent(socket, data);
+    socket.on('callUser', async data => {
+      await SignallingServerService.emitCallMadeEvent(socket, data);
+      await SignallingServerService.emitOnlinePractitionersEvent(socket);
     });
   }
 
-  private static emitCallMadeEvent(socket: Socket, data: any) {
+  private static async emitCallMadeEvent(socket: Socket, data: any) {
+    await SignallingServerService.emitOnlinePractitionersEvent(socket);
     const token = SignallingServerService
       .twilioService
       .generateAccessToken(
@@ -208,12 +213,14 @@ export class SignallingServerService {
   }
 
   private static listenForMakeAnswerEvent(socket: Socket) {
-    socket.on('makeAnswer', data => {
-      SignallingServerService.emitAnswerMadeEvent(socket, data);
+    socket.on('makeAnswer', async data => {
+      await SignallingServerService.emitOnlinePractitionersEvent(socket);
+      await SignallingServerService.emitAnswerMadeEvent(socket, data);
     });
   }
 
-  private static emitAnswerMadeEvent(socket: Socket, data: any) {
+  private static async emitAnswerMadeEvent(socket: Socket, data: any) {
+    await SignallingServerService.emitOnlinePractitionersEvent(socket);
     socket.to(data.to).emit('answerMade', {
       socket: socket.id,
       answer: data.answer,
