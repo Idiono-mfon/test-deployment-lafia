@@ -63,6 +63,7 @@ export class SignallingServerService {
   public initialize(): void {
     this.io.on('connection', async (socket: Socket) => {
       await SignallingServerService.listenForConnectionEvent(socket);
+      await SignallingServerService.emitOnlinePractitionersEvent(socket);
       SignallingServerService.listenForNewVideoBroadcastEvent(socket);
       SignallingServerService.listenForAcceptCareEvent(socket);
       SignallingServerService.listenForIceCandidateEvent(socket);
