@@ -243,7 +243,7 @@ export class SignallingServerService {
 
       console.log(`User disconnected: ${socket.id}`);
 
-      // await SignallingServerService.emitOnlinePractitionersEvent(socket);
+      await SignallingServerService.emitOnlinePractitionersEvent(socket);
     });
   }
 }
