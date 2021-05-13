@@ -240,10 +240,11 @@ export class SignallingServerService {
       resourceType = resourceType.toLowerCase();
       const user: IOnlineUser = { userId, resourceType } as IOnlineUser;
 
+      console.log(`DisconnectedUser: ${socket.id}`);
+
       await SignallingServerService.redisStore.removeUserBYId(user.userId);
       await SignallingServerService.emitOnlinePractitionersEvent(socket);
 
-      console.log(`DisconnectedUser: ${socket.id}`);
     });
   }
 }
