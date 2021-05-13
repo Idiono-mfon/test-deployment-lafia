@@ -112,22 +112,8 @@ export class SignallingServerService {
   private static listenForNewVideoBroadcastEvent(socket: Socket) {
     socket.on('newVideoBroadcast', async (newBroadcast: INewBroadcast) => {
       await SignallingServerService.redisStore.saveBroadcast(newBroadcast);
-      const {
-        patientId,
-        videoUrl,
-        initiateCare,
-        patientName,
-        description,
-      } = await this.redisStore
+      const newCareBroadCast = await this.redisStore
         .getBroadcastByVideoUrl(newBroadcast.videoUrl);
-
-      const newCareBroadCast = {
-        patientId,
-        initiateCare,
-        videoUrl,
-        patientName,
-        description,
-      };
 
       SignallingServerService.emitNewCareEvent(socket, newCareBroadCast);
     });
