@@ -70,7 +70,7 @@ export class SignallingServerService {
       SignallingServerService.listenForPatientOnlineStatusEvent(socket);
       SignallingServerService.listenForCallUserEvent(socket);
       SignallingServerService.listenForMakeAnswerEvent(socket);
-      SignallingServerService.listenForDisconnectEvent(this.io);
+      SignallingServerService.listenForDisconnectEvent(this.io, socket);
     });
   }
 
@@ -233,8 +233,8 @@ export class SignallingServerService {
     });
   }
 
-  private static listenForDisconnectEvent(socket: Socket) {
-    socket.on('disconnect', async () => {
+  private static listenForDisconnectEvent(io: Socket, socket: Socket) {
+    io.on('disconnect', async () => {
       let { userId, resourceType } = socket.handshake.query;
       resourceType = resourceType as unknown as string;
       resourceType = resourceType.toLowerCase();
@@ -243,7 +243,7 @@ export class SignallingServerService {
       console.log(`DisconnectedUser: ${socket.id}`);
 
       await SignallingServerService.redisStore.removeUserBYId(user.userId);
-      await SignallingServerService.emitOnlinePractitionersEvent(socket);
+      await SignallingServerService.emitOnlinePractitionersEvent(io);
 
     });
   }
