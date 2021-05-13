@@ -70,7 +70,7 @@ export class SignallingServerService {
       SignallingServerService.listenForPatientOnlineStatusEvent(socket);
       SignallingServerService.listenForCallUserEvent(socket);
       SignallingServerService.listenForMakeAnswerEvent(socket);
-      SignallingServerService.listenForDisconnectEvent(socket);
+      SignallingServerService.listenForDisconnectEvent(this.io);
     });
   }
 
