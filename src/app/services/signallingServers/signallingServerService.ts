@@ -234,7 +234,8 @@ export class SignallingServerService {
   }
 
   private static listenForDisconnectEvent(socket: Socket) {
-    socket.on('disconnect', async () => {let { userId, resourceType } = socket.handshake.query;
+    socket.on('disconnect', async () => {
+      let { userId, resourceType } = socket.handshake.query;
       resourceType = resourceType as unknown as string;
       resourceType = resourceType.toLowerCase();
       const user: IOnlineUser = { userId, resourceType } as IOnlineUser;
