@@ -116,7 +116,8 @@ export class SignallingServerService {
         patientId,
         videoUrl,
         initiateCare,
-        patientName
+        patientName,
+        description,
       } = await this.redisStore
         .getBroadcastByVideoUrl(newBroadcast.videoUrl);
 
@@ -124,7 +125,8 @@ export class SignallingServerService {
         patientId,
         initiateCare,
         videoUrl,
-        patientName
+        patientName,
+        description,
       };
 
       SignallingServerService.emitNewCareEvent(socket, newCareBroadCast);

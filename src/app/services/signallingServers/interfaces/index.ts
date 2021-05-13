@@ -11,6 +11,7 @@ export interface IBroadcastStatus {
   initiateCare: boolean;
   patientId: string;
   patientName: string;
+  description: string;
 }
 
 export interface INewCare {
@@ -18,6 +19,7 @@ export interface INewCare {
   patientName: string;
   videoUrl: string;
   initiateCare: boolean;
+  description: string;
 }
 
 export interface IRooms {
