@@ -1,7 +1,12 @@
 import * as Knex from "knex";
 import { Schema } from '../schema';
 import { Table } from '../table';
-import { languages, maritalStatus, relationships } from './codeSystemData';
+import {
+  durations,
+  languages,
+  maritalStatus,
+  relationships
+} from './codeSystemData';
 import { qualifications } from './codeSystemData/qualifications';
 
 export async function seed(knex: Knex): Promise<void> {
@@ -14,5 +19,6 @@ export async function seed(knex: Knex): Promise<void> {
     ...maritalStatus,
     ...languages,
     ...qualifications,
+    ...durations,
   ]);
 }
