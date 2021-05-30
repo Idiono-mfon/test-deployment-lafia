@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
 import TYPES from '../../config/types';
-import { ICodeSystem } from '../../models/codeSystems';
+import { ICodeSystem } from '../../models';
 import { CodeSystemRepository } from '../../repository/codeSystems';
 
 @injectable()

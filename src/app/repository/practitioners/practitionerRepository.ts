@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import { transaction } from 'objection';
-import { IPractitioner, PractitionerModel } from '../../models/practitioners';
+import { IPractitioner, PractitionerModel } from '../../models';
 import {
   GenericResponseError,
   HttpStatusCode,
