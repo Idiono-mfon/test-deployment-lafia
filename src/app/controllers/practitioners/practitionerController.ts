@@ -15,7 +15,10 @@ import {
   IPractitioner, IPractitionerWithToken
 } from '../../models';
 import { PractitionerService } from '../../services';
-import { MessageBroker } from '../../services/messageBroker';
+import {
+  MessageBroker,
+  rmqSuccessResponse
+} from '../../services/messageBroker';
 import { HttpStatusCode } from '../../utils';
 import { BaseController } from '../baseController';
 
@@ -48,7 +51,7 @@ export class PractitionerController extends BaseController {
       const practitioner: IPractitioner = await this.practitionerService.findPractitionerById(id);
 
       this.success(res, practitioner, 'Request completed');
-    } catch(e) {
+    } catch (e) {
       this.error(res, e);
     }
   }
@@ -58,17 +61,19 @@ export class PractitionerController extends BaseController {
     try {
       const practitionerData: any = req.body;
       const practitioner: IPractitionerWithToken = await this.practitionerService.createPractitioner(practitionerData);
-      const rmqPubMsg = {
-        status: 'success',
-        resource_type: practitioner?.user?.resourceType,
-        message: 'Resource created successfully',
-        id: practitioner?.user?.id,
-        email: practitionerData?.email,
-      }
+      const rmqData = {
+        data: practitionerData,
+        resource_type: practitioner?.user?.resourceType as string
+      };
+      const rmqPubMsg = rmqSuccessResponse(
+        rmqData,
+        practitioner?.user?.id as string,
+        'Resource created successfully'
+      );
       await this.messageBroker.rmqPublish(JSON.stringify(rmqPubMsg));
 
       this.success(res, practitioner, 'Practitioner registration successful', HttpStatusCode.CREATED);
-    } catch(e) {
+    } catch (e) {
       this.error(res, e);
     }
   }
@@ -80,7 +85,7 @@ export class PractitionerController extends BaseController {
       const attachment: IAttachment = await this.practitionerService.uploadAttachment(practitionerId, req.file);
 
       this.success(res, attachment, 'Request completed successfully');
-    } catch(e) {
+    } catch (e) {
       this.error(res, e);
     }
   }

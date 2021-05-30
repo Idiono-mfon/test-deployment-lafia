@@ -35,113 +35,124 @@ export class MessageBroker {
       console.log(' [x] Sent Date: %s', new Date().toString());
       console.log(' [x] Sent Data: %s', msg);
     } catch (e) {
-      console.log('error:', e.message);
+      console.log(e);
     }
   }
 
   public async rmqSubscribe() {
+    let rmqChannel: any;
+
     try {
-      const rmqChannel = await initRMQ();
+      rmqChannel = await initRMQ();
+    } catch (e) {
+      const rmqPubMsg = rmqErrorResponse(e.message);
+      await this.rmqPublish(JSON.stringify(rmqPubMsg));
 
-      rmqChannel.assertQueue(this.subQueue, { durable: false });
-      rmqChannel.consume(this.subQueue, async msg => {
-        if (msg) {
-          // Acknowledge the received message
-          rmqChannel.ack(msg);
+      return;
+    }
 
-          const msgString = msg.content.toString();
-          let msgJson: any = {};
-          try {
-            msgJson = JSON.parse(msgString);
-          } catch (e) {
-            const rmqPubMsg = {
-              status: 'error',
-              message: 'The payload is not a valid JSON. Did you remember to stringify it?',
-              id: null
-            }
-            await this.rmqPublish(JSON.stringify(rmqPubMsg));
+    if (!rmqChannel) {
+      const rmqPubMsg = rmqErrorResponse('RabbitMQ unable to create channel');
+      await this.rmqPublish(JSON.stringify(rmqPubMsg));
 
-            return;
-          }
+      return;
+    }
 
-          console.log(' [x] Received Date: %s', new Date().toString());
-          console.log(' [x] Received Data: %s', msgString);
+    rmqChannel.assertQueue(this.subQueue, { durable: false });
+    rmqChannel.consume(this.subQueue, async (msg: any) => {
+      if (msg) {
+        // Acknowledge the received message
+        rmqChannel.ack(msg);
 
-          const { data, resource_type } = msgJson;
+        const msgString = msg.content.toString();
+        let msgJson: any = {};
+        try {
+          msgJson = JSON.parse(msgString);
+        } catch (e) {
+          const rmqPubMsg = rmqErrorResponse('The payload is not a valid JSON. Did you remember to stringify it?');
+          await this.rmqPublish(JSON.stringify(rmqPubMsg));
 
-          if (data || !_.isEmpty(data)) {
-            let resource: IPatient | IPractitioner | any = {};
+          return;
+        }
 
-            if (!resource_type) {
-              const rmqPubMsg = {
-                status: 'error',
-                resource_type,
-                message: 'Unable to create resource: resource_type is required!',
-                id: null
-              }
+        console.log(' [x] Received Date: %s', new Date().toString());
+        console.log(' [x] Received Data: %s', msgString);
+
+        const { data, resource_type } = msgJson;
+
+        if (resource_type && !_.isEmpty(data)) {
+          let resource: IPatient | IPractitioner | any = {};
+
+          if (resource_type?.toLowerCase() === forWho.patient) {
+            try {
+              resource = await this.patientService.createPatient(data);
+            } catch (e) {
+              const rmqPubMsg = rmqErrorResponse(e.message, resource_type);
               await this.rmqPublish(JSON.stringify(rmqPubMsg));
 
               return;
             }
-
-            if (resource_type?.toLowerCase() === forWho.patient) {
-              try {
-                resource = await this.patientService.createPatient(data);
-              } catch(e) {
-                const rmqPubMsg = {
-                  status: 'error',
-                  resource_type,
-                  message: e.message,
-                  id: null
-                }
-                await this.rmqPublish(JSON.stringify(rmqPubMsg));
-
-                return;
-              }
-            }
-
-            if (resource_type?.toLowerCase() === forWho.practitioner) {
-              try {
-                resource = await this.practitionerService.createPractitioner(data);
-              } catch(e) {
-                const rmqPubMsg = {
-                  status: 'error',
-                  resource_type,
-                  message: e.message,
-                  id: null
-                }
-                await this.rmqPublish(JSON.stringify(rmqPubMsg));
-
-                return;
-              }
-            }
-
-            const rmqPubMsg = {
-              status: 'success',
-              resource_type,
-              message: 'Resource created successfully',
-              id: resource?.user?.id,
-              email: data?.email,
-            }
-            await this.rmqPublish(JSON.stringify(rmqPubMsg));
-          } else {
-            const rmqPubMsg = {
-              status: 'error',
-              resource_type,
-              message: 'Unable to create resource',
-              id: null
-            }
-            await this.rmqPublish(JSON.stringify(rmqPubMsg));
           }
+
+          if (resource_type?.toLowerCase() === forWho.practitioner) {
+            try {
+              resource = await this.practitionerService.createPractitioner(data);
+            } catch (e) {
+              const rmqPubMsg = rmqErrorResponse(e.message, resource_type);
+              await this.rmqPublish(JSON.stringify(rmqPubMsg));
+
+              return;
+            }
+          }
+
+          const rmqPubMsg = rmqSuccessResponse(msgJson, resource?.user?.id, 'Resource created successfully');
+          await this.rmqPublish(JSON.stringify(rmqPubMsg));
+        } else {
+          const rmqPubMsg = rmqErrorResponse('Unable to create resource: resource_type and data fields are required!');
+          await this.rmqPublish(JSON.stringify(rmqPubMsg));
         }
-      });
-    } catch (e) {
-      const subError = {
-        status: 'error',
-        message: e.message,
-        id: null
       }
-      await this.rmqPublish(subError);
-    }
+    });
   }
+}
+
+export function rmqErrorResponse(message: string, resource_type = undefined): IRmqMessageResponse {
+  return {
+    status: 'error',
+    message,
+    id: null,
+    resource_type,
+  };
+}
+
+export function rmqSuccessResponse(receivedData: IRmqReceivedMessage, id: string, message: string): IRmqMessageResponse {
+  const { resource_type, data } = receivedData;
+  return {
+    status: 'success',
+    message,
+    id,
+    resource_type,
+    ...data,
+  };
+}
+
+export interface IRmqReceivedMessage {
+  resource_type: string;
+  data: IRmqMessageData;
+}
+
+export interface IRmqMessageData {
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  password?: string;
+  gender?: string;
+}
+
+export interface IRmqMessageResponse extends IRmqMessageData {
+  status: string;
+  message: string;
+  resource_type?: string;
+  id?: string | null;
+
 }

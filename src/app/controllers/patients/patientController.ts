@@ -10,7 +10,10 @@ import TYPES from '../../config/types';
 import { uploadFile } from '../../middlewares';
 import { IAttachment, IPatient, IPatientWithToken } from '../../models';
 import { PatientService } from '../../services';
-import { MessageBroker } from '../../services/messageBroker';
+import {
+  MessageBroker,
+  rmqSuccessResponse
+} from '../../services/messageBroker';
 import { HttpStatusCode } from '../../utils';
 import { BaseController } from '../baseController';
 
@@ -54,13 +57,15 @@ export class PatientController extends BaseController {
       const patientData: any = req.body;
 
       const patient: IPatientWithToken = await this.patientService.createPatient(patientData);
-      const rmqPubMsg = {
-        status: 'success',
-        resource_type: patient?.user?.resourceType,
-        message: 'Resource created successfully',
-        id: patient?.user?.id,
-        email: patientData?.email,
+      const rmqData = {
+        data: patientData,
+        resource_type: patient?.user?.resourceType as string
       }
+      const rmqPubMsg = rmqSuccessResponse(
+        rmqData,
+        patient?.user?.id as string,
+        'Resource created successfully'
+      );
       await this.messageBroker.rmqPublish(JSON.stringify(rmqPubMsg));
 
       this.success(res, patient, 'Patient registration successful', HttpStatusCode.CREATED);
