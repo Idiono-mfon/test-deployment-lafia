@@ -62,6 +62,27 @@ export class UserService {
     return await this.userRepository.updateUser(id, data);
   }
 
+  public async userLogin(email: string, password: string): Promise<IUser> {
+    try {
+      // Login with email?
+      let user = await this.userRepository.getOneUser({ email });
+
+      if (!user) {
+        throwError('Invalid username or password', error.unauthorized);
+      }
+
+      const isValidPassword = await Password.compare(password, user.password);
+
+      if (!isValidPassword) {
+        throwError('Invalid username or password', error.unauthorized);
+      }
+
+      return user;
+    } catch (e) {
+      throw new GenericResponseError(e.message, e.code);
+    }
+  }
+
   public async userLogout(id: string): Promise<IUser> {
     return await this.userRepository.userLogout(id);
   }

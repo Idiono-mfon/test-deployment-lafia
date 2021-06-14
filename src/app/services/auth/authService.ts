@@ -28,20 +28,16 @@ export class AuthService {
         throwError('Invalid email or password', error.badRequest);
       }
 
-      const platformLogin = await this.platformSdkService.userLogin(email, password);
+      const loggedInUser = await this.userService.userLogin(email, password);
 
-      if (platformLogin.code >= error.badRequest) {
-        throwError(platformLogin.messages, platformLogin.code);
-      }
-
-      const token = this.platformSdkService.generateJwtToken({ email, id: user.resourceId });
+      const token = this.userService.generateJwtToken({ email, id: user.resourceId });
       let loggedInUserData: any;
 
-      if (user.resourceType === forWho.patient) {
+      if (loggedInUser.resourceType === forWho.patient) {
         loggedInUserData = await this.patientService.patientLogin({ user, token });
       }
 
-      if (user.resourceType === forWho.practitioner) {
+      if (loggedInUser.resourceType === forWho.practitioner) {
         loggedInUserData = await this.practitionerService.practitionerLogin({ user, token });
       }
 
