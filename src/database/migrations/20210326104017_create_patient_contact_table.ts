@@ -36,6 +36,24 @@ export async function up(knex: Knex): Promise<void> {
                   .comment('period');
                 tableBuilder
                   .timestamps(true, true);
+
+                // Set foreign key
+                tableBuilder
+                  .foreign('human_name_id')
+                  .references('id')
+                  .inTable(`${Schema.lafiaService}.${Table.human_names}`);
+                tableBuilder
+                  .foreign('address_id')
+                  .references('id')
+                  .inTable(`${Schema.lafiaService}.${Table.address}`);
+                tableBuilder
+                  .foreign('reference_id')
+                  .references('id')
+                  .inTable(`${Schema.lafiaService}.${Table.references}`);
+                tableBuilder
+                  .foreign('period_id')
+                  .references('id')
+                  .inTable(`${Schema.lafiaService}.${Table.periods}`);
               });
           }
         }))
