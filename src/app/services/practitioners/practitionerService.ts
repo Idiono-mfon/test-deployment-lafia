@@ -8,7 +8,7 @@ import {
   IPractitioner,
   IQualification,
   IContactPoint,
-  ICommunication, IUser
+  ICommunication, IUser, IFindUser
 } from '../../models';
 import { IUserLoginParams } from '../auth';
 import { S3Service } from '../awsS3';
@@ -99,7 +99,7 @@ export class PractitionerService {
       throwError('User already exists!', error.badRequest);
     }
 
-    await this.platformSdkService.userSignup(data);
+    const user = await this.userService.createUser(data);
 
     const practitionerData: IPractitioner = {
       active: true,
@@ -122,14 +122,14 @@ export class PractitionerService {
     };
 
     const practitioner = await this.practitionerRepo.createPractitioner(practitionerData);
-    const token = this.platformSdkService.generateJwtToken({ email, id: practitioner.id });
-    const userData: IUser = {
+    const token = this.userService.generateJwtToken({ email, id: practitioner.id });
+    const userData: IFindUser = {
       email,
       token,
       resource_id: practitioner.id,
       resource_type: forWho.practitioner,
     }
-    await this.userService.createUser(userData);
+    await this.userService.updateUser(user.id!, userData);
 
     return {
       user: practitioner,

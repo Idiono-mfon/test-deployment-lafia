@@ -9,6 +9,11 @@ export class UserModel extends BaseModel implements IUser {
   email!: IUser['email'];
   resource_type!: IUser['resource_type'];
   resource_id!: IUser['resource_id'];
+  first_name!: IUser['first_name'];
+  last_name!: IUser['last_name'];
+  password!: IUser['password'];
+  password_reset_token!: IUser['password_reset_token'];
+  gender!: IUser['gender'];
   token!: IUser['token'];
 
   static get tableName() {

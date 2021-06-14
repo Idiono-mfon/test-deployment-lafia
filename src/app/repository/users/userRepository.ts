@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
 import TYPES from '../../config/types';
-import { IUser, UserModel } from '../../models';
+import { IFindUser, IUser, UserModel } from '../../models';
 import { PlatformSdkService } from '../../services/platformSDK';
 import { InternalServerError } from '../../utils';
 
@@ -19,7 +19,7 @@ export class UserRepository {
     }
   }
 
-  public async getOneUser(data: IUser): Promise<IUser> {
+  public async getOneUser(data: IFindUser): Promise<IUser> {
     try {
       return await UserModel.query().findOne(data);
     } catch (e) {
@@ -27,7 +27,7 @@ export class UserRepository {
     }
   }
 
-  public async updateUser(id: string, data: IUser): Promise<any> {
+  public async updateUser(id: string, data: IFindUser): Promise<any> {
     try {
       return await UserModel.query()
         .patchAndFetchById(id, data);
