@@ -101,4 +101,44 @@ export class UserService {
       throw new GenericResponseError(e.message, e.code);
     }
   }
+
+  public async changePassword(id: string, oldPassword: string, newPassword: string): Promise<IUser> {
+    try {
+      let user = await this.userRepository.getOneUser({ id });
+
+      if (!user) {
+        user = await this.userRepository.getOneUser({ resource_id: id });
+
+        if (!user) {
+          throwError('Unable to update password: user does not exist', error.badRequest);
+        }
+      }
+
+      const isNewPasswordValid = Password.validatePassword(newPassword);
+      if (!isNewPasswordValid) {
+        const ERROR_MESSAGE = 'Hint: new password must be minimum ' +
+          'of 6 characters and must have a ' +
+          'combination of at least one Upper case, one Lower case, ' +
+          'one digit and one or more of ' +
+          'these special characters - !@#$%^&-.+=()';
+
+        throwError(ERROR_MESSAGE, error.badRequest);
+      }
+
+      const isOldPasswordValid = await Password.compare(oldPassword, user.password);
+      if (!isOldPasswordValid) {
+        throwError('Invalid old password', error.badRequest);
+      }
+
+      const newPasswordHash = await Password.hash(newPassword);
+
+      const updatedUser = await this.userRepository.updateUser(user.id!, { password: newPasswordHash });
+
+      delete updatedUser.password;
+
+      return updatedUser;
+    } catch (e) {
+      throw new GenericResponseError(e.message, e.code);
+    }
+  }
 }
