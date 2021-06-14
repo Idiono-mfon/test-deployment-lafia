@@ -41,8 +41,7 @@ export async function up(knex: Knex): Promise<void> {
                   .string('resource_id')
                   .unique();
                 tableBuilder
-                  .string('token')
-                  .notNullable();
+                  .string('token');
                 tableBuilder
                   .timestamps(true, true);
               });

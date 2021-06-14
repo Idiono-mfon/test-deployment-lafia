@@ -37,10 +37,10 @@ export async function up(knex: Knex): Promise<void> {
                   .timestamps(true, true);
 
                 // Set foreign key
-                tableBuilder
-                  .foreign('practitioner_id')
-                  .references('id')
-                  .inTable(`${Schema.lafiaService}.${Table.practitioners}`);
+                // tableBuilder
+                //   .foreign('practitioner_id')
+                //   .references('id')
+                //   .inTable(`${Schema.lafiaService}.${Table.practitioners}`);
                 tableBuilder
                   .foreign('qualification_id')
                   .references('id')
