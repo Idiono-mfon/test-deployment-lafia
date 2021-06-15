@@ -4,25 +4,25 @@ import {
   AuthController,
   HealthController,
   PatientController,
+  CodeSystemController,
   PractitionerController
 } from '../controllers';
-import { CodeSystemController } from '../controllers/codeSystems';
 import {
   UserRepository,
   PatientRepository,
+  CodeSystemRepository,
   PractitionerRepository
 } from '../repository';
-import { CodeSystemRepository } from '../repository/codeSystems';
 import {
   UserService,
+  EmailService,
+  MessageBroker,
   PatientService,
+  CodeSystemService,
+  PlatformSdkService,
   PractitionerService,
-  S3Service, AuthService
+  S3Service, AuthService,
 } from '../services';
-import { CodeSystemService } from '../services/codeSystems';
-import { EmailService } from '../services/email/emailService';
-import { MessageBroker } from '../services/messageBroker';
-import { PlatformSdkService } from '../services/platformSDK';
 import { UtilityService } from '../utils';
 import TYPES from './types';
 
