@@ -20,6 +20,7 @@ import {
   S3Service, AuthService
 } from '../services';
 import { CodeSystemService } from '../services/codeSystems';
+import { EmailService } from '../services/email/emailService';
 import { MessageBroker } from '../services/messageBroker';
 import { PlatformSdkService } from '../services/platformSDK';
 import { UtilityService } from '../utils';
@@ -85,6 +86,10 @@ container
 container
   .bind<AuthService>(TYPES.AuthService)
   .to(AuthService)
+  .inSingletonScope();
+container
+  .bind<EmailService>(TYPES.EmailService)
+  .to(EmailService)
   .inSingletonScope();
 
 // repositories

@@ -37,4 +37,17 @@ export class UserController extends BaseController {
       this.error(res, e);
     }
   }
+
+  @httpPost('/reset-password')
+  public async resetPassword(@request() req: Request, @response() res: Response) {
+    try {
+      const { email } = req.body;
+
+      await this.userService.resetPassword(email);
+
+      this.success(res, [], 'Password reset guide successfully sent to the users email');
+    } catch (e) {
+      this.error(res, e);
+    }
+  }
 }

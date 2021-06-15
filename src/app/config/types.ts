@@ -16,6 +16,7 @@ const TYPES = {
   UtilityService: Symbol('UtilityService'),
   PlatformSdkService: Symbol('PlatformSdkService'),
   AuthService: Symbol('AuthService'),
+  EmailService: Symbol('EmailService'),
 
   // repositories
   UserRepository: Symbol('UserRepository'),

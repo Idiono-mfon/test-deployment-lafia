@@ -12,6 +12,7 @@ import {
   throwError
 } from '../../utils';
 import { Password } from '../../utils/password';
+import { EmailService, IComposeEmail } from '../email/emailService';
 import { PlatformSdkService } from '../platformSDK';
 import { IJwtPayload } from '../platformSDK/interfaces';
 
@@ -25,11 +26,13 @@ export class UserService {
   @inject(TYPES.PlatformSdkService)
   private readonly platformSdkService: PlatformSdkService;
 
+  @inject(TYPES.EmailService)
+  private readonly emailService: EmailService;
+
   public async createUser(user: IUser): Promise<IUser> {
     try {
       // Validate password
       const isValidPassword = Password.validatePassword(user.password);
-      console.log('isValidPassword:', isValidPassword);
 
       if (!isValidPassword) {
         const ERROR_MESSAGE = 'Hint: password must be minimum ' +
@@ -137,6 +140,56 @@ export class UserService {
       delete updatedUser.password;
 
       return updatedUser;
+    } catch (e) {
+      throw new GenericResponseError(e.message, e.code);
+    }
+  }
+
+  public async resetPassword(email: string): Promise<any> {
+    try {
+      if (!email) {
+        throwError('Please provide an email address to reset your password', error.badRequest);
+      }
+
+      // Does user with the email exist
+      const user = await this.userRepository.getOneUser({ email });
+      if (!user) {
+        throwError(`No user account found with the email: ${email}`, error.badRequest);
+      }
+
+      // Generate new password
+      const newPassword = Math.random().toString(36).substring(2, 12).toUpperCase();
+
+      // Hash the new password
+      const hashPassword = await Password.hash(newPassword);
+
+      // Update the user's password
+      await this.userRepository.updateUser(user.id!, { password: hashPassword });
+
+      // Send the new password details to the user
+      const emailMessage = `
+        <p>Hello <strong>${user.firstName} ${user.lastName}</strong>,</p>
+        <p>You receive this email because you requested for a password reset on 
+        your lafia account. You password has now been reset and a new password 
+        has been assigned to you. Please login with the new password and then 
+        update it from your account.</p>
+        <div>
+          <strong>Email:</strong>    <strong style="color: saddlebrown">${email}</strong>
+          <br />
+          <strong>New Password:</strong>    <strong style="color: saddlebrown">${newPassword}</strong>
+        </div>
+        <br />
+        <p>Thank you</p>
+        <p>Lafia Team (support@lafia.io)</p>
+      `
+
+      const composedEmail: IComposeEmail = {
+        html: emailMessage,
+        to: email,
+        subject: 'Reset Password'
+      }
+
+      await this.emailService.sendEmail(composedEmail);
     } catch (e) {
       throw new GenericResponseError(e.message, e.code);
     }
