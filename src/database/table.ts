@@ -4,6 +4,7 @@ export class Table {
   public static codings = 'codings';
   public static periods = 'periods';
   public static patients = 'patients';
+  public static labels: string = 'labels'
   public static references = 'references';
   public static narratives = 'narratives';
   public static encounters = 'encounters';
@@ -13,13 +14,16 @@ export class Table {
   public static code_systems = 'code_systems';
   public static organizations = 'organizations';
   public static patient_links = 'patient_links';
-  public static communications = 'communications';
   public static practitioners = 'practitioners';
+  public static languages: string = 'languages';
+  public static communications = 'communications';
+  public static components: string = 'components';
   public static contact_points = 'contact_points';
   public static qualifications = 'qualifications';
   public static patients_address = 'patients_address';
   public static patient_contacts = 'patient_contacts';
   public static codeable_concepts = 'codeable_concepts';
+  public static language_label:string = 'language_label';
   public static patients_references = 'patients_references';
   public static patients_attachments = 'patients_attachments';
   public static patients_identifiers = 'patients_identifiers';

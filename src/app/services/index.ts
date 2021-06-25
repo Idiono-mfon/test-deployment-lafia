@@ -8,3 +8,4 @@ export * from './email'
 export * from './codeSystems';
 export * from './messageBroker';
 export * from './platformSDK';
+export * from './lang'
