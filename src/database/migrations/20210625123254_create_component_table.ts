@@ -22,7 +22,7 @@ export async function up(knex: Knex): Promise<void> {
                   .string('name')
                   .notNullable();
                 tableBuilder
-                  .string('fields');
+                  .text('fields');
                 tableBuilder
                   .uuid('label_id');
                 tableBuilder

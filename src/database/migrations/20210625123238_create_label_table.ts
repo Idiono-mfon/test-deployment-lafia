@@ -11,13 +11,13 @@ export async function up(knex: Knex): Promise<void> {
           if (!tableExists) {
             return trx.schema
               .withSchema(Schema.lafiaService)
-              .createTable(Table.encounters, (tableBuilder: Knex.CreateTableBuilder) => {
+              .createTable(Table.labels, (tableBuilder: Knex.CreateTableBuilder) => {
                 tableBuilder
                   .uuid('id')
                   .unique()
                   .notNullable()
-                  .defaultTo(knex.raw('gen_random_uuid()'));
-                  // .primary(`${Table.encounters}_id`);
+                  .defaultTo(knex.raw('gen_random_uuid()'))
+                  .primary(`${Table.labels}_id`);
                 tableBuilder
                   .string('name')
                   .notNullable();

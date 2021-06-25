@@ -6,6 +6,6 @@ export const LanguageValidation: JSONSchema = {
   required: ['name', 'fields'],
   properties: {
     name: { type: 'string' },
-    fields: { type: 'string' },
+    fields: { type: 'object' },
   }
 }
