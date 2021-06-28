@@ -17,12 +17,16 @@ const TYPES = {
   PlatformSdkService: Symbol('PlatformSdkService'),
   AuthService: Symbol('AuthService'),
   EmailService: Symbol('EmailService'),
+  LanguageService: Symbol('LanguageService'),
 
   // repositories
   UserRepository: Symbol('UserRepository'),
   PractitionerRepository: Symbol('PractitionerRepository'),
   PatientRepository: Symbol('PatientRepository'),
   CodeSystemRepository: Symbol('CodeSystemRepository'),
+  LanguageRepository: Symbol('LanguageRepository'),
+  LabelRepository: Symbol('LabelRepository'),
+  ComponentRepository: Symbol('ComponentRepository'),
 };
 
 export default TYPES;

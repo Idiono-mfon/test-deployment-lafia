@@ -21,7 +21,7 @@ import {
   CodeSystemService,
   PlatformSdkService,
   PractitionerService,
-  S3Service, AuthService,
+  S3Service, AuthService, LanguageService
 } from '../services';
 import { UtilityService } from '../utils';
 import TYPES from './types';
@@ -90,6 +90,10 @@ container
 container
   .bind<EmailService>(TYPES.EmailService)
   .to(EmailService)
+  .inSingletonScope();
+container
+  .bind<LanguageService>(TYPES.LanguageService)
+  .to(LanguageService)
   .inSingletonScope();
 
 // repositories
