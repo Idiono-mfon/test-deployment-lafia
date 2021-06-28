@@ -1,4 +1,5 @@
 import { inject } from "inversify";
+import { Request, Response } from 'express';
 import { controller, httpDelete, httpGet, httpPost, httpPut, request, response } from "inversify-express-utils";
 import TYPES from "../../config/types";
 import { ILabel } from "../../models/lang/interfaces";
@@ -24,7 +25,8 @@ export class LabelController extends BaseController {
     public async createLabel(@request() req: Request, @response() res: Response) {
         try {
             const LabelData: ILabel = req.body;
-            const label = await this.languageService.addl(LabelData);
+            const label = await this.languageService.addLabel(LabelData);
+
             this.success(res, label, 'Label successfully added');
         } catch (e) {
             this.error(res, e);

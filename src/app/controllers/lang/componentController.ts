@@ -1,3 +1,4 @@
+import { Request, Response } from 'express';
 import { inject } from "inversify";
 import { controller, httpDelete, httpGet, httpPost, httpPut, request, response } from "inversify-express-utils";
 import TYPES from "../../config/types";

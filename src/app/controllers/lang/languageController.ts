@@ -1,4 +1,5 @@
 import { inject } from "inversify";
+import { Request, Response } from 'express';
 import { controller, httpDelete, httpGet, httpPost, httpPut, request, response } from "inversify-express-utils";
 import TYPES from "../../config/types";
 import { ILangauge } from "../../models/lang/interfaces";
