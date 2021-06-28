@@ -12,7 +12,11 @@ export class LabelRepository {
     }
     
     public async addLabel(data: ILabel): Promise<ILabel> {
+      try {
         return LabelModel.query().insertAndFetch(data);
+      } catch (e) {
+        throw new InternalServerError(e.message);
+      }
     }
 
     

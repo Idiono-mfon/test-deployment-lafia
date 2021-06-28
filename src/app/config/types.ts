@@ -5,6 +5,9 @@ const TYPES = {
   PractitionerController: Symbol('PractitionerController'),
   CodeSystemController: Symbol('CodeSystemController'),
   AuthController: Symbol('AuthController'),
+  LanguageController: Symbol('LanguageController'),
+  LabelController: Symbol('LabelController'),
+  ComponentController: Symbol('ComponentController'),
 
   // service
   UserService: Symbol('UserService'),

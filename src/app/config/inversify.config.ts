@@ -8,11 +8,21 @@ import {
   PractitionerController
 } from '../controllers';
 import {
+  ComponentController,
+  LabelController,
+  LanguageController
+} from '../controllers/lang';
+import {
   UserRepository,
   PatientRepository,
   CodeSystemRepository,
   PractitionerRepository
 } from '../repository';
+import {
+  ComponentRepository,
+  LabelRepository,
+  LanguageRepository
+} from '../repository/lang';
 import {
   UserService,
   EmailService,
@@ -49,6 +59,19 @@ container
   .bind<AuthController>(TYPES.AuthController)
   .to(AuthController)
   .inSingletonScope();
+container
+  .bind<LabelController>(TYPES.LabelController)
+  .to(LabelController)
+  .inSingletonScope();
+container
+  .bind<ComponentController>(TYPES.ComponentController)
+  .to(ComponentController)
+  .inSingletonScope();
+container
+  .bind<LanguageController>(TYPES.LanguageController)
+  .to(LanguageController)
+  .inSingletonScope();
+
 
 // services
 container
@@ -96,6 +119,7 @@ container
   .to(LanguageService)
   .inSingletonScope();
 
+
 // repositories
 container
   .bind<UserRepository>(TYPES.UserRepository)
@@ -112,6 +136,18 @@ container
 container
   .bind<CodeSystemRepository>(TYPES.CodeSystemRepository)
   .to(CodeSystemRepository)
+  .inSingletonScope();
+container
+  .bind<LabelRepository>(TYPES.LabelRepository)
+  .to(LabelRepository)
+  .inSingletonScope();
+container
+  .bind<ComponentRepository>(TYPES.ComponentRepository)
+  .to(ComponentRepository)
+  .inSingletonScope();
+container
+  .bind<LanguageRepository>(TYPES.LanguageRepository)
+  .to(LanguageRepository)
   .inSingletonScope();
 
 export default container;

@@ -6,7 +6,7 @@ import { ILabel } from "../../models/lang/interfaces";
 import { LanguageService } from "../../services";
 import { BaseController } from "../baseController";
 
-@controller('/label')
+@controller('/labels')
 export class LabelController extends BaseController {
   @inject(TYPES.LanguageService)
   private readonly languageService: LanguageService;
