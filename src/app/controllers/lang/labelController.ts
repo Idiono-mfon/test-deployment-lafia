@@ -2,7 +2,7 @@ import { inject } from "inversify";
 import { Request, Response } from 'express';
 import { controller, httpDelete, httpGet, httpPost, httpPut, request, response } from "inversify-express-utils";
 import TYPES from "../../config/types";
-import { ILabel } from "../../models/lang/interfaces";
+import { ILabel, ILabelComponent } from "../../models/lang/interfaces";
 import { LanguageService } from "../../services";
 import { BaseController } from "../baseController";
 
@@ -26,8 +26,18 @@ export class LabelController extends BaseController {
         try {
             const LabelData: ILabel = req.body;
             const label = await this.languageService.addLabel(LabelData);
-
             this.success(res, label, 'Label successfully added');
+        } catch (e) {
+            this.error(res, e);
+        }
+    }
+
+    @httpPost('/component')
+    public async attachComponent(@request() req: Request, @response() res: Response) {
+        try {
+            const LabelData: ILabelComponent = req.body;
+            const label = await this.languageService.attachComponentToLabel(LabelData.labelId, LabelData.componentId);
+            this.success(res, label, 'Component successfully added to label');
         } catch (e) {
             this.error(res, e);
         }
@@ -43,7 +53,18 @@ export class LabelController extends BaseController {
         } catch (e) {
             this.error(res, e);
         }
-    }  
+    }
+
+    @httpDelete('/component')
+    public async detachComponent(@request() req: Request, @response() res: Response) {
+        try {
+            const LabelData: ILabelComponent = req.body;
+            const label = await this.languageService.detachComponentFromLabel(LabelData.labelId, LabelData.componentId);
+            this.success(res, label, 'Component successfully removed from label');
+        } catch (e) {
+            this.error(res, e);
+        }
+    } 
 
     @httpDelete('/:id')
     public async deleteLabel(@request() req: Request, @response() res: Response) {

@@ -10,6 +10,10 @@ export class ComponentRepository {
     public async fetchComponents() {
         return ComponentModel.query();
     }
+
+    public async fetchComponentByID(id: string) {
+        return ComponentModel.query().findById(id);
+    }
     
     public async addComponent(data: IComponent): Promise<IComponent> {
         return ComponentModel.query().insertAndFetch(data);

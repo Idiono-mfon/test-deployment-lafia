@@ -1,11 +1,16 @@
 import { injectable } from "inversify";
 import { transaction } from "objection";
-import { ILabel } from "../../models/lang/interfaces";
+import { ComponentModel } from "../../models/lang/componentModel";
+import { IComponent, ILabel } from "../../models/lang/interfaces";
 import { LabelModel } from "../../models/lang/labelModel";
 import { GenericResponseError, HttpStatusCode, InternalServerError } from "../../utils";
 
 @injectable()
 export class LabelRepository {
+
+    public async fetchLabelByID(id: string) {
+      return LabelModel.query().findById(id);
+    }
 
     public async fetchLabels() {
         return LabelModel.query();
@@ -19,6 +24,22 @@ export class LabelRepository {
       }
     }
 
+    public async addComponent(id: string, data: object): Promise<any> {
+      return await LabelModel.relatedQuery('components')
+                        .for(id)
+                        .insert(data);
+    }
+
+    public async attachComponent(labelId: string, componentId: string): Promise<any> {
+      return await ( await LabelModel.query().findById(labelId) ).$relatedQuery('components')
+                        .relate( await ComponentModel.query().findById(componentId) );
+      // return await LabelModel.relatedQuery('components').for(labelId).relate(componentId);                  
+    }
+
+    public async detachComponent(labelId: string, componentId: string): Promise<any> {
+      return await ( await LabelModel.query().findById(labelId) ).$relatedQuery('components')
+                        .unrelate().where("id", componentId );                  
+    }
     
     public async updateLabel(id:string, data: ILabel): Promise<ILabel> {
         try {
