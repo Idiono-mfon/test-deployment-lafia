@@ -12,9 +12,22 @@ export class LanguageRepository {
         return LanguageModel.query();
     }
 
+    public async fetchLanguageByID(id: string) {
+        return LanguageModel.query().findById(id);
+    }
+
     public async addLanguage(data: ILangauge): Promise<ILangauge> {
         return LanguageModel.query().insertAndFetch(data);
     }
+
+    public async attachLabel(languageId: string, labelId: string): Promise<any> {
+        return await LanguageModel.relatedQuery('labels').for(languageId).relate(labelId);                  
+    }
+
+    public async detachLabel(languageId: string, labelId: string): Promise<any> {
+        return await ( await LanguageModel.query().findById( languageId ) ).$relatedQuery('labels')
+                          .unrelate().where("id", labelId );                  
+      }
 
     public async updateLanguage(id:string, data: ILangauge): Promise<ILangauge> {
         try {

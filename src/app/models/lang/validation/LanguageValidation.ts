@@ -3,9 +3,9 @@ import { JSONSchema } from 'objection';
 export const LanguageValidation: JSONSchema = {
   type: 'object',
   title: 'Language Schema Validation',
-  required: ['name', 'fields'],
+  required: ['name', 'code'],
   properties: {
     name: { type: 'string' },
-    fields: { type: 'object' },
+    code: { type: 'string' },
   }
 }
