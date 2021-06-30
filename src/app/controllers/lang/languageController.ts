@@ -15,19 +15,21 @@ export class LanguageController extends BaseController {
     public async fetchLanguages(@request() req: Request, @response() res: Response) {
         try {
             const languages = await this.languageService.fetchLanguage();
-            this.success(res, languages, 'Language successfully fetched');
+            this.success(res, languages, 'Languages successfully fetched');
         } catch (e) {
             this.error(res, e);
         }
     }
 
-    @httpGet(':code/contents')
+    @httpGet('/:code/contents')
     public async fetchLanguagesWithContent(@request() req: Request, @response() res: Response) {
         try {
             const { code } = req.params;
             const languages = await this.languageService.fetchLanguagesWithContent(code);
+            console.log(languages)
             this.success(res, languages, 'Language successfully fetched');
         } catch (e) {
+            console.log(e)
             this.error(res, e);
         }
     }
@@ -47,7 +49,7 @@ export class LanguageController extends BaseController {
     public async attachComponent(@request() req: Request, @response() res: Response) {
         try {
             const languageData: ILangaugeLabel = req.body;
-            const label = await this.languageService.attachComponentToLabel(languageData.languageId, languageData.labelId);
+            const label = await this.languageService.attachLabelToLanguage(languageData.languageId, languageData.labelId);
             this.success(res, label, 'Label successfully added to language');
         } catch (e) {
             this.error(res, e);

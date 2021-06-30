@@ -2,12 +2,13 @@ import { JSONSchema } from "objection";
 import { Schema, Table } from "../../../database";
 import { BaseModel } from "../base";
 import { IComponent } from "./interfaces";
-import { LanguageModel } from "./languageModel";
+import { LabelModel } from "./labelModel";
 import { ComponentValidation } from "./validation";
 
 export class ComponentModel extends BaseModel implements IComponent {
     name!: string;
     feilds!: string;
+    labelId!: string;
 
     static get tableName(): string {
         return `${Schema.lafiaService}.${Table.components}`;
@@ -23,12 +24,12 @@ export class ComponentModel extends BaseModel implements IComponent {
 
     static get relationMappings() {
         return {
-            languages: {
+            label: {
                 relation: BaseModel.BelongsToOneRelation,
-                modelClass: LanguageModel,
+                modelClass: LabelModel,
                 join: {
-                    from: `${Schema.lafiaService}.${Table.labels}.id`,
-                    to: `${Schema.lafiaService}.${Table.languages}.label_id`
+                    from: `${Schema.lafiaService}.${Table.components}.label_id`,
+                    to: `${Schema.lafiaService}.${Table.labels}.id`
                 }
             }
         }

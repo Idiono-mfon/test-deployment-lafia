@@ -6,6 +6,6 @@ export interface ILabel extends IBase {
 
 export interface ILabelComponent extends IBase {
     labelId: string;
-    componentId: string;
+    componentId: string; 
 }
   

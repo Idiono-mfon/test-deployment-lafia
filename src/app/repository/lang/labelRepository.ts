@@ -9,7 +9,9 @@ import { GenericResponseError, HttpStatusCode, InternalServerError } from "../..
 export class LabelRepository {
 
     public async fetchLabelByID(id: string) {
-      return LabelModel.query().findById(id);
+      const label = await LabelModel.query().findById(id);
+      console.log(label);
+      return label;
     }
 
     public async fetchLabels() {

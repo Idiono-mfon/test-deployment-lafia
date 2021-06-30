@@ -28,6 +28,7 @@ export class ComponentController extends BaseController {
             const component = await this.languageService.addComponent(componentData);
             this.success(res, component, 'Component successfully added');
         } catch (e) {
+            console.log(e);
             this.error(res, e);
         }
     }  

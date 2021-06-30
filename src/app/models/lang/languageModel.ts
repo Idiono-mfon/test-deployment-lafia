@@ -24,12 +24,12 @@ export class LanguageModel extends BaseModel implements ILangauge {
     static get relationMappings() {
         return {
             labels: {
-                relation: BaseModel.HasManyRelation,
+                relation: BaseModel.ManyToManyRelation,
                 modelClass: LabelModel,
                 join: {
                     from: `${Schema.lafiaService}.${Table.languages}.id`,
                     through: {
-                        from: `${Schema.lafiaService}.${Table.language_label}.langauge_id`,
+                        from: `${Schema.lafiaService}.${Table.language_label}.language_id`,
                         to: `${Schema.lafiaService}.${Table.language_label}.label_id`
                     },
                     to: `${Schema.lafiaService}.${Table.labels}.id`

@@ -60,6 +60,7 @@ export class LanguageService {
   }
 
   public async addComponent(data: IComponent): Promise<IComponent> {
+    data.feilds = JSON.stringify(data.feilds);
     return this.componentRepository.addComponent(data);
   }
 
@@ -100,7 +101,7 @@ export class LanguageService {
     if ( !label ) {
       throw new NotFoundError("label not found");
     }
-    const language: LanguageModel = await this.languageRepository.fetchLanguageByID(labelId);
+    const language: LanguageModel = await this.languageRepository.fetchLanguageByID(languageId);
     if ( !language ) {
       throw new NotFoundError("language not found");
     }
