@@ -1,5 +1,5 @@
 import { injectable } from 'inversify';
-import { CodeSystemModel, ICodeSystem } from '../../models/codeSystems';
+import { CodeSystemModel, ICodeSystem } from '../../models';
 import { InternalServerError } from '../../utils';
 
 @injectable()
@@ -14,7 +14,7 @@ export class CodeSystemRepository {
           .skipUndefined();
       }
 
-      return codeSystems;
+      return await codeSystems;
     } catch (e) {
       throw new InternalServerError(e.message);
     }
@@ -26,7 +26,7 @@ export class CodeSystemRepository {
 
   public async getCodeSystemByCode(code: string): Promise<ICodeSystem> {
     try {
-      return CodeSystemModel.query()
+      return await CodeSystemModel.query()
         .where({ code })
         .skipUndefined()
         .first();

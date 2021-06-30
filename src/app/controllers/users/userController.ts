@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { inject } from 'inversify';
 import {
-  controller, httpPost, request, response
+  controller, httpPost, httpPut, request, response
 } from 'inversify-express-utils';
 import TYPES from '../../config/types';
 import { UserService } from '../../services';
@@ -19,6 +19,33 @@ export class UserController extends BaseController {
       const newUser = await this.userService.createUser(req.body);
 
       this.success(res, newUser, 'User created', HttpStatusCode.CREATED);
+    } catch (e) {
+      this.error(res, e);
+    }
+  }
+
+  @httpPut('/:id/change-password')
+  public async updatePassword(@request() req: Request, @response() res: Response) {
+    try {
+      const { id } = req.params;
+      const { old_password, new_password } = req.body;
+
+      const updatedUser = await this.userService.changePassword(id, old_password, new_password);
+
+      this.success(res, updatedUser, 'User password changed successfully');
+    } catch (e) {
+      this.error(res, e);
+    }
+  }
+
+  @httpPost('/reset-password')
+  public async resetPassword(@request() req: Request, @response() res: Response) {
+    try {
+      const { email } = req.body;
+
+      await this.userService.resetPassword(email);
+
+      this.success(res, [], 'Password reset guide successfully sent to the users email');
     } catch (e) {
       this.error(res, e);
     }

@@ -10,7 +10,7 @@ import {
   IContactPoint,
   ICommunication,
   IPatientContact,
-  ICodeableConcept
+  ICodeableConcept, IFindUser
 } from '../../models';
 import { IUserLoginParams } from '../auth';
 import { S3Service } from '../awsS3';
@@ -103,7 +103,7 @@ export class PatientService {
         throwError('User already exists!', error.badRequest);
       }
 
-      await this.platformSdkService.userSignup(data);
+      const user = await this.userService.createUser(data);
 
       const patientData: IPatient = {
         active: true,
@@ -125,14 +125,13 @@ export class PatientService {
       };
 
       const patient = await this.patientRepo.createPatient(patientData);
-      const token = this.platformSdkService.generateJwtToken({ email, id: patient.id });
-      const userData: IUser = {
-        email,
+      const token = this.userService.generateJwtToken({ email, id: patient.id });
+      const userData: IFindUser = {
         token,
         resource_id: patient.id,
         resource_type: forWho.patient,
       }
-      await this.userService.createUser(userData);
+      await this.userService.updateUser(user.id!, userData);
 
       return {
         user: patient,

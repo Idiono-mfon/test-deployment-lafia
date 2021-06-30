@@ -1,4 +1,4 @@
-import { ICodeSystem } from '../../../app/models/codeSystems';
+import { ICodeSystem } from '../../../app/models';
 
 export const qualifications: ICodeSystem[] = [
   {

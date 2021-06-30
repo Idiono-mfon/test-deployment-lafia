@@ -4,24 +4,35 @@ import {
   AuthController,
   HealthController,
   PatientController,
+  CodeSystemController,
   PractitionerController
 } from '../controllers';
-import { CodeSystemController } from '../controllers/codeSystems';
+import {
+  ComponentController,
+  LabelController,
+  LanguageController
+} from '../controllers/lang';
 import {
   UserRepository,
   PatientRepository,
+  CodeSystemRepository,
   PractitionerRepository
 } from '../repository';
-import { CodeSystemRepository } from '../repository/codeSystems';
+import {
+  ComponentRepository,
+  LabelRepository,
+  LanguageRepository
+} from '../repository/lang';
 import {
   UserService,
+  EmailService,
+  MessageBroker,
   PatientService,
+  CodeSystemService,
+  PlatformSdkService,
   PractitionerService,
-  S3Service, AuthService
+  S3Service, AuthService, LanguageService
 } from '../services';
-import { CodeSystemService } from '../services/codeSystems';
-import { MessageBroker } from '../services/messageBroker';
-import { PlatformSdkService } from '../services/platformSDK';
 import { UtilityService } from '../utils';
 import TYPES from './types';
 
@@ -48,6 +59,19 @@ container
   .bind<AuthController>(TYPES.AuthController)
   .to(AuthController)
   .inSingletonScope();
+container
+  .bind<LabelController>(TYPES.LabelController)
+  .to(LabelController)
+  .inSingletonScope();
+container
+  .bind<ComponentController>(TYPES.ComponentController)
+  .to(ComponentController)
+  .inSingletonScope();
+container
+  .bind<LanguageController>(TYPES.LanguageController)
+  .to(LanguageController)
+  .inSingletonScope();
+
 
 // services
 container
@@ -86,6 +110,15 @@ container
   .bind<AuthService>(TYPES.AuthService)
   .to(AuthService)
   .inSingletonScope();
+container
+  .bind<EmailService>(TYPES.EmailService)
+  .to(EmailService)
+  .inSingletonScope();
+container
+  .bind<LanguageService>(TYPES.LanguageService)
+  .to(LanguageService)
+  .inSingletonScope();
+
 
 // repositories
 container
@@ -103,6 +136,18 @@ container
 container
   .bind<CodeSystemRepository>(TYPES.CodeSystemRepository)
   .to(CodeSystemRepository)
+  .inSingletonScope();
+container
+  .bind<LabelRepository>(TYPES.LabelRepository)
+  .to(LabelRepository)
+  .inSingletonScope();
+container
+  .bind<ComponentRepository>(TYPES.ComponentRepository)
+  .to(ComponentRepository)
+  .inSingletonScope();
+container
+  .bind<LanguageRepository>(TYPES.LanguageRepository)
+  .to(LanguageRepository)
   .inSingletonScope();
 
 export default container;

@@ -4,3 +4,8 @@ export * from './patients';
 export * from './practitioners';
 export * from './awsS3';
 export * from './twilio';
+export * from './email'
+export * from './codeSystems';
+export * from './messageBroker';
+export * from './platformSDK';
+export * from './lang'

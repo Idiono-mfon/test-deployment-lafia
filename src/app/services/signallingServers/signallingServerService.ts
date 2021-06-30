@@ -63,13 +63,14 @@ export class SignallingServerService {
   public initialize(): void {
     this.io.on('connection', async (socket: Socket) => {
       await SignallingServerService.listenForConnectionEvent(socket);
+      await SignallingServerService.emitOnlinePractitionersEvent(this.io);
       SignallingServerService.listenForNewVideoBroadcastEvent(socket);
       SignallingServerService.listenForAcceptCareEvent(socket);
       SignallingServerService.listenForIceCandidateEvent(socket);
       SignallingServerService.listenForPatientOnlineStatusEvent(socket);
       SignallingServerService.listenForCallUserEvent(socket);
       SignallingServerService.listenForMakeAnswerEvent(socket);
-      SignallingServerService.listenForDisconnectEvent(socket);
+      SignallingServerService.listenForDisconnectEvent(this.io, socket);
     });
   }
 
@@ -90,33 +91,29 @@ export class SignallingServerService {
     if (user.resourceType === forWho.practitioner) {
       socket.join(SignallingServerService.onlinePractitionerRoom);
     }
-
-    await SignallingServerService.emitOnlineUsersEvent(socket);
   }
 
-  private static async emitOnlineUsersEvent(socket: Socket) {
+  private static async emitOnlinePractitionersEvent(socket: Socket) {
     const onlineUsers = await SignallingServerService.redisStore.getOnlineUsers();
+    let onlinePractitioners = [];
 
-    socket.to('onlineUsers').emit('onlineUsers', onlineUsers);
+    for (let user of onlineUsers) {
+      if (user.resourceType === forWho.practitioner) {
+        onlinePractitioners.push(user);
+      }
+    }
+
+    console.log('OnlinePractitioners:', onlinePractitioners);
+    console.log('OnlineUsers:', onlineUsers);
+
+    socket.emit('onlinePractitioners', onlinePractitioners);
   }
 
   private static listenForNewVideoBroadcastEvent(socket: Socket) {
     socket.on('newVideoBroadcast', async (newBroadcast: INewBroadcast) => {
       await SignallingServerService.redisStore.saveBroadcast(newBroadcast);
-      const {
-        patientId,
-        videoUrl,
-        initiateCare,
-        patientName
-      } = await this.redisStore
+      const newCareBroadCast = await this.redisStore
         .getBroadcastByVideoUrl(newBroadcast.videoUrl);
-
-      const newCareBroadCast = {
-        patientId,
-        initiateCare,
-        videoUrl,
-        patientName
-      };
 
       SignallingServerService.emitNewCareEvent(socket, newCareBroadCast);
     });
@@ -166,6 +163,7 @@ export class SignallingServerService {
           patientSocketId: null,
         });
       }
+      await SignallingServerService.emitOnlinePractitionersEvent(socket);
 
       return cb({
         status: 'online',
@@ -185,7 +183,7 @@ export class SignallingServerService {
       .twilioService
       .generateAccessToken(
         data.patientId,
-        data.rommId
+        data.roomId
       );
 
     socket.to(data.to).emit('callMade', {
@@ -197,7 +195,8 @@ export class SignallingServerService {
   }
 
   private static listenForMakeAnswerEvent(socket: Socket) {
-    socket.on('makeAnswer', data => {
+    socket.on('makeAnswer', async data => {
+      await SignallingServerService.emitOnlinePractitionersEvent(socket);
       SignallingServerService.emitAnswerMadeEvent(socket, data);
     });
   }
@@ -222,18 +221,18 @@ export class SignallingServerService {
     });
   }
 
-  private static listenForDisconnectEvent(socket: Socket) {
-    let { userId, resourceType } = socket.handshake.query;
-    resourceType = resourceType as unknown as string;
-    resourceType = resourceType.toLowerCase();
-    const user: IOnlineUser = { userId, resourceType } as IOnlineUser;
-
+  private static listenForDisconnectEvent(io: Socket, socket: Socket) {
     socket.on('disconnect', async () => {
-      await SignallingServerService.redisStore.removeUserBY(user.userId);
+      let { userId, resourceType } = socket.handshake.query;
+      resourceType = resourceType as unknown as string;
+      resourceType = resourceType.toLowerCase();
+      const user: IOnlineUser = { userId, resourceType } as IOnlineUser;
 
-      console.log(`User disconnected: ${socket.id}`);
+      console.log(`DisconnectedUser: ${socket.id}`);
 
-      await SignallingServerService.emitOnlineUsersEvent(socket);
+      await SignallingServerService.redisStore.removeUserBYId(user.userId);
+      await SignallingServerService.emitOnlinePractitionersEvent(io);
+
     });
   }
 }

@@ -67,5 +67,7 @@ module.exports = {
     'guard-for-in': 0,
     '@typescript-eslint/no-unsafe-return': 0,
     '@typescript-eslint/no-non-null-assertion': 0,
+    'prefer-promise-reject-errors': 0,
+    'spaced-comment': 0,
   },
 };
