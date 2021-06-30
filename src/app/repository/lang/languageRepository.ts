@@ -16,6 +16,16 @@ export class LanguageRepository {
         return LanguageModel.query().findById(id);
     }
 
+    public async fetchLanguageByCode(code: string) {
+        return LanguageModel.query().where('code', code).first();
+    }
+
+    public async fetchLanguagesWithContent(code: string) {
+        return LanguageModel.query()
+        .withGraphFetched('[labels.components]')
+        .where('code', code).first();
+    }
+
     public async addLanguage(data: ILangauge): Promise<ILangauge> {
         return LanguageModel.query().insertAndFetch(data);
     }

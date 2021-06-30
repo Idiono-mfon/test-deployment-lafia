@@ -37,6 +37,14 @@ export class LanguageService {
     return this.componentRepository.fetchComponents();
   }
 
+  public async fetchLanguagesWithContent(code: string): Promise<ILangauge> {
+    const language: LanguageModel = await this.languageRepository.fetchLanguageByCode(code);
+    if ( !language ) {
+      throw new NotFoundError("language not found");
+    }
+    return this.languageRepository.fetchLanguagesWithContent(code);
+  }
+
   // create
 
   public async addLanguage(data: ILangauge): Promise<ILangauge> {

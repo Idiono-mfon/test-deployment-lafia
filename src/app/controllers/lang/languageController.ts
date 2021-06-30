@@ -21,6 +21,17 @@ export class LanguageController extends BaseController {
         }
     }
 
+    @httpGet(':code/contents')
+    public async fetchLanguagesWithContent(@request() req: Request, @response() res: Response) {
+        try {
+            const { code } = req.params;
+            const languages = await this.languageService.fetchLanguagesWithContent(code);
+            this.success(res, languages, 'Language successfully fetched');
+        } catch (e) {
+            this.error(res, e);
+        }
+    }
+
     @httpPost('')
     public async createLanguage(@request() req: Request, @response() res: Response) {
         try {
