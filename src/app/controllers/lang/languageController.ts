@@ -2,9 +2,11 @@ import { inject } from "inversify";
 import { Request, Response } from 'express';
 import { controller, httpDelete, httpGet, httpPost, httpPut, request, response } from "inversify-express-utils";
 import TYPES from "../../config/types";
-import { ILangauge, ILangaugeLabel } from "../../models/lang/interfaces";
+import { ILabel, ILangauge, ILangaugeLabel } from "../../models/lang/interfaces";
 import { LanguageService } from "../../services";
 import { BaseController } from "../baseController";
+import { LanguageModel } from "../../models/lang/languageModel";
+import { LabelModel } from "../../models/lang/labelModel";
 
 @controller('/language')
 export class LanguageController extends BaseController {
@@ -25,11 +27,16 @@ export class LanguageController extends BaseController {
     public async fetchLanguagesWithContent(@request() req: Request, @response() res: Response) {
         try {
             const { code } = req.params;
-            const languages = await this.languageService.fetchLanguagesWithContent(code);
-            console.log(languages)
+            const languages: ILangauge = await this.languageService.fetchLanguagesWithContent(code);
+            const labels: Array<any> = languages.labels?.map( (label: any) => { 
+                console.log(label.components)
+                return {
+                    [label.name]: label.components.map( (component:any) => component.fields )[0] // TODO: normmally label should have many component, but the front end is restricting me to to this format. 
+                } 
+            } );
+            languages.labels! = labels; // { ...labels[0] }
             this.success(res, languages, 'Language successfully fetched');
         } catch (e) {
-            console.log(e)
             this.error(res, e);
         }
     }
