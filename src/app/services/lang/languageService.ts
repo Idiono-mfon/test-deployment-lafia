@@ -60,7 +60,7 @@ export class LanguageService {
   }
 
   public async addComponent(data: IComponent): Promise<IComponent> {
-    data.feilds = JSON.stringify(data.feilds);
+    data.feilds = JSON.stringify(data.feilds);  
     return this.componentRepository.addComponent(data);
   }
 
