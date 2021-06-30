@@ -2,7 +2,7 @@ import { inject } from "inversify";
 import { Request, Response } from 'express';
 import { controller, httpDelete, httpGet, httpPost, httpPut, request, response } from "inversify-express-utils";
 import TYPES from "../../config/types";
-import { ILangauge } from "../../models/lang/interfaces";
+import { ILangauge, ILangaugeLabel } from "../../models/lang/interfaces";
 import { LanguageService } from "../../services";
 import { BaseController } from "../baseController";
 
@@ -30,7 +30,18 @@ export class LanguageController extends BaseController {
         } catch (e) {
             this.error(res, e);
         }
-    }  
+    } 
+    
+    @httpPost('/label')
+    public async attachComponent(@request() req: Request, @response() res: Response) {
+        try {
+            const languageData: ILangaugeLabel = req.body;
+            const label = await this.languageService.attachComponentToLabel(languageData.languageId, languageData.labelId);
+            this.success(res, label, 'Label successfully added to language');
+        } catch (e) {
+            this.error(res, e);
+        }
+    } 
 
     @httpPut('/:id')
     public async updateLanguage(@request() req: Request, @response() res: Response) {
@@ -58,5 +69,16 @@ export class LanguageController extends BaseController {
             this.error(res, e);
         }
     }  
+
+    @httpDelete('/label')
+    public async detachComponent(@request() req: Request, @response() res: Response) {
+        try {
+            const languageData: ILangaugeLabel = req.body;
+            const label = await this.languageService.attachComponentToLabel(languageData.languageId, languageData.labelId);
+            this.success(res, label, 'Label successfully removed from language');
+        } catch (e) {
+            this.error(res, e);
+        }
+    } 
 
 }
