@@ -28,13 +28,11 @@ export class LanguageController extends BaseController {
         try {
             const { code } = req.params;
             const languages: ILangauge = await this.languageService.fetchLanguagesWithContent(code);
-            const labels: Array<any> = languages.labels?.map( (label: any) => { 
-                console.log(label.components)
-                return {
-                    [label.name]: label.components.map( (component:any) => component.fields )[0] // TODO: normmally label should have many component, but the front end is restricting me to to this format. 
-                } 
+            const labels: object | any = {}; 
+            languages.labels?.forEach( (label: any) => { 
+                labels[label.name] = label.components[0].fields // TODO: normmally label should have many component, but the front end is restricting me to to this format. 
             } );
-            languages.labels! = labels; // { ...labels[0] }
+            languages.labels! = labels;
             this.success(res, languages, 'Language successfully fetched');
         } catch (e) {
             this.error(res, e);
