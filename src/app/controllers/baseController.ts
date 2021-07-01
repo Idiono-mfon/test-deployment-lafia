@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import { injectable } from 'inversify';
 import Joi from 'joi';
-import { GenericResponseError } from '../utils';
+import {GenericResponseError, HttpStatusCode} from '../utils';
 
 @injectable()
 export abstract class BaseController {
@@ -30,7 +30,11 @@ export abstract class BaseController {
   }
 
   protected error(res: Response, e: GenericResponseError) {
-    const { code, message } = e;
+    let { code, message } = e;
+
+    if (!code || typeof code === 'string'! || code > HttpStatusCode.INTERNAL_SERVER_ERROR) {
+      code = HttpStatusCode.INTERNAL_SERVER_ERROR;
+    }
 
     return res.status(code).send({
       status: 'error',
