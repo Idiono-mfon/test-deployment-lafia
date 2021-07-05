@@ -5,8 +5,6 @@ import TYPES from "../../config/types";
 import { ILabel, ILangauge, ILangaugeLabel } from "../../models/lang/interfaces";
 import { LanguageService } from "../../services";
 import { BaseController } from "../baseController";
-import { LanguageModel } from "../../models/lang/languageModel";
-import { LabelModel } from "../../models/lang/labelModel";
 
 @controller('/language')
 export class LanguageController extends BaseController {
