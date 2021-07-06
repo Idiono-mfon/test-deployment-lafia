@@ -9,7 +9,7 @@ import {
   LabelRepository,
   LanguageRepository
 } from '../../repository/lang';
-import { NotFoundError } from '../../utils';
+import { BadGatewayError, BadRequestError, ConflictError, NotFoundError } from '../../utils';
 
 @injectable()
 export class LanguageService {
@@ -48,14 +48,28 @@ export class LanguageService {
   // create
 
   public async addLanguage(data: ILangauge): Promise<ILangauge> {
+    if ( !data.name || !data.code ) {
+      throw new BadRequestError("language name and code are required feilds");
+    }
+    const language: LanguageModel = await this.languageRepository.fetchLanguageByNameAndCode(data.code, data.name);
+    if (language) {
+      throw new ConflictError("duplicate language resource");
+    }
     return this.languageRepository.addLanguage(data);
   }
 
   public async addLabel(data: ILabel): Promise<ILabel | any> {
+    if ( !data.name ) {
+      throw new BadRequestError("label name is required");
+    }
     try {
+      const label: ILabel = await this.labelRepository.fetchLabelByName(data.name);
+      if (label ) {
+        throw new ConflictError("duplicate label resource");
+      }
       return this.labelRepository.addLabel(data);
     } catch (e) {
-      console.log(e);
+      throw new BadGatewayError(e.toSring())
     }
   }
 
@@ -148,3 +162,11 @@ export class LanguageService {
     return this.componentRepository.deleteComponent(id);
   }
 }
+
+
+// exports.up = async function(knex, Promise) {
+//   await knex.schema.alterTable('campaigns', function(table) {
+//       table.timestamp('intake_start_date').alter();
+//       table.timestamp('intake_end_date').alter();
+//   });
+// }

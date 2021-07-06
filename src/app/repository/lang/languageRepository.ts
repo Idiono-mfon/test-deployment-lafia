@@ -20,6 +20,10 @@ export class LanguageRepository {
         return LanguageModel.query().where('code', code).first();
     }
 
+    public async fetchLanguageByNameAndCode(code: string, name: string) {
+        return LanguageModel.query().where({'code': code, 'name': name}).first();
+    }
+
     public async fetchLanguagesWithContent(code: string) {
         return LanguageModel.query()
         .withGraphFetched('[labels.components]')

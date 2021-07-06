@@ -10,7 +10,11 @@ export class LabelRepository {
 
     public async fetchLabelByID(id: string) {
       const label = await LabelModel.query().findById(id);
-      console.log(label);
+      return label;
+    }
+
+    public async fetchLabelByName(name: string) {
+      const label = await LabelModel.query().where('name', name).first();
       return label;
     }
 
