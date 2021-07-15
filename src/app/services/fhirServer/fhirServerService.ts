@@ -6,6 +6,9 @@ import { GenericResponseError } from '../../utils';
 
 const axiosInstance = axios.create({
   baseURL: `${Env.all().fhir_server_base_url}/`,
+  headers : {
+      'Content-Type': 'application/json'
+  }
 });
 
 axiosInstance.interceptors.request.use((config) => {

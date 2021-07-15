@@ -42,7 +42,7 @@ export class FhirServerController extends BaseController {
   public async fhirResourcePostMethode(@request() req: Request, @response() res: Response) {
     try {
       const [,fullUrl] = req.url.split('fhir');
-      const { status: code, headers, data } = await this.fhirServerService.communicate(fullUrl, 'POST');
+      const { status: code, headers, data } = await this.fhirServerService.communicate(fullUrl, 'POST', req.body);
 
       delete headers['transfer-encoding'];
       headers['x-powered-by'] = 'LAFIA FHIR 5.4.0 REST Server (FHIR Server; FHIR 4.0.1/R4)';
@@ -61,7 +61,7 @@ export class FhirServerController extends BaseController {
   public async fhirResourcePutMethode(@request() req: Request, @response() res: Response) {
     try {
       const [,fullUrl] = req.url.split('fhir');
-      const { status: code, headers, data } = await this.fhirServerService.communicate(fullUrl, 'PUT');
+      const { status: code, headers, data } = await this.fhirServerService.communicate(fullUrl, 'PUT', req.body);
 
       delete headers['transfer-encoding'];
       headers['x-powered-by'] = 'LAFIA FHIR 5.4.0 REST Server (FHIR Server; FHIR 4.0.1/R4)';
@@ -80,7 +80,7 @@ export class FhirServerController extends BaseController {
   public async fhirResourcePatchMethode(@request() req: Request, @response() res: Response) {
     try {
       const [,fullUrl] = req.url.split('fhir');
-      const { status: code, headers, data } = await this.fhirServerService.communicate(fullUrl, 'PATCH');
+      const { status: code, headers, data } = await this.fhirServerService.communicate(fullUrl, 'PATCH', req.body);
 
       delete headers['transfer-encoding'];
       headers['x-powered-by'] = 'LAFIA FHIR 5.4.0 REST Server (FHIR Server; FHIR 4.0.1/R4)';
@@ -99,7 +99,7 @@ export class FhirServerController extends BaseController {
   public async fhirResourceDeleteMethode(@request() req: Request, @response() res: Response) {
     try {
       const [,fullUrl] = req.url.split('fhir');
-      const { status: code, headers, data } = await this.fhirServerService.communicate(fullUrl, 'DELETE');
+      const { status: code, headers, data } = await this.fhirServerService.communicate(fullUrl, 'DELETE', req.body);
 
       delete headers['transfer-encoding'];
       headers['x-powered-by'] = 'LAFIA FHIR 5.4.0 REST Server (FHIR Server; FHIR 4.0.1/R4)';
