@@ -2,18 +2,24 @@ import { Request, Response } from 'express';
 import { inject } from 'inversify';
 import {
   controller,
+  httpGet,
+  httpPut,
   httpPost,
   response,
-  request, httpGet, httpPut
+  request,
 } from 'inversify-express-utils';
 import TYPES from '../../config/types';
 import { uploadFile } from '../../middlewares';
-import { IAttachment, IPatient, IPatientWithToken } from '../../models';
-import { PatientService } from '../../services';
 import {
+  IAttachment,
+  IPatient,
+  IPatientWithToken
+} from '../../models';
+import {
+  PatientService,
   MessageBroker,
   rmqSuccessResponse
-} from '../../services/messageBroker';
+} from '../../services';
 import { HttpStatusCode } from '../../utils';
 import { BaseController } from '../baseController';
 
@@ -51,7 +57,7 @@ export class PatientController extends BaseController {
     }
   }
 
-  @httpPost('')
+  @httpPost('/')
   public async createPatient(@request() req: Request, @response() res: Response) {
     try {
       const patientData: any = req.body;
@@ -80,7 +86,7 @@ export class PatientController extends BaseController {
       const { id: patientId } = req.params;
       const { file } = req;
 
-      const attachment: IAttachment = await this.patientService.uploadAttachment(patientId, file!);
+      const attachment: IAttachment = await this.patientService.uploadAttachment(patientId, file);
 
       this.success(res, attachment, 'Request completed successfully');
     } catch(e) {

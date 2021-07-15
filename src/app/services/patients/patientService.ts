@@ -16,6 +16,7 @@ import { IUserLoginParams } from '../auth';
 import { S3Service } from '../awsS3';
 import { CodeSystemService } from '../codeSystems';
 import { PatientRepository } from '../../repository';
+import { FhirServerService } from '../fhirServer';
 import { PlatformSdkService } from '../platformSDK';
 import {
   codeType, error,
@@ -44,6 +45,9 @@ export class PatientService {
 
   @inject(TYPES.UserService)
   private readonly userService: UserService;
+
+  @inject(TYPES.FhirServerService)
+  private readonly fhirServerService: FhirServerService;
 
   public async updatePatient(id: string, data: any): Promise<IPatient> {
     try {
@@ -106,8 +110,9 @@ export class PatientService {
       const user = await this.userService.createUser(data);
 
       const patientData: IPatient = {
+        resourceType: 'Patient',
         active: true,
-        gender,
+        gender: gender.toLowerCase(),
         name: {
           use: 'official',
           text: `${first_name} ${last_name}`,
@@ -124,7 +129,8 @@ export class PatientService {
         ],
       };
 
-      const patient = await this.patientRepo.createPatient(patientData);
+      const patientResponse = await this.fhirServerService.communicate('/Patient', 'POST', patientData);
+      const patient = patientResponse.data;
       const token = this.userService.generateJwtToken({ email, id: patient.id });
       const userData: IFindUser = {
         token,
@@ -138,6 +144,7 @@ export class PatientService {
         auth_token: token,
       }
     } catch (e) {
+      console.log(e.code.data);
       throw new GenericResponseError(e.message, e.code);
     }
   }
