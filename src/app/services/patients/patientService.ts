@@ -108,10 +108,13 @@ export class PatientService {
         throwError('User already exists!', error.badRequest);
       }
 
+      delete data.phone;
+
       const user = await this.userService.createUser(data);
 
       const patientData: IPatient = {
         resourceType: 'Patient',
+        id: phone,
         active: true,
         gender: gender.toLowerCase(),
         name: {
