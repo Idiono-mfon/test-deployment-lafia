@@ -13,3 +13,7 @@ export interface ILangaugeLabel extends IBase {
     labelId: string;
 }
   
+export interface ILanguageComponent extends IBase {
+    languageId: string;
+    componentId: string;
+}

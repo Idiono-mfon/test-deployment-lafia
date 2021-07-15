@@ -12,6 +12,7 @@ import {
   LabelController,
   LanguageController
 } from '../controllers/lang';
+import { AuthMiddleware } from '../middlewares';
 import {
   UserRepository,
   PatientRepository,
@@ -155,6 +156,12 @@ container
 container
   .bind<LanguageRepository>(TYPES.LanguageRepository)
   .to(LanguageRepository)
+  .inSingletonScope();
+
+// middleware
+container
+  .bind<AuthMiddleware>(TYPES.AuthMiddleware)
+  .to(AuthMiddleware)
   .inSingletonScope();
 
 export default container;

@@ -51,15 +51,15 @@ export class UserService {
       // find user by email
       let emailUser = await this.getUserByFeild("email", user.email);
 
-      if (!emailUser) {
+      if ( emailUser ) {
         const ERROR_MESSAGE = 'a user with this email already exist';
         throwError(ERROR_MESSAGE, error.badRequest);
       }
 
       // find user by phone number
-      let passlUser = await this.getUserByFeild("phone", user.phone);
+      let phoneUser = await this.getUserByFeild("phone", user.phone);
 
-      if (!passlUser) {
+      if ( phoneUser ) {
         const ERROR_MESSAGE = 'a user with this phone already exist';
         throwError(ERROR_MESSAGE, error.badRequest);
       }
@@ -85,6 +85,10 @@ export class UserService {
 
   public async getOneUser(data: IFindUser): Promise<IUser> {
     return await this.userRepository.getOneUser(data);
+  }
+  
+  public async getOneBy(field: string, value: string): Promise<IUser> {
+    return await this.userRepository.getOneBy(field, value);
   }
 
   public async updateUser(id: string, data: IFindUser): Promise<IFindUser> {
@@ -123,6 +127,17 @@ export class UserService {
       return jwt.sign(data, env.jwt_secrete_key, {
         audience: id,
       });
+    } catch (e) {
+      if (typeof e.code === 'string' || !e.code) {
+        e.code = HttpStatusCode.INTERNAL_SERVER_ERROR;
+      }
+      throw new GenericResponseError(e.message, e.code);
+    }
+  }
+
+  public async decodeJwtToken(token: string): Promise<object | string | IJwtPayload> {
+    try {
+      return await jwt.verify(token, env.jwt_secrete_key);
     } catch (e) {
       if (typeof e.code === 'string' || !e.code) {
         e.code = HttpStatusCode.INTERNAL_SERVER_ERROR;
