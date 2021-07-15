@@ -8,7 +8,7 @@ import { TwilioService, UserService } from '../../services';
 import { HttpStatusCode } from '../../utils';
 import { BaseController } from '../baseController';
 
-@controller('/users', TYPES.AuthMiddleware)
+@controller('/users')
 export class UserController extends BaseController {
   @inject(TYPES.UserService)
   private userService: UserService;
@@ -27,7 +27,7 @@ export class UserController extends BaseController {
     }
   }
 
-  @httpPost('/update')
+  @httpPost('/update', TYPES.AuthMiddleware)
   public async updateUser(@request() req: Request, @response() res: Response) {
     try {
       const user = await this.userService.updateUser(req.body.user.id, req.body);
