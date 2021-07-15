@@ -1,6 +1,7 @@
 import { JSONSchema } from "objection";
 import { Schema, Table } from "../../../database";
 import { BaseModel } from "../base";
+import { ComponentModel } from "./componentModel";
 import { ILangauge } from "./interfaces";
 import { LabelModel } from "./labelModel";
 import { LanguageValidation } from "./validation";
@@ -23,6 +24,14 @@ export class LanguageModel extends BaseModel implements ILangauge {
 
     static get relationMappings() {
         return {
+            components: {
+                relation: BaseModel.HasManyRelation,
+                modelClass: ComponentModel,
+                join: {
+                    from: `${Schema.lafiaService}.${Table.languages}.id`,
+                    to: `${Schema.lafiaService}.${Table.components}.language_id`
+                }
+            },
             labels: {
                 relation: BaseModel.ManyToManyRelation,
                 modelClass: LabelModel,

@@ -6,15 +6,13 @@ export async function up(knex: Knex): Promise<void> {
     return knex
     .transaction(async (trx: Knex.Transaction) => trx.schema
       .createSchemaIfNotExists(Schema.lafiaService)
-      .then(() => trx.schema.hasTable(Table.users)
+      .then(() => trx.schema.hasTable(Table.components)
         .then((tableExists: boolean) => {
           if (tableExists) {
             return trx.schema
                 .withSchema(Schema.lafiaService)
-                .alterTable(Table.users, (table: Knex.AlterTableBuilder) => {
-                    table.string('phone');
-                    table.boolean('hasVerifiedPhone');
-                    table.boolean('hasVerifiedEmail');
+                .alterTable(Table.components, (table: Knex.AlterTableBuilder) => {
+                    table.string('language_id');
                 });
             }
         }))
@@ -26,18 +24,16 @@ export async function down(knex: Knex): Promise<void> {
     return knex
     .transaction(async (trx: Knex.Transaction) => trx.schema
       .createSchemaIfNotExists(Schema.lafiaService)
-      .then(() => trx.schema.hasTable(Table.users)
+      .then(() => trx.schema.hasTable(Table.components)
         .then((tableExists: boolean) => {
           if (tableExists) {
             return trx.schema
               .withSchema(Schema.lafiaService)
-              .table(Table.users, (table: Knex.AlterTableBuilder) => {
-                table.dropColumn('phone');
-                table.dropColumn('hasVerifiedPhone');
-                table.dropColumn('hasVerifiedEmail');
+              .table(Table.components, (table: Knex.AlterTableBuilder) => {
+                table
+                  .dropColumn('language_id');
                 });
             }
         }))
       .catch((e) => console.error('MIGRATION_ERROR', e)));
 }
-

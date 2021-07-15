@@ -11,7 +11,7 @@ export async function up(knex: Knex): Promise<void> {
           if (tableExists) {
             return trx.schema
               .withSchema(Schema.lafiaService)
-              .table(Table.languages, (table: Knex.AlterTableBuilder) => {
+              .alterTable(Table.languages, (table: Knex.AlterTableBuilder) => {
                 table
                   .string('englishName');
                 });

@@ -27,6 +27,14 @@ export class UserRepository {
     }
   }
 
+  public async getOneBy(field: string, value:string): Promise<IUser> {
+    try {
+      return await UserModel.query().where(field, value).first();
+    } catch (e) {
+      throw new InternalServerError(e.message);
+    }
+  }
+
   public async updateUser(id: string, data: IFindUser): Promise<any> {
     try {
       return await UserModel.query()

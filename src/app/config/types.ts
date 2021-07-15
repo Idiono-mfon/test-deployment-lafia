@@ -31,6 +31,9 @@ const TYPES = {
   LanguageRepository: Symbol('LanguageRepository'),
   LabelRepository: Symbol('LabelRepository'),
   ComponentRepository: Symbol('ComponentRepository'),
+
+  // middlewares
+  AuthMiddleware: Symbol('AuthMiddleware'),
 };
 
 export default TYPES;

@@ -42,7 +42,7 @@ export class LanguageService {
     if ( !language ) {
       throw new NotFoundError("language not found");
     }
-    return this.languageRepository.fetchLanguagesWithContent(code);
+    return this.languageRepository.fetchLanguageContent(language);
   }
 
   // create
@@ -86,6 +86,31 @@ export class LanguageService {
     return this.labelRepository.addComponent(labelId, data);
   }
 
+  public async attachComponentToLanguage(languageId: string, componentId: string): Promise<any> {
+    const language: LanguageModel = await this.languageRepository.fetchLanguageByID(languageId);
+    if ( !language ) {
+      throw new NotFoundError("language not found");
+    }
+    const component: ComponentModel = await this.componentRepository.fetchComponentByID(componentId);
+    if ( !component ) {
+      throw new NotFoundError("component not found");
+    }
+    return this.languageRepository.attachComponent(languageId, componentId);
+  }
+
+  public async detachComponentFromLanguage(languageId: string, componentId: string): Promise<any> {
+    const language: LanguageModel = await this.languageRepository.fetchLanguageByID(languageId);
+    if ( !language ) {
+      throw new NotFoundError("language not found");
+    }
+    const component: ComponentModel = await this.componentRepository.fetchComponentByID(componentId);
+    if ( !component ) {
+      throw new NotFoundError("component not found");
+    }
+    return this.languageRepository.detachComponent(languageId, componentId);
+  }
+
+
   public async attachComponentToLabel(labelId: string, componentId: string): Promise<any> {
     const label: LabelModel = await this.labelRepository.fetchLabelByID(labelId);
     if ( !label ) {
@@ -109,6 +134,7 @@ export class LanguageService {
     }
     return this.labelRepository.detachComponent(labelId, componentId);
   }
+
 
   public async attachLabelToLanguage(languageId: string, labelId: string): Promise<any> {
     const label: LabelModel = await this.labelRepository.fetchLabelByID(labelId);
