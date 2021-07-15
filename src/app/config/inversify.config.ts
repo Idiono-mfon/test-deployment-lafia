@@ -31,7 +31,10 @@ import {
   CodeSystemService,
   PlatformSdkService,
   PractitionerService,
-  S3Service, AuthService, LanguageService
+  S3Service, 
+  AuthService, 
+  LanguageService, 
+  TwilioService
 } from '../services';
 import { UtilityService } from '../utils';
 import TYPES from './types';
@@ -117,6 +120,10 @@ container
 container
   .bind<LanguageService>(TYPES.LanguageService)
   .to(LanguageService)
+  .inSingletonScope();
+container
+  .bind<TwilioService>(TYPES.TwilioService)
+  .to(TwilioService)
   .inSingletonScope();
 
 

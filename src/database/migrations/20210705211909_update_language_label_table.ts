@@ -11,7 +11,7 @@ export async function up(knex: Knex): Promise<void> {
             if (tableExists) {
                 return trx.schema
                 .withSchema(Schema.lafiaService)
-                .alterTable(Table.language_label, (table: Knex.AlterTableBuilder) => {
+                .alterTable(Table.languages, (table: Knex.AlterTableBuilder) => {
                     table.dropForeign(['language_id', 'label_id']);
                     table.foreign('language_id')
                     .references('id')
@@ -38,7 +38,7 @@ export async function down(knex: Knex): Promise<void> {
             if (tableExists) {
                 return trx.schema
                 .withSchema(Schema.lafiaService)
-                .alterTable(Table.language_label, (table: Knex.AlterTableBuilder) => {
+                .alterTable(Table.languages, (table: Knex.AlterTableBuilder) => {
                     table.dropForeign(['language_id', 'label_id']);
                     table.foreign('language_id')
                     .references('id')
