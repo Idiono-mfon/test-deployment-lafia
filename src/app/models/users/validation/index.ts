@@ -6,6 +6,7 @@ export const UserValidation: JSONSchema = {
   title: 'User Schema Validation',
   properties: {
     email: { type: 'string', format: 'email' },
+    phone: { type: 'string', minLength: 11 },
     first_name: { type: 'string' },
     last_name: { type: 'string' },
     gender: { type: 'string' },

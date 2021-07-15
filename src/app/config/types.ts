@@ -21,6 +21,7 @@ const TYPES = {
   AuthService: Symbol('AuthService'),
   EmailService: Symbol('EmailService'),
   LanguageService: Symbol('LanguageService'),
+  TwilioService: Symbol('TwilioService'),
 
   // repositories
   UserRepository: Symbol('UserRepository'),
@@ -30,6 +31,9 @@ const TYPES = {
   LanguageRepository: Symbol('LanguageRepository'),
   LabelRepository: Symbol('LabelRepository'),
   ComponentRepository: Symbol('ComponentRepository'),
+
+  // middlewares
+  AuthMiddleware: Symbol('AuthMiddleware'),
 };
 
 export default TYPES;

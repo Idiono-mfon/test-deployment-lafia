@@ -4,6 +4,7 @@ import { ILabel } from "./ILabel";
 export interface ILangauge extends IBase {
     name: string;
     code: string;
+    englishName?: string;
     labels?: Array<any> | any;
 }
 
@@ -12,3 +13,7 @@ export interface ILangaugeLabel extends IBase {
     labelId: string;
 }
   
+export interface ILanguageComponent extends IBase {
+    languageId: string;
+    componentId: string;
+}

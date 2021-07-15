@@ -22,15 +22,16 @@ export class AuthService {
 
   public async login(email: string, password: string): Promise<any> {
     try {
+      
       const user = await this.userService.getOneUser({ email });
-
+      
       if (!user) {
         throwError('Invalid email or password', error.badRequest);
       }
 
       const loggedInUser = await this.userService.userLogin(email, password);
 
-      const token = this.userService.generateJwtToken({ email, id: user.resourceId });
+      const token = this.userService.generateJwtToken({ email, id: user.id });
       let loggedInUserData: any;
 
       if (loggedInUser.resourceType === forWho.patient) {
@@ -46,7 +47,7 @@ export class AuthService {
         auth_token: token
       }
     } catch (e) {
-      throw new GenericResponseError('Invalid email or password', e.code);
+      throw new GenericResponseError(e.toString(), e.code);
     }
   }
 }

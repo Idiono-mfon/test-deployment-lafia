@@ -12,6 +12,7 @@ import {
   LabelController,
   LanguageController
 } from '../controllers/lang';
+import { AuthMiddleware } from '../middlewares';
 import {
   UserRepository,
   PatientRepository,
@@ -31,7 +32,10 @@ import {
   CodeSystemService,
   PlatformSdkService,
   PractitionerService,
-  S3Service, AuthService, LanguageService
+  S3Service, 
+  AuthService, 
+  LanguageService, 
+  TwilioService
 } from '../services';
 import { UtilityService } from '../utils';
 import TYPES from './types';
@@ -118,6 +122,10 @@ container
   .bind<LanguageService>(TYPES.LanguageService)
   .to(LanguageService)
   .inSingletonScope();
+container
+  .bind<TwilioService>(TYPES.TwilioService)
+  .to(TwilioService)
+  .inSingletonScope();
 
 
 // repositories
@@ -148,6 +156,12 @@ container
 container
   .bind<LanguageRepository>(TYPES.LanguageRepository)
   .to(LanguageRepository)
+  .inSingletonScope();
+
+// middleware
+container
+  .bind<AuthMiddleware>(TYPES.AuthMiddleware)
+  .to(AuthMiddleware)
   .inSingletonScope();
 
 export default container;

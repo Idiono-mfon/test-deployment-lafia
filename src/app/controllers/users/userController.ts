@@ -4,7 +4,7 @@ import {
   controller, httpPost, httpPut, request, response
 } from 'inversify-express-utils';
 import TYPES from '../../config/types';
-import { UserService } from '../../services';
+import { TwilioService, UserService } from '../../services';
 import { HttpStatusCode } from '../../utils';
 import { BaseController } from '../baseController';
 
@@ -13,12 +13,26 @@ export class UserController extends BaseController {
   @inject(TYPES.UserService)
   private userService: UserService;
 
+  @inject(TYPES.TwilioService)
+  private twilioService: TwilioService;
+
   @httpPost('/register')
   public async createUser(@request() req: Request, @response() res: Response) {
     try {
       const newUser = await this.userService.createUser(req.body);
 
       this.success(res, newUser, 'User created', HttpStatusCode.CREATED);
+    } catch (e) {
+      this.error(res, e);
+    }
+  }
+
+  @httpPost('/update', TYPES.AuthMiddleware)
+  public async updateUser(@request() req: Request, @response() res: Response) {
+    try {
+      const user = await this.userService.updateUser(req.body.user.id, req.body);
+
+      this.success(res, user, 'User updated', HttpStatusCode.CREATED);
     } catch (e) {
       this.error(res, e);
     }
@@ -50,4 +64,43 @@ export class UserController extends BaseController {
       this.error(res, e);
     }
   }
+
+  @httpPost('/check')
+  public async check(@request() req: Request, @response() res: Response) {
+    try {
+      const { field, value } = req.body;
+
+      const user = await this.userService.getUserByFeild(field, value);
+
+      const exist = user ? true : false;
+
+      this.success(res, [exist], 'user checked successfully');
+    } catch (e) {
+      this.error(res, e);
+    }
+  }
+
+  @httpPost('/otp/send')
+  public async sendOtp(@request() req: Request, @response() res: Response) {
+    try {
+      const { phone } = req.body;
+      const otp = await this.twilioService.sendOTP(phone);
+      this.success(res, otp, 'OTP sent');
+    } catch (e) {
+      this.error(res, e);
+    }
+  }
+
+  @httpPost('/otp/verify')
+  public async verifyOtp(@request() req: Request, @response() res: Response) {
+    try {
+      // console.log(req.body.user)
+      const { phone, code } = req.body;
+      const verify = await this.twilioService.verifyOTP(phone, code);
+      this.success(res, verify, 'OTP verification checked');
+    } catch (e) {
+      this.error(res, e);
+    }
+  }
+
 }

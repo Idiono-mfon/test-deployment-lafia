@@ -15,6 +15,7 @@ import { Password } from '../../utils/password';
 import { EmailService, IComposeEmail } from '../email/emailService';
 import { PlatformSdkService } from '../platformSDK';
 import { IJwtPayload } from '../platformSDK/interfaces';
+import { TwilioService } from '../twilio';
 
 const env = Env.all();
 
@@ -28,6 +29,9 @@ export class UserService {
 
   @inject(TYPES.EmailService)
   private readonly emailService: EmailService;
+
+  @inject(TYPES.TwilioService)
+  private readonly twilioService: TwilioService;
 
   public async createUser(user: IUser): Promise<IUser> {
     try {
@@ -44,8 +48,26 @@ export class UserService {
         throwError(ERROR_MESSAGE, error.badRequest);
       }
 
+      // find user by email
+      let emailUser = await this.getUserByFeild("email", user.email);
+
+      if ( emailUser ) {
+        const ERROR_MESSAGE = 'a user with this email already exist';
+        throwError(ERROR_MESSAGE, error.badRequest);
+      }
+
+      // find user by phone number
+      let phoneUser = await this.getUserByFeild("phone", user.phone);
+
+      if ( phoneUser ) {
+        const ERROR_MESSAGE = 'a user with this phone already exist';
+        throwError(ERROR_MESSAGE, error.badRequest);
+      }
+
       // Hash user password
       user.password = await Password.hash(user.password);
+
+      // this.twilioService.sendOTP(user.phone);
 
       const data = {
         id: uuid(),
@@ -57,8 +79,16 @@ export class UserService {
     }
   }
 
+  public async getUserByFeild(field:string, data: string): Promise<IUser> {
+    return await this.userRepository.getOneUser({[field]: data});
+  }
+
   public async getOneUser(data: IFindUser): Promise<IUser> {
     return await this.userRepository.getOneUser(data);
+  }
+  
+  public async getOneBy(field: string, value: string): Promise<IUser> {
+    return await this.userRepository.getOneBy(field, value);
   }
 
   public async updateUser(id: string, data: IFindUser): Promise<IFindUser> {
@@ -97,6 +127,17 @@ export class UserService {
       return jwt.sign(data, env.jwt_secrete_key, {
         audience: id,
       });
+    } catch (e) {
+      if (typeof e.code === 'string' || !e.code) {
+        e.code = HttpStatusCode.INTERNAL_SERVER_ERROR;
+      }
+      throw new GenericResponseError(e.message, e.code);
+    }
+  }
+
+  public async decodeJwtToken(token: string): Promise<object | string | IJwtPayload> {
+    try {
+      return await jwt.verify(token, env.jwt_secrete_key);
     } catch (e) {
       if (typeof e.code === 'string' || !e.code) {
         e.code = HttpStatusCode.INTERNAL_SERVER_ERROR;
