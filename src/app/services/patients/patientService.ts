@@ -99,6 +99,7 @@ export class PatientService {
         first_name,
         last_name,
         email,
+        phone
       } = data;
 
       const existingUser: IUser = await this.userService.getOneUser({ email });
@@ -125,6 +126,12 @@ export class PatientService {
             use: 'home',
             rank: 0,
             value: email
+          },
+          {
+            system: 'phone',
+            use: 'mobile',
+            rank: 0,
+            value: phone
           }
         ],
       };
