@@ -8,6 +8,7 @@ const TYPES = {
   LanguageController: Symbol('LanguageController'),
   LabelController: Symbol('LabelController'),
   ComponentController: Symbol('ComponentController'),
+  FhirServerController: Symbol('FhirServerController'),
 
   // service
   UserService: Symbol('UserService'),

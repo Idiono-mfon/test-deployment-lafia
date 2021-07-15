@@ -4,8 +4,9 @@ import {
   AuthController,
   HealthController,
   PatientController,
+  FhirServerController,
   CodeSystemController,
-  PractitionerController
+  PractitionerController,
 } from '../controllers';
 import {
   ComponentController,
@@ -19,16 +20,18 @@ import {
   PractitionerRepository
 } from '../repository';
 import {
-  ComponentRepository,
   LabelRepository,
-  LanguageRepository
+  LanguageRepository,
+  ComponentRepository,
 } from '../repository/lang';
 import {
   UserService,
   EmailService,
   MessageBroker,
   PatientService,
+  LanguageService, 
   CodeSystemService,
+  FhirServerService,
   PlatformSdkService,
   PractitionerService,
   S3Service, AuthService, LanguageService
@@ -70,6 +73,10 @@ container
 container
   .bind<LanguageController>(TYPES.LanguageController)
   .to(LanguageController)
+  .inSingletonScope();
+container
+  .bind<FhirServerController>(TYPES.FhirServerController)
+  .to(FhirServerController)
   .inSingletonScope();
 
 
