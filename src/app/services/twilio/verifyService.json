@@ -1,0 +1,31 @@
+{
+    "sid": "VA3e0e709a184c699632d6fa7bab20fe14",
+    "accountSid": "ACe0e88f434f7b4ba8dfbcfa50d8b74942",
+    "friendlyName": "Lafia User Verify Service",
+    "codeLength": 6,
+    "lookupEnabled": true,
+    "psd2Enabled": false,
+    "skipSmsToLandlines": true,
+    "dtmfInputRequired": true,
+    "ttsName": null,
+    "doNotShareWarningEnabled": false,
+    "customCodeEnabled": false,
+    "push": {
+      "apn_credential_sid": null,
+      "include_date": true,
+      "fcm_credential_sid": null
+    },
+    "totp": "undefined",
+    "dateCreated": "2021-07-14T20:12:38.000Z",
+    "dateUpdated": "2021-07-14T20:12:38.000Z",
+    "url": "https://verify.twilio.com/v2/Services/VA3e0e709a184c699632d6fa7bab20fe14",
+    "links": {
+      "verification_checks": "https://verify.twilio.com/v2/Services/VA3e0e709a184c699632d6fa7bab20fe14/VerificationCheck",
+      "rate_limits": "https://verify.twilio.com/v2/Services/VA3e0e709a184c699632d6fa7bab20fe14/RateLimits",
+      "entities": "https://verify.twilio.com/v2/Services/VA3e0e709a184c699632d6fa7bab20fe14/Entities",
+      "access_tokens": "https://verify.twilio.com/v2/Services/VA3e0e709a184c699632d6fa7bab20fe14/AccessTokens",
+      "verifications": "https://verify.twilio.com/v2/Services/VA3e0e709a184c699632d6fa7bab20fe14/Verifications",
+      "webhooks": "https://verify.twilio.com/v2/Services/VA3e0e709a184c699632d6fa7bab20fe14/Webhooks",
+      "messaging_configurations": "https://verify.twilio.com/v2/Services/VA3e0e709a184c699632d6fa7bab20fe14/MessagingConfigurations"
+    }
+  }

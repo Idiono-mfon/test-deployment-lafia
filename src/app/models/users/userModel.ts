@@ -7,6 +7,7 @@ import { UserValidation } from './validation';
 export class UserModel extends BaseModel implements IUser {
   id!: IUser['id'];
   email!: IUser['email'];
+  phone!: IUser['phone'];
   resource_type!: IUser['resource_type'];
   resource_id!: IUser['resource_id'];
   first_name!: IUser['first_name'];

@@ -19,7 +19,7 @@ export class UserRepository {
     }
   }
 
-  public async getOneUser(data: IFindUser): Promise<IUser> {
+  public async getOneUser(data: IFindUser | any): Promise<IUser> {
     try {
       return await UserModel.query().findOne(data);
     } catch (e) {

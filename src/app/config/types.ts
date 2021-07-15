@@ -21,6 +21,7 @@ const TYPES = {
   AuthService: Symbol('AuthService'),
   EmailService: Symbol('EmailService'),
   LanguageService: Symbol('LanguageService'),
+  TwilioService: Symbol('TwilioService'),
 
   // repositories
   UserRepository: Symbol('UserRepository'),
