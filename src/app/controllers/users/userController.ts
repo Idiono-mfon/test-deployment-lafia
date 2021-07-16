@@ -74,7 +74,7 @@ export class UserController extends BaseController {
 
       const exist = user ? true : false;
 
-      this.success(res, [exist], 'user checked successfully');
+      this.success(res, {exist}, 'user checked successfully');
     } catch (e) {
       this.error(res, e);
     }
@@ -94,7 +94,6 @@ export class UserController extends BaseController {
   @httpPost('/otp/verify')
   public async verifyOtp(@request() req: Request, @response() res: Response) {
     try {
-      // console.log(req.body.user)
       const { phone, code } = req.body;
       const verify = await this.twilioService.verifyOTP(phone, code);
       this.success(res, verify, 'OTP verification checked');
