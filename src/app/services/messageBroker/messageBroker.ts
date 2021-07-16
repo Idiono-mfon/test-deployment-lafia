@@ -29,7 +29,7 @@ export class MessageBroker {
     try {
       const rmqChannel = await initRMQ();
 
-      rmqChannel.assertQueue(this.pubQueue, { durable: true });
+      rmqChannel.assertQueue(this.pubQueue, { durable: false });
       rmqChannel.sendToQueue(this.pubQueue, Buffer.from(msg));
 
       console.log(' [x] Sent Date: %s', new Date().toString());
@@ -58,7 +58,7 @@ export class MessageBroker {
       return;
     }
 
-    rmqChannel.assertQueue(this.subQueue, { durable: true });
+    rmqChannel.assertQueue(this.subQueue, { durable: false });
     rmqChannel.consume(this.subQueue, async (msg: any) => {
       if (msg) {
         // Acknowledge the received message
