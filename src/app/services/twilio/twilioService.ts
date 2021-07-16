@@ -1,7 +1,10 @@
-import { injectable } from 'inversify';
+import { inject, injectable } from 'inversify';
 import twilio, { jwt } from 'twilio';
 import { v4 as uuidV4 } from 'uuid';
 import { Env } from '../../config/env';
+import TYPES from '../../config/types';
+import { IUser } from '../../models';
+import { UserRepository } from '../../repository';
 import { GenericResponseError } from '../../utils';
 
 const env = Env.all();
@@ -15,8 +18,9 @@ const twilioClient = twilio(
 @injectable()
 export class TwilioService {
 
-  // @inject(TYPES.AuthUser) private readonly auth: object;
-
+  @inject(TYPES.UserRepository)
+  private userRepository: UserRepository;
+  
   public generateAccessToken(identity: string, roomId: string): string {
     try {
       const videoGrant = new VideoGrant({
@@ -68,7 +72,7 @@ export class TwilioService {
 
   public async sendOTP(phone: string): Promise<any> {
 
-    const sid = env.twilio_verify_sid || 'VA3e0e709a184c699632d6fa7bab20fe14';
+    const sid = env.twilio_verify_sid;
     try {
       const { to, channel, status, valid } = await twilioClient.verify
         .services(sid)
@@ -84,13 +88,19 @@ export class TwilioService {
 
   public async verifyOTP(phone: string, code: string): Promise<any> {
 
-    const sid = env.twilio_verify_sid || 'VA3e0e709a184c699632d6fa7bab20fe14';
+    const sid = env.twilio_verify_sid;
     try {
-      const { to, channel, status, valid } = await twilioClient.verify
-        .services(sid)
-        .verificationChecks
-        .create({ to: phone, code });
-      return { to, channel, status, valid };
+      const {to, channel, status, valid} = await twilioClient.verify
+      .services(sid)
+      .verificationChecks
+      .create({to: phone, code: code});
+      if (status === "approved") {
+        let user: IUser = await this.userRepository.getOneUser({ phone });
+        const userId: string | any = user.id;
+        this.userRepository.updateUser(userId, {hasVerifiedPhone: true});
+      }
+      //.then(verification_check => console.log(verification_check.status));
+      return {to, channel, status, valid};
     } catch (e) {
       console.log(e)
       throw new GenericResponseError(e.message, e.status);
