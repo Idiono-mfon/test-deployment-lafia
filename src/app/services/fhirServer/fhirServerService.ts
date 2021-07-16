@@ -19,11 +19,6 @@ axiosInstance.interceptors.request.use((config) => {
 
 @injectable()
 export class FhirServerService implements IFhirServer {
-  private readonly fhirBaseUrl: string;
-
-  constructor() {
-    this.fhirBaseUrl = Env.all().fhir_server_base_url;
-  }
 
   public async communicate(resourceQuery: string, httpMethod: Method, data?: any): Promise<any> {
     try {
@@ -39,7 +34,6 @@ export class FhirServerService implements IFhirServer {
         data: responseData,
       };
     } catch (e) {
-      console.error(e);
       throw new GenericResponseError(e.message, e.response);
     }
   }
