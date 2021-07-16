@@ -69,5 +69,6 @@ module.exports = {
     '@typescript-eslint/no-non-null-assertion': 0,
     'prefer-promise-reject-errors': 0,
     'spaced-comment': 0,
+    '@typescript-eslint/ban-types': 0,
   },
 };

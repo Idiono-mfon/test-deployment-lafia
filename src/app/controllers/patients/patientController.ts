@@ -37,7 +37,7 @@ export class PatientController extends BaseController {
       const { id: patientId } = req.params;
       const patientData: IPatient = req.body;
 
-      const patient = await this.patientService.updatePatient(patientId, patientData);
+      const patient = await this.patientService.updatePatient(patientId, { id: patientId, ...patientData });
 
       this.success(res, patient, 'Patient profile successfully updated');
     } catch (e) {

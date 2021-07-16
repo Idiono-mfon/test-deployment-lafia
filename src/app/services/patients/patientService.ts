@@ -1,16 +1,11 @@
 import { inject, injectable } from 'inversify';
-import _ from 'lodash';
 import TYPES from '../../config/types';
 import {
   IUser,
   AttachmentModel,
   IAttachment,
   PatientsAttachmentModel,
-  IPatient,
-  IContactPoint,
-  ICommunication,
-  IPatientContact,
-  ICodeableConcept, IFindUser
+  IPatient, IFindUser
 } from '../../models';
 import { IUserLoginParams } from '../auth';
 import { S3Service } from '../awsS3';
@@ -19,7 +14,7 @@ import { PatientRepository } from '../../repository';
 import { FhirServerService } from '../fhirServer';
 import { PlatformSdkService } from '../platformSDK';
 import {
-  codeType, error,
+  error,
   forWho, GenericResponseError,
   InternalServerError,
   throwError, UtilityService
@@ -52,19 +47,22 @@ export class PatientService {
   public async updatePatient(id: string, data: any): Promise<IPatient> {
     try {
 
-      return await this.patientRepo.updatePatient(data);
+      const { data: patientUpdatedData } = await this.fhirServerService.communicate(
+        `/Patient/${id}`,
+        'PUT',
+        data
+      );
+
+      return patientUpdatedData;
     } catch (e) {
-      throw new InternalServerError(e.message);
+      throw new GenericResponseError(e.message, e.code);
     }
   }
 
   public async findPatientById(id: string): Promise<IPatient> {
-    console.log("============================findPatientById============================")
-    const patient = await this.fhirServerService.communicate(`/${id}`, 'GET');
-    console.log(patient);
-    return patient.data;
+    const patient = await this.fhirServerService.communicate(`/Patient/${id}`, 'GET');
 
-    // return this.patientRepo.findPatientById(id);
+    return patient.data;
   }
 
   public async createPatient(data: any): Promise<any> {
@@ -140,16 +138,17 @@ export class PatientService {
   public async patientLogin(data: IUserLoginParams): Promise<any> {
     try {
       const { user, token } = data;
-      await this.userService.updateUser(user.resourceId!, {...user, token});
+      await this.userService.updateUser(user.id!, {...user, token});
 
-      return await this.patientRepo.findPatientById(user.resourceId!);
+      const { data: patientData } = await this.fhirServerService.communicate(
+        `/Patient/${user.resourceId}`,
+        'GET'
+      );
+
+      return patientData;
     } catch (e) {
       throw new GenericResponseError(e.message, e.code);
     }
-  }
-
-  private async getPatientObjectIdsById(id: string): Promise<any> {
-    return this.patientRepo.getIds(id);
   }
 
   public async uploadAttachment(patientId: string, file: Express.Multer.File): Promise<IAttachment> {
