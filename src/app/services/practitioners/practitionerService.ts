@@ -1,25 +1,23 @@
 import { inject, injectable } from 'inversify';
-import _ from 'lodash';
 import TYPES from '../../config/types';
 import {
   AttachmentModel,
   IAttachment,
   PractitionersAttachmentModel,
   IPractitioner,
-  IQualification,
-  IContactPoint,
-  ICommunication, IUser, IFindUser
+  IUser, IFindUser
 } from '../../models';
 import { IUserLoginParams } from '../auth';
 import { S3Service } from '../awsS3';
 import { CodeSystemService } from '../codeSystems';
 import { PractitionerRepository } from '../../repository';
 import {
-  codeType, error,
+  error,
   forWho, GenericResponseError,
   InternalServerError,
   throwError, UtilityService
 } from '../../utils';
+import { FhirServerService } from '../fhirServer';
 import { PlatformSdkService } from '../platformSDK';
 import { UserService } from '../users';
 
@@ -43,43 +41,27 @@ export class PractitionerService {
   @inject(TYPES.UserService)
   private readonly userService: UserService;
 
+  @inject(TYPES.FhirServerService)
+  private readonly fhirServerService: FhirServerService;
+
   public async updatePractitioner(id: string, data: any): Promise<IPractitioner> {
     try {
-      const dob = this.utilService.extractDateOfBirth(data, forWho.practitioner);
-      const practitionerName = this.utilService.extractName(data, forWho.practitioner);
-      const practitionerAddress = this.utilService.extractAddress(data, forWho.practitioner);
-      const practitionerCommunication: ICommunication = {
-        language: await this.utilService.extractCodeableConcept(data, forWho.practitioner, codeType.language),
-        preferred: true
-      };
-      const telecom: IContactPoint[] = this.utilService.extractContactPoint(data, forWho.practitioner);
-      const qualification: IQualification | IQualification[] = await this.utilService.getQualification(data, forWho.practitioner, codeType.qualification);
+      const { data: practitionerData } = await this.fhirServerService.communicate(
+        `/Practitioner/${id}`,
+        'PUT',
+        data
+      )
 
-      let practitioner: IPractitioner = {
-        active: true,
-        resourceType: _.capitalize(forWho.practitioner),
-        gender: data.practitioner_gender,
-        birthDate: dob,
-        name: practitionerName,
-        address: practitionerAddress,
-        telecom,
-        communication: practitionerCommunication,
-        qualification,
-      };
-
-      const practitionerOldData = await this.getPractitionerObjectIdsById(id);
-
-      this.utilService.removeFalsyProps(practitionerOldData);
-      this.utilService.mergeDataForUpdate(practitioner, practitionerOldData);
-
-      return await this.practitionerRepo.updatePractitioner(practitioner);
+      return practitionerData;
     } catch (e) {
       throw new InternalServerError(e.message);
     }
   }
 
   public async findPractitionerById(id: string): Promise<IPractitioner> {
-    return this.practitionerRepo.findPractitionerById(id);
+    const practitioner = await this.fhirServerService.communicate(`/Practitioner/${id}`, 'GET');
+
+    return practitioner.data;
   }
 
   public async createPractitioner(data: any): Promise<any> {
@@ -90,6 +72,7 @@ export class PractitionerService {
       first_name,
       last_name,
       email,
+      phone,
       birth_date: birthDate,
     } = data;
 
@@ -99,9 +82,11 @@ export class PractitionerService {
       throwError('User already exists!', error.badRequest);
     }
 
-    const user = await this.userService.createUser(data);
+    delete data.phone;
 
     const practitionerData: IPractitioner = {
+      resourceType: 'Practitioner',
+      id: phone,
       active: true,
       gender,
       birthDate,
@@ -117,11 +102,22 @@ export class PractitionerService {
           use: 'home',
           rank: 0,
           value: email
+        },
+        {
+          system: 'phone',
+          use: 'mobile',
+          rank: 0,
+          value: phone
         }
       ],
     };
 
-    const practitioner = await this.practitionerRepo.createPractitioner(practitionerData);
+    const practitionerResponse = await this.fhirServerService.communicate(
+      '/Practitioner',
+      'POST',
+      practitionerData
+    );
+    const practitioner = practitionerResponse.data;
     const token = this.userService.generateJwtToken({ email, id: practitioner.id });
     const userData: IFindUser = {
       email,
@@ -129,7 +125,11 @@ export class PractitionerService {
       resource_id: practitioner.id,
       resource_type: forWho.practitioner,
     }
-    await this.userService.updateUser(user.id!, userData);
+
+    await this.userService.createUser({
+      ...data,
+      ...userData
+    });
 
     return {
       user: practitioner,
@@ -146,10 +146,6 @@ export class PractitionerService {
     } catch (e) {
       throw new GenericResponseError(e.message, e.code);
     }
-  }
-
-  private async getPractitionerObjectIdsById(id: string): Promise<any> {
-    return this.practitionerRepo.getIds(id);
   }
 
   public async uploadAttachment(practitionerId: string, file: Express.Multer.File): Promise<IAttachment> {

@@ -1,17 +1,16 @@
 import { inject, injectable } from 'inversify';
 import _ from 'lodash';
 import TYPES from '../config/types';
-import { IAddress } from '../models/address';
-import { ICodeableConcept } from '../models/codeableConcepts';
-import { ICodeSystem, ICodeType } from '../models/codeSystems';
-import { ICoding } from '../models/codings';
-import { IContactPoint } from '../models/contactPoints';
-import { IHumanName } from '../models/humanNames';
-import { INarrative } from '../models/narratives';
-import { IPeriod } from '../models/periods';
-import { IQualification } from '../models/qualifications';
-import { IReference } from '../models/references';
-import { CodeSystemService } from '../services/codeSystems';
+import {
+  IAddress,
+  ICodeableConcept,
+  ICodeSystem, ICodeType,
+  ICoding, IContactPoint,
+  IHumanName, INarrative,
+  IPeriod, IQualification,
+  IReference,
+} from '../models';
+import { CodeSystemService } from '../services';
 import {
   error,
   throwError,
@@ -218,15 +217,10 @@ class UtilityService {
   public checkForRequiredFields(data: any) {
     try {
       const { email } = data;
-      // const { gender } = data;
 
       if (!email) {
         throwError('Email is required!', badRequest);
       }
-
-      // if (!gender) {
-      //   throwError('Gender is required!', badRequest);
-      // }
     } catch (e) {
       throw new GenericResponseError(e.message, e.code);
     }

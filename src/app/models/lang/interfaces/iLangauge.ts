@@ -1,5 +1,4 @@
 import { IBase } from "../../base";
-import { ILabel } from "./ILabel";
 
 export interface ILangauge extends IBase {
     name: string;

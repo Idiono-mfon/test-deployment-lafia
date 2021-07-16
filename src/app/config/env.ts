@@ -33,6 +33,7 @@ interface IEnv {
   twilio_verify_sid: string;
   email_address: string;
   email_password: string;
+  fhir_server_base_url: string;
 }
 
 const config: IEnv = {
@@ -68,6 +69,7 @@ const config: IEnv = {
   twilio_verify_sid: process.env.TWILIO_VERIFY_SID as string,
   email_address: process.env.EMAIL_ADDRESS as string,
   email_password: process.env.EMAIL_PASSWORD as string,
+  fhir_server_base_url: process.env.FHIR_SERVER_BASE_URL as string,
 };
 
 export class Env {

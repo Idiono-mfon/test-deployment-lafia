@@ -4,8 +4,9 @@ import {
   AuthController,
   HealthController,
   PatientController,
+  FhirServerController,
   CodeSystemController,
-  PractitionerController
+  PractitionerController,
 } from '../controllers';
 import {
   ComponentController,
@@ -20,22 +21,22 @@ import {
   PractitionerRepository
 } from '../repository';
 import {
-  ComponentRepository,
   LabelRepository,
-  LanguageRepository
+  LanguageRepository,
+  ComponentRepository,
 } from '../repository/lang';
 import {
   UserService,
   EmailService,
   MessageBroker,
+  TwilioService,
   PatientService,
+  LanguageService,
   CodeSystemService,
+  FhirServerService,
   PlatformSdkService,
   PractitionerService,
-  S3Service, 
-  AuthService, 
-  LanguageService, 
-  TwilioService
+  S3Service, AuthService,
 } from '../services';
 import { UtilityService } from '../utils';
 import TYPES from './types';
@@ -74,6 +75,10 @@ container
 container
   .bind<LanguageController>(TYPES.LanguageController)
   .to(LanguageController)
+  .inSingletonScope();
+container
+  .bind<FhirServerController>(TYPES.FhirServerController)
+  .to(FhirServerController)
   .inSingletonScope();
 
 
@@ -122,6 +127,10 @@ container
   .bind<LanguageService>(TYPES.LanguageService)
   .to(LanguageService)
   .inSingletonScope();
+container
+  .bind<FhirServerService>(TYPES.FhirServerService)
+  .to(FhirServerService)
+  .inSingletonScope()
 container
   .bind<TwilioService>(TYPES.TwilioService)
   .to(TwilioService)

@@ -12,7 +12,7 @@ import {
   throwError
 } from '../../utils';
 import { Password } from '../../utils/password';
-import { EmailService, IComposeEmail } from '../email/emailService';
+import { EmailService, IComposeEmail } from '../email';
 import { PlatformSdkService } from '../platformSDK';
 import { IJwtPayload } from '../platformSDK/interfaces';
 import { TwilioService } from '../twilio';
@@ -57,7 +57,7 @@ export class UserService {
       }
 
       // find user by phone number
-      let phoneUser = await this.getUserByFeild("phone", user.phone);
+      let phoneUser = await this.getUserByFeild("phone", user.phone!);
 
       if ( phoneUser ) {
         const ERROR_MESSAGE = 'a user with this phone already exist';
@@ -67,32 +67,30 @@ export class UserService {
       // Hash user password
       user.password = await Password.hash(user.password);
 
-      // this.twilioService.sendOTP(user.phone);
-
       const data = {
         id: uuid(),
         ...user,
       };
-      return await this.userRepository.createUser(data);
+      return this.userRepository.createUser(data);
     } catch (e) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
 
   public async getUserByFeild(field:string, data: string): Promise<IUser> {
-    return await this.userRepository.getOneUser({[field]: data});
+    return this.userRepository.getOneUser({[field]: data});
   }
 
   public async getOneUser(data: IFindUser): Promise<IUser> {
-    return await this.userRepository.getOneUser(data);
+    return this.userRepository.getOneUser(data);
   }
   
   public async getOneBy(field: string, value: string): Promise<IUser> {
-    return await this.userRepository.getOneBy(field, value);
+    return this.userRepository.getOneBy(field, value);
   }
 
   public async updateUser(id: string, data: IFindUser): Promise<IFindUser> {
-    return await this.userRepository.updateUser(id, data);
+    return this.userRepository.updateUser(id, data);
   }
 
   public async userLogin(email: string, password: string): Promise<IUser> {
@@ -117,7 +115,7 @@ export class UserService {
   }
 
   public async userLogout(id: string): Promise<IUser> {
-    return await this.userRepository.userLogout(id);
+    return this.userRepository.userLogout(id);
   }
 
   public generateJwtToken(data: IJwtPayload): string {
@@ -135,9 +133,9 @@ export class UserService {
     }
   }
 
-  public async decodeJwtToken(token: string): Promise<object | string | IJwtPayload> {
+  public decodeJwtToken(token: string): object | string | IJwtPayload {
     try {
-      return await jwt.verify(token, env.jwt_secrete_key);
+      return jwt.verify(token, env.jwt_secrete_key);
     } catch (e) {
       if (typeof e.code === 'string' || !e.code) {
         e.code = HttpStatusCode.INTERNAL_SERVER_ERROR;

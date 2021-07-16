@@ -21,7 +21,12 @@ export abstract class BaseController {
     data: any = [],
     message: string = '',
     httpStatus: number = 200,
+    headers?: any
   ) {
+    if (headers) {
+      return res.set(headers).status(httpStatus).json(data);
+    }
+
     return res.status(httpStatus).send({
       status: 'success',
       message,
@@ -30,7 +35,16 @@ export abstract class BaseController {
   }
 
   protected error(res: Response, e: GenericResponseError) {
-    let { code, message } = e;
+    let { code, message }: {code: any, message: string} = e;
+
+    if (code?.status || code?.headers) {
+      const { status: statusCode, headers, data } = code;
+
+      delete headers['transfer-encoding'];
+      headers['x-powered-by'] = 'LAFIA FHIR 5.4.0 REST Server (FHIR Server; FHIR 4.0.1/R4)';
+
+      return res.set(headers).status(statusCode).json(data);
+    }
 
     if (!code || typeof code === 'string'! || code > HttpStatusCode.INTERNAL_SERVER_ERROR) {
       code = HttpStatusCode.INTERNAL_SERVER_ERROR;

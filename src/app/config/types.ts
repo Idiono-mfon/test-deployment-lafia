@@ -8,6 +8,7 @@ const TYPES = {
   LanguageController: Symbol('LanguageController'),
   LabelController: Symbol('LabelController'),
   ComponentController: Symbol('ComponentController'),
+  FhirServerController: Symbol('FhirServerController'),
 
   // service
   UserService: Symbol('UserService'),
@@ -21,6 +22,7 @@ const TYPES = {
   AuthService: Symbol('AuthService'),
   EmailService: Symbol('EmailService'),
   LanguageService: Symbol('LanguageService'),
+  FhirServerService: Symbol('FhirServerService'),
   TwilioService: Symbol('TwilioService'),
 
   // repositories

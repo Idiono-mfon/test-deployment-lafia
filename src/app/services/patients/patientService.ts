@@ -1,24 +1,20 @@
 import { inject, injectable } from 'inversify';
-import _ from 'lodash';
 import TYPES from '../../config/types';
 import {
   IUser,
   AttachmentModel,
   IAttachment,
   PatientsAttachmentModel,
-  IPatient,
-  IContactPoint,
-  ICommunication,
-  IPatientContact,
-  ICodeableConcept, IFindUser
+  IPatient, IFindUser
 } from '../../models';
 import { IUserLoginParams } from '../auth';
 import { S3Service } from '../awsS3';
 import { CodeSystemService } from '../codeSystems';
 import { PatientRepository } from '../../repository';
+import { FhirServerService } from '../fhirServer';
 import { PlatformSdkService } from '../platformSDK';
 import {
-  codeType, error,
+  error,
   forWho, GenericResponseError,
   InternalServerError,
   throwError, UtilityService
@@ -45,45 +41,28 @@ export class PatientService {
   @inject(TYPES.UserService)
   private readonly userService: UserService;
 
+  @inject(TYPES.FhirServerService)
+  private readonly fhirServerService: FhirServerService;
+
   public async updatePatient(id: string, data: any): Promise<IPatient> {
     try {
-      const dob = this.utilService.extractDateOfBirth(data, forWho.patient);
-      const maritalStatus: ICodeableConcept = await this.utilService.extractCodeableConcept(data, forWho.patient, codeType.maritalStatus);
-      const patientName = this.utilService.extractName(data, forWho.patient);
-      const patientAddress = this.utilService.extractAddress(data, forWho.patient);
-      const patientContact: IPatientContact = await this.utilService.getContact(data, forWho.patientContact, codeType);
-      const patientCommunication: ICommunication = {
-        language: await this.utilService.extractCodeableConcept(data, forWho.patient, codeType.language),
-        preferred: true
-      };
-      const telecom: IContactPoint[] = this.utilService.extractContactPoint(data, forWho.patient);
 
-      let patient: IPatient = {
-        active: true,
-        resourceType: _.capitalize(forWho.patient),
-        gender: data.patient_gender,
-        birthDate: dob,
-        maritalStatus,
-        name: patientName,
-        address: patientAddress,
-        telecom,
-        contact: patientContact,
-        communication: patientCommunication
-      };
+      const { data: patientUpdatedData } = await this.fhirServerService.communicate(
+        `/Patient/${id}`,
+        'PUT',
+        data
+      );
 
-      const patientOldData = await this.getPatientObjectIdsById(id);
-
-      this.utilService.removeFalsyProps(patientOldData);
-      this.utilService.mergeDataForUpdate(patient, patientOldData);
-
-      return await this.patientRepo.updatePatient(patient);
+      return patientUpdatedData;
     } catch (e) {
-      throw new InternalServerError(e.message);
+      throw new GenericResponseError(e.message, e.code);
     }
   }
 
   public async findPatientById(id: string): Promise<IPatient> {
-    return this.patientRepo.findPatientById(id);
+    const patient = await this.fhirServerService.communicate(`/Patient/${id}`, 'GET');
+
+    return patient.data;
   }
 
   public async createPatient(data: any): Promise<any> {
@@ -95,6 +74,7 @@ export class PatientService {
         first_name,
         last_name,
         email,
+        phone
       } = data;
 
       const existingUser: IUser = await this.userService.getOneUser({ email });
@@ -103,11 +83,13 @@ export class PatientService {
         throwError('User already exists!', error.badRequest);
       }
 
-      const user = await this.userService.createUser(data);
+      delete data.phone;
 
       const patientData: IPatient = {
+        resourceType: 'Patient',
+        id: phone,
         active: true,
-        gender,
+        gender: gender.toLowerCase(),
         name: {
           use: 'official',
           text: `${first_name} ${last_name}`,
@@ -120,18 +102,29 @@ export class PatientService {
             use: 'home',
             rank: 0,
             value: email
+          },
+          {
+            system: 'phone',
+            use: 'mobile',
+            rank: 0,
+            value: phone
           }
         ],
       };
 
-      const patient = await this.patientRepo.createPatient(patientData);
+      const patientResponse = await this.fhirServerService.communicate('/Patient', 'POST', patientData);
+      const patient = patientResponse.data;
       const token = this.userService.generateJwtToken({ email, id: patient.id });
       const userData: IFindUser = {
         token,
         resource_id: patient.id,
         resource_type: forWho.patient,
       }
-      await this.userService.updateUser(user.id!, userData);
+
+      await this.userService.createUser({
+        ...data,
+        ...userData,
+      });
 
       return {
         user: patient,
@@ -145,16 +138,17 @@ export class PatientService {
   public async patientLogin(data: IUserLoginParams): Promise<any> {
     try {
       const { user, token } = data;
-      await this.userService.updateUser(user.resourceId!, {...user, token});
+      await this.userService.updateUser(user.id!, {...user, token});
 
-      return await this.patientRepo.findPatientById(user.resourceId!);
+      const { data: patientData } = await this.fhirServerService.communicate(
+        `/Patient/${user.resourceId}`,
+        'GET'
+      );
+
+      return patientData;
     } catch (e) {
       throw new GenericResponseError(e.message, e.code);
     }
-  }
-
-  private async getPatientObjectIdsById(id: string): Promise<any> {
-    return this.patientRepo.getIds(id);
   }
 
   public async uploadAttachment(patientId: string, file: Express.Multer.File): Promise<IAttachment> {

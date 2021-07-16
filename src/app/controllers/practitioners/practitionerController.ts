@@ -14,11 +14,11 @@ import {
   IAttachment,
   IPractitioner, IPractitionerWithToken
 } from '../../models';
-import { PractitionerService } from '../../services';
 import {
   MessageBroker,
-  rmqSuccessResponse
-} from '../../services/messageBroker';
+  rmqSuccessResponse,
+  PractitionerService
+} from '../../services';
 import { HttpStatusCode } from '../../utils';
 import { BaseController } from '../baseController';
 
@@ -36,7 +36,7 @@ export class PractitionerController extends BaseController {
       const { id: practitionerId } = req.params;
       const practitionerData: IPractitioner = req.body;
 
-      const practitioner = await this.practitionerService.updatePractitioner(practitionerId, practitionerData);
+      const practitioner = await this.practitionerService.updatePractitioner(practitionerId, { id: practitionerId, ...practitionerData });
 
       this.success(res, practitioner, 'Practitioner profile successfully updated');
     } catch (e) {
@@ -82,7 +82,7 @@ export class PractitionerController extends BaseController {
   public async uploadAttachment(@request() req: Request, @response() res: Response) {
     try {
       const { id: practitionerId } = req.params;
-      const attachment: IAttachment = await this.practitionerService.uploadAttachment(practitionerId, req.file!);
+      const attachment: IAttachment = await this.practitionerService.uploadAttachment(practitionerId, req.file);
 
       this.success(res, attachment, 'Request completed successfully');
     } catch (e) {
