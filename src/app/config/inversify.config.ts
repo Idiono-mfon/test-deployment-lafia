@@ -13,6 +13,7 @@ import {
   LabelController,
   LanguageController
 } from '../controllers/lang';
+import { AuthMiddleware } from '../middlewares';
 import {
   UserRepository,
   PatientRepository,
@@ -28,8 +29,9 @@ import {
   UserService,
   EmailService,
   MessageBroker,
+  TwilioService,
   PatientService,
-  LanguageService, 
+  LanguageService,
   CodeSystemService,
   FhirServerService,
   PlatformSdkService,
@@ -128,6 +130,10 @@ container
 container
   .bind<FhirServerService>(TYPES.FhirServerService)
   .to(FhirServerService)
+  .inSingletonScope()
+container
+  .bind<TwilioService>(TYPES.TwilioService)
+  .to(TwilioService)
   .inSingletonScope();
 
 
@@ -159,6 +165,12 @@ container
 container
   .bind<LanguageRepository>(TYPES.LanguageRepository)
   .to(LanguageRepository)
+  .inSingletonScope();
+
+// middleware
+container
+  .bind<AuthMiddleware>(TYPES.AuthMiddleware)
+  .to(AuthMiddleware)
   .inSingletonScope();
 
 export default container;

@@ -7,6 +7,7 @@ export interface IUser extends IBase {
   resourceType?: string;
   resourceId?: string;
   email: string;
+  phone: string;
   password: string;
   firstName?: string;
   lastName?: string;
@@ -25,6 +26,7 @@ export interface IFindUser extends IBase {
   resourceType?: string;
   resourceId?: string;
   email?: string;
+  phone?: string;
   password?: string;
   firstName?: string;
   lastName?: string;

@@ -6,14 +6,13 @@ export async function up(knex: Knex): Promise<void> {
     return knex
     .transaction(async (trx: Knex.Transaction) => trx.schema
       .createSchemaIfNotExists(Schema.lafiaService)
-      .then(() => trx.schema.hasTable(Table.languages)
+      .then(() => trx.schema.hasTable(Table.components)
         .then((tableExists: boolean) => {
           if (tableExists) {
             return trx.schema
-              .withSchema(Schema.lafiaService)
-              .alterTable(Table.languages, (table: Knex.AlterTableBuilder) => {
-                table
-                  .string('englishName');
+                .withSchema(Schema.lafiaService)
+                .alterTable(Table.components, (table: Knex.AlterTableBuilder) => {
+                    table.string('language_id');
                 });
             }
         }))
@@ -25,17 +24,16 @@ export async function down(knex: Knex): Promise<void> {
     return knex
     .transaction(async (trx: Knex.Transaction) => trx.schema
       .createSchemaIfNotExists(Schema.lafiaService)
-      .then(() => trx.schema.hasTable(Table.languages)
+      .then(() => trx.schema.hasTable(Table.components)
         .then((tableExists: boolean) => {
           if (tableExists) {
             return trx.schema
               .withSchema(Schema.lafiaService)
-              .table(Table.languages, (table: Knex.AlterTableBuilder) => {
+              .table(Table.components, (table: Knex.AlterTableBuilder) => {
                 table
-                  .dropColumn('englishName');
+                  .dropColumn('language_id');
                 });
             }
         }))
       .catch((e) => console.error('MIGRATION_ERROR', e)));
 }
-

@@ -1,5 +1,6 @@
 import { injectable } from "inversify";
 import { transaction } from "objection";
+import { ComponentModel } from "../../models/lang/componentModel";
 import { ILangauge } from "../../models/lang/interfaces";
 import { LanguageModel } from "../../models/lang/languageModel";
 import { GenericResponseError, HttpStatusCode, InternalServerError } from "../../utils";
@@ -24,10 +25,13 @@ export class LanguageRepository {
         return LanguageModel.query().where({'code': code, 'name': name}).first();
     }
 
-    public async fetchLanguagesWithContent(code: string) {
+    public async fetchLanguageContent(language: LanguageModel) {
+        const languageId: string | any = language.id;
         return LanguageModel.query()
-        .withGraphFetched('[labels.components]')
-        .where('code', code).first();
+        .modifyGraph('labels.components', builder  => {
+            builder.where('language_id', languageId);
+        })
+        .where('code', language.code).first();
     }
 
     public async addLanguage(data: ILangauge): Promise<ILangauge> {
@@ -41,6 +45,17 @@ export class LanguageRepository {
     public async detachLabel(languageId: string, labelId: string): Promise<any> {
         return await ( await LanguageModel.query().findById( languageId ) ).$relatedQuery('labels')
                           .unrelate().where("id", labelId );                  
+    }
+
+    public async attachComponent(languageId: string, componentId: string): Promise<any> {
+        return await ( await LanguageModel.query().findById(languageId) ).$relatedQuery('components')
+                          .relate( await ComponentModel.query().findById(componentId) );
+        // return await LabelModel.relatedQuery('components').for(labelId).relate(componentId);                  
+      }
+  
+      public async detachComponent(languageId: string, componentId: string): Promise<any> {
+        return await ( await LanguageModel.query().findById(languageId) ).$relatedQuery('components')
+                          .unrelate().where("id", componentId );                  
       }
 
     public async updateLanguage(id:string, data: ILangauge): Promise<ILangauge> {

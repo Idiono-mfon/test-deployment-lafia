@@ -1,3 +1,4 @@
+import { injectable } from 'inversify';
 import twilio, { jwt } from 'twilio';
 import { v4 as uuidV4 } from 'uuid';
 import { Env } from '../../config/env';
@@ -11,7 +12,11 @@ const twilioClient = twilio(
   env.twilio_auth_token
 )
 
+@injectable()
 export class TwilioService {
+
+  // @inject(TYPES.AuthUser) private readonly auth: object;
+
   public generateAccessToken(identity: string, roomId: string): string {
     try {
       const videoGrant = new VideoGrant({
@@ -58,6 +63,37 @@ export class TwilioService {
       return room?.sid;
     } catch (e) {
       throw new GenericResponseError(e.message, e.code);
+    }
+  }
+
+  public async sendOTP(phone: string): Promise<any> {
+
+    const sid = env.twilio_verify_sid || 'VA3e0e709a184c699632d6fa7bab20fe14';
+    try {
+      const { to, channel, status, valid } = await twilioClient.verify
+        .services(sid)
+        .verifications
+        .create({ to: phone, channel: 'sms' });
+      //.then(verification => console.log(verification.status));
+      return { to, channel, status, valid };
+    } catch (e) {
+      throw new GenericResponseError(e.message, e.status);
+    }
+
+  }
+
+  public async verifyOTP(phone: string, code: string): Promise<any> {
+
+    const sid = env.twilio_verify_sid || 'VA3e0e709a184c699632d6fa7bab20fe14';
+    try {
+      const { to, channel, status, valid } = await twilioClient.verify
+        .services(sid)
+        .verificationChecks
+        .create({ to: phone, code });
+      return { to, channel, status, valid };
+    } catch (e) {
+      console.log(e)
+      throw new GenericResponseError(e.message, e.status);
     }
   }
 }

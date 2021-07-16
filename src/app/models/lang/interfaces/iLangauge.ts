@@ -1,5 +1,4 @@
 import { IBase } from "../../base";
-import { ILabel } from "./ILabel";
 
 export interface ILangauge extends IBase {
     name: string;
@@ -13,3 +12,7 @@ export interface ILangaugeLabel extends IBase {
     labelId: string;
 }
   
+export interface ILanguageComponent extends IBase {
+    languageId: string;
+    componentId: string;
+}

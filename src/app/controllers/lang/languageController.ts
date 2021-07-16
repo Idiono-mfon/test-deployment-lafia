@@ -2,7 +2,7 @@ import { inject } from "inversify";
 import { Request, Response } from 'express';
 import { controller, httpDelete, httpGet, httpPost, httpPut, request, response } from "inversify-express-utils";
 import TYPES from "../../config/types";
-import { ILabel, ILangauge, ILangaugeLabel } from "../../models/lang/interfaces";
+import { ILangauge, ILangaugeLabel, ILanguageComponent } from "../../models/lang/interfaces";
 import { LanguageService } from "../../services";
 import { BaseController } from "../baseController";
 
@@ -26,6 +26,7 @@ export class LanguageController extends BaseController {
         try {
             const { code } = req.params;
             const languages: ILangauge = await this.languageService.fetchLanguagesWithContent(code);
+            // console.log(languages);
             const labels: object | any = {}; 
             languages.labels?.forEach( (label: any) => { 
                 labels[label.name] = label.components[0].fields // TODO: normmally label should have many component, but the front end is restricting me to to this format. 
@@ -49,7 +50,7 @@ export class LanguageController extends BaseController {
     } 
     
     @httpPost('/label')
-    public async attachComponent(@request() req: Request, @response() res: Response) {
+    public async attachLabel(@request() req: Request, @response() res: Response) {
         try {
             const languageData: ILangaugeLabel = req.body;
             const label = await this.languageService.attachLabelToLanguage(languageData.languageId, languageData.labelId);
@@ -58,6 +59,18 @@ export class LanguageController extends BaseController {
             this.error(res, e);
         }
     } 
+
+
+    @httpPost('/component')
+    public async attachComponent(@request() req: Request, @response() res: Response) {
+        try {
+            const LanguageComponentData: ILanguageComponent = req.body;
+            const label = await this.languageService.attachComponentToLanguage(LanguageComponentData.languageId, LanguageComponentData.componentId);
+            this.success(res, label, 'Component successfully added to language');
+        } catch (e) {
+            this.error(res, e);
+        }
+    }  
 
     @httpPut('/:id')
     public async updateLanguage(@request() req: Request, @response() res: Response) {
@@ -86,8 +99,19 @@ export class LanguageController extends BaseController {
         }
     }  
 
-    @httpDelete('/label')
+    @httpDelete('/component')
     public async detachComponent(@request() req: Request, @response() res: Response) {
+        try {
+            const LanguageComponentData: ILanguageComponent = req.body;
+            const language = await this.languageService.detachComponentFromLanguage(LanguageComponentData.languageId, LanguageComponentData.componentId);
+            this.success(res, language, 'Component successfully removed from language');
+        } catch (e) {
+            this.error(res, e);
+        }
+    } 
+
+    @httpDelete('/label')
+    public async detachLabel(@request() req: Request, @response() res: Response) {
         try {
             const languageData: ILangaugeLabel = req.body;
             const label = await this.languageService.attachComponentToLabel(languageData.languageId, languageData.labelId);
