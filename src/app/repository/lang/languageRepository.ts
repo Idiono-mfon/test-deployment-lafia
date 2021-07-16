@@ -27,11 +27,14 @@ export class LanguageRepository {
 
     public async fetchLanguageContent(language: LanguageModel) {
         const languageId: string | any = language.id;
-        return LanguageModel.query()
+        const lang = LanguageModel.query()
+        .withGraphFetched('labels.components')
         .modifyGraph('labels.components', builder  => {
             builder.where('language_id', languageId);
         })
         .where('code', language.code).first();
+        
+        return lang;
     }
 
     public async addLanguage(data: ILangauge): Promise<ILangauge> {
