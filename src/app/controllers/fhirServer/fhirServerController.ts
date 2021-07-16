@@ -23,18 +23,11 @@ export class FhirServerController extends BaseController {
   public async fhirResourceGetMethode(@request() req: Request, @response() res: Response) {
     try {
       const [,requestUrl] = req.url.split('fhir');
-      const { status: code, headers, data } = await this.fhirServerService.communicate(requestUrl, 'GET');
+      const { status: statusCode, headers, data } = await this.fhirServerService.communicate(requestUrl, 'GET');
 
-      delete headers['transfer-encoding'];
-      headers['x-powered-by'] = 'LAFIA FHIR 5.4.0 REST Server (FHIR Server; FHIR 4.0.1/R4)';
-
-      res.set(headers).status(code).json(data);
+      this.success(res, data, '', statusCode, headers);
     } catch (e) {
-      const { status: code, headers, data } = e.code;
-
-      delete headers['transfer-encoding'];
-      headers['x-powered-by'] = 'LAFIA FHIR 5.4.0 REST Server (FHIR Server; FHIR 4.0.1/R4)';
-      res.set(headers).status(code).json(data);
+      this.error(res, e);
     }
   }
 
@@ -42,18 +35,11 @@ export class FhirServerController extends BaseController {
   public async fhirResourcePostMethode(@request() req: Request, @response() res: Response) {
     try {
       const [,fullUrl] = req.url.split('fhir');
-      const { status: code, headers, data } = await this.fhirServerService.communicate(fullUrl, 'POST', req.body);
+      const { status: statusCode, headers, data } = await this.fhirServerService.communicate(fullUrl, 'POST', req.body);
 
-      delete headers['transfer-encoding'];
-      headers['x-powered-by'] = 'LAFIA FHIR 5.4.0 REST Server (FHIR Server; FHIR 4.0.1/R4)';
-
-      res.set(headers).status(code).json(data);
+      this.success(res, data, '', statusCode, headers);
     } catch (e) {
-      const { status: code, headers, data } = e.code;
-
-      delete headers['transfer-encoding'];
-      headers['x-powered-by'] = 'LAFIA FHIR 5.4.0 REST Server (FHIR Server; FHIR 4.0.1/R4)';
-      res.set(headers).status(code).json(data);
+      this.error(res, e);
     }
   }
 
@@ -61,18 +47,11 @@ export class FhirServerController extends BaseController {
   public async fhirResourcePutMethode(@request() req: Request, @response() res: Response) {
     try {
       const [,fullUrl] = req.url.split('fhir');
-      const { status: code, headers, data } = await this.fhirServerService.communicate(fullUrl, 'PUT', req.body);
+      const { status: statusCode, headers, data } = await this.fhirServerService.communicate(fullUrl, 'PUT', req.body);
 
-      delete headers['transfer-encoding'];
-      headers['x-powered-by'] = 'LAFIA FHIR 5.4.0 REST Server (FHIR Server; FHIR 4.0.1/R4)';
-
-      res.set(headers).status(code).json(data);
+      this.success(res, data, '', statusCode, headers);
     } catch (e) {
-      const { status: code, headers, data } = e.code;
-
-      delete headers['transfer-encoding'];
-      headers['x-powered-by'] = 'LAFIA FHIR 5.4.0 REST Server (FHIR Server; FHIR 4.0.1/R4)';
-      res.set(headers).status(code).json(data);
+      this.error(res, e);
     }
   }
 
@@ -80,18 +59,11 @@ export class FhirServerController extends BaseController {
   public async fhirResourcePatchMethode(@request() req: Request, @response() res: Response) {
     try {
       const [,fullUrl] = req.url.split('fhir');
-      const { status: code, headers, data } = await this.fhirServerService.communicate(fullUrl, 'PATCH', req.body);
+      const { status: statusCode, headers, data } = await this.fhirServerService.communicate(fullUrl, 'PATCH', req.body);
 
-      delete headers['transfer-encoding'];
-      headers['x-powered-by'] = 'LAFIA FHIR 5.4.0 REST Server (FHIR Server; FHIR 4.0.1/R4)';
-
-      res.set(headers).status(code).json(data);
+      this.success(res, data, '', statusCode, headers);
     } catch (e) {
-      const { status: code, headers, data } = e.code;
-
-      delete headers['transfer-encoding'];
-      headers['x-powered-by'] = 'LAFIA FHIR 5.4.0 REST Server (FHIR Server; FHIR 4.0.1/R4)';
-      res.set(headers).status(code).json(data);
+      this.error(res, e);
     }
   }
 
@@ -99,18 +71,11 @@ export class FhirServerController extends BaseController {
   public async fhirResourceDeleteMethode(@request() req: Request, @response() res: Response) {
     try {
       const [,fullUrl] = req.url.split('fhir');
-      const { status: code, headers, data } = await this.fhirServerService.communicate(fullUrl, 'DELETE', req.body);
+      const { status: statusCode, headers, data } = await this.fhirServerService.communicate(fullUrl, 'DELETE', req.body);
 
-      delete headers['transfer-encoding'];
-      headers['x-powered-by'] = 'LAFIA FHIR 5.4.0 REST Server (FHIR Server; FHIR 4.0.1/R4)';
-
-      res.set(headers).status(code).json(data);
+      this.success(res, data, '', statusCode, headers);
     } catch (e) {
-      const { status: code, headers, data } = e.code;
-
-      delete headers['transfer-encoding'];
-      headers['x-powered-by'] = 'LAFIA FHIR 5.4.0 REST Server (FHIR Server; FHIR 4.0.1/R4)';
-      res.set(headers).status(code).json(data);
+      this.error(res, e);
     }
   }
 }

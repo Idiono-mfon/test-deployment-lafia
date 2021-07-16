@@ -28,6 +28,9 @@ export class FhirServerService implements IFhirServer {
         data,
       });
 
+      delete headers['transfer-encoding'];
+      headers['x-powered-by'] = 'LAFIA FHIR 5.4.0 REST Server (FHIR Server; FHIR 4.0.1/R4)';
+
       return {
         status,
         headers,
