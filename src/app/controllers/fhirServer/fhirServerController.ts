@@ -22,8 +22,8 @@ export class FhirServerController extends BaseController {
   @httpGet('*')
   public async fhirResourceGetMethode(@request() req: Request, @response() res: Response) {
     try {
-      const [,fullUrl] = req.url.split('fhir');
-      const { status: code, headers, data } = await this.fhirServerService.communicate(fullUrl, 'GET');
+      const [,requestUrl] = req.url.split('fhir');
+      const { status: code, headers, data } = await this.fhirServerService.communicate(requestUrl, 'GET');
 
       delete headers['transfer-encoding'];
       headers['x-powered-by'] = 'LAFIA FHIR 5.4.0 REST Server (FHIR Server; FHIR 4.0.1/R4)';
