@@ -22,6 +22,7 @@ const TYPES = {
   AuthService: Symbol('AuthService'),
   EmailService: Symbol('EmailService'),
   LanguageService: Symbol('LanguageService'),
+  FhirServerService: Symbol('FhirServerService'),
 
   // repositories
   UserRepository: Symbol('UserRepository'),

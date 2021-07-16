@@ -34,7 +34,7 @@ import {
   FhirServerService,
   PlatformSdkService,
   PractitionerService,
-  S3Service, AuthService, LanguageService
+  S3Service, AuthService,
 } from '../services';
 import { UtilityService } from '../utils';
 import TYPES from './types';
@@ -124,6 +124,10 @@ container
 container
   .bind<LanguageService>(TYPES.LanguageService)
   .to(LanguageService)
+  .inSingletonScope();
+container
+  .bind<FhirServerService>(TYPES.FhirServerService)
+  .to(FhirServerService)
   .inSingletonScope();
 
 

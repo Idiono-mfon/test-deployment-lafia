@@ -37,3 +37,4 @@ export * from './qualificationsIdentifiers';
 export * from './references';
 export * from './referencesIdentifiers';
 export * from './users';
+export * from './fhirServer';
