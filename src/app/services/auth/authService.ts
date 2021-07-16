@@ -1,5 +1,6 @@
 import { inject, injectable } from 'inversify';
 import TYPES from '../../config/types';
+import { IUser } from '../../models';
 import { error, forWho, GenericResponseError, throwError } from '../../utils';
 import { PatientService } from '../patients';
 import { PlatformSdkService } from '../platformSDK';
@@ -22,24 +23,18 @@ export class AuthService {
 
   public async login(email: string, password: string): Promise<any> {
     try {
-      
-      const user = await this.userService.getOneUser({ email });
-      
-      if (!user) {
-        throwError('Invalid email or password', error.badRequest);
-      }
 
-      const loggedInUser = await this.userService.userLogin(email, password);
+      const loggedInUser: IUser = await this.userService.userLogin(email, password);
 
-      const token = this.userService.generateJwtToken({ email, id: user.id });
+      const token = this.userService.generateJwtToken({ email, id: loggedInUser.id });
       let loggedInUserData: any;
 
       if (loggedInUser.resourceType === forWho.patient) {
-        loggedInUserData = await this.patientService.patientLogin({ user, token });
+        loggedInUserData = await this.patientService.patientLogin({ user: loggedInUser, token });
       }
 
       if (loggedInUser.resourceType === forWho.practitioner) {
-        loggedInUserData = await this.practitionerService.practitionerLogin({ user, token });
+        loggedInUserData = await this.practitionerService.practitionerLogin({ user: loggedInUser, token });
       }
 
       return {

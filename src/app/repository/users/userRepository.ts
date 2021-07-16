@@ -35,6 +35,14 @@ export class UserRepository {
     }
   }
 
+  public async getUserByEmailOrPhone(value:string): Promise<IUser> {
+    try {
+      return await UserModel.query().where("email", value).orWhere("phone", value).first();
+    } catch (e) {
+      throw new InternalServerError(e.message);
+    }
+  }
+
   public async updateUser(id: string, data: IFindUser): Promise<any> {
     try {
       return await UserModel.query()

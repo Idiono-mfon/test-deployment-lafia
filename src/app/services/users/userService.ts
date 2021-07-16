@@ -95,13 +95,13 @@ export class UserService {
     return await this.userRepository.updateUser(id, data);
   }
 
-  public async userLogin(email: string, password: string): Promise<IUser> {
+  public async userLogin(data: string, password: string): Promise<IUser> {
     try {
-      // Login with email?
-      let user = await this.userRepository.getOneUser({ email });
+      // Login with email and phone?
+      let user = await this.userRepository.getUserByEmailOrPhone( data );
 
       if (!user) {
-        throwError('Invalid username or password', error.unauthorized);
+        throwError('Invalid credentials. User not found!', error.unauthorized);
       }
 
       const isValidPassword = await Password.compare(password, user.password);
