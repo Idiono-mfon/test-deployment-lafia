@@ -87,7 +87,6 @@ export class TwilioService {
   }
 
   public async verifyOTP(phone: string, code: string): Promise<any> {
-
     const sid = env.twilio_verify_sid;
     try {
       const {to, channel, status, valid} = await twilioClient.verify
