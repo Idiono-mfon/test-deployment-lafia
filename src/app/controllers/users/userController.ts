@@ -70,9 +70,9 @@ export class UserController extends BaseController {
     try {
       const { field, value } = req.body;
 
-      const user = await this.userService.getUserByFeild(field, value);
+      const user = await this.userService.getUserByField(field, value);
 
-      const exist = user ? true : false;
+      const exist = !!user;
 
       this.success(res, [exist], 'user checked successfully');
     } catch (e) {

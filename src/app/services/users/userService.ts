@@ -49,7 +49,7 @@ export class UserService {
       }
 
       // find user by email
-      let emailUser = await this.getUserByFeild("email", user.email);
+      let emailUser = await this.getUserByField("email", user.email);
 
       if ( emailUser ) {
         const ERROR_MESSAGE = 'a user with this email already exist';
@@ -57,7 +57,7 @@ export class UserService {
       }
 
       // find user by phone number
-      let phoneUser = await this.getUserByFeild("phone", user.phone!);
+      let phoneUser = await this.getUserByField("phone", user.phone!);
 
       if ( phoneUser ) {
         const ERROR_MESSAGE = 'a user with this phone already exist';
@@ -77,7 +77,7 @@ export class UserService {
     }
   }
 
-  public async getUserByFeild(field:string, data: string): Promise<IUser> {
+  public async getUserByField(field:string, data: string): Promise<IUser> {
     return this.userRepository.getOneUser({[field]: data});
   }
 
