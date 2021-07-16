@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify';
 import TYPES from '../../config/types';
 import { IFindUser, IUser, UserModel } from '../../models';
-import { PlatformSdkService } from '../../services/platformSDK';
+import { PlatformSdkService } from '../../services';
 import { InternalServerError } from '../../utils';
 
 @injectable()

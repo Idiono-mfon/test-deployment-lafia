@@ -82,8 +82,6 @@ export class PractitionerService {
       throwError('User already exists!', error.badRequest);
     }
 
-    delete data.phone;
-
     const practitionerData: IPractitioner = {
       resourceType: 'Practitioner',
       id: phone,

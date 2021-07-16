@@ -83,8 +83,6 @@ export class PatientService {
         throwError('User already exists!', error.badRequest);
       }
 
-      delete data.phone;
-
       const patientData: IPatient = {
         resourceType: 'Patient',
         id: phone,
