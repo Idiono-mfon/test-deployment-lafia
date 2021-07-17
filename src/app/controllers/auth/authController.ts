@@ -19,7 +19,7 @@ export class AuthController extends BaseController {
   public async login(@request() req: Request, @response() res: Response): Promise<void> {
     try {
       const { email, password } = req.body;
-      const userData = await this.authService.login(email, password);
+      const userData = await this.authService.login(email, password, req);
 
       this.success(res, userData, 'Login Successful');
     } catch (e) {

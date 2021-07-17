@@ -19,7 +19,7 @@ export class UserController extends BaseController {
   @httpPost('/register')
   public async createUser(@request() req: Request, @response() res: Response) {
     try {
-      const newUser = await this.userService.createUser(req.body);
+      const newUser = await this.userService.createUser(req);
 
       this.success(res, newUser, 'User created', HttpStatusCode.CREATED);
     } catch (e) {

@@ -1,4 +1,5 @@
 import { inject, injectable } from 'inversify';
+import { Request } from 'express';
 import jwt from 'jsonwebtoken';
 import { v4 as uuid } from 'uuid';
 import { Env } from '../../config/env';
@@ -9,7 +10,8 @@ import {
   error,
   GenericResponseError,
   HttpStatusCode,
-  throwError
+  throwError,
+  getE164Format
 } from '../../utils';
 import { Password } from '../../utils/password';
 import { EmailService, IComposeEmail } from '../email';
@@ -33,7 +35,9 @@ export class UserService {
   @inject(TYPES.TwilioService)
   private readonly twilioService: TwilioService;
 
-  public async createUser(user: IUser): Promise<IUser> {
+  public async createUser(req: Request): Promise<IUser> {
+
+    const user: IUser = req.body
     try {
       // Validate password
       const isValidPassword = Password.validatePassword(user.password);
@@ -55,9 +59,12 @@ export class UserService {
         const ERROR_MESSAGE = 'a user with this email already exist';
         throwError(ERROR_MESSAGE, error.badRequest);
       }
+      
+
+      user.phone = getE164Format(user.phone!, req);
 
       // find user by phone number
-      let phoneUser = await this.getUserByField("phone", user.phone!);
+      let phoneUser = await this.getUserByField("phone", user.phone);
 
       if ( phoneUser ) {
         const ERROR_MESSAGE = 'a user with this phone already exist';

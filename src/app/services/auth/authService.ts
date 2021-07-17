@@ -1,7 +1,8 @@
 import { inject, injectable } from 'inversify';
+import { Request } from 'express';
 import TYPES from '../../config/types';
 import { IUser } from '../../models';
-import { error, forWho, GenericResponseError, throwError } from '../../utils';
+import { error, forWho, GenericResponseError, getE164Format, throwError, Validations } from '../../utils';
 import { PatientService } from '../patients';
 import { PlatformSdkService } from '../platformSDK';
 import { PractitionerService } from '../practitioners';
@@ -21,8 +22,12 @@ export class AuthService {
   @inject(TYPES.PlatformSdkService)
   private platformSdkService: PlatformSdkService;
 
-  public async login(email: string, password: string): Promise<any> {
+  public async login(email: string, password: string, req: Request): Promise<any> {
     try {
+
+      if (Validations.isNumeric(email)) {
+          email = getE164Format(email, req);
+      }
 
       const loggedInUser: IUser = await this.userService.userLogin(email, password);
 
