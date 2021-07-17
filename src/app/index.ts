@@ -6,8 +6,7 @@ import container from './config/inversify.config';
 import { InversifyExpressServer } from 'inversify-express-utils';
 import { Env } from './config/env';
 import TYPES from './config/types';
-import { PatientService, PractitionerService } from './services';
-import { MessageBroker } from './services/messageBroker';
+import { PatientService, PractitionerService, MessageBroker } from './services';
 import { SignallingServerService } from './services/signallingServers';
 
 dotConfig();
