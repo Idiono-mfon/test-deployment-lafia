@@ -7,7 +7,7 @@ import { GenericResponseError } from '../../utils';
 const axiosInstance = axios.create({
   baseURL: `${Env.all().fhir_server_base_url}/`,
   headers : {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/fhir+json'
   }
 });
 
@@ -20,7 +20,7 @@ axiosInstance.interceptors.request.use((config) => {
 @injectable()
 export class FhirServerService implements IFhirServer {
 
-  public async communicate(resourceQuery: string, httpMethod: Method, data?: any): Promise<any> {
+  public async executeQuery(resourceQuery: string, httpMethod: Method, data?: any): Promise<any> {
     try {
       const { status, data: responseData, headers } = await axiosInstance({
         url: resourceQuery,
