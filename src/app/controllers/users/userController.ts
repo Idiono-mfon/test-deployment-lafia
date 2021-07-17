@@ -103,4 +103,15 @@ export class UserController extends BaseController {
     }
   }
 
+  @httpPost('/existing')
+  public async checkExistingUser(@request() req: Request, @response() res: Response) {
+    try {
+        await this.userService.checkExistingUser(req.body);
+
+      this.success(res, {}, 'User does not exist');
+    } catch (e) {
+        this.error(res, e);
+    }
+  }
+
 }

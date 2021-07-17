@@ -13,6 +13,7 @@ import {
 } from '../../utils';
 import { Password } from '../../utils/password';
 import { EmailService, IComposeEmail } from '../email';
+import { FhirServerService } from '../fhirServer';
 import { PlatformSdkService } from '../platformSDK';
 import { IJwtPayload } from '../platformSDK/interfaces';
 import { TwilioService } from '../twilio';
@@ -33,6 +34,9 @@ export class UserService {
   @inject(TYPES.TwilioService)
   private readonly twilioService: TwilioService;
 
+  @inject(TYPES.FhirServerService)
+  private readonly fhirServerService: FhirServerService;
+
   public async createUser(user: IUser): Promise<IUser> {
     try {
       // Validate password
@@ -49,17 +53,17 @@ export class UserService {
       }
 
       // find user by email
-      let emailUser = await this.getUserByField("email", user.email);
+      let emailUser = await this.getUserByField('email', user.email);
 
-      if ( emailUser ) {
+      if (emailUser) {
         const ERROR_MESSAGE = 'a user with this email already exist';
         throwError(ERROR_MESSAGE, error.badRequest);
       }
 
       // find user by phone number
-      let phoneUser = await this.getUserByField("phone", user.phone!);
+      let phoneUser = await this.getUserByField('phone', user.phone!);
 
-      if ( phoneUser ) {
+      if (phoneUser) {
         const ERROR_MESSAGE = 'a user with this phone already exist';
         throwError(ERROR_MESSAGE, error.badRequest);
       }
@@ -77,14 +81,45 @@ export class UserService {
     }
   }
 
-  public async getUserByField(field:string, data: string): Promise<IUser> {
-    return this.userRepository.getOneUser({[field]: data});
+  public async getUserByField(field: string, data: string): Promise<IUser> {
+    return this.userRepository.getOneUser({ [field]: data });
+  }
+
+  public async checkExistingUser(data: IFindUser): Promise<any> {
+
+    // Get User By Phone
+    let existingUser: IUser = await this.getOneUser({ phone: data.phone });
+
+    if (!existingUser) {
+      // Get User By Email
+      existingUser = await this.getOneUser({ email: data.email });
+    }
+
+    try {
+
+      if (existingUser) {
+        let userFhirData: any = await this.fhirServerService.executeQuery(
+          `/Patient/${existingUser.resourceId}`,
+          'GET'
+        );
+
+        throw new GenericResponseError('Patient already exists', {
+          status: HttpStatusCode.CONFLICT,
+          data: userFhirData.data,
+          headers : userFhirData.headers
+        });
+
+      }
+
+    } catch (e) {
+      throw new GenericResponseError(e.message, e.code);
+    }
   }
 
   public async getOneUser(data: IFindUser): Promise<IUser> {
     return this.userRepository.getOneUser(data);
   }
-  
+
   public async getOneBy(field: string, value: string): Promise<IUser> {
     return this.userRepository.getOneBy(field, value);
   }
