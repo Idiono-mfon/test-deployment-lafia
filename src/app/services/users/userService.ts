@@ -35,7 +35,7 @@ export class UserService {
   @inject(TYPES.TwilioService)
   private readonly twilioService: TwilioService;
 
-  public async createUser(req: Request): Promise<IUser> {
+  public async createUser(req: Request): Promise<boolean /**IUser */> {
 
     const user: IUser = req.body
     try {
@@ -72,13 +72,13 @@ export class UserService {
       }
 
       // Hash user password
-      user.password = await Password.hash(user.password);
+      // user.password = await Password.hash(user.password);
 
-      const data = {
-        id: uuid(),
-        ...user,
-      };
-      return this.userRepository.createUser(data);
+      // const data = {
+      //   id: uuid(),
+      //   ...user,
+      // };
+      return true;//this.userRepository.createUser(data);
     } catch (e) {
       throw new GenericResponseError(e.message, e.code);
     }
@@ -97,6 +97,7 @@ export class UserService {
   }
 
   public async updateUser(id: string, data: IFindUser): Promise<IFindUser> {
+    data.gender = data.gender?.toLowerCase();
     return this.userRepository.updateUser(id, data);
   }
 

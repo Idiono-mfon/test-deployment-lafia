@@ -16,7 +16,7 @@ export class UserController extends BaseController {
   @inject(TYPES.TwilioService)
   private twilioService: TwilioService;
 
-  @httpPost('/register')
+  @httpPost('/validate')
   public async createUser(@request() req: Request, @response() res: Response) {
     try {
       const newUser = await this.userService.createUser(req);

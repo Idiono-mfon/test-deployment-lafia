@@ -23,7 +23,7 @@ server.setConfig((app) => {
   app.use(cors());
 });
 
-// messageBroker.rmqSubscribe().then();
+messageBroker.rmqSubscribe().then();
 const serverInstance = server.build();
 const PORT = Env.all().port;
 

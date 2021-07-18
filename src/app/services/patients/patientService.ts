@@ -1,4 +1,5 @@
 import { inject, injectable } from 'inversify';
+import { Request } from 'express';
 import TYPES from '../../config/types';
 import {
   IUser,
@@ -16,6 +17,7 @@ import { PlatformSdkService } from '../platformSDK';
 import {
   error,
   forWho, GenericResponseError,
+  getE164Format,
   InternalServerError,
   throwError, UtilityService
 } from '../../utils';
@@ -65,17 +67,25 @@ export class PatientService {
     return patient.data;
   }
 
-  public async createPatient(data: any): Promise<any> {
+  public async createPatient(req: Request): Promise<any> {
     try {
+
+      const data: any = req.body;
+
       this.utilService.checkForRequiredFields(data);
 
       const {
         gender,
         first_name,
         last_name,
-        email,
-        phone
+        email
       } = data;
+
+      let { phone } = data;
+
+      if (!!phone) {
+        phone = getE164Format(phone!, req);
+      }
 
       const existingUser: IUser = await this.userService.getOneUser({ email });
 
