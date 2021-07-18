@@ -23,7 +23,7 @@ export class FhirServerController extends BaseController {
   public async fhirResourceGetMethode(@request() req: Request, @response() res: Response) {
     try {
       const [,requestUrl] = req.url.split('fhir');
-      const { status: statusCode, headers, data } = await this.fhirServerService.communicate(requestUrl, 'GET');
+      const { status: statusCode, headers, data } = await this.fhirServerService.executeQuery(requestUrl, 'GET');
 
       this.success(res, data, '', statusCode, headers);
     } catch (e) {
@@ -34,8 +34,8 @@ export class FhirServerController extends BaseController {
   @httpPost('*')
   public async fhirResourcePostMethode(@request() req: Request, @response() res: Response) {
     try {
-      const [,fullUrl] = req.url.split('fhir');
-      const { status: statusCode, headers, data } = await this.fhirServerService.communicate(fullUrl, 'POST', req.body);
+      const [,requestUrl] = req.url.split('fhir');
+      const { status: statusCode, headers, data } = await this.fhirServerService.executeQuery(requestUrl, 'POST', req.body);
 
       this.success(res, data, '', statusCode, headers);
     } catch (e) {
@@ -46,8 +46,8 @@ export class FhirServerController extends BaseController {
   @httpPut('*')
   public async fhirResourcePutMethode(@request() req: Request, @response() res: Response) {
     try {
-      const [,fullUrl] = req.url.split('fhir');
-      const { status: statusCode, headers, data } = await this.fhirServerService.communicate(fullUrl, 'PUT', req.body);
+      const [,requestUrl] = req.url.split('fhir');
+      const { status: statusCode, headers, data } = await this.fhirServerService.executeQuery(requestUrl, 'PUT', req.body);
 
       this.success(res, data, '', statusCode, headers);
     } catch (e) {
@@ -58,8 +58,8 @@ export class FhirServerController extends BaseController {
   @httpPatch('*')
   public async fhirResourcePatchMethode(@request() req: Request, @response() res: Response) {
     try {
-      const [,fullUrl] = req.url.split('fhir');
-      const { status: statusCode, headers, data } = await this.fhirServerService.communicate(fullUrl, 'PATCH', req.body);
+      const [,requestUrl] = req.url.split('fhir');
+      const { status: statusCode, headers, data } = await this.fhirServerService.executeQuery(requestUrl, 'PATCH', req.body);
 
       this.success(res, data, '', statusCode, headers);
     } catch (e) {
@@ -70,8 +70,8 @@ export class FhirServerController extends BaseController {
   @httpDelete('*')
   public async fhirResourceDeleteMethode(@request() req: Request, @response() res: Response) {
     try {
-      const [,fullUrl] = req.url.split('fhir');
-      const { status: statusCode, headers, data } = await this.fhirServerService.communicate(fullUrl, 'DELETE', req.body);
+      const [,requestUrl] = req.url.split('fhir');
+      const { status: statusCode, headers, data } = await this.fhirServerService.executeQuery(requestUrl, 'DELETE', req.body);
 
       this.success(res, data, '', statusCode, headers);
     } catch (e) {

@@ -40,9 +40,6 @@ export abstract class BaseController {
     if (code?.status || code?.headers) {
       const { status: statusCode, headers, data } = code;
 
-      delete headers['transfer-encoding'];
-      headers['x-powered-by'] = 'LAFIA FHIR 5.4.0 REST Server (FHIR Server; FHIR 4.0.1/R4)';
-
       return res.set(headers).status(statusCode).json(data);
     }
 

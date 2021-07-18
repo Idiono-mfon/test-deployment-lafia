@@ -46,7 +46,7 @@ export class PractitionerService {
 
   public async updatePractitioner(id: string, data: any): Promise<IPractitioner> {
     try {
-      const { data: practitionerData } = await this.fhirServerService.communicate(
+      const { data: practitionerData } = await this.fhirServerService.executeQuery(
         `/Practitioner/${id}`,
         'PUT',
         data
@@ -59,7 +59,7 @@ export class PractitionerService {
   }
 
   public async findPractitionerById(id: string): Promise<IPractitioner> {
-    const practitioner = await this.fhirServerService.communicate(`/Practitioner/${id}`, 'GET');
+    const practitioner = await this.fhirServerService.executeQuery(`/Practitioner/${id}`, 'GET');
 
     return practitioner.data;
   }
@@ -110,7 +110,7 @@ export class PractitionerService {
       ],
     };
 
-    const practitionerResponse = await this.fhirServerService.communicate(
+    const practitionerResponse = await this.fhirServerService.executeQuery(
       '/Practitioner',
       'POST',
       practitionerData

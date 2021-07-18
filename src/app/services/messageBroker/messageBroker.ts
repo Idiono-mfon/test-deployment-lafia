@@ -6,6 +6,7 @@ import { IPatient, IPractitioner } from '../../models';
 import { forWho } from '../../utils';
 import { PatientService } from '../patients';
 import { PractitionerService } from '../practitioners';
+import { UserService } from '../users';
 import { initRMQ } from './rmqSetup';
 
 const env = Env.all();
@@ -16,6 +17,8 @@ export class MessageBroker {
   private readonly patientService: PatientService;
   @inject(TYPES.PractitionerService)
   private readonly practitionerService: PractitionerService;
+  @inject(TYPES.UserService)
+  private readonly userService: UserService;
 
   private readonly pubQueue: string;
   private readonly subQueue: string;
@@ -78,7 +81,16 @@ export class MessageBroker {
         console.log(' [x] Received Date: %s', new Date().toString());
         console.log(' [x] Received Data: %s', msgString);
 
-        const { data, resource_type } = msgJson;
+        const { data, resource_type, resource_id } = msgJson;
+
+        if (resource_id && data) {
+          await this.userService.createUser({
+            resource_id,
+            ...data,
+          });
+
+          return;
+        }
 
         if (resource_type && !_.isEmpty(data)) {
           let resource: IPatient | IPractitioner | any = {};

@@ -47,7 +47,7 @@ export class PatientService {
   public async updatePatient(id: string, data: any): Promise<IPatient> {
     try {
 
-      const { data: patientUpdatedData } = await this.fhirServerService.communicate(
+      const { data: patientUpdatedData } = await this.fhirServerService.executeQuery(
         `/Patient/${id}`,
         'PUT',
         data
@@ -60,7 +60,7 @@ export class PatientService {
   }
 
   public async findPatientById(id: string): Promise<IPatient> {
-    const patient = await this.fhirServerService.communicate(`/Patient/${id}`, 'GET');
+    const patient = await this.fhirServerService.executeQuery(`/Patient/${id}`, 'GET');
 
     return patient.data;
   }
@@ -110,7 +110,7 @@ export class PatientService {
         ],
       };
 
-      const patientResponse = await this.fhirServerService.communicate('/Patient', 'POST', patientData);
+      const patientResponse = await this.fhirServerService.executeQuery('/Patient', 'POST', patientData);
       const patient = patientResponse.data;
       const token = this.userService.generateJwtToken({ email, id: patient.id });
       const userData: IFindUser = {
@@ -138,7 +138,7 @@ export class PatientService {
       const { user, token } = data;
       await this.userService.updateUser(user.id!, {...user, token});
 
-      const { data: patientData } = await this.fhirServerService.communicate(
+      const { data: patientData } = await this.fhirServerService.executeQuery(
         `/Patient/${user.resourceId}`,
         'GET'
       );

@@ -1,7 +1,7 @@
 import { HttpStatusCode } from './constants';
 
 export class GenericResponseError extends Error {
-  constructor(readonly message: string, readonly code: number) {
+  constructor(readonly message: string, readonly code: number | any) {
     super(message);
   }
 }
