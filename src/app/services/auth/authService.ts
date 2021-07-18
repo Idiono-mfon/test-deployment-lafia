@@ -2,11 +2,12 @@ import { inject, injectable } from 'inversify';
 import { Request } from 'express';
 import TYPES from '../../config/types';
 import { IUser } from '../../models';
-import { error, forWho, GenericResponseError, getE164Format, throwError, Validations } from '../../utils';
+import { forWho, GenericResponseError, getE164Format } from '../../utils';
 import { PatientService } from '../patients';
 import { PlatformSdkService } from '../platformSDK';
 import { PractitionerService } from '../practitioners';
 import { UserService } from '../users';
+import * as _ from 'lodash';
 
 @injectable()
 export class AuthService {
@@ -25,7 +26,7 @@ export class AuthService {
   public async login(email: string, password: string, req: Request): Promise<any> {
     try {
 
-      if (Validations.isNumeric(email)) {
+      if (_.isNumber(email)) {
           email = getE164Format(email, req);
       }
 
