@@ -39,7 +39,9 @@ export class UserService {
   @inject(TYPES.FhirServerService)
   private readonly fhirServerService: FhirServerService;
 
-  public async createUser(user: IUser): Promise<IUser> {
+  public async validateUser(req: Request): Promise<boolean> {
+
+    const user: IUser = req.body
     try {
       // Validate password
       const isValidPassword = Password.validatePassword(user.password);
