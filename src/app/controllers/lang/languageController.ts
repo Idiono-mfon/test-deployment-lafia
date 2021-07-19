@@ -26,7 +26,7 @@ export class LanguageController extends BaseController {
         try {
             const { code } = req.params;
             const languages: ILangauge = await this.languageService.fetchLanguagesWithContent(code);
-            // console.log(languages);
+            
             const labels: object | any = {}; 
             languages.labels?.forEach( (label: any) => { 
                 labels[label.name] = label.components[0].fields // TODO: normmally label should have many component, but the front end is restricting me to to this format. 

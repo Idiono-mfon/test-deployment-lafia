@@ -1,4 +1,5 @@
 import { inject, injectable } from 'inversify';
+import { Request } from 'express';
 import jwt from 'jsonwebtoken';
 import { v4 as uuid } from 'uuid';
 import { Env } from '../../config/env';
@@ -9,7 +10,8 @@ import {
   error,
   GenericResponseError,
   HttpStatusCode,
-  throwError
+  throwError,
+  getE164Format
 } from '../../utils';
 import { Password } from '../../utils/password';
 import { EmailService, IComposeEmail } from '../email';
@@ -37,7 +39,9 @@ export class UserService {
   @inject(TYPES.FhirServerService)
   private readonly fhirServerService: FhirServerService;
 
-  public async createUser(user: IUser): Promise<IUser> {
+  public async validateUser(req: Request): Promise<boolean> {
+
+    const user: IUser = req.body
     try {
       // Validate password
       const isValidPassword = Password.validatePassword(user.password);
@@ -59,12 +63,39 @@ export class UserService {
         const ERROR_MESSAGE = 'a user with this email already exist';
         throwError(ERROR_MESSAGE, error.badRequest);
       }
+      
+
+      user.phone = getE164Format(user.phone!, req);
 
       // find user by phone number
       let phoneUser = await this.getUserByField('phone', user.phone!);
 
       if (phoneUser) {
         const ERROR_MESSAGE = 'a user with this phone already exist';
+        throwError(ERROR_MESSAGE, error.badRequest);
+      }
+
+      this.twilioService.sendOTP(user.phone);
+
+      return true;
+    } catch (e) {
+      throw new GenericResponseError(e.message, e.code);
+    }
+  }
+
+  public async createUser(user: IUser): Promise< IUser> {
+
+    try {
+      // Validate password
+      const isValidPassword = Password.validatePassword(user.password);
+
+      if (!isValidPassword) {
+        const ERROR_MESSAGE = 'Hint: password must be minimum ' +
+          'of 6 characters and must have a ' +
+          'combination of at least one Upper case, one Lower case, ' +
+          'one digit and one or more of ' +
+          'these special characters - !@#$%^&-.+=()';
+
         throwError(ERROR_MESSAGE, error.badRequest);
       }
 
@@ -125,16 +156,17 @@ export class UserService {
   }
 
   public async updateUser(id: string, data: IFindUser): Promise<IFindUser> {
+    data.gender = data.gender?.toLowerCase();
     return this.userRepository.updateUser(id, data);
   }
 
-  public async userLogin(email: string, password: string): Promise<IUser> {
+  public async userLogin(data: string, password: string): Promise<IUser> {
     try {
-      // Login with email?
-      let user = await this.userRepository.getOneUser({ email });
+      // Login with email and phone?
+      let user = await this.userRepository.getUserByEmailOrPhone( data );
 
       if (!user) {
-        throwError('Invalid username or password', error.unauthorized);
+        throwError('Invalid credentials. User not found!', error.unauthorized);
       }
 
       const isValidPassword = await Password.compare(password, user.password);
