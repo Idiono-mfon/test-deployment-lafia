@@ -73,14 +73,38 @@ export class UserService {
         throwError(ERROR_MESSAGE, error.badRequest);
       }
 
-      // Hash user password
-      // user.password = await Password.hash(user.password);
+      this.twilioService.sendOTP(user.phone);
 
-      // const data = {
-      //   id: uuid(),
-      //   ...user,
-      // };
-      return true;//this.userRepository.createUser(data);
+      return true;
+    } catch (e) {
+      throw new GenericResponseError(e.message, e.code);
+    }
+  }
+
+  public async createUser(user: IUser): Promise< IUser> {
+
+    try {
+      // Validate password
+      const isValidPassword = Password.validatePassword(user.password);
+
+      if (!isValidPassword) {
+        const ERROR_MESSAGE = 'Hint: password must be minimum ' +
+          'of 6 characters and must have a ' +
+          'combination of at least one Upper case, one Lower case, ' +
+          'one digit and one or more of ' +
+          'these special characters - !@#$%^&-.+=()';
+
+        throwError(ERROR_MESSAGE, error.badRequest);
+      }
+
+      // Hash user password
+      user.password = await Password.hash(user.password);
+
+      const data = {
+        id: uuid(),
+        ...user,
+      };
+      return this.userRepository.createUser(data);
     } catch (e) {
       throw new GenericResponseError(e.message, e.code);
     }
