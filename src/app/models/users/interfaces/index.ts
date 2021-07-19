@@ -16,6 +16,10 @@ export interface IUser extends IBase {
   password_reset_token?: string;
   token?: string;
   phone?: string;
+  hasVerifiedPhone?: boolean;
+  hasVerifiedEmail?: boolean;
+  has_verified_phone?: boolean;
+  has_verified_email?: boolean;
 }
 
 export interface IFindUser extends IBase {
@@ -34,4 +38,8 @@ export interface IFindUser extends IBase {
   password_reset_token?: string;
   token?: string;
   phone?: string;
+  hasVerifiedPhone?: boolean;
+  hasVerifiedEmail?: boolean;
+  has_verified_phone?: boolean;
+  has_verified_email?: boolean;
 }
