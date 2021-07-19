@@ -70,5 +70,7 @@ module.exports = {
     'prefer-promise-reject-errors': 0,
     'spaced-comment': 0,
     '@typescript-eslint/ban-types': 0,
+    '@typescript-eslint/no-non-null-asserted-optional-chain': 0,
+    '@typescript-eslint/no-unnecessary-type-assertion': 0,
   },
 };

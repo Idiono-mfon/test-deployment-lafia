@@ -82,7 +82,7 @@ export class PractitionerController extends BaseController {
   public async uploadAttachment(@request() req: Request, @response() res: Response) {
     try {
       const { id: practitionerId } = req.params;
-      const attachment: IAttachment = await this.practitionerService.uploadAttachment(practitionerId, req.file);
+      const attachment: IAttachment = await this.practitionerService.uploadAttachment(practitionerId, req?.file!);
 
       this.success(res, attachment, 'Request completed successfully');
     } catch (e) {
