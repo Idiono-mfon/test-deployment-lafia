@@ -4,6 +4,7 @@ import {
   controller, httpPost, httpPut, request, response
 } from 'inversify-express-utils';
 import TYPES from '../../config/types';
+import { IUser } from '../../models';
 import { TwilioService, UserService } from '../../services';
 import { HttpStatusCode } from '../../utils';
 import { BaseController } from '../baseController';
@@ -16,10 +17,22 @@ export class UserController extends BaseController {
   @inject(TYPES.TwilioService)
   private twilioService: TwilioService;
 
-  @httpPost('/validate')
+  @httpPost('/register')
   public async createUser(@request() req: Request, @response() res: Response) {
+    const user: IUser = req.body
     try {
-      const newUser = await this.userService.createUser(req);
+      const newUser = await this.userService.createUser(user);
+
+      this.success(res, newUser, 'User created', HttpStatusCode.CREATED);
+    } catch (e) {
+      this.error(res, e);
+    }
+  }
+
+  @httpPost('/validate')
+  public async validateUser(@request() req: Request, @response() res: Response) {
+    try {
+      const newUser = await this.userService.validateUser(req);
 
       this.success(res, newUser, 'User created', HttpStatusCode.CREATED);
     } catch (e) {
