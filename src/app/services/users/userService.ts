@@ -1,4 +1,5 @@
 import { inject, injectable } from 'inversify';
+import { Request } from 'express';
 import jwt from 'jsonwebtoken';
 import { v4 as uuid } from 'uuid';
 import { Env } from '../../config/env';
@@ -9,7 +10,8 @@ import {
   error,
   GenericResponseError,
   HttpStatusCode,
-  throwError
+  throwError,
+  getE164Format
 } from '../../utils';
 import { Password } from '../../utils/password';
 import { EmailService, IComposeEmail } from '../email';
@@ -59,6 +61,9 @@ export class UserService {
         const ERROR_MESSAGE = 'a user with this email already exist';
         throwError(ERROR_MESSAGE, error.badRequest);
       }
+      
+
+      user.phone = getE164Format(user.phone!, req);
 
       // find user by phone number
       let phoneUser = await this.getUserByField('phone', user.phone!);
