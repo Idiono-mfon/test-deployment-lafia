@@ -75,7 +75,7 @@ export class UserService {
         throwError(ERROR_MESSAGE, error.badRequest);
       }
 
-      this.twilioService.sendOTP(user.phone);
+      await this.twilioService.sendOTP(user.phone);
 
       return true;
     } catch (e) {
