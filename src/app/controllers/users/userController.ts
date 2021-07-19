@@ -4,6 +4,7 @@ import {
   controller, httpPost, httpPut, request, response
 } from 'inversify-express-utils';
 import TYPES from '../../config/types';
+import { IUser } from '../../models';
 import { TwilioService, UserService } from '../../services';
 import { HttpStatusCode } from '../../utils';
 import { BaseController } from '../baseController';
@@ -18,8 +19,20 @@ export class UserController extends BaseController {
 
   @httpPost('/register')
   public async createUser(@request() req: Request, @response() res: Response) {
+    const user: IUser = req.body
     try {
-      const newUser = await this.userService.createUser(req.body);
+      const newUser = await this.userService.createUser(user);
+
+      this.success(res, newUser, 'User created', HttpStatusCode.CREATED);
+    } catch (e) {
+      this.error(res, e);
+    }
+  }
+
+  @httpPost('/validate')
+  public async validateUser(@request() req: Request, @response() res: Response) {
+    try {
+      const newUser = await this.userService.validateUser(req);
 
       this.success(res, newUser, 'User created', HttpStatusCode.CREATED);
     } catch (e) {
@@ -74,7 +87,7 @@ export class UserController extends BaseController {
 
       const exist = !!user;
 
-      this.success(res, [exist], 'user checked successfully');
+      this.success(res, {exist}, 'user checked successfully');
     } catch (e) {
       this.error(res, e);
     }
@@ -94,7 +107,6 @@ export class UserController extends BaseController {
   @httpPost('/otp/verify')
   public async verifyOtp(@request() req: Request, @response() res: Response) {
     try {
-      // console.log(req.body.user)
       const { phone, code } = req.body;
       const verify = await this.twilioService.verifyOTP(phone, code);
       this.success(res, verify, 'OTP verification checked');

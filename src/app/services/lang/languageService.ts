@@ -42,6 +42,7 @@ export class LanguageService {
     if ( !language ) {
       throw new NotFoundError("language not found");
     }
+    
     return this.languageRepository.fetchLanguageContent(language);
   }
 

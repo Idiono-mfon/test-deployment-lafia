@@ -1,10 +1,13 @@
 import { inject, injectable } from 'inversify';
+import { Request } from 'express';
 import TYPES from '../../config/types';
-import { error, forWho, GenericResponseError, throwError } from '../../utils';
+import { IUser } from '../../models';
+import { forWho, GenericResponseError, getE164Format } from '../../utils';
 import { PatientService } from '../patients';
 import { PlatformSdkService } from '../platformSDK';
 import { PractitionerService } from '../practitioners';
 import { UserService } from '../users';
+import * as _ from 'lodash';
 
 @injectable()
 export class AuthService {
@@ -20,26 +23,24 @@ export class AuthService {
   @inject(TYPES.PlatformSdkService)
   private platformSdkService: PlatformSdkService;
 
-  public async login(email: string, password: string): Promise<any> {
+  public async login(email: string, password: string, req: Request): Promise<any> {
     try {
-      
-      const user = await this.userService.getOneUser({ email });
-      
-      if (!user) {
-        throwError('Invalid email or password', error.badRequest);
+
+      if (_.isNumber(email)) {
+          email = getE164Format(email, req);
       }
 
-      const loggedInUser = await this.userService.userLogin(email, password);
+      const loggedInUser: IUser = await this.userService.userLogin(email, password);
 
-      const token = this.userService.generateJwtToken({ email, id: user.id });
+      const token = this.userService.generateJwtToken({ email, id: loggedInUser.id });
       let loggedInUserData: any;
 
       if (loggedInUser.resourceType === forWho.patient) {
-        loggedInUserData = await this.patientService.patientLogin({ user, token });
+        loggedInUserData = await this.patientService.patientLogin({ user: loggedInUser, token });
       }
 
       if (loggedInUser.resourceType === forWho.practitioner) {
-        loggedInUserData = await this.practitionerService.practitionerLogin({ user, token });
+        loggedInUserData = await this.practitionerService.practitionerLogin({ user: loggedInUser, token });
       }
 
       return {

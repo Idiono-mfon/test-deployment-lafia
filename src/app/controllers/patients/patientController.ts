@@ -62,7 +62,7 @@ export class PatientController extends BaseController {
     try {
       const patientData: any = req.body;
 
-      const patient: IPatientWithToken = await this.patientService.createPatient(patientData);
+      const patient: IPatientWithToken = await this.patientService.createPatient(req);
       const rmqData = {
         data: patientData,
         resource_type: patient?.user?.resourceType as string
