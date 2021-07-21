@@ -29,7 +29,7 @@ export class LanguageController extends BaseController {
             
             const labels: object | any = {}; 
             languages.labels?.forEach( (label: any) => { 
-                labels[label.name] = label.components[0].fields // TODO: normmally label should have many component, but the front end is restricting me to to this format. 
+                labels[label.name] = label.components[0]?.fields // TODO: normmally label should have many component, but the front end is restricting me to to this format. 
             } );
             languages.labels! = labels;
             this.success(res, languages, 'Language successfully fetched');
