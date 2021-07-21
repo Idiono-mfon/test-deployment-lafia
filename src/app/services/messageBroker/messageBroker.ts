@@ -89,6 +89,7 @@ export class MessageBroker {
 
           await this.userService.createUser({
             resource_id,
+            resource_type,
             ...data,
           });
 
