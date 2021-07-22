@@ -28,10 +28,15 @@ export class LanguageRepository {
     public async fetchLanguageContent(language: LanguageModel) {
         const languageId: string | any = language.id;
         const lang = LanguageModel.query()
-        .withGraphFetched('labels.components')
-        .modifyGraph('labels.components', builder  => {
-            builder.where('language_id', languageId);
+        .withGraphFetched('labels.components(forLanguage)')
+        .modifiers({
+            forLanguage(builder) {
+                builder.where('language_id', languageId);
+            }
         })
+        // .modifyGraph('labels.components', builder  => {
+        //     builder.where('language_id', languageId);
+        // })
         .where('code', language.code).first();
         
         return lang;
