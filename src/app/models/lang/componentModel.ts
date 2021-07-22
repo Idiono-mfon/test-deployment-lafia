@@ -9,6 +9,7 @@ export class ComponentModel extends BaseModel implements IComponent {
     name!: string;
     feilds!: string;
     labelId!: string;
+    languageId!: string;
 
     static get tableName(): string {
         return `${Schema.lafiaService}.${Table.components}`;
