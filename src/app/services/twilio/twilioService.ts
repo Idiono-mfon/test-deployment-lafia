@@ -93,11 +93,11 @@ export class TwilioService {
       .services(sid)
       .verificationChecks
       .create({to: phone, code: code});
-      if (status === "approved") {
-        let user: IUser = await this.userRepository.getOneUser({ phone });
-        const userId: string | any = user.id;
-        this.userRepository.updateUser(userId, {hasVerifiedPhone: true});
-      }
+      // if (status === "approved") {
+      //   let user: IUser = await this.userRepository.getOneUser({ phone });
+      //   const userId: string | any = user.id;
+      //   this.userRepository.updateUser(userId, {hasVerifiedPhone: true});
+      // }
       //.then(verification_check => console.log(verification_check.status));
       return {to, channel, status, valid};
     } catch (e) {
