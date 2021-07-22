@@ -44,17 +44,17 @@ export class UserService {
     const user: IUser = req.body
     try {
       // Validate password
-      const isValidPassword = Password.validatePassword(user.password);
+      // const isValidPassword = Password.validatePassword(user.password);
 
-      if (!isValidPassword) {
-        const ERROR_MESSAGE = 'Hint: password must be minimum ' +
-          'of 6 characters and must have a ' +
-          'combination of at least one Upper case, one Lower case, ' +
-          'one digit and one or more of ' +
-          'these special characters - !@#$%^&-.+=()';
+      // if (!isValidPassword) {
+      //   const ERROR_MESSAGE = 'Hint: password must be minimum ' +
+      //     'of 6 characters and must have a ' +
+      //     'combination of at least one Upper case, one Lower case, ' +
+      //     'one digit and one or more of ' +
+      //     'these special characters - !@#$%^&-.+=()';
 
-        throwError(ERROR_MESSAGE, error.badRequest);
-      }
+      //   throwError(ERROR_MESSAGE, error.badRequest);
+      // }
 
       // find user by email
       let emailUser = await this.getUserByField('email', user.email);
