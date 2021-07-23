@@ -129,6 +129,8 @@ export class PatientService {
         resource_type: forWho.patient,
       }
 
+      data.hasVerifiedPhone = true;
+
       await this.userService.createUser({
         ...data,
         ...userData,

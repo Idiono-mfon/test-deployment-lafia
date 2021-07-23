@@ -4,5 +4,6 @@ export interface IComponent extends IBase {
     name: string;
     feilds: string;
     labelId: string;
+    languageId?: string
 }
   
