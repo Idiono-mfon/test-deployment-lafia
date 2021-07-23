@@ -138,9 +138,14 @@ export class PractitionerService {
   public async practitionerLogin(data: IUserLoginParams): Promise<any> {
     try {
       const { user, token } = data;
-      await this.userService.updateUser(user.resourceId!, {...user, token});
+      await this.userService.updateUser(user.id!, {...user, token});
 
-      return await this.practitionerRepo.findPractitionerById(user.resourceId!);
+      const { data: practitionerData } = await this.fhirServerService.executeQuery(
+        `/Practitioner/${user.resourceId}`,
+        'GET'
+      );
+
+      return practitionerData;
     } catch (e) {
       throw new GenericResponseError(e.message, e.code);
     }
