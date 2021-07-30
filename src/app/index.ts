@@ -22,7 +22,7 @@ server.setConfig((app) => {
   app.use(cors());
 });
 
-messageBroker.rmqSubscribe().then();
+messageBroker.rmqSubscribe().then().catch(e => console.log('sdssds=>', e));
 const serverInstance = server.build();
 const PORT = Env.all().port;
 
