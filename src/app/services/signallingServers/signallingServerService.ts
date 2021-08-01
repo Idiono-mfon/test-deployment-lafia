@@ -202,7 +202,11 @@ export class SignallingServerService {
     });
   }
 
-  private static emitCallEvent(socket: Socket, data: any) {
+  private static async emitCallEvent(socket: Socket, data: any) {
+    const userData: IOnlineUser = await SignallingServerService
+        .redisStore
+        .getUserById(data.reciever);
+
     const token = data.type === "connect" ? SignallingServerService
       .twilioService
       .generateAccessToken(
@@ -210,7 +214,7 @@ export class SignallingServerService {
         data.room
       ) : null;
 
-    socket.to(data.reciever).emit('call', {
+    socket.to(userData.socketId).emit('call', {
       room: data.room,
       token,
       sender: data.sender,
