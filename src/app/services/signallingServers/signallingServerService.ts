@@ -69,12 +69,14 @@ export class SignallingServerService {
       SignallingServerService.listenForIceCandidateEvent(socket);
       SignallingServerService.listenForPatientOnlineStatusEvent(socket);
       SignallingServerService.listenForCallUserEvent(socket);
+      SignallingServerService.listenForCallEvent(socket);
       SignallingServerService.listenForMakeAnswerEvent(socket);
       SignallingServerService.listenForDisconnectEvent(this.io, socket);
     });
   }
 
   private static async listenForConnectionEvent(socket: Socket) {
+    // console.log(socket.handshake.query, socket.id)
     let { userId, resourceType } = socket.handshake.query;
     resourceType = resourceType as unknown as string;
     resourceType = resourceType.toLowerCase();
@@ -190,6 +192,30 @@ export class SignallingServerService {
       roomId: data.roomId,
       token,
       practitionerName: data.practitionerName,
+      socket: socket.id,
+    });
+  }
+
+  private static listenForCallEvent(socket: Socket) {
+    socket.on('call', data => {
+      SignallingServerService.emitCallEvent(socket, data);
+    });
+  }
+
+  private static emitCallEvent(socket: Socket, data: any) {
+    const token = data.type === "connect" ? SignallingServerService
+      .twilioService
+      .generateAccessToken(
+        data.sender,
+        data.room
+      ) : null;
+
+    socket.to(data.reciever).emit('call', {
+      room: data.room,
+      token,
+      sender: data.sender,
+      reciever: data.reciever,
+      type: data.type,
       socket: socket.id,
     });
   }
