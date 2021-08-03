@@ -203,6 +203,7 @@ export class SignallingServerService {
   }
 
   private static async emitCallEvent(socket: Socket, data: any) {
+    // console.log(data)
     const userData: IOnlineUser = await SignallingServerService
         .redisStore
         .getUserById(data.reciever);
@@ -214,7 +215,9 @@ export class SignallingServerService {
         data.room
       ) : null;
 
-    socket.to(userData.socketId).emit('call', {
+    socket
+    .to(userData.socketId)
+    .emit('call', {
       room: data.room,
       token,
       sender: data.sender,
