@@ -1,4 +1,25 @@
-import { Account_coverage, Account_identifier, Account_meta, Account_text, Account_type, Account_type_coding, AuditEvent_source_observer, Contract_period, Encounter, Person_address, Practitioner, Practitioner_name, Practitioner_qualification } from "./swagger/models";
+import { 
+    Account_coverage, 
+    Account_identifier, 
+    Account_meta, 
+    Account_subject, 
+    Account_text, 
+    Account_type, 
+    Account_type_coding, 
+    ActivityDefinition_valueCodeableConcept, 
+    AdverseEvent_category, 
+    Appointment, 
+    Appointment_coding, 
+    Appointment_participant, 
+    Appointment_serviceType, 
+    AuditEvent_source_observer, 
+    Contract_period, 
+    Encounter, 
+    Person_address, 
+    Practitioner, 
+    Practitioner_name, 
+    Practitioner_qualification 
+} from "./swagger/models";
 
 const swaggerDocument = {
     "swagger": "2.0",
@@ -21,6 +42,191 @@ const swaggerDocument = {
     "host": "api.lafia.io",
     "basePath": "/",
     "paths": {
+
+        "/fhir/Appointment": {
+            "get": {
+                "tags": ["Appointment"],
+                "summary": "GET Appointment Resource Bundle",
+                "description": "Returns a list containing all Appointment resource.",
+                "produces": ["application/xml", "application/json"],
+                "parameters": [
+                    {
+                        "name": "_format",
+                        "in": "query",
+                        "description": "format",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "_id",
+                        "in": "query",
+                        "description": "format",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "_language",
+                        "in": "query",
+                        "description": "format",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "actor",
+                        "in": "query",
+                        "description": "format",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "appointment-type",
+                        "in": "query",
+                        "description": "format",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "based-on",
+                        "in": "query",
+                        "description": "format",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "date",
+                        "in": "query",
+                        "description": "format",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "identifier",
+                        "in": "query",
+                        "description": "format",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "location",
+                        "in": "query",
+                        "description": "format",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "part-status",
+                        "in": "query",
+                        "description": "format",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "practitioner",
+                        "in": "query",
+                        "description": "format",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "patient",
+                        "in": "query",
+                        "description": "format",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "reason-reference",
+                        "in": "query",
+                        "description": "format",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "reason-code",
+                        "in": "query",
+                        "description": "format",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "service-category",
+                        "in": "query",
+                        "description": "format",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "service-type",
+                        "in": "query",
+                        "description": "format",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "slot",
+                        "in": "query",
+                        "description": "format",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "format",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "specialty",
+                        "in": "query",
+                        "description": "format",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "supporting-info",
+                        "in": "query",
+                        "description": "format",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A list of Appointment",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Appointment"
+                            }
+                        }
+                    }
+                }
+            },
+
+            "post": {
+                "tags": ["Appointment"],
+                "summary": "Create Appointment Resource",
+                "description": "This api lets you create a new instance of the Appointment resource.",
+                "produces": ["application/xml", "application/json"],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Appointment",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Appointment"
+                        }
+                    },
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                }
+            }
+        },
 
         "/fhir/Encounter": {
             "get": {
@@ -629,6 +835,7 @@ const swaggerDocument = {
     "definitions": {
         "Encounter": Encounter,
         "Practitioner": Practitioner,
+        "Appointment": Appointment,
         "Account_identifier": Account_identifier,
         "Account_meta": Account_meta,
         "Account_type": Account_type,
@@ -639,7 +846,13 @@ const swaggerDocument = {
         "Practitioner_qualification": Practitioner_qualification,
         "Person_address": Person_address,
         "Account_text": Account_text,
-        "Account_coverage": Account_coverage
+        "Account_coverage": Account_coverage,
+        "Account_subject": Account_subject,
+        "ActivityDefinition_valueCodeableConcept": ActivityDefinition_valueCodeableConcept,
+        "AdverseEvent_category": AdverseEvent_category,
+        "Appointment_participant": Appointment_participant,
+        "Appointment_serviceType": Appointment_serviceType,
+        "Appointment_coding": Appointment_coding
     }
 }
 export default swaggerDocument;

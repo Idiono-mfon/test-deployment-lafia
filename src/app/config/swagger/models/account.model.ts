@@ -102,3 +102,20 @@ export const Account_coverage = {
         }
     }
 }
+
+export const Account_subject = {
+    "required":[
+        "display",
+        "reference"
+    ],
+    "properties":{
+        "reference":{
+            "type":"string",
+            "minLength":1
+        },
+        "display":{
+            "type":"string",
+            "minLength":1
+        }
+    }
+}
