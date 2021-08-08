@@ -27,12 +27,12 @@ export class LafiaMediaController extends BaseController {
   }
 
   @httpPost('/events')
-  public async listenForAwsIvsEvent(@request() req: Request, @response() res: Response): Promise<void> {
+  public async listenForMediaServerEvent(@request() req: Request, @response() res: Response): Promise<void> {
     try {
       // Retrieve the request's body
       const event = req.body;
 
-      console.log('Event:', event);
+      console.log('MediaEvent:', event);
 
       if (event?.action === 'vodReady') {
         const streamUrl = await this.lafiaMediaService.getRecordedStream(event?.vodId);
