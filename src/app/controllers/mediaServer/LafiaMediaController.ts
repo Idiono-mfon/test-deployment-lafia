@@ -26,18 +26,6 @@ export class LafiaMediaController extends BaseController {
     }
   }
 
-  @httpGet('/:streamId', TYPES.AuthMiddleware)
-  public async getRecordedStreamUrl(@request() req: Request, @response() res: Response) {
-    try {
-      const{ streamId } = req.params;
-      const broadcast = await this.lafiaMediaService.getOneVideoRecord({ streamId });
-
-      this.success(res, { video_url: broadcast?.stream_url }, 'Recorded Video Retrieved successfully', HttpStatusCode.CREATED);
-    } catch (e) {
-      this.error(res, e);
-    }
-  }
-
   @httpPost('/events')
   public async listenForAwsIvsEvent(@request() req: Request, @response() res: Response): Promise<void> {
     try {
@@ -64,6 +52,18 @@ export class LafiaMediaController extends BaseController {
       res.sendStatus(200);
     } catch (e) {
       console.log(e);
+    }
+  }
+
+  @httpGet('/broadcast/:streamId', TYPES.AuthMiddleware)
+  public async getRecordedStreamUrl(@request() req: Request, @response() res: Response) {
+    try {
+      const{ streamId } = req.params;
+      const broadcast = await this.lafiaMediaService.getOneVideoRecord({ streamId });
+
+      this.success(res, { video_url: broadcast?.stream_url }, 'Recorded Video Retrieved successfully', HttpStatusCode.CREATED);
+    } catch (e) {
+      this.error(res, e);
     }
   }
 }
