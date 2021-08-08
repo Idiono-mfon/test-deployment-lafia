@@ -1,12 +1,12 @@
 import { Container } from 'inversify';
-import 'reflect-metadata';
 import {
+  IvsController,
   AuthController,
   HealthController,
   PatientController,
   FhirServerController,
   CodeSystemController,
-  PractitionerController,
+  PractitionerController, LafiaMediaController,
 } from '../controllers';
 import {
   ComponentController,
@@ -18,7 +18,8 @@ import {
   UserRepository,
   PatientRepository,
   CodeSystemRepository,
-  PractitionerRepository
+  VideoRecordRepository,
+  PractitionerRepository,
 } from '../repository';
 import {
   LabelRepository,
@@ -26,7 +27,9 @@ import {
   ComponentRepository,
 } from '../repository/lang';
 import {
+  S3Service,
   UserService,
+  AuthService,
   EmailService,
   MessageBroker,
   TwilioService,
@@ -34,9 +37,10 @@ import {
   LanguageService,
   CodeSystemService,
   FhirServerService,
+  LafiaMediaService,
   PlatformSdkService,
+  VideoRecordService,
   PractitionerService,
-  S3Service, AuthService,
 } from '../services';
 import { UtilityService } from '../utils';
 import TYPES from './types';
@@ -79,6 +83,14 @@ container
 container
   .bind<FhirServerController>(TYPES.FhirServerController)
   .to(FhirServerController)
+  .inSingletonScope();
+container
+  .bind<IvsController>(TYPES.IvsController)
+  .to(IvsController)
+  .inSingletonScope();
+container
+  .bind<LafiaMediaController>(TYPES.LafiaMediaController)
+  .to(LafiaMediaController)
   .inSingletonScope();
 
 
@@ -135,6 +147,14 @@ container
   .bind<TwilioService>(TYPES.TwilioService)
   .to(TwilioService)
   .inSingletonScope();
+container
+  .bind<VideoRecordService>(TYPES.VideoRecordService)
+  .to(VideoRecordService)
+  .inSingletonScope();
+container
+  .bind<LafiaMediaService>(TYPES.LafiaMediaService)
+  .to(LafiaMediaService)
+  .inSingletonScope();
 
 
 // repositories
@@ -165,6 +185,10 @@ container
 container
   .bind<LanguageRepository>(TYPES.LanguageRepository)
   .to(LanguageRepository)
+  .inSingletonScope();
+container
+  .bind<VideoRecordRepository>(TYPES.VideoRecordRepository)
+  .to(VideoRecordRepository)
   .inSingletonScope();
 
 // middleware

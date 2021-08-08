@@ -8,7 +8,7 @@ import {
   IUser, IFindUser
 } from '../../models';
 import { IUserLoginParams } from '../auth';
-import { S3Service } from '../awsS3';
+import { S3Service } from '../aws';
 import { CodeSystemService } from '../codeSystems';
 import { PractitionerRepository } from '../../repository';
 import {

@@ -8,7 +8,7 @@ import {
 } from 'inversify-express-utils';
 import TYPES from '../../config/types';
 import { CODE_SYSTEM_TYPE, ICodeSystem } from '../../models';
-import { CodeSystemService } from '../../services/codeSystems';
+import { CodeSystemService } from '../../services';
 import { HttpStatusCode } from '../../utils';
 import { BaseController } from '../baseController';
 

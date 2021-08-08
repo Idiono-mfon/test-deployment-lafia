@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import cors from 'cors';
 import { config as dotConfig } from 'dotenv';
 import express from 'express';
@@ -19,6 +20,7 @@ const practitionerService = container.get<PractitionerService>(TYPES.Practitione
 
 server.setConfig((app) => {
   app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
   app.use(cors());
 });
 
