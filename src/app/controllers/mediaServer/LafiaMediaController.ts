@@ -44,6 +44,8 @@ export class LafiaMediaController extends BaseController {
       // Retrieve the request's body
       const event = req.body;
 
+      console.log('Event:', event);
+
       if (event?.action === 'vodReady') {
         const streamUrl = await this.lafiaMediaService.getRecordedStream(event?.vodId);
 
