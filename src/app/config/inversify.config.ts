@@ -1,6 +1,5 @@
 import { Container } from 'inversify';
 import {
-  IvsController,
   AuthController,
   HealthController,
   PatientController,
@@ -83,10 +82,6 @@ container
 container
   .bind<FhirServerController>(TYPES.FhirServerController)
   .to(FhirServerController)
-  .inSingletonScope();
-container
-  .bind<IvsController>(TYPES.IvsController)
-  .to(IvsController)
   .inSingletonScope();
 container
   .bind<LafiaMediaController>(TYPES.LafiaMediaController)

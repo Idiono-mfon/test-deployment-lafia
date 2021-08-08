@@ -9,7 +9,6 @@ const TYPES = {
   LabelController: Symbol('LabelController'),
   ComponentController: Symbol('ComponentController'),
   FhirServerController: Symbol('FhirServerController'),
-  IvsController: Symbol('IvsController'),
   LafiaMediaController: Symbol('LafiaMediaController'),
 
   // service
