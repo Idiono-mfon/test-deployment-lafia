@@ -26,10 +26,10 @@ server.setConfig((app) => {
   app.use(cors());
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
     customfavIcon: "https://lafia.io/wp-content/uploads/2021/02/lafia_logo_small.png", customSiteTitle: "lafia.io api docs"
-  }));;
+  }));
 });
 
-// messageBroker.rmqSubscribe().then().catch(e => console.log('sdssds=>', e));
+messageBroker.rmqSubscribe().then().catch(e => console.log('Error: ', e));
 const serverInstance = server.build();
 const PORT = Env.all().port;
 
