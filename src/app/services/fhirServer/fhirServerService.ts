@@ -11,7 +11,7 @@ const axiosInstance = axios.create({
   }
 });
 
-axiosInstance.interceptors.request.use((config) => {
+axiosInstance.interceptors.request.use((config: any) => {
   config.params = config.params || {};
   config.params._format = 'json';
   return config;
