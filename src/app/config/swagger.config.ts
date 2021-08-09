@@ -6,6 +6,8 @@ import {
     Account_text, 
     Account_type, 
     Account_type_coding, 
+    ActivityDefinition_code, 
+    ActivityDefinition_jurisdiction, 
     ActivityDefinition_valueCodeableConcept, 
     AdverseEvent_category, 
     Appointment, 
@@ -223,6 +225,86 @@ const swaggerDocument = {
                 "responses": {
                     "201": {
                         "description": "Created"
+                    }
+                }
+            }
+        },
+
+        "/fhir/Appointment/{id}": {
+            "get": {
+                "tags": ["Appointment"],
+                "summary": "GET Appointment Resource by ID",
+                "description": "Returns one Appointment resource.",
+                "produces": ["application/xml", "application/json"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "format",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Appointment resource",
+                        "schema": {
+                            "type": "object",
+                            "items": {
+                                "$ref": "#/definitions/Appointment"
+                            }
+                        }
+                    }
+                }
+            },
+
+            "delete": {
+                "tags": ["Appointment"],
+                "summary": "Delete Appointment Resource",
+                "description": "This api lets you delete an existing instance of the Appointment resource by its ID.",
+                "produces": ["application/xml", "application/json"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "format",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                }
+            },
+
+            "put": {
+                "tags": ["Appointment"],
+                "summary": "Update Appointment Resource",
+                "description": "This api lets you create a new current version for an existing Appointment resource or creates an initial version if no Appointment resource already exists for the given id.",
+                "produces": ["application/xml", "application/json"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "format",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Appointment",
+                        "schema": {
+                            "type": "object",
+                            "items": {
+                                "$ref": "#/definitions/Appointment"
+                            }
+                        }
                     }
                 }
             }
@@ -451,6 +533,86 @@ const swaggerDocument = {
                 "responses": {
                     "201": {
                         "description": "Created"
+                    }
+                }
+            }
+        },
+
+        "/fhir/Encounter/{id}": {
+            "get": {
+                "tags": ["Encounter"],
+                "summary": "GET Encounter Resource by ID",
+                "description": "Returns one Encounter resource.",
+                "produces": ["application/xml", "application/json"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "format",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Encounter resource",
+                        "schema": {
+                            "type": "object",
+                            "items": {
+                                "$ref": "#/definitions/Encounter"
+                            }
+                        }
+                    }
+                }
+            },
+
+            "delete": {
+                "tags": ["Encounter"],
+                "summary": "Delete Encounter Resource",
+                "description": "This api lets you delete an existing instance of the Encounter resource by its ID.",
+                "produces": ["application/xml", "application/json"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "format",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                }
+            },
+
+            "put": {
+                "tags": ["Encounter"],
+                "summary": "Update Encounter Resource",
+                "description": "This api lets you create a new current version for an existing Encounter resource or creates an initial version if no Encounter resource already exists for the given id.",
+                "produces": ["application/xml", "application/json"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "format",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Encounter",
+                        "schema": {
+                            "type": "object",
+                            "items": {
+                                "$ref": "#/definitions/Encounter"
+                            }
+                        }
                     }
                 }
             }
@@ -852,7 +1014,9 @@ const swaggerDocument = {
         "AdverseEvent_category": AdverseEvent_category,
         "Appointment_participant": Appointment_participant,
         "Appointment_serviceType": Appointment_serviceType,
-        "Appointment_coding": Appointment_coding
+        "Appointment_coding": Appointment_coding,
+        "ActivityDefinition_jurisdiction": ActivityDefinition_jurisdiction,
+        "ActivityDefinition_code": ActivityDefinition_code
     }
 }
 export default swaggerDocument;
