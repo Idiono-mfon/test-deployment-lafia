@@ -43,7 +43,8 @@ export class LafiaMediaService {
       await this.videoRecordService.saveRecordedStream( { streamId: streamKey, patient_id });
 
       return {
-        stream_url: `rtmp://media.lafia.io/LiveApp/${streamKey}`
+        rtmp_url: `rtmp://media.lafia.io/LiveApp`,
+        stream_key: `${streamKey}`,
       };
     } catch (e) {
       throw new GenericResponseError(e.message, e.code);
