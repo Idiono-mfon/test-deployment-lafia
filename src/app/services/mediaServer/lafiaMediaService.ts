@@ -19,18 +19,6 @@ export class LafiaMediaService {
     this.env = Env.all();
   }
 
-  // private async recordStream(id: string) {
-  //   try {
-  //     const recordResponse: AxiosResponse = await axios.put(
-  //       `${this.env.lafia_media_url}/rest/v2/broadcasts/${id}/recording/true?recordType=mp4`
-  //     );
-  //
-  //     return recordResponse.data;
-  //   } catch (e) {
-  //     throw new GenericResponseError(e.message, e.code);
-  //   }
-  // }
-
   public async createBroadcast(patient_id: string) {
     try {
       const axiosResponse: AxiosResponse = await axios.post(
