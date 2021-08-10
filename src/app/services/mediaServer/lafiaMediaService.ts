@@ -43,7 +43,7 @@ export class LafiaMediaService {
       await this.videoRecordService.saveRecordedStream( { streamId: streamKey, patient_id });
 
       return {
-        rtmp_url: `rtmp://media.lafia.io/LiveApp`,
+        rtmp_url: `rtmp://media.lafia.io/WebRTCAppEE`,
         stream_key: `${streamKey}`,
       };
     } catch (e) {
