@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { inject } from 'inversify';
-import { controller, httpGet, httpPost, request, response } from 'inversify-express-utils';
+import { controller, httpDelete, httpGet, httpPost, request, response } from 'inversify-express-utils';
 import TYPES from '../../config/types';
 import { AuthMiddleware } from '../../middlewares';
 import { LafiaMediaService } from '../../services';
@@ -56,12 +56,36 @@ export class LafiaMediaController extends BaseController {
   }
 
   @httpGet('/broadcast/:streamId', TYPES.AuthMiddleware)
-  public async getRecordedStreamUrl(@request() req: Request, @response() res: Response) {
+  public async getRecordedStream(@request() req: Request, @response() res: Response) {
     try {
       const{ streamId } = req.params;
       const broadcast = await this.lafiaMediaService.getOneVideoRecord({ streamId });
 
-      this.success(res, { video_url: broadcast?.stream_url }, 'Recorded Video Retrieved successfully', HttpStatusCode.CREATED);
+      this.success(res, broadcast, 'Recorded Video Retrieved successfully', HttpStatusCode.CREATED);
+    } catch (e) {
+      this.error(res, e);
+    }
+  }
+
+  @httpGet('/broadcast', TYPES.AuthMiddleware)
+  public async getAllRecordedStream(@request() req: Request, @response() res: Response) {
+    try {
+      const { user } = res.locals;
+      const broadcast = await this.lafiaMediaService.getAllVideoRecords(user?.id!);
+
+      this.success(res, broadcast, 'Recorded Video Retrieved successfully', HttpStatusCode.CREATED);
+    } catch (e) {
+      this.error(res, e);
+    }
+  }
+
+  @httpDelete('/broadcast/:id', TYPES.AuthMiddleware)
+  public async getRecordedStreamUrl(@request() req: Request, @response() res: Response) {
+    try {
+      const{ id } = req.params;
+      const broadcast = await this.lafiaMediaService.deleteVideoRecord(id);
+
+      this.success(res, broadcast, 'Recorded Video deleted successfully', HttpStatusCode.CREATED);
     } catch (e) {
       this.error(res, e);
     }

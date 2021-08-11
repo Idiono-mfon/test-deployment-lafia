@@ -54,6 +54,14 @@ export class LafiaMediaService {
     return this.videoRecordService.getOneVideoRecord(data);
   }
 
+  public async getAllVideoRecords(user_id: string): Promise<IVideoRecord[]> {
+    return this.videoRecordService.getAllVideoRecords(user_id);
+  }
+
+  public async deleteVideoRecord(id: string): Promise<any> {
+    return this.videoRecordService.deleteVideoRecord(id);
+  }
+
   public async updateVideoRecord(id: string, data: IFindVideoRecord): Promise<any> {
     return this.videoRecordService.updateVideoRecord(id, data);
   }

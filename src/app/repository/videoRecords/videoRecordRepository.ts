@@ -23,6 +23,22 @@ export class VideoRecordRepository {
     }
   }
 
+  public async getAllVideoRecords(user_id: string): Promise<IVideoRecord[]> {
+    try {
+      return await VideoRecordModel.query().where({ patient_id: user_id });
+    } catch (e) {
+      throw new InternalServerError(e.message);
+    }
+  }
+
+  public async deleteVideoRecord(id: string): Promise<any> {
+    try {
+      return await VideoRecordModel.query().deleteById(id);
+    } catch (e) {
+      throw new InternalServerError(e.message);
+    }
+  }
+
   public async updateVideoRecord(id: string, data: IFindVideoRecord): Promise<any> {
     try {
       return await VideoRecordModel.query()
