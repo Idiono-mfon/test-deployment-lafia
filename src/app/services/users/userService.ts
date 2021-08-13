@@ -11,7 +11,7 @@ import {
   GenericResponseError,
   HttpStatusCode,
   throwError,
-  getE164Format
+  getE164Format, Validations
 } from '../../utils';
 import { Password } from '../../utils/password';
 import { ConsentService, ICreateConsentAccount } from '../consents';
@@ -77,6 +77,13 @@ export class UserService {
   public async createUser(user: IUser): Promise< IUser> {
 
     try {
+      // Validate Email
+      const isValidEmail = Validations.validateEmail(user.email);
+
+      if (!isValidEmail) {
+        throwError('Email is not valid', error.badRequest);
+      }
+
       // Validate password
       const isValidPassword = Password.validatePassword(user.password);
 
