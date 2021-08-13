@@ -5,7 +5,8 @@ import {
   PatientController,
   FhirServerController,
   CodeSystemController,
-  PractitionerController, LafiaMediaController,
+  LafiaMediaController,
+  PractitionerController, ConsentController,
 } from '../controllers';
 import {
   ComponentController,
@@ -32,6 +33,7 @@ import {
   EmailService,
   MessageBroker,
   TwilioService,
+  ConsentService,
   PatientService,
   LanguageService,
   CodeSystemService,
@@ -86,6 +88,10 @@ container
 container
   .bind<LafiaMediaController>(TYPES.LafiaMediaController)
   .to(LafiaMediaController)
+  .inSingletonScope();
+container
+  .bind<ConsentController>(TYPES.ConsentController)
+  .to(ConsentController)
   .inSingletonScope();
 
 
@@ -149,6 +155,10 @@ container
 container
   .bind<LafiaMediaService>(TYPES.LafiaMediaService)
   .to(LafiaMediaService)
+  .inSingletonScope();
+container
+  .bind<ConsentService>(TYPES.ConsentService)
+  .to(ConsentService)
   .inSingletonScope();
 
 

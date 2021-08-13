@@ -12,3 +12,4 @@ export * from './lang';
 export * from './fhirServer';
 export * from './mediaServer';
 export * from './videoRecords';
+export * from './consents';

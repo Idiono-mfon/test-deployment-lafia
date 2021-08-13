@@ -38,6 +38,8 @@ export interface IEnv {
   fhir_server_base_url: string;
   cloudinary_url: string;
   lafia_media_url: string;
+  consent_service_base_url: string;
+  consent_service_auth_code: string;
 }
 
 const config: IEnv = {
@@ -78,6 +80,8 @@ const config: IEnv = {
   fhir_server_base_url: process.env.FHIR_SERVER_BASE_URL as string,
   cloudinary_url: process.env.CLOUDINARY_URL as string,
   lafia_media_url: process.env.LAFIA_MEDIA_URL as string,
+  consent_service_base_url: process.env.CONSENT_SERVICE_BASE_URL as string,
+  consent_service_auth_code: process.env.CONSENT_SERVICE_AUTH_CODE as string,
 };
 
 export class Env {

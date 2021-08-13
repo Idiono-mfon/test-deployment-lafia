@@ -10,6 +10,7 @@ const TYPES = {
   ComponentController: Symbol('ComponentController'),
   FhirServerController: Symbol('FhirServerController'),
   LafiaMediaController: Symbol('LafiaMediaController'),
+  ConsentController: Symbol('ConsentController'),
 
   // service
   UserService: Symbol('UserService'),
@@ -27,6 +28,7 @@ const TYPES = {
   TwilioService: Symbol('TwilioService'),
   VideoRecordService: Symbol('VideoRecordService'),
   LafiaMediaService: Symbol('LafiaMediaService'),
+  ConsentService: Symbol('ConsentService'),
 
   // repositories
   UserRepository: Symbol('UserRepository'),
