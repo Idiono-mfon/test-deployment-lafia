@@ -204,9 +204,13 @@ export class SignallingServerService {
 
   private static async emitCallEvent(socket: Socket, data: any) {
     // console.log(data)
-    const userData: IOnlineUser = await SignallingServerService
+    const reciever: IOnlineUser = await SignallingServerService
         .redisStore
         .getUserById(data.reciever);
+
+    const sender: IOnlineUser = await SignallingServerService
+        .redisStore
+        .getUserById(data.sender);
 
     const token = data.type === "connect" ? SignallingServerService
       .twilioService
@@ -215,16 +219,22 @@ export class SignallingServerService {
         data.room
       ) : null;
 
-    socket
-    .to(userData.socketId)
-    .emit('call', {
+    const res = {
       room: data.room,
       token,
       sender: data.sender,
       reciever: data.reciever,
+      senderDetails: sender,
+      recieverDetails: reciever,
       type: data.type,
       socket: socket.id,
-    });
+    };
+
+    console.log(res)
+
+    socket
+    .to(reciever.socketId)
+    .emit('call', res);
   }
 
   private static listenForMakeAnswerEvent(socket: Socket) {

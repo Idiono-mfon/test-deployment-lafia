@@ -27,7 +27,7 @@ server.setConfig((app) => {
   }));;
 });
 
-// messageBroker.rmqSubscribe().then().catch(e => console.log('sdssds=>', e));
+messageBroker.rmqSubscribe().then().catch(e => console.log('rmq=>', e));
 const serverInstance = server.build();
 const PORT = Env.all().port;
 
