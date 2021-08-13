@@ -76,10 +76,7 @@ export class SignallingServerService {
   }
 
   private static async listenForConnectionEvent(socket: Socket) {
-    // console.log(socket.handshake.query, socket.id)
     let { userId, resourceType } = socket.handshake.query;
-
-    console.log('SOCKET_CONNECTION_DATA:', { userId, resourceType });
 
     resourceType = resourceType as unknown as string;
     resourceType = resourceType.toLowerCase();
