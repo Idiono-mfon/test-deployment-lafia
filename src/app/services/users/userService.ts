@@ -106,6 +106,8 @@ export class UserService {
         userName: data.email,
       };
       await this.consentService.createConsentAccount(consentAccount);
+      await this.consentService.addConsentCategory(consentAccount?.userName, 'newBroadcast');
+      await this.consentService.addConsentCategory(consentAccount?.userName, 'acceptBroadcast');
 
       return newUser;
     } catch (e) {
