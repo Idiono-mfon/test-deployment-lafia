@@ -32,7 +32,7 @@ export class AuthService {
 
       const loggedInUser: IUser = await this.userService.userLogin(email, password);
 
-      const token = this.userService.generateJwtToken({ email, id: loggedInUser.id });
+      const token = this.userService.generateJwtToken({ email, id: loggedInUser.resourceId });
       let loggedInUserData: any;
 
       if (loggedInUser.resourceType === forWho.patient) {

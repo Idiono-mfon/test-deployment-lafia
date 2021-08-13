@@ -13,6 +13,7 @@ export class Table {
   public static human_names = 'human_names';
   public static code_systems = 'code_systems';
   public static organizations = 'organizations';
+  public static video_records = 'video_records';
   public static patient_links = 'patient_links';
   public static practitioners = 'practitioners';
   public static languages: string = 'languages';

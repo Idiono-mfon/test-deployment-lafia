@@ -14,6 +14,7 @@ import {
   getE164Format
 } from '../../utils';
 import { Password } from '../../utils/password';
+import { ConsentService, ICreateConsentAccount } from '../consents';
 import { EmailService, IComposeEmail } from '../email';
 import { FhirServerService } from '../fhirServer';
 import { PlatformSdkService } from '../platformSDK';
@@ -39,23 +40,13 @@ export class UserService {
   @inject(TYPES.FhirServerService)
   private readonly fhirServerService: FhirServerService;
 
+  @inject(TYPES.ConsentService)
+  private readonly consentService: ConsentService;
+
   public async validateUser(req: Request): Promise<boolean> {
 
     const user: IUser = req.body
     try {
-      // Validate password
-      // const isValidPassword = Password.validatePassword(user.password);
-
-      // if (!isValidPassword) {
-      //   const ERROR_MESSAGE = 'Hint: password must be minimum ' +
-      //     'of 6 characters and must have a ' +
-      //     'combination of at least one Upper case, one Lower case, ' +
-      //     'one digit and one or more of ' +
-      //     'these special characters - !@#$%^&-.+=()';
-
-      //   throwError(ERROR_MESSAGE, error.badRequest);
-      // }
-
       // find user by email
       let emailUser = await this.getUserByField('email', user.email);
 
@@ -75,7 +66,7 @@ export class UserService {
         throwError(ERROR_MESSAGE, error.badRequest);
       }
 
-      this.twilioService.sendOTP(user.phone);
+      await this.twilioService.sendOTP(user.phone);
 
       return true;
     } catch (e) {
@@ -106,7 +97,19 @@ export class UserService {
         id: uuid(),
         ...user,
       };
-      return this.userRepository.createUser(data);
+      const newUser = await this.userRepository.createUser(data);
+
+      const consentAccount: ICreateConsentAccount = {
+        firstName: data.first_name,
+        lastName: data.last_name,
+        password: data.password,
+        userName: data.email,
+      };
+      await this.consentService.createConsentAccount(consentAccount);
+      await this.consentService.addConsentCategory(consentAccount?.userName, 'newBroadcast');
+      await this.consentService.addConsentCategory(consentAccount?.userName, 'acceptBroadcast');
+
+      return newUser;
     } catch (e) {
       throw new GenericResponseError(e.message, e.code);
     }

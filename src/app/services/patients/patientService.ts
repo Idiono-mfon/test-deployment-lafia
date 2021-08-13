@@ -9,7 +9,7 @@ import {
   IPatient, IFindUser
 } from '../../models';
 import { IUserLoginParams } from '../auth';
-import { S3Service } from '../awsS3';
+import { S3Service } from '../aws';
 import { CodeSystemService } from '../codeSystems';
 import { PatientRepository } from '../../repository';
 import { FhirServerService } from '../fhirServer';
@@ -83,7 +83,7 @@ export class PatientService {
 
       let { phone } = data;
 
-      if (!!phone) {
+      if (phone) {
         phone = getE164Format(phone!, req);
       }
 

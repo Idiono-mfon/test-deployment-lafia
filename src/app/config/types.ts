@@ -9,6 +9,8 @@ const TYPES = {
   LabelController: Symbol('LabelController'),
   ComponentController: Symbol('ComponentController'),
   FhirServerController: Symbol('FhirServerController'),
+  LafiaMediaController: Symbol('LafiaMediaController'),
+  ConsentController: Symbol('ConsentController'),
 
   // service
   UserService: Symbol('UserService'),
@@ -24,6 +26,9 @@ const TYPES = {
   LanguageService: Symbol('LanguageService'),
   FhirServerService: Symbol('FhirServerService'),
   TwilioService: Symbol('TwilioService'),
+  VideoRecordService: Symbol('VideoRecordService'),
+  LafiaMediaService: Symbol('LafiaMediaService'),
+  ConsentService: Symbol('ConsentService'),
 
   // repositories
   UserRepository: Symbol('UserRepository'),
@@ -33,6 +38,7 @@ const TYPES = {
   LanguageRepository: Symbol('LanguageRepository'),
   LabelRepository: Symbol('LabelRepository'),
   ComponentRepository: Symbol('ComponentRepository'),
+  VideoRecordRepository: Symbol('VideoRecordRepository'),
 
   // middlewares
   AuthMiddleware: Symbol('AuthMiddleware'),

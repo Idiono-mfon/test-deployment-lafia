@@ -57,7 +57,9 @@ export class S3Service {
       // Return object link
       return `https://${uploadParams.Bucket}.s3.amazonaws.com/${uploadParams.Key}`;
     } catch (e) {
-      throw new GenericResponseError(e.code || 500, e.message);
+      throw new GenericResponseError(e.message, e.code || 500);
     }
   }
+
+
 }

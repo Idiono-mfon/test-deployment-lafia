@@ -86,7 +86,7 @@ export class PatientController extends BaseController {
       const { id: patientId } = req.params;
       const { file } = req;
 
-      const attachment: IAttachment = await this.patientService.uploadAttachment(patientId, file);
+      const attachment: IAttachment = await this.patientService.uploadAttachment(patientId, file!);
 
       this.success(res, attachment, 'Request completed successfully');
     } catch(e) {

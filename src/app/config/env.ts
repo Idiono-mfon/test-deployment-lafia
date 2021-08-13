@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-interface IEnv {
+export interface IEnv {
   port: number;
   environment: string;
   pg_port: number;
@@ -20,6 +20,8 @@ interface IEnv {
   aws_secret_access_Key: string;
   aws_region: string;
   aws_bucket: string;
+  aws_cloudfront: string;
+  aws_account_id: string;
   jwt_secrete_key: string;
   platform_admin_key: number;
   platform_app_namespace: string;
@@ -34,6 +36,10 @@ interface IEnv {
   email_address: string;
   email_password: string;
   fhir_server_base_url: string;
+  cloudinary_url: string;
+  lafia_media_url: string;
+  consent_service_base_url: string;
+  consent_service_auth_code: string;
 }
 
 const config: IEnv = {
@@ -56,6 +62,8 @@ const config: IEnv = {
   aws_secret_access_Key: process.env.AWS_SECRET_ACCESS_KEY as string,
   aws_region: process.env.AWS_REGION as string,
   aws_bucket: process.env.AWS_BUCKET as string,
+  aws_cloudfront: process.env.AWS_CLOUDFRONT as string,
+  aws_account_id: process.env.AWS_ACCOUNT_ID as string,
   jwt_secrete_key: process.env.JWT_SECRETE_KEY as string,
   platform_admin_key: Number(process.env.PLATFORM_ADMIN_KEY),
   platform_app_namespace: process.env.PLATFORM_APP_NAMESPACE as string,
@@ -70,6 +78,10 @@ const config: IEnv = {
   email_address: process.env.EMAIL_ADDRESS as string,
   email_password: process.env.EMAIL_PASSWORD as string,
   fhir_server_base_url: process.env.FHIR_SERVER_BASE_URL as string,
+  cloudinary_url: process.env.CLOUDINARY_URL as string,
+  lafia_media_url: process.env.LAFIA_MEDIA_URL as string,
+  consent_service_base_url: process.env.CONSENT_SERVICE_BASE_URL as string,
+  consent_service_auth_code: process.env.CONSENT_SERVICE_AUTH_CODE as string,
 };
 
 export class Env {

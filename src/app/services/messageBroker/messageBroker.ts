@@ -84,8 +84,12 @@ export class MessageBroker {
         const { data, resource_type, resource_id } = msgJson;
 
         if (resource_id && data) {
+          console.log(' [x] Received Date: %s', new Date().toString());
+          console.log(' [x] Received Data: %s', msgString);
+
           await this.userService.createUser({
             resource_id,
+            resource_type,
             ...data,
           });
 

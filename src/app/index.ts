@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import cors from 'cors';
 import { config as dotConfig } from 'dotenv';
 import express from 'express';
@@ -21,10 +22,11 @@ const practitionerService = container.get<PractitionerService>(TYPES.Practitione
 
 server.setConfig((app) => {
   app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
   app.use(cors());
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
     customfavIcon: "https://lafia.io/wp-content/uploads/2021/02/lafia_logo_small.png", customSiteTitle: "lafia.io api docs"
-  }));;
+  }));
 });
 
 messageBroker.rmqSubscribe().then().catch(e => console.log('rmq=>', e));

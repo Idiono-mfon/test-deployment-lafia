@@ -1,5 +1,5 @@
-import { PhoneNumberUtil, PhoneNumberFormat } from 'google-libphonenumber';
 import geoip from 'geoip-lite';
+import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber';
 
 export const getE164Format = (phoneNumber: string, req: any) => {
     
@@ -8,7 +8,5 @@ export const getE164Format = (phoneNumber: string, req: any) => {
 
     const phoneUtil = PhoneNumberUtil.getInstance();
     const number = phoneUtil.parseAndKeepRawInput(phoneNumber, geo?.country);
-    const phone = phoneUtil.format(number, PhoneNumberFormat.E164)
-    
-    return phone;
+    return phoneUtil.format(number, PhoneNumberFormat.E164);
 }
