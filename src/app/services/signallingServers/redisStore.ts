@@ -100,7 +100,7 @@ export class RedisStore {
   }
 
   public async saveOnlineUser(user: IOnlineUser): Promise<void> {
-    console.log(user)
+    // console.log(user)
     try {
       // Get All Online Users
       let onlineUsers: IOnlineUser[] = await this.getOnlineUsers();
@@ -116,26 +116,24 @@ export class RedisStore {
       }
 
       let username: string = '';
-      console.log("resource => ", user);
+      
       if (user?.resourceType === forWho.patient) {
         try {
           const patient: IPatient = await this.patientService.findPatientById(user.userId);
-          console.log("patient =>", patient);
           // @ts-ignore
           username = patient?.name[0]?.text;
         } catch (e) {
-          console.log(e);
+          // console.log(e);
         }
       }
 
       if (user?.resourceType === forWho.practitioner) {
         try {
           const practitioner: IPractitioner = await this.practitionerService.findPractitionerById(user.userId);
-          console.log("practitioner => ", practitioner);
           // @ts-ignore
           username = practitioner?.name[0]?.text;
         } catch (e) {
-          console.log(e);
+          // console.log(e);
         }
         
       }
