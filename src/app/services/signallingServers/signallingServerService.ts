@@ -76,10 +76,8 @@ export class SignallingServerService {
   }
 
   private static async listenForConnectionEvent(socket: Socket) {
-    // console.log(socket.handshake.query, socket.id)
+    
     let { userId, resourceType } = socket.handshake.query;
-
-    console.log('SOCKET_CONNECTION_DATA:', { userId, resourceType });
 
     resourceType = resourceType as unknown as string;
     resourceType = resourceType.toLowerCase();
@@ -90,8 +88,6 @@ export class SignallingServerService {
     } as IOnlineUser;
 
     await SignallingServerService.redisStore.saveOnlineUser(user);
-
-    console.log('ConnectedUser:', user);
 
     if (user.resourceType === forWho.practitioner) {
       socket.join(SignallingServerService.onlinePractitionerRoom);
@@ -107,9 +103,6 @@ export class SignallingServerService {
         onlinePractitioners.push(user);
       }
     }
-
-    console.log('OnlinePractitioners:', onlinePractitioners);
-    console.log('OnlineUsers:', onlineUsers);
 
     socket.emit('onlinePractitioners', onlinePractitioners);
   }
@@ -206,7 +199,6 @@ export class SignallingServerService {
   }
 
   private static async emitCallEvent(socket: Socket, data: any) {
-    // console.log(data)
     const reciever: IOnlineUser = await SignallingServerService
         .redisStore
         .getUserById(data.reciever);
@@ -233,7 +225,7 @@ export class SignallingServerService {
       socket: socket.id,
     };
 
-    console.log(res)
+    // console.log(res)
 
     socket
     .to(reciever.socketId)
@@ -273,8 +265,6 @@ export class SignallingServerService {
       resourceType = resourceType as unknown as string;
       resourceType = resourceType.toLowerCase();
       const user: IOnlineUser = { userId, resourceType } as IOnlineUser;
-
-      console.log(`DisconnectedUser: ${socket.id}`);
 
       await SignallingServerService.redisStore.removeUserBYId(user.userId);
       await SignallingServerService.emitOnlinePractitionersEvent(io);
