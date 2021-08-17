@@ -123,7 +123,7 @@ export class RedisStore {
           // @ts-ignore
           username = patient?.name[0]?.text;
         } catch (e) {
-          // console.log(e);
+          console.log(e);
         }
       }
 
@@ -133,7 +133,7 @@ export class RedisStore {
           // @ts-ignore
           username = practitioner?.name[0]?.text;
         } catch (e) {
-          // console.log(e);
+          console.log(e);
         }
         
       }

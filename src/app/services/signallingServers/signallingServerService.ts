@@ -77,7 +77,7 @@ export class SignallingServerService {
 
   private static async listenForConnectionEvent(socket: Socket) {
     let { userId, resourceType } = socket.handshake.query;
-
+    console.log('SOCKET_CONNECTION_DATA:', { userId, resourceType });
     resourceType = resourceType as unknown as string;
     resourceType = resourceType.toLowerCase();
     const user: IOnlineUser = {
@@ -102,6 +102,9 @@ export class SignallingServerService {
         onlinePractitioners.push(user);
       }
     }
+
+    console.log('OnlinePractitioners:', onlinePractitioners);
+    console.log('OnlineUsers:', onlineUsers);
 
     socket.emit('onlinePractitioners', onlinePractitioners);
   }
@@ -264,7 +267,7 @@ export class SignallingServerService {
       resourceType = resourceType as unknown as string;
       resourceType = resourceType.toLowerCase();
       const user: IOnlineUser = { userId, resourceType } as IOnlineUser;
-
+      console.log(`DisconnectedUser: ${socket.id}`);
       await SignallingServerService.redisStore.removeUserBYId(user.userId);
       await SignallingServerService.emitOnlinePractitionersEvent(io);
 
