@@ -201,10 +201,11 @@ export class SignallingServerService {
   }
 
   private static async emitCallEvent(socket: Socket, data: any) {
+    console.log(data)
     const reciever: IOnlineUser = await SignallingServerService
         .redisStore
         .getUserById(data.reciever);
-
+    console.log(reciever)
     const sender: IOnlineUser = await SignallingServerService
         .redisStore
         .getUserById(data.sender);
