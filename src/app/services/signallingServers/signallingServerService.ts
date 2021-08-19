@@ -202,7 +202,6 @@ export class SignallingServerService {
     const reciever: IOnlineUser = await SignallingServerService
         .redisStore
         .getUserById(data.reciever);
-
     const sender: IOnlineUser = await SignallingServerService
         .redisStore
         .getUserById(data.sender);
