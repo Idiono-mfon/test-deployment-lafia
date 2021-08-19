@@ -21,8 +21,12 @@ export class TwilioService {
   @inject(TYPES.UserRepository)
   private userRepository: UserRepository;
   
-  public generateAccessToken(identity: string, roomId: string): string {
+  public async generateAccessToken(identity: string, roomId?: string): Promise<{ roomId: string, token: string }> {
     try {
+
+      roomId = !roomId ? await TwilioService.createRoom() :
+        await TwilioService.createRoom(roomId);
+
       const videoGrant = new VideoGrant({
         room: roomId
       });
@@ -35,19 +39,22 @@ export class TwilioService {
       );
       token.addGrant(videoGrant);
 
-      return token.toJwt();
+      return {
+        roomId,
+        token: token.toJwt(),
+      };
 
     } catch (e) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
 
-  public static async createRoom(): Promise<string> {
+  public static async createRoom(roomName?: string): Promise<string> {
     try {
       const room = await twilioClient
         .video.rooms
         .create({
-          uniqueName: uuidV4(),
+          uniqueName: roomName||uuidV4(),
           recordParticipantsOnConnect: true,
         });
 

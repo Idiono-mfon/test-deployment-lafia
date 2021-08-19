@@ -137,11 +137,9 @@ export class SignallingServerService {
 
       await SignallingServerService.redisStore.updateBroadcast(acceptCare);
 
-      const roomId = await TwilioService.createRoom();
-      const token = await SignallingServerService.twilioService.generateAccessToken(
-        acceptCare?.practitionerId as string,
-        roomId
-      );
+      // const roomId = await TwilioService.createRoom();
+      const { token, roomId } = await SignallingServerService.twilioService
+        .generateAccessToken(acceptCare?.practitionerId as string);
       return cb({
         roomId,
         token,
@@ -173,13 +171,13 @@ export class SignallingServerService {
   }
 
   private static listenForCallUserEvent(socket: Socket) {
-    socket.on('callUser', data => {
-      SignallingServerService.emitCallMadeEvent(socket, data);
+    socket.on('callUser', async (data) => {
+      await SignallingServerService.emitCallMadeEvent(socket, data);
     });
   }
 
-  private static emitCallMadeEvent(socket: Socket, data: any) {
-    const token = SignallingServerService
+  private static async emitCallMadeEvent(socket: Socket, data: any) {
+    const { token } = await SignallingServerService
       .twilioService
       .generateAccessToken(
         data.patientId,
@@ -195,8 +193,8 @@ export class SignallingServerService {
   }
 
   private static listenForCallEvent(socket: Socket) {
-    socket.on('call', data => {
-      SignallingServerService.emitCallEvent(socket, data);
+    socket.on('call', async (data) => {
+      await SignallingServerService.emitCallEvent(socket, data);
     });
   }
 
@@ -209,7 +207,7 @@ export class SignallingServerService {
         .redisStore
         .getUserById(data.sender);
 
-    const token = data.type === "connect" ? SignallingServerService
+    const { token } = data.type === "connect" ? await SignallingServerService
       .twilioService
       .generateAccessToken(
         data.sender,
