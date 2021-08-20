@@ -62,11 +62,11 @@ export class TwilioService {
 
       const roomSid = room?.sid;
 
-      const rc = await twilioClient.video.rooms(roomSid)
-        .recordingRules
-        .update({ rules: [{ 'type': 'include', 'all': true }] });
-
-      console.log('RC:', rc);
+      // const rc = await twilioClient.video.rooms(roomSid)
+      //   .recordingRules
+      //   .update({ rules: [{ 'type': 'include', 'all': true }] });
+      //
+      // console.log('RC:', rc);
 
       return roomSid;
     } catch (e) {
