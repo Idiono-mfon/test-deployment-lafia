@@ -201,7 +201,7 @@ export class SignallingServerService {
         .redisStore
         .getUserById(data.sender);
 
-    const { token } = data.type === "connect" ? await SignallingServerService
+    const access = data.type === "connect" ? await SignallingServerService
       .twilioService
       .generateAccessToken(
         data.sender,
@@ -210,7 +210,7 @@ export class SignallingServerService {
 
     const res = {
       room: data.room,
-      token,
+      token: access?.token,
       sender: data.sender,
       reciever: data.reciever,
       senderDetails: sender,
