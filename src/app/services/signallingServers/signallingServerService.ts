@@ -210,7 +210,7 @@ export class SignallingServerService {
       ) : null;
 
     const res = {
-      room: data.room,
+      room: access?.roomId,
       token: access?.token,
       sender: data.sender,
       reciever: data.reciever,
