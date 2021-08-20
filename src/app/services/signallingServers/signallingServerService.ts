@@ -220,13 +220,6 @@ export class SignallingServerService {
       socket: socket?.id,
     };
 
-    if (data.type === 'connect') {
-      console.log('Call Access:', res);
-      console.log(`Practitioner with an id of ${res?.sender} is calling a patient with an id of ${res?.reciever}...`)
-    } else {
-      console.log('No Access:', res);
-    }
-
     socket
     .to(reciever.socketId)
     .emit('call', res);
