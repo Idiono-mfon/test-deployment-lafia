@@ -87,13 +87,20 @@ export class MessageBroker {
           console.log(' [x] Received Date: %s', new Date().toString());
           console.log(' [x] Received Data: %s', msgString);
 
-          await this.userService.createUser({
-            resource_id,
-            resource_type,
-            ...data,
-          });
+          try {
+            await this.userService.createUser({
+              resource_id,
+              resource_type,
+              ...data,
+            });
 
-          return;
+            return;
+          } catch (e) {
+            const rmqPubMsg = rmqErrorResponse(e.message, resource_type);
+            await this.rmqPublish(JSON.stringify(rmqPubMsg));
+
+            return;
+          }
         }
 
         if (resource_type && !_.isEmpty(data)) {
