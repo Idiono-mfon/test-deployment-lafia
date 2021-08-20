@@ -3,7 +3,6 @@ import twilio, { jwt } from 'twilio';
 import { v4 as uuidV4 } from 'uuid';
 import { Env } from '../../config/env';
 import TYPES from '../../config/types';
-import { IUser } from '../../models';
 import { UserRepository } from '../../repository';
 import { GenericResponseError } from '../../utils';
 
@@ -21,14 +20,13 @@ export class TwilioService {
   @inject(TYPES.UserRepository)
   private userRepository: UserRepository;
   
-  public async generateAccessToken(identity: string, roomId?: string): Promise<{ roomId: string, token: string }> {
+  public async generateAccessToken(identity: string): Promise<{ roomId: string, token: string }> {
     try {
 
-      roomId = !roomId ? await TwilioService.createRoom() :
-        await TwilioService.createRoom(roomId);
+      const newRoomId = await TwilioService.createRoom();
 
       const videoGrant = new VideoGrant({
-        room: roomId
+        room: newRoomId
       });
 
       const token = new AccessToken(
@@ -40,7 +38,7 @@ export class TwilioService {
       token.addGrant(videoGrant);
 
       return {
-        roomId,
+        roomId: newRoomId,
         token: token.toJwt(),
       };
 
@@ -49,12 +47,12 @@ export class TwilioService {
     }
   }
 
-  public static async createRoom(roomName?: string): Promise<string> {
+  public static async createRoom(): Promise<string> {
     try {
       const room = await twilioClient
         .video.rooms
         .create({
-          uniqueName: roomName||uuidV4(),
+          uniqueName: uuidV4(),
           recordParticipantsOnConnect: true,
         });
 
@@ -99,7 +97,7 @@ export class TwilioService {
       const {to, channel, status, valid} = await twilioClient.verify
       .services(sid)
       .verificationChecks
-      .create({to: phone, code: code});
+      .create({to: phone, code});
       // if (status === "approved") {
       //   let user: IUser = await this.userRepository.getOneUser({ phone });
       //   const userId: string | any = user.id;
