@@ -202,14 +202,12 @@ export class SignallingServerService {
         .redisStore
         .getUserById(data.sender);
 
-    const access = data.type === "connect" ? await SignallingServerService
+    const access = data.type === 'connect' ? await SignallingServerService
       .twilioService
       .generateAccessToken(
         data.sender,
         data.room
       ) : null;
-
-    console.log('Call Access:', access);
 
     const res = {
       room: data.room,
@@ -222,7 +220,11 @@ export class SignallingServerService {
       socket: socket?.id,
     };
 
-    console.log(`Practitioner with an id of ${res?.sender} is calling a patient with an id of ${res?.reciever}...`)
+
+    if (data.type === 'connect') {
+      console.log('Call Access:', access);
+      console.log(`Practitioner with an id of ${res?.sender} is calling a patient with an id of ${res?.reciever}...`)
+    }
 
     socket
     .to(reciever.socketId)
