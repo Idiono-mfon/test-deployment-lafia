@@ -236,7 +236,7 @@ export class SignallingServerService {
     console.log('Received RoomId:', data?.room);
 
     const res = {
-      room: data.room,
+      room: access?.roomId,
       token: access?.token,
       sender: data.sender,
       reciever: data.reciever,
