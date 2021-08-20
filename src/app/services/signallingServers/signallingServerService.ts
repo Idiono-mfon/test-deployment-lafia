@@ -209,6 +209,8 @@ export class SignallingServerService {
         data.room
       ) : null;
 
+    console.log('Call Access:', access);
+
     const res = {
       room: data.room,
       token: access?.token,
