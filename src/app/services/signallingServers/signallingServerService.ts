@@ -195,6 +195,7 @@ export class SignallingServerService {
   }
 
   private static async emitCallEvent(socket: Socket, data: any) {
+    console.log('Received Data:', data);
     const reciever: IOnlineUser = await SignallingServerService
         .redisStore
         .getUserById(data.reciever);
