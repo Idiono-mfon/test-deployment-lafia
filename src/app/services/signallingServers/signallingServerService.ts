@@ -219,7 +219,7 @@ export class SignallingServerService {
       socket: socket?.id,
     };
 
-    // console.log(res)
+    console.log(`Practitioner with an id of ${res?.sender} is calling a patient with an id of ${res?.reciever}...`)
 
     socket
     .to(reciever.socketId)
