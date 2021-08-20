@@ -31,11 +31,6 @@ const subClient = pubClient.duplicate();
  * Note: http://localhost:3000 address is only
  * used for development.
  */
-// const corsAllowedOriginsForSocketIO = [
-//   'http://localhost:3000',
-//   'http://sonalysis-frontend.s3.amazonaws.com',
-//   'http://sonalysis-frontend.s3-website-us-east-1.amazonaws.com'
-// ];
 
 export class SignallingServerService {
   private readonly io: any;
@@ -83,7 +78,7 @@ export class SignallingServerService {
     const user: IOnlineUser = {
       userId,
       resourceType,
-      socketId: socket.id
+      socketId: socket?.id
     } as IOnlineUser;
 
     await SignallingServerService.redisStore.saveOnlineUser(user);
@@ -188,7 +183,7 @@ export class SignallingServerService {
       roomId: data.roomId,
       token,
       practitionerName: data.practitionerName,
-      socket: socket.id,
+      socket: socket?.id,
     });
   }
 
@@ -221,7 +216,7 @@ export class SignallingServerService {
       senderDetails: sender,
       recieverDetails: reciever,
       type: data.type,
-      socket: socket.id,
+      socket: socket?.id,
     };
 
     // console.log(res)
@@ -240,7 +235,7 @@ export class SignallingServerService {
 
   private static emitAnswerMadeEvent(socket: Socket, data: any) {
     socket.to(data.to).emit('answerMade', {
-      socket: socket.id,
+      socket: socket?.id,
       answer: data.answer,
     });
   }
@@ -254,7 +249,7 @@ export class SignallingServerService {
   private static emitCandidateSharedEvent(socket: Socket, data: any) {
     socket.to(data.to).emit('candidateShared', {
       candidate: data.candidate,
-      socket: socket.id,
+      socket: socket?.id,
     });
   }
 
@@ -264,7 +259,7 @@ export class SignallingServerService {
       resourceType = resourceType as unknown as string;
       resourceType = resourceType.toLowerCase();
       const user: IOnlineUser = { userId, resourceType } as IOnlineUser;
-      console.log(`DisconnectedUser: ${socket.id}`);
+      console.log(`DisconnectedUser: ${socket?.id}`);
       await SignallingServerService.redisStore.removeUserBYId(user.userId);
       await SignallingServerService.emitOnlinePractitionersEvent(io);
 

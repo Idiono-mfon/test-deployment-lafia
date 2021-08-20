@@ -20,10 +20,14 @@ export class TwilioService {
   @inject(TYPES.UserRepository)
   private userRepository: UserRepository;
   
-  public async generateAccessToken(identity: string): Promise<{ roomId: string, token: string }> {
+  public async generateAccessToken(identity: string, roomId?: string): Promise<{ roomId: string, token: string }> {
     try {
 
-      const newRoomId = await TwilioService.createRoom();
+      let newRoomId = roomId;
+
+      if (!newRoomId) {
+        newRoomId = await TwilioService.createRoom();
+      }
 
       const videoGrant = new VideoGrant({
         room: newRoomId
