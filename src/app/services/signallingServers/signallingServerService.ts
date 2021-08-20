@@ -72,7 +72,6 @@ export class SignallingServerService {
 
   private static async listenForConnectionEvent(socket: Socket) {
     let { userId, resourceType } = socket.handshake.query;
-    console.log('SOCKET_CONNECTION_DATA:', { userId, resourceType });
     resourceType = resourceType as unknown as string;
     resourceType = resourceType.toLowerCase();
     const user: IOnlineUser = {
@@ -124,10 +123,12 @@ export class SignallingServerService {
       const existingCare = await SignallingServerService.redisStore.getBroadcastByVideoUrl(acceptCare.videoUrl);
 
       if (existingCare?.initiateCare) {
-        return cb({
-          status: false,
-          description: 'Care already initiated by another practitioner'
-        });
+        if (existingCare?.practitionerId !== acceptCare?.practitionerId) {
+          return cb({
+            status: false,
+            description: 'Care already initiated by another practitioner'
+          });
+        }
       }
 
       await SignallingServerService.redisStore.updateBroadcast(acceptCare);
