@@ -129,8 +129,8 @@ export class UserController extends BaseController {
   @httpPost('/access/generate')
   public async generateTwilioAccessToken(@request() req: Request, @response() res: Response) {
     try {
-      const { identity } = req.body;
-      const verify = await this.twilioService.generateAccessToken(identity);
+      const { identity, room } = req.body;
+      const verify = await this.twilioService.generateAccessToken(identity, room);
       this.success(res, verify, 'Access Token');
     } catch (e) {
       this.error(res, e);
