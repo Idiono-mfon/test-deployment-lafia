@@ -206,7 +206,7 @@ export class SignallingServerService {
     const access = data.type === 'connect' ? await SignallingServerService
       .twilioService
       .generateAccessToken(
-        data.sender,
+        data.reciever,
         data.room
       ) : null;
 
