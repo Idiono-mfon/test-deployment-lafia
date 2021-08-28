@@ -65,13 +65,7 @@ export class TwilioService {
           recordParticipantsOnConnect: true,
         });
 
-      const roomSid = room?.sid;
-
-      await twilioClient.video.rooms(roomSid)
-        .recordingRules
-        .update({ rules: [{ 'type': 'include', 'all': true }] });
-
-      return roomSid;
+      return room?.sid;
     } catch (e) {
       throw new GenericResponseError(e.message, e.code);
     }
