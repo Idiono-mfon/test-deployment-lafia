@@ -56,6 +56,7 @@ export class TwilioService {
         .video.rooms
         .create({
           uniqueName: roomUniqueName,
+          type: 'group',
           recordParticipantsOnConnect: true,
         });
 
