@@ -25,9 +25,7 @@ export class TwilioService {
 
       let newRoomId = roomId;
 
-      // if (!newRoomId) {
-      //   newRoomId = await TwilioService.createRoom();
-      // }
+      await TwilioService.createRoom(newRoomId);
 
       const videoGrant = new VideoGrant({
         room: newRoomId
@@ -51,12 +49,13 @@ export class TwilioService {
     }
   }
 
-  public static async createRoom(): Promise<string> {
+  public static async createRoom(roomName: string): Promise<string> {
     try {
+      const roomUniqueName = roomName ||uuidV4();
       const room = await twilioClient
         .video.rooms
         .create({
-          uniqueName: uuidV4(),
+          uniqueName: roomUniqueName,
           recordParticipantsOnConnect: true,
         });
 
