@@ -23,15 +23,6 @@ const pubClient = new Redis({
 });
 const subClient = pubClient.duplicate();
 
-
-/*
- * These are all the client side addresses
- * allowed through cors for socket.io communication
- *
- * Note: http://localhost:3000 address is only
- * used for development.
- */
-
 export class SignallingServerService {
   private readonly io: any;
   private static redisStore: RedisStore;
@@ -209,9 +200,6 @@ export class SignallingServerService {
         data.reciever,
         data.room
       ) : null;
-
-    console.log('Access RoomId:', access?.roomId);
-    console.log('Received RoomId:', data?.room);
 
     const res = {
       room: data.room,
