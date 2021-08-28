@@ -25,7 +25,7 @@ export class TwilioService {
 
       let newRoomId = roomId;
 
-      // await TwilioService.createRoom(newRoomId);
+      await TwilioService.createRoom(newRoomId);
 
       const videoGrant = new VideoGrant({
         room: newRoomId
