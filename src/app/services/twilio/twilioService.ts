@@ -56,22 +56,15 @@ export class TwilioService {
 
   public static async createRoom(roomName: string): Promise<string> {
     try {
-      const roomUniqueName = roomName ||uuidV4();
       const room = await twilioClient
         .video.rooms
         .create({
-          uniqueName: roomUniqueName,
+          uniqueName: roomName,
           type: 'group',
           recordParticipantsOnConnect: true,
         });
 
-      const roomSid = room?.sid;
-
-      await twilioClient.video.rooms(roomSid)
-        .recordingRules
-        .update({ rules: [{ 'type': 'include', 'all': true }] });
-
-      return roomSid;
+      return room?.sid;
     } catch (e) {
       throw new GenericResponseError(e.message, e.code);
     }
