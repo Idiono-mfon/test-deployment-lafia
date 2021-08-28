@@ -4,7 +4,7 @@ import { v4 as uuidV4 } from 'uuid';
 import { Env } from '../../config/env';
 import TYPES from '../../config/types';
 import { UserRepository } from '../../repository';
-import { GenericResponseError } from '../../utils';
+import { GenericResponseError, HttpStatusCode } from '../../utils';
 
 const env = Env.all();
 const { AccessToken } = jwt;
@@ -25,7 +25,12 @@ export class TwilioService {
 
       let newRoomId = roomId;
 
-      await TwilioService.createRoom(newRoomId);
+      try {
+        await TwilioService.createRoom(newRoomId);
+      } catch (e) {
+        console.log("Error creating room");
+        throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
+      }
 
       const videoGrant = new VideoGrant({
         room: newRoomId
