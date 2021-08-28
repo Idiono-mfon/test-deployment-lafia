@@ -215,6 +215,8 @@ export class SignallingServerService {
       socket: socket?.id,
     };
 
+    console.log('RES:', res);
+
     socket
     .to(reciever.socketId)
     .emit('call', res);
