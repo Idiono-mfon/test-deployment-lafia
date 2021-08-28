@@ -201,6 +201,9 @@ export class SignallingServerService {
         data.room
       ) : null;
 
+    console.log('Access RoomId:', access?.roomId);
+    console.log('Received RoomId:', data?.room);
+
     const res = {
       room: data.room,
       token: access?.token,
@@ -215,6 +218,8 @@ export class SignallingServerService {
     socket
     .to(reciever.socketId)
     .emit('call', res);
+
+    console.log('Calling...');
   }
 
   private static listenForMakeAnswerEvent(socket: Socket) {
