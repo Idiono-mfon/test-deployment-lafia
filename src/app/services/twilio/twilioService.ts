@@ -1,6 +1,5 @@
 import { inject, injectable } from 'inversify';
 import twilio, { jwt } from 'twilio';
-import { v4 as uuidV4 } from 'uuid';
 import { Env } from '../../config/env';
 import TYPES from '../../config/types';
 import { UserRepository } from '../../repository';
@@ -20,16 +19,18 @@ export class TwilioService {
   @inject(TYPES.UserRepository)
   private userRepository: UserRepository;
   
-  public async generateAccessToken(identity: string, roomId: string): Promise<{ roomId: string, token: string }> {
+  public async generateAccessToken(identity: string, roomId: string, newRoom = false): Promise<{ roomId: string, token: string }> {
     try {
 
       let newRoomId = roomId;
 
-      try {
-        await TwilioService.createRoom(newRoomId);
-      } catch (e) {
-        console.log("Error creating room");
-        throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
+      if (newRoom) {
+        try {
+          await TwilioService.createRoom(newRoomId);
+        } catch (e) {
+          console.log('Error creating room');
+          throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
+        }
       }
 
       const videoGrant = new VideoGrant({
@@ -40,8 +41,8 @@ export class TwilioService {
         env.twilio_account_sid,
         env.twilio_api_key,
         env.twilio_api_secret,
-        { identity }
       );
+      token.identity = identity;
       token.addGrant(videoGrant);
 
       return {
@@ -119,3 +120,5 @@ export class TwilioService {
     }
   }
 }
+
+TwilioService.createRoom('xgBEad5ShZMOL26AAAF').then(e => console.log(e)).catch(e => console.log(e));
