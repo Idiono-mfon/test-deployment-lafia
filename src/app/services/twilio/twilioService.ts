@@ -120,5 +120,3 @@ export class TwilioService {
     }
   }
 }
-
-TwilioService.createRoom('xgBEad5ShZMOL26AAAF').then(e => console.log(e)).catch(e => console.log(e));
