@@ -7,7 +7,7 @@ import container from './config/inversify.config';
 import { InversifyExpressServer } from 'inversify-express-utils';
 import { Env } from './config/env';
 import TYPES from './config/types';
-import { PatientService, PractitionerService, MessageBroker } from './services';
+import { PatientService, PractitionerService, MessageBroker, VideoBroadcastService } from './services';
 import { SignallingServerService } from './services/signallingServers';
 import * as swaggerUi  from 'swagger-ui-express';
 import swaggerDocument from './config/swagger.config';
@@ -18,6 +18,7 @@ const app = express();
 const server = new InversifyExpressServer(container, null, null, app);
 const messageBroker = container.get<MessageBroker>(TYPES.MessageBroker);
 const patientService = container.get<PatientService>(TYPES.PatientService);
+const videoBroadcastService = container.get<VideoBroadcastService>(TYPES.VideoBroadcastService);
 const practitionerService = container.get<PractitionerService>(TYPES.PractitionerService);
 
 server.setConfig((app) => {
@@ -39,7 +40,7 @@ appServer.listen(PORT, () => {
   console.log(`Listening on port: ${PORT}`);
 });
 
-const signallingServer  = new SignallingServerService(appServer, patientService, practitionerService);
+const signallingServer  = new SignallingServerService(appServer, patientService, practitionerService, videoBroadcastService);
 signallingServer.initialize();
 
 export { app };

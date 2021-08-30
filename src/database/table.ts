@@ -22,6 +22,7 @@ export class Table {
   public static contact_points = 'contact_points';
   public static qualifications = 'qualifications';
   public static patients_address = 'patients_address';
+  public static video_broadcasts = 'video_broadcasts';
   public static patient_contacts = 'patient_contacts';
   public static codeable_concepts = 'codeable_concepts';
   public static language_label:string = 'language_label';
@@ -46,6 +47,7 @@ export class Table {
   public static practitioners_contact_points = 'practitioners_contact_points';
   public static practitioners_qualifications = 'practitioners_qualifications';
   public static practitioners_communications = 'practitioners_communications';
+  public static practitioner_video_broadcasts = 'practitioner_video_broadcasts';
   public static patient_contacts_contact_points = 'patient_contacts_contact_points';
   public static patient_contacts_codeable_concepts = 'patient_contacts_codeable_concepts';
 }
