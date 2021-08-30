@@ -11,3 +11,16 @@ export const VideoRecordValidation: JSONSchema = {
     streamUrl: { type: 'string' },
   }
 };
+
+export const VideoBroadcastValidation: JSONSchema = {
+  title: 'Video Broadcast Validation',
+  type: 'object',
+  required: ['streamId'],
+  properties: {
+    description: { type: 'string' },
+    initiate_care: { type: 'string' },
+    initiateCare: { type: 'string' },
+    videoUrl: { type: 'string' },
+    video_url: { type: 'string' }
+  }
+};
