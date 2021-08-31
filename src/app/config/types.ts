@@ -29,6 +29,7 @@ const TYPES = {
   VideoRecordService: Symbol('VideoRecordService'),
   LafiaMediaService: Symbol('LafiaMediaService'),
   ConsentService: Symbol('ConsentService'),
+  VideoBroadcastService: Symbol('VideoBroadcastService'),
 
   // repositories
   UserRepository: Symbol('UserRepository'),
@@ -39,6 +40,8 @@ const TYPES = {
   LabelRepository: Symbol('LabelRepository'),
   ComponentRepository: Symbol('ComponentRepository'),
   VideoRecordRepository: Symbol('VideoRecordRepository'),
+  VideoBroadcastRepository: Symbol('VideoBroadcastRepository'),
+  PractitionerVideoBroadcastRepository: Symbol('PractitionerVideoBroadcastRepository'),
 
   // middlewares
   AuthMiddleware: Symbol('AuthMiddleware'),

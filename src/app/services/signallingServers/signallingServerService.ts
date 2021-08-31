@@ -5,6 +5,7 @@ import { Env } from '../../config/env';
 import { forWho } from '../../utils';
 import { PatientService } from '../patients';
 import { PractitionerService } from '../practitioners';
+import { VideoBroadcastService } from '../videoRecords';
 import { TwilioService } from '../twilio';
 import {
   IAcceptCare,
@@ -13,6 +14,7 @@ import {
   IOnlineUser
 } from './interfaces';
 import { RedisStore } from './redisStore';
+import { IPractitionerVideoBroadcast, IVideoBroadcast } from '../../models';
 
 const env = Env.all();
 
@@ -23,25 +25,18 @@ const pubClient = new Redis({
 });
 const subClient = pubClient.duplicate();
 
-
-/*
- * These are all the client side addresses
- * allowed through cors for socket.io communication
- *
- * Note: http://localhost:3000 address is only
- * used for development.
- */
-
 export class SignallingServerService {
   private readonly io: any;
   private static redisStore: RedisStore;
   private static onlinePractitionerRoom: string;
   private static twilioService: any;
+  private static videoBroadcastService: VideoBroadcastService;
 
-  constructor(appServer: any, patientService: PatientService, practitionerService: PractitionerService) {
+  constructor(appServer: any, patientService: PatientService, practitionerService: PractitionerService, videoBroadcastService: VideoBroadcastService) {
     SignallingServerService.redisStore = new RedisStore(pubClient, patientService, practitionerService);
     SignallingServerService.onlinePractitionerRoom = 'onlinePractitioners';
     SignallingServerService.twilioService = new TwilioService();
+    SignallingServerService.videoBroadcastService = videoBroadcastService;
 
     this.io = new Server(appServer, {
       cors: {
@@ -72,7 +67,6 @@ export class SignallingServerService {
 
   private static async listenForConnectionEvent(socket: Socket) {
     let { userId, resourceType } = socket.handshake.query;
-    console.log('SOCKET_CONNECTION_DATA:', { userId, resourceType });
     resourceType = resourceType as unknown as string;
     resourceType = resourceType.toLowerCase();
     const user: IOnlineUser = {
@@ -109,6 +103,18 @@ export class SignallingServerService {
       await SignallingServerService.redisStore.saveBroadcast(newBroadcast);
       const newCareBroadCast = await this.redisStore
         .getBroadcastByVideoUrl(newBroadcast.videoUrl);
+      
+      const vidBroadcast: IVideoBroadcast = {
+        patientId: newCareBroadCast.patientId,
+        patient_id: newCareBroadCast.patientId,
+        description: newCareBroadCast.description,
+        initiate_care: newCareBroadCast.initiateCare,
+        initiateCare: newCareBroadCast.initiateCare,
+        videoUrl: newCareBroadCast.videoUrl,
+        video_url: newCareBroadCast.videoUrl
+      }
+
+      SignallingServerService.videoBroadcastService.saveBroadcastVideo(vidBroadcast);
 
       SignallingServerService.emitNewCareEvent(socket, newCareBroadCast);
     });
@@ -119,18 +125,35 @@ export class SignallingServerService {
       .emit('newCare', newCareBroadcast);
   }
 
-  private static listenForAcceptCareEvent(socket: Socket) {
+  private static async listenForAcceptCareEvent(socket: Socket) {
     socket.on('acceptCare', async (acceptCare: IAcceptCare, cb) => {
       const existingCare = await SignallingServerService.redisStore.getBroadcastByVideoUrl(acceptCare.videoUrl);
 
       if (existingCare?.initiateCare) {
-        return cb({
-          status: false,
-          description: 'Care already initiated by another practitioner'
-        });
+        if (existingCare?.practitionerId !== acceptCare?.practitionerId) {
+          return cb({
+            status: false,
+            description: 'Care already initiated by another practitioner'
+          });
+        }
       }
 
       await SignallingServerService.redisStore.updateBroadcast(acceptCare);
+
+      const videoBroadcast = await SignallingServerService.videoBroadcastService.getOneVideoRecord({
+        patient_id: existingCare.patientId,
+        video_url: existingCare.videoUrl
+      });
+
+      if(videoBroadcast) {
+        const vidId: string = videoBroadcast.id ? videoBroadcast.id: '';
+        const data: IPractitionerVideoBroadcast = {
+          practioner_id: acceptCare.practitionerId,
+          video_broadcast_id: vidId
+        }
+        SignallingServerService.videoBroadcastService.assignBroadcastVideoToPractitioner(data);
+      }
+      
 
       // const roomId = await TwilioService.createRoom();
       const { token, roomId } = await SignallingServerService.twilioService
@@ -194,6 +217,7 @@ export class SignallingServerService {
   }
 
   private static async emitCallEvent(socket: Socket, data: any) {
+    console.log('Received Data:', data);
     const reciever: IOnlineUser = await SignallingServerService
         .redisStore
         .getUserById(data.reciever);
@@ -201,12 +225,15 @@ export class SignallingServerService {
         .redisStore
         .getUserById(data.sender);
 
-    const access = data.type === "connect" ? await SignallingServerService
+    const access = data.type === 'connect' ? await SignallingServerService
       .twilioService
       .generateAccessToken(
         data.reciever,
         data.room
       ) : null;
+
+    console.log('Access RoomId:', access?.roomId);
+    console.log('Received RoomId:', data?.room);
 
     const res = {
       room: data.room,
@@ -219,11 +246,13 @@ export class SignallingServerService {
       socket: socket?.id,
     };
 
-    console.log(`Practitioner with an id of ${res?.sender} is calling a patient with an id of ${res?.reciever}...`)
+    console.log('RES:', res);
 
     socket
     .to(reciever.socketId)
     .emit('call', res);
+
+    console.log('Calling...');
   }
 
   private static listenForMakeAnswerEvent(socket: Socket) {
