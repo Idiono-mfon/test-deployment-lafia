@@ -37,3 +37,13 @@ export interface IFindVideoBroadcast extends IBase {
   videoUrl?: string;
   video_url?: string;
 }
+
+export interface IPractitionerVideoBroadcast extends IBase {
+  practioner_id?: string;
+  video_broadcast_id: string;
+}
+
+export interface IFindPractitionerVideoBroadcast extends IBase {
+  practioner_id?: string;
+  video_broadcast_id: string;
+}
