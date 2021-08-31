@@ -15,12 +15,23 @@ export const VideoRecordValidation: JSONSchema = {
 export const VideoBroadcastValidation: JSONSchema = {
   title: 'Video Broadcast Validation',
   type: 'object',
-  required: ['streamId'],
+  required: ['patient_id'],
   properties: {
+    patient_id: { format: 'uuid', type: 'string'  },
     description: { type: 'string' },
     initiate_care: { type: 'string' },
-    initiateCare: { type: 'string' },
-    videoUrl: { type: 'string' },
+    // initiateCare: { type: 'string' },
+    // videoUrl: { type: 'string' },
     video_url: { type: 'string' }
+  }
+};
+
+export const PractitionerVideoBroadcastValidation: JSONSchema = {
+  title: 'Practitioner Video Broadcast Validation',
+  type: 'object',
+  required: ['pratitioner_id'],
+  properties: {
+    pratitioner_id: { format: 'uuid', type: 'string' },
+    pratitionerId: { format: 'uuid', type: 'string' }
   }
 };

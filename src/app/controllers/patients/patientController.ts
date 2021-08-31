@@ -93,4 +93,15 @@ export class PatientController extends BaseController {
       this.error(res, e);
     }
   }
+
+  @httpGet('/:id/broadcast/videos')
+  public async broadcastVideos(@request() req: Request, @response() res: Response){
+    try {
+      const { id: patientId } = req.params;
+      const vids = await this.patientService.findPatientVideoBroadcast(patientId);
+      this.success(res, vids, 'Request completed successfully');
+    } catch (e) {
+      this.error(res, e);
+    }
+  }
 }

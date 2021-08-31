@@ -1,13 +1,19 @@
 import { inject, injectable } from "inversify";
 import TYPES from "../../config/types";
-import { IFindVideoBroadcast, IVideoBroadcast } from "../../models";
+import { IFindVideoBroadcast, IPractitionerVideoBroadcast, IVideoBroadcast } from "../../models";
+import { VideoBroadcastModel } from "../../models/videoRecords/videoBroadcastModel";
 import { VideoBroadcastRepository } from "../../repository";
-import { InternalServerError } from "../../utils";
+import { PractitionerVideoBroadcastRepository } from "../../repository/videoRecords/practitionerVideoBroadcastRepository";
+import { InternalServerError, NotFoundError } from "../../utils";
 
 @injectable()
 export class VideoBroadcastService {
     @inject(TYPES.VideoBroadcastRepository)
     private readonly videoBroadcastRepository: VideoBroadcastRepository;
+
+    @inject(TYPES.PractitionerVideoBroadcastRepository)
+    private readonly practitionervideoBroadcastRepository: PractitionerVideoBroadcastRepository;
+
 
     public async saveBroadcastVideo(data: IVideoBroadcast): Promise<IVideoBroadcast> {
         try {
@@ -23,13 +29,26 @@ export class VideoBroadcastService {
         } catch (e) {
           throw new InternalServerError(e.message);
         }
-      }
+    }
     
-      public async getAllVideoRecords(user_id: string): Promise<IVideoBroadcast[]> {
+    public async getAllVideoRecords(user_id: string): Promise<IVideoBroadcast[]> {
         try {
           return await this.videoBroadcastRepository.getAllBroadcastVideos(user_id);
         } catch (e) {
           throw new InternalServerError(e.message);
         }
-      }
+    }
+
+    public async assignBroadcastVideoToPractitioner(data: IPractitionerVideoBroadcast): Promise<IPractitionerVideoBroadcast> {
+        const videoBroadcasts: VideoBroadcastModel = await this.videoBroadcastRepository.fetchBroadcastByID(data.video_broadcast_id);
+        if ( !videoBroadcasts ) {
+            throw new NotFoundError("video broadcasts not found");
+        }
+
+        try {
+          return await this.practitionervideoBroadcastRepository.savePractitionerBroadcastVideo(data);
+        } catch (e) {
+          throw new InternalServerError(e.message);
+        }
+    }
 }

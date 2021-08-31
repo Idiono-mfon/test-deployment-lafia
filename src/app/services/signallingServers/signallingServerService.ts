@@ -14,7 +14,7 @@ import {
   IOnlineUser
 } from './interfaces';
 import { RedisStore } from './redisStore';
-import { IVideoBroadcast } from '../../models';
+import { IPractitionerVideoBroadcast, IVideoBroadcast } from '../../models';
 
 const env = Env.all();
 
@@ -140,10 +140,20 @@ export class SignallingServerService {
 
       await SignallingServerService.redisStore.updateBroadcast(acceptCare);
 
-      // const videoBroadcast = await SignallingServerService.videoBroadcastService.getOneVideoRecord({
-      //   patient_id: existingCare.patientId,
-      //   video_url: existingCare.videoUrl
-      // })
+      const videoBroadcast = await SignallingServerService.videoBroadcastService.getOneVideoRecord({
+        patient_id: existingCare.patientId,
+        video_url: existingCare.videoUrl
+      });
+
+      if(videoBroadcast) {
+        const vidId: string = videoBroadcast.id ? videoBroadcast.id: '';
+        const data: IPractitionerVideoBroadcast = {
+          practioner_id: acceptCare.practitionerId,
+          video_broadcast_id: vidId
+        }
+        SignallingServerService.videoBroadcastService.assignBroadcastVideoToPractitioner(data);
+      }
+      
 
       // const roomId = await TwilioService.createRoom();
       const { token, roomId } = await SignallingServerService.twilioService
