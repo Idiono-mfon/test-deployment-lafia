@@ -5,6 +5,7 @@ import { Env } from '../../config/env';
 import { forWho } from '../../utils';
 import { PatientService } from '../patients';
 import { PractitionerService } from '../practitioners';
+import { VideoBroadcastService } from '../videoRecords';
 import { TwilioService } from '../twilio';
 import {
   IAcceptCare,
@@ -13,6 +14,7 @@ import {
   IOnlineUser
 } from './interfaces';
 import { RedisStore } from './redisStore';
+import { IPractitionerVideoBroadcast, IVideoBroadcast } from '../../models';
 
 const env = Env.all();
 
@@ -28,11 +30,13 @@ export class SignallingServerService {
   private static redisStore: RedisStore;
   private static onlinePractitionerRoom: string;
   private static twilioService: any;
+  private static videoBroadcastService: VideoBroadcastService;
 
-  constructor(appServer: any, patientService: PatientService, practitionerService: PractitionerService) {
+  constructor(appServer: any, patientService: PatientService, practitionerService: PractitionerService, videoBroadcastService: VideoBroadcastService) {
     SignallingServerService.redisStore = new RedisStore(pubClient, patientService, practitionerService);
     SignallingServerService.onlinePractitionerRoom = 'onlinePractitioners';
     SignallingServerService.twilioService = new TwilioService();
+    SignallingServerService.videoBroadcastService = videoBroadcastService;
 
     this.io = new Server(appServer, {
       cors: {
@@ -99,6 +103,18 @@ export class SignallingServerService {
       await SignallingServerService.redisStore.saveBroadcast(newBroadcast);
       const newCareBroadCast = await this.redisStore
         .getBroadcastByVideoUrl(newBroadcast.videoUrl);
+      
+      const vidBroadcast: IVideoBroadcast = {
+        patientId: newCareBroadCast.patientId,
+        patient_id: newCareBroadCast.patientId,
+        description: newCareBroadCast.description,
+        initiate_care: newCareBroadCast.initiateCare,
+        initiateCare: newCareBroadCast.initiateCare,
+        videoUrl: newCareBroadCast.videoUrl,
+        video_url: newCareBroadCast.videoUrl
+      }
+
+      SignallingServerService.videoBroadcastService.saveBroadcastVideo(vidBroadcast);
 
       SignallingServerService.emitNewCareEvent(socket, newCareBroadCast);
     });
@@ -109,7 +125,7 @@ export class SignallingServerService {
       .emit('newCare', newCareBroadcast);
   }
 
-  private static listenForAcceptCareEvent(socket: Socket) {
+  private static async listenForAcceptCareEvent(socket: Socket) {
     socket.on('acceptCare', async (acceptCare: IAcceptCare, cb) => {
       const existingCare = await SignallingServerService.redisStore.getBroadcastByVideoUrl(acceptCare.videoUrl);
 
@@ -123,6 +139,21 @@ export class SignallingServerService {
       }
 
       await SignallingServerService.redisStore.updateBroadcast(acceptCare);
+
+      const videoBroadcast = await SignallingServerService.videoBroadcastService.getOneVideoRecord({
+        patient_id: existingCare.patientId,
+        video_url: existingCare.videoUrl
+      });
+
+      if(videoBroadcast) {
+        const vidId: string = videoBroadcast.id ? videoBroadcast.id: '';
+        const data: IPractitionerVideoBroadcast = {
+          practioner_id: acceptCare.practitionerId,
+          video_broadcast_id: vidId
+        }
+        SignallingServerService.videoBroadcastService.assignBroadcastVideoToPractitioner(data);
+      }
+      
 
       // const roomId = await TwilioService.createRoom();
       const { token, roomId } = await SignallingServerService.twilioService

@@ -89,4 +89,15 @@ export class PractitionerController extends BaseController {
       this.error(res, e);
     }
   }
+
+  @httpGet('/:id/broadcast/videos')
+  public async broadcastVideos(@request() req: Request, @response() res: Response){
+    try {
+      const { id: practitionerId } = req.params;
+      const vids = await this.practitionerService.findAssignedPractitionervideoBroadcast(practitionerId);
+      this.success(res, vids, 'Request completed successfully');
+    } catch (e) {
+      this.error(res, e);
+    }
+  }
 }

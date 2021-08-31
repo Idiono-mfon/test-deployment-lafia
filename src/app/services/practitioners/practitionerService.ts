@@ -5,21 +5,24 @@ import {
   IAttachment,
   PractitionersAttachmentModel,
   IPractitioner,
-  IUser, IFindUser
+  IUser, IFindUser, PractitionerModel
 } from '../../models';
 import { IUserLoginParams } from '../auth';
 import { S3Service } from '../aws';
 import { CodeSystemService } from '../codeSystems';
-import { PractitionerRepository } from '../../repository';
+import { PractitionerRepository, VideoBroadcastRepository } from '../../repository';
 import {
   error,
   forWho, GenericResponseError,
   InternalServerError,
+  NotFoundError,
   throwError, UtilityService
 } from '../../utils';
 import { FhirServerService } from '../fhirServer';
 import { PlatformSdkService } from '../platformSDK';
 import { UserService } from '../users';
+import { VideoBroadcastModel } from '../../models/videoRecords/videoBroadcastModel';
+import { PractitionerVideoBroadcastRepository } from '../../repository/videoRecords/practitionerVideoBroadcastRepository';
 
 @injectable()
 export class PractitionerService {
@@ -43,6 +46,12 @@ export class PractitionerService {
 
   @inject(TYPES.FhirServerService)
   private readonly fhirServerService: FhirServerService;
+
+  @inject(TYPES.VideoBroadcastRepository)
+  private readonly videoBroadcastRepository: VideoBroadcastRepository;
+
+  @inject(TYPES.PractitionerVideoBroadcastRepository)
+  private readonly practitionervideoBroadcastRepository: PractitionerVideoBroadcastRepository;
 
   public async updatePractitioner(id: string, data: any): Promise<IPractitioner> {
     try {
@@ -189,5 +198,27 @@ export class PractitionerService {
     } catch (e) {
       throw new InternalServerError(e.message);
     }
+  }
+
+  public async attachBroadCastVideo(practictionerId: string, videoBroadcastId: string): Promise<any> {
+
+    const videoBroadcasts: VideoBroadcastModel = await this.videoBroadcastRepository.fetchBroadcastByID(videoBroadcastId);
+    if ( !videoBroadcasts ) {
+      throw new NotFoundError("video broadcasts not found");
+    }
+    const practitioner: IPractitioner = await this.practitionerRepo.findPractitionerById(practictionerId);
+    if ( !practitioner ) {
+      throw new NotFoundError("practitioner not found");
+    }
+    return this.practitionerRepo.attachBroadcastVideos(practictionerId, videoBroadcastId);
+  }
+
+  public async findAssignedPractitionervideoBroadcast(practitionerId: string) {
+    const practitioner = this.findPractitionerById(practitionerId)
+    if ( !practitioner ) {
+      throw new NotFoundError("unknown practitioner");
+    }
+    const practVidBroad = await this.practitionervideoBroadcastRepository.fetchPractitionerBroadcastByID(practitionerId);
+    return practVidBroad;
   }
 }
