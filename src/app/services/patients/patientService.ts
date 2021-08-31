@@ -19,9 +19,11 @@ import {
   forWho, GenericResponseError,
   getE164Format,
   InternalServerError,
+  NotFoundError,
   throwError, UtilityService
 } from '../../utils';
 import { UserService } from '../users';
+import { VideoBroadcastService } from '../videoRecords';
 
 @injectable()
 export class PatientService {
@@ -30,6 +32,9 @@ export class PatientService {
 
   @inject(TYPES.CodeSystemService)
   private readonly codeSystemService: CodeSystemService;
+
+  @inject(TYPES.VideoBroadcastService)
+  private readonly videoBroadcastService: VideoBroadcastService;
 
   @inject(TYPES.S3Service)
   private readonly s3Service: S3Service;
@@ -200,4 +205,14 @@ export class PatientService {
       throw new InternalServerError(e.message);
     }
   }
+
+  public async findPatientVideoBroadcast(patientId: string) {
+    const patient = this.findPatientById(patientId)
+    if ( !patient ) {
+      throw new NotFoundError("unknown patient");
+    }
+    const practVidBroad = await this.videoBroadcastService.getAllVideoRecords(patientId);
+    return practVidBroad;
+  }
+
 }

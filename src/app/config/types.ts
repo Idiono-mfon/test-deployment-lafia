@@ -41,6 +41,7 @@ const TYPES = {
   ComponentRepository: Symbol('ComponentRepository'),
   VideoRecordRepository: Symbol('VideoRecordRepository'),
   VideoBroadcastRepository: Symbol('VideoBroadcastRepository'),
+  PractitionerVideoBroadcastRepository: Symbol('PractitionerVideoBroadcastRepository'),
 
   // middlewares
   AuthMiddleware: Symbol('AuthMiddleware'),

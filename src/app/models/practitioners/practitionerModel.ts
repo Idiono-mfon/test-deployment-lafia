@@ -154,6 +154,20 @@ export class PractitionerModel extends BaseModel implements IPractitioner {
           to: `${Schema.lafiaService}.${Table.qualifications}.id`
         }
       },
+
+      broadcastVideos: {
+        relation: BaseModel.ManyToManyRelation,
+        modelClass: '../videoRecords/videoBroadcastModel',
+        join: {
+          from: `${Schema.lafiaService}.${Table.practitioners}.id`,
+          through: {
+            modelClass: '../videoRecords/practitionerVideoBroadcastModel',
+            from: `${Schema.lafiaService}.${Table.practitioner_video_broadcasts}.practitioner_id`,
+            to: `${Schema.lafiaService}.${Table.practitioner_video_broadcasts}.video_broadcast_id`,
+          },
+          to: `${Schema.lafiaService}.${Table.video_broadcasts}.id`
+        }
+      }
     }
   }
 }

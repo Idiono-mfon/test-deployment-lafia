@@ -6,6 +6,11 @@ import { InternalServerError } from '../../utils';
 @injectable()
 export class VideoBroadcastRepository {
 
+    public async fetchBroadcastByID(videoBroadcastId: string){
+        const vid = await VideoBroadcastModel.query().findById(videoBroadcastId);
+        return vid;
+    }
+
     public async saveBroadcastVideo(data: IVideoBroadcast): Promise<IVideoBroadcast> {
         try {
           return await VideoBroadcastModel.query()

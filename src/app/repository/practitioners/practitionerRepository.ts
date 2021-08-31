@@ -126,4 +126,8 @@ export class PractitionerRepository {
       throw new GenericResponseError(e.message, HttpStatusCode.BAD_REQUEST);
     }
   }
+
+  public async attachBroadcastVideos(practitionerID: string, broadcastVideoId: string): Promise<any> {
+    return await PractitionerModel.relatedQuery('broadcastVideos').for(practitionerID).relate(broadcastVideoId);                  
+  }
 }
