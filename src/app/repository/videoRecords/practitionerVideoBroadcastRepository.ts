@@ -1,14 +1,18 @@
 import { injectable } from 'inversify';
-import { IFindPractitionerVideoBroadcast, IPractitionerVideoBroadcast } from '../../models';
-import { PractitionerVideoBroadcastModel } from '../../models/videoRecords/PractitionerVideoBroadcastModel';
+import {
+  IPractitionerVideoBroadcast,
+  IFindPractitionerVideoBroadcast,
+  PractitionerVideoBroadcastModel,
+} from '../../models';
 import { InternalServerError } from '../../utils';
 
 @injectable()
 export class PractitionerVideoBroadcastRepository {
 
     public async fetchPractitionerBroadcastByID(practitionerVideoBroadcastId: string){
-        const vid = await PractitionerVideoBroadcastModel.query().withGraphFetched('videoBroadcast').findById(practitionerVideoBroadcastId);
-        return vid;
+      return PractitionerVideoBroadcastModel.query()
+        .withGraphFetched('videoBroadcast')
+        .findById(practitionerVideoBroadcastId);
     }
 
     public async savePractitionerBroadcastVideo(data: IPractitionerVideoBroadcast): Promise<IPractitionerVideoBroadcast> {

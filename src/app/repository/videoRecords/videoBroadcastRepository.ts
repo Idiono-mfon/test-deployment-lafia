@@ -1,6 +1,9 @@
 import { injectable } from 'inversify';
-import { IFindVideoBroadcast, IVideoBroadcast } from '../../models';
-import { VideoBroadcastModel } from '../../models/videoRecords/videoBroadcastModel';
+import {
+  IVideoBroadcast,
+  IFindVideoBroadcast,
+  VideoBroadcastModel,
+} from '../../models';
 import { InternalServerError } from '../../utils';
 
 @injectable()
