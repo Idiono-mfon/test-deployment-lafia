@@ -62,10 +62,15 @@ export class TwilioService {
         .create({
           uniqueName: roomName,
           type: 'group',
-          recordParticipantsOnConnect: true,
         });
 
-      return room?.sid;
+      const roomSid = room?.sid;
+
+      await twilioClient.video.rooms(roomSid)
+        .recordingRules
+        .update({ rules: [{ 'type': 'include', 'all': true }] });
+
+      return roomSid;
     } catch (e) {
       throw new GenericResponseError(e.message, e.code);
     }
@@ -79,6 +84,17 @@ export class TwilioService {
         .update({ status: 'completed' });
 
       return room?.sid;
+    } catch (e) {
+      throw new GenericResponseError(e.message, e.code);
+    }
+  }
+
+  public async getVideoRecording(recordingSid: string): Promise<string | any> {
+    try {
+      const uri = `https://video.twilio.com/v1/Recordings/${recordingSid}/Media`;
+      const twilioRecordResponse = await twilioClient.request({ method: "GET", uri: uri });
+      console.log('TRR:', twilioRecordResponse);
+      return twilioRecordResponse?.body?.redirect_to;
     } catch (e) {
       throw new GenericResponseError(e.message, e.code);
     }
@@ -120,3 +136,6 @@ export class TwilioService {
     }
   }
 }
+
+
+// new TwilioService().getVideoRecording('RTd6c30b7cc53784408dfbd92d9096b1ad').then(e => console.log(e)).catch(e => console.log(e));

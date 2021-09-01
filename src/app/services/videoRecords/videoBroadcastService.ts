@@ -12,7 +12,7 @@ export class VideoBroadcastService {
     private readonly videoBroadcastRepository: VideoBroadcastRepository;
 
     @inject(TYPES.PractitionerVideoBroadcastRepository)
-    private readonly practitionervideoBroadcastRepository: PractitionerVideoBroadcastRepository;
+    private readonly practitionerVideoBroadcastRepository: PractitionerVideoBroadcastRepository;
 
 
     public async saveBroadcastVideo(data: IVideoBroadcast): Promise<IVideoBroadcast> {
@@ -46,7 +46,7 @@ export class VideoBroadcastService {
         }
 
         try {
-          return await this.practitionervideoBroadcastRepository.savePractitionerBroadcastVideo(data);
+          return await this.practitionerVideoBroadcastRepository.savePractitionerBroadcastVideo(data);
         } catch (e) {
           throw new InternalServerError(e.message);
         }
