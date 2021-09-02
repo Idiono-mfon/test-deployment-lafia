@@ -20,12 +20,14 @@ import {
   CodeSystemRepository,
   VideoRecordRepository,
   PractitionerRepository,
+  VideoBroadcastRepository,
 } from '../repository';
 import {
   LabelRepository,
   LanguageRepository,
   ComponentRepository,
 } from '../repository/lang';
+import { PractitionerVideoBroadcastRepository } from '../repository/videoRecords/practitionerVideoBroadcastRepository';
 import {
   S3Service,
   UserService,
@@ -42,6 +44,7 @@ import {
   PlatformSdkService,
   VideoRecordService,
   PractitionerService,
+  VideoBroadcastService,
 } from '../services';
 import { UtilityService } from '../utils';
 import TYPES from './types';
@@ -160,6 +163,10 @@ container
   .bind<ConsentService>(TYPES.ConsentService)
   .to(ConsentService)
   .inSingletonScope();
+container
+  .bind<VideoBroadcastService>(TYPES.VideoBroadcastService)
+  .to(VideoBroadcastService)
+  .inSingletonScope();
 
 
 // repositories
@@ -194,6 +201,14 @@ container
 container
   .bind<VideoRecordRepository>(TYPES.VideoRecordRepository)
   .to(VideoRecordRepository)
+  .inSingletonScope();
+container
+  .bind<VideoBroadcastRepository>(TYPES.VideoBroadcastRepository)
+  .to(VideoBroadcastRepository)
+  .inSingletonScope();
+container
+  .bind<PractitionerVideoBroadcastRepository>(TYPES.PractitionerVideoBroadcastRepository)
+  .to(PractitionerVideoBroadcastRepository)
   .inSingletonScope();
 
 // middleware
