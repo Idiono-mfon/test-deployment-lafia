@@ -31,7 +31,7 @@ const swaggerDocument = {
         "title":"LAFIA FHIR API",
         "x-summary":"Lafia Healthcare Data Repository-FHIR offers a suite of REST APIs implemented per HL7 FHIR specification and is secured using the OAuth 2.0 security framework."
     },
-    "basePath":"https://api.lafia.io/fhir",
+    "basePath":"/fhir",
     "tags":[
         {
             "name":"Account"
