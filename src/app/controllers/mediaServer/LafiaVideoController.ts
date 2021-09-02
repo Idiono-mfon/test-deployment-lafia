@@ -3,7 +3,7 @@ import { inject } from 'inversify';
 import { controller, httpDelete, httpGet, httpPost, request, response } from 'inversify-express-utils';
 import TYPES from '../../config/types';
 import { AuthMiddleware } from '../../middlewares';
-import { LafiaMediaService, VideoBroadcastService } from '../../services';
+import { VideoBroadcastService } from '../../services';
 import { HttpStatusCode } from '../../utils';
 import { BaseController } from '../baseController';
 
@@ -26,7 +26,7 @@ export class LafiaVideoController extends BaseController {
     }
   }
 
-  @httpPost('/broadcast/patient/:patient_id')
+  @httpGet('/broadcast/patient/:patient_id')
   public async fetchPatientVideo(@request() req: Request, @response() res: Response): Promise<void> {
     try {
       // Retrieve the request's body
@@ -41,7 +41,7 @@ export class LafiaVideoController extends BaseController {
     }
   }
 
-  @httpPost('/broadcast/practitioner/:practitioner_id')
+  @httpGet('/broadcast/practitioner/:practitioner_id')
   public async fetchPractitionerVideo(@request() req: Request, @response() res: Response): Promise<void> {
     try {
       // Retrieve the request's body
