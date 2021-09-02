@@ -1,3 +1,5 @@
-export * from './videoRecordModel';
 export * from './interfaces';
 export * from './validation';
+export * from './videoRecordModel';
+export * from './videoBroadcastModel';
+export * from './practitionerVideoBroadcastModel';

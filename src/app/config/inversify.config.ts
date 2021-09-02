@@ -1,33 +1,30 @@
 import { Container } from 'inversify';
 import {
   AuthController,
+  LabelController,
   HealthController,
   PatientController,
+  ConsentController,
+  LanguageController,
+  ComponentController,
   FhirServerController,
   CodeSystemController,
   LafiaMediaController,
-  PractitionerController, ConsentController,
+  PractitionerController,
 } from '../controllers';
-import {
-  ComponentController,
-  LabelController,
-  LanguageController
-} from '../controllers/lang';
 import { AuthMiddleware } from '../middlewares';
 import {
   UserRepository,
+  LabelRepository,
   PatientRepository,
+  LanguageRepository,
+  ComponentRepository,
   CodeSystemRepository,
   VideoRecordRepository,
   PractitionerRepository,
   VideoBroadcastRepository,
+  PractitionerVideoBroadcastRepository,
 } from '../repository';
-import {
-  LabelRepository,
-  LanguageRepository,
-  ComponentRepository,
-} from '../repository/lang';
-import { PractitionerVideoBroadcastRepository } from '../repository/videoRecords/practitionerVideoBroadcastRepository';
 import {
   S3Service,
   UserService,

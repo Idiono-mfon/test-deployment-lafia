@@ -1,3 +1,4 @@
+export * from './lang';
 export * from './users';
 export * from './patients';
 export * from './codeSystems';
