@@ -110,7 +110,7 @@ export class SignallingServerService {
         // patientId: newCareBroadCast.patientId,
         patient_id: newCareBroadCast.patientId,
         description: newCareBroadCast.description,
-        initiate_care: newCareBroadCast.initiateCare,
+        initiate_care: String(newCareBroadCast.initiateCare),
         // initiateCare: newCareBroadCast.initiateCare,
         // videoUrl: newCareBroadCast.videoUrl,
         video_url: newCareBroadCast.videoUrl
