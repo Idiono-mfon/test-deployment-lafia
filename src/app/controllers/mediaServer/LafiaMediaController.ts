@@ -3,8 +3,8 @@ import { inject } from 'inversify';
 import { controller, httpDelete, httpGet, httpPost, request, response } from 'inversify-express-utils';
 import TYPES from '../../config/types';
 import { AuthMiddleware } from '../../middlewares';
-import { LafiaMediaService } from '../../services';
-import { HttpStatusCode } from '../../utils';
+import { FhirServerService, LafiaMediaService, TwilioService } from '../../services';
+import { GenericResponseError, HttpStatusCode } from '../../utils';
 import { BaseController } from '../baseController';
 
 @controller('/media')
@@ -13,6 +13,10 @@ export class LafiaMediaController extends BaseController {
   private readonly lafiaMediaService: LafiaMediaService;
   @inject(TYPES.AuthMiddleware)
   private readonly auth: AuthMiddleware;
+  @inject(TYPES.TwilioService)
+  private readonly twilioService: TwilioService;
+  @inject(TYPES.FhirServerService)
+  private readonly fhirServerService: FhirServerService;
 
   @httpPost('/broadcast', TYPES.AuthMiddleware)
   public async createBroadcast(@request() req: Request, @response() res: Response) {
@@ -32,8 +36,6 @@ export class LafiaMediaController extends BaseController {
       // Retrieve the request's body
       const event = req.body;
 
-      console.log('MediaEvent:', event);
-
       if (event?.action === 'vodReady') {
         const streamUrl = await this.lafiaMediaService.getRecordedStream(event?.vodId);
 
@@ -49,6 +51,106 @@ export class LafiaMediaController extends BaseController {
         }
       }
 
+      if (event?.StatusCallbackEvent === 'recording-completed') {
+        await this.twilioService.composeRecordingMedia(event?.RoomSid);
+      }
+
+      if (event?.StatusCallbackEvent === 'composition-available') {
+        const recordedFileUrl = await this.twilioService.getVideoRecordingFile(event?.CompositionSid);
+        const { practitioner, patients } = await this.twilioService.getParticipantsByRoomSid(event?.RoomSid);
+
+        for (let patientId of patients) {
+          // Create an encounter for the patient
+          const encounterResourceData = {
+            resourceType: 'Encounter',
+            status: 'finished',
+            class: {
+              system: 'http://terminology.hl7.org/CodeSystem/v3-ActCode',
+              code: 'VR',
+              display: 'virtual'
+            },
+            subject: {
+              reference: `Patient/${patientId}`,
+            },
+            participant: [
+              {
+                period: {
+                  end: event?.Timestamp,
+                },
+                individual: {
+                  reference: `Practitioner/${practitioner}`
+                }
+              }
+            ],
+            period: {
+              end: event?.Timestamp,
+            },
+            reasonCode: [
+              {
+                text: `The patient had a TeleHealth care with a practitioner with concern to the patient's health condition`,
+              }
+            ]
+          }
+
+          let encounterResponse: any
+
+          try {
+            encounterResponse = await this.fhirServerService.executeQuery(
+              '/Encounter',
+              'POST',
+              encounterResourceData
+            );
+          } catch (e) {
+            throw new GenericResponseError(e.message, e.code);
+          }
+
+          const encounter = encounterResponse?.data;
+
+          // Create a media for the encounter
+          const mediaResourceData = {
+            resourceType: 'Media',
+            status: 'completed',
+            type: {
+              coding: [
+                {
+                  system: 'https://www.hl7.org/fhir/codesystem-media-type.html',
+                  code: 'video',
+                  display: 'Video'
+                }
+              ]
+            },
+            encounter: {
+              reference: `Encounter/${encounter?.id}`,
+            },
+            subject: {
+              reference: `Patient/${patientId}`,
+            },
+            createdDateTime: event?.Timestamp,
+            operator: {
+              reference: `Practitioner/${practitioner}`
+            },
+            duration: event?.Duration,
+            content: {
+              contentType: 'video/mp4',
+              url: recordedFileUrl,
+              size: event?.Size,
+              title: 'TeleHealth',
+              creation: event?.Timestamp,
+            }
+          }
+
+          try {
+            await this.fhirServerService.executeQuery(
+              '/Media',
+              'POST',
+              mediaResourceData
+            );
+          } catch (e) {
+            throw new GenericResponseError(e.message, e.code);
+          }
+        }
+      }
+
       res.sendStatus(200);
     } catch (e) {
       console.log(e);
@@ -58,7 +160,7 @@ export class LafiaMediaController extends BaseController {
   @httpGet('/broadcast/:streamId', TYPES.AuthMiddleware)
   public async getRecordedStream(@request() req: Request, @response() res: Response) {
     try {
-      const{ streamId } = req.params;
+      const { streamId } = req.params;
       const broadcast = await this.lafiaMediaService.getOneVideoRecord({ streamId });
 
       this.success(res, broadcast, 'Recorded Video Retrieved successfully', HttpStatusCode.CREATED);
@@ -82,7 +184,7 @@ export class LafiaMediaController extends BaseController {
   @httpDelete('/broadcast/:id', TYPES.AuthMiddleware)
   public async getRecordedStreamUrl(@request() req: Request, @response() res: Response) {
     try {
-      const{ id } = req.params;
+      const { id } = req.params;
       const broadcast = await this.lafiaMediaService.deleteVideoRecord(id);
 
       this.success(res, broadcast, 'Recorded Video deleted successfully', HttpStatusCode.CREATED);
@@ -92,7 +194,7 @@ export class LafiaMediaController extends BaseController {
   }
 
   @httpPost('/twilio/callback')
-  public async twilioVideoCallback(@request() req: Request, @response() res:Response) {
+  public async twilioVideoCallback(@request() req: Request, @response() res: Response) {
 
   }
 }

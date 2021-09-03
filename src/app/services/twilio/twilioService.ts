@@ -18,7 +18,7 @@ export class TwilioService {
 
   @inject(TYPES.UserRepository)
   private userRepository: UserRepository;
-  
+
   public async generateAccessToken(identity: string, roomId: string, newRoom = false): Promise<{ roomId: string, token: string }> {
     try {
 
@@ -89,12 +89,61 @@ export class TwilioService {
     }
   }
 
+  public async getParticipantsByRoomSid(roomSid: string) {
+    try {
+      const room = await twilioClient.video.rooms(roomSid)
+        .fetch();
+
+      const [,participants] = room?.uniqueName?.split(':');
+      const [practitioner, ...patients] = participants?.split('-');
+      
+      return { practitioner, patients, };
+    } catch (e) {
+      throw new GenericResponseError(e.message, e.code);
+    }
+  }
+
   public async getVideoRecording(recordingSid: string): Promise<string | any> {
     try {
       const uri = `https://video.twilio.com/v1/Recordings/${recordingSid}/Media`;
-      const twilioRecordResponse = await twilioClient.request({ method: "GET", uri: uri });
-      console.log('TRR:', twilioRecordResponse);
+      const twilioRecordResponse = await twilioClient.request({ method: 'GET', uri });
+
       return twilioRecordResponse?.body?.redirect_to;
+    } catch (e) {
+      throw new GenericResponseError(e.message, e.code);
+    }
+  }
+
+  public async composeRecordingMedia(roomId: string) {
+    try {
+      const composition = await twilioClient.video.compositions.create({
+        roomSid: roomId,
+        audioSources: '*',
+        videoLayout: {
+          grid: {
+            video_sources: ['*']
+          }
+        },
+        statusCallback: 'https://api.lafia.io/media/events',
+        format: 'mp4'
+      })
+
+      return composition.sid;
+    } catch (e) {
+      throw new GenericResponseError(e.message, e.code);
+    }
+  }
+
+  public async getVideoRecordingFile(compositionSid: string) {
+    try {
+      const uri =
+        'https://video.twilio.com/v1/Compositions/' +
+        compositionSid +
+        '/Media';
+
+      const compositionFileResponse = await twilioClient.request({ method: 'GET', uri })
+
+      return compositionFileResponse?.body?.redirect_to;
     } catch (e) {
       throw new GenericResponseError(e.message, e.code);
     }
@@ -119,23 +168,20 @@ export class TwilioService {
   public async verifyOTP(phone: string, code: string): Promise<any> {
     const sid = env.twilio_verify_sid;
     try {
-      const {to, channel, status, valid} = await twilioClient.verify
-      .services(sid)
-      .verificationChecks
-      .create({to: phone, code});
+      const { to, channel, status, valid } = await twilioClient.verify
+        .services(sid)
+        .verificationChecks
+        .create({ to: phone, code });
       // if (status === "approved") {
       //   let user: IUser = await this.userRepository.getOneUser({ phone });
       //   const userId: string | any = user.id;
       //   this.userRepository.updateUser(userId, {hasVerifiedPhone: true});
       // }
       //.then(verification_check => console.log(verification_check.status));
-      return {to, channel, status, valid};
+      return { to, channel, status, valid };
     } catch (e) {
       console.log(e)
       throw new GenericResponseError(e.message, e.status);
     }
   }
 }
-
-
-// new TwilioService().getVideoRecording('RTd6c30b7cc53784408dfbd92d9096b1ad').then(e => console.log(e)).catch(e => console.log(e));
