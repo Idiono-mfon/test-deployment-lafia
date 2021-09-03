@@ -108,6 +108,8 @@ export class LafiaMediaController extends BaseController {
 
           const encounter = encounterResponse?.data;
 
+          console.log('Encounter:', encounter);
+
           // Create a media for the encounter
           const mediaResourceData = {
             resourceType: 'Media',
@@ -148,6 +150,7 @@ export class LafiaMediaController extends BaseController {
               mediaResourceData
             );
           } catch (e) {
+            console.error('MediaError:', e.message);
             throw new GenericResponseError(e.message, e.code);
           }
         }
