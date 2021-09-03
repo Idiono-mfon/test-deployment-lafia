@@ -19,12 +19,12 @@ export interface IFindVideoRecord extends IBase {
 }
 
 export interface IVideoBroadcast extends IBase {
-  patientId?: string;
+  // patientId?: string;
   patient_id?: string;
   description: string;
   initiate_care?: string;
-  initiateCare?: string;
-  videoUrl?: string;
+  // initiateCare?: string;
+  // videoUrl?: string;
   video_url?: string;
 }
 

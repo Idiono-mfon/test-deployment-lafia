@@ -104,20 +104,21 @@ export class SignallingServerService {
       const newCareBroadCast = await this.redisStore
         .getBroadcastByVideoUrl(newBroadcast.videoUrl);
       
+      SignallingServerService.emitNewCareEvent(socket, newCareBroadCast);
+
       const vidBroadcast: IVideoBroadcast = {
-        patientId: newCareBroadCast.patientId,
+        // patientId: newCareBroadCast.patientId,
         patient_id: newCareBroadCast.patientId,
         description: newCareBroadCast.description,
         initiate_care: newCareBroadCast.initiateCare,
-        initiateCare: newCareBroadCast.initiateCare,
-        videoUrl: newCareBroadCast.videoUrl,
+        // initiateCare: newCareBroadCast.initiateCare,
+        // videoUrl: newCareBroadCast.videoUrl,
         video_url: newCareBroadCast.videoUrl
       }
 
       const persistedBroadcast = await SignallingServerService.videoBroadcastService.saveBroadcastVideo(vidBroadcast);
       console.log("persistedBroadcast {}", persistedBroadcast);
 
-      SignallingServerService.emitNewCareEvent(socket, newCareBroadCast);
     });
   }
 
