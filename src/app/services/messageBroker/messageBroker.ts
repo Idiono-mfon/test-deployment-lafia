@@ -159,6 +159,14 @@ export function rmqSuccessResponse(receivedData: IRmqReceivedMessage, id: string
   };
 }
 
+export function rmqNewBroadcastSuccessResponse(data: any, message: string) {
+  return {
+    status: 'success',
+    message,
+    ...data,
+  };
+}
+
 export interface IRmqReceivedMessage {
   resource_type: string;
   data: IRmqMessageData;

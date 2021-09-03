@@ -1,8 +1,12 @@
+import { inject } from 'inversify';
 import { Server, Socket } from 'socket.io';
 import { createAdapter } from 'socket.io-redis';
 import Redis from 'ioredis';
+import uuid from 'uuid';
 import { Env } from '../../config/env';
+import TYPES from '../../config/types';
 import { forWho } from '../../utils';
+import { MessageBroker, rmqNewBroadcastSuccessResponse } from '../messageBroker';
 import { PatientService } from '../patients';
 import { PractitionerService } from '../practitioners';
 import { VideoBroadcastService } from '../videoRecords';
@@ -26,6 +30,8 @@ const pubClient = new Redis({
 const subClient = pubClient.duplicate();
 
 export class SignallingServerService {
+  @inject(TYPES.MessageBroker)
+  private readonly messageBroker: MessageBroker;
   private readonly io: any;
   private static redisStore: RedisStore;
   private static onlinePractitionerRoom: string;
@@ -54,7 +60,7 @@ export class SignallingServerService {
     this.io.on('connection', async (socket: Socket) => {
       await SignallingServerService.listenForConnectionEvent(socket);
       await SignallingServerService.emitOnlinePractitionersEvent(this.io);
-      SignallingServerService.listenForNewVideoBroadcastEvent(socket);
+      this.listenForNewVideoBroadcastEvent(socket);
       SignallingServerService.listenForAcceptCareEvent(socket);
       SignallingServerService.listenForIceCandidateEvent(socket);
       SignallingServerService.listenForPatientOnlineStatusEvent(socket);
@@ -98,13 +104,16 @@ export class SignallingServerService {
     socket.emit('onlinePractitioners', onlinePractitioners);
   }
 
-  private static listenForNewVideoBroadcastEvent(socket: Socket) {
+  private listenForNewVideoBroadcastEvent(socket: Socket) {
     socket.on('newVideoBroadcast', async (newBroadcast: INewBroadcast) => {
       await SignallingServerService.redisStore.saveBroadcast(newBroadcast);
-      const newCareBroadCast = await this.redisStore
+      const newCareBroadCast = await SignallingServerService.redisStore
         .getBroadcastByVideoUrl(newBroadcast.videoUrl);
       
       SignallingServerService.emitNewCareEvent(socket, newCareBroadCast);
+
+      const rmqPubMsg = rmqNewBroadcastSuccessResponse(newCareBroadCast, 'New broadcast event emitted successfully');
+      await this.messageBroker.rmqPublish(JSON.stringify(rmqPubMsg));
 
       const vidBroadcast: IVideoBroadcast = {
         // patientId: newCareBroadCast.patientId,
@@ -129,7 +138,7 @@ export class SignallingServerService {
       .emit('newCare', newCareBroadcast);
   }
 
-  private static async listenForAcceptCareEvent(socket: Socket) {
+  private static listenForAcceptCareEvent(socket: Socket) {
     socket.on('acceptCare', async (acceptCare: IAcceptCare, cb) => {
       const existingCare = await SignallingServerService.redisStore.getBroadcastByVideoUrl(acceptCare.videoUrl);
 
@@ -155,13 +164,12 @@ export class SignallingServerService {
           practioner_id: acceptCare.practitionerId,
           video_broadcast_id: vidId
         }
-        SignallingServerService.videoBroadcastService.assignBroadcastVideoToPractitioner(data);
+        await SignallingServerService.videoBroadcastService.assignBroadcastVideoToPractitioner(data);
       }
       
 
-      // const roomId = await TwilioService.createRoom();
       const { token, roomId } = await SignallingServerService.twilioService
-        .generateAccessToken(acceptCare?.practitionerId as string);
+        .generateAccessToken(acceptCare?.practitionerId as string, uuid.v4());
       return cb({
         roomId,
         token,
