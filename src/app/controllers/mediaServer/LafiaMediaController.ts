@@ -149,6 +149,8 @@ export class LafiaMediaController extends BaseController {
             throw new GenericResponseError(e.message, e.code);
           }
         }
+
+        console.log('TeleHealth Record encounter successfully saved');
       }
 
       res.sendStatus(200);
