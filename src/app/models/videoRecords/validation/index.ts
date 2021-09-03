@@ -17,11 +17,9 @@ export const VideoBroadcastValidation: JSONSchema = {
   type: 'object',
   required: ['patient_id'],
   properties: {
-    patient_id: { format: 'uuid', type: 'string'  },
+    patient_id: { type: 'string'  },
     description: { type: 'string' },
     initiate_care: { type: 'string' },
-    // initiateCare: { type: 'string' },
-    // videoUrl: { type: 'string' },
     video_url: { type: 'string' }
   }
 };
@@ -31,7 +29,7 @@ export const PractitionerVideoBroadcastValidation: JSONSchema = {
   type: 'object',
   required: ['pratitioner_id'],
   properties: {
-    pratitioner_id: { format: 'uuid', type: 'string' },
-    pratitionerId: { format: 'uuid', type: 'string' }
+    pratitioner_id: { type: 'string' },
+    pratitionerId: { type: 'string' }
   }
 };
