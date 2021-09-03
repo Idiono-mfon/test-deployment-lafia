@@ -77,7 +77,7 @@ export class SignallingServerService {
 
     await SignallingServerService.redisStore.saveOnlineUser(user);
 
-    if (user.resourceType === forWho.practitioner) {
+    if (user.resourceType === forWho.practitioner && user.userId) {
       socket.join(SignallingServerService.onlinePractitionerRoom);
     }
   }
