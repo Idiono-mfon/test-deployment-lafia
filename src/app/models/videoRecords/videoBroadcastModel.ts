@@ -9,6 +9,7 @@ export class VideoBroadcastModel extends Model implements IVideoBroadcast {
   initiateCare?: IVideoBroadcast['initiateCare'];
   videoUrl?: IVideoBroadcast['videoUrl'];
   video_url?: IVideoBroadcast['video_url'];
+  patient_id: IVideoBroadcast['patient_id'];
 
   static get tableName(): string {
     return `${Schema.lafiaService}.${Table.video_broadcasts}`;

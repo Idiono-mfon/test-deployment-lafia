@@ -114,7 +114,8 @@ export class SignallingServerService {
         video_url: newCareBroadCast.videoUrl
       }
 
-      SignallingServerService.videoBroadcastService.saveBroadcastVideo(vidBroadcast);
+      const persistedBroadcast = await SignallingServerService.videoBroadcastService.saveBroadcastVideo(vidBroadcast);
+      console.log("persistedBroadcast {}", persistedBroadcast);
 
       SignallingServerService.emitNewCareEvent(socket, newCareBroadCast);
     });
