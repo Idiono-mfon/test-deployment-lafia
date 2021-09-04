@@ -150,7 +150,7 @@ export class SignallingServerService {
       if(videoBroadcast) {
         const vidId: string = videoBroadcast.id ? videoBroadcast.id: '';
         const data: IPractitionerVideoBroadcast = {
-          practioner_id: acceptCare.practitionerId,
+          practitioner_id: acceptCare.practitionerId,
           video_broadcast_id: vidId
         }
         SignallingServerService.videoBroadcastService.assignBroadcastVideoToPractitioner(data);
