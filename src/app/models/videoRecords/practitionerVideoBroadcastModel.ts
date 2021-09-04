@@ -5,7 +5,7 @@ import { IPractitionerVideoBroadcast } from './interfaces';
 import { PractitionerVideoBroadcastValidation } from './validation';
 
 export class PractitionerVideoBroadcastModel extends BaseModel implements IPractitionerVideoBroadcast {
-  practioner_id: IPractitionerVideoBroadcast['practioner_id'];
+  practitioner_id: IPractitionerVideoBroadcast['practitioner_id'];
   video_broadcast_id: IPractitionerVideoBroadcast['video_broadcast_id'];
 
   static get tableName(): string {
