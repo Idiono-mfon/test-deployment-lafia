@@ -21,6 +21,7 @@ export class Table {
   public static components: string = 'components';
   public static contact_points = 'contact_points';
   public static qualifications = 'qualifications';
+  public static twilio_rooms: string = 'twilio_rooms'
   public static patients_address = 'patients_address';
   public static video_broadcasts = 'video_broadcasts';
   public static patient_contacts = 'patient_contacts';

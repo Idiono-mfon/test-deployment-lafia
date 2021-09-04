@@ -3,3 +3,4 @@ export * from './validation';
 export * from './videoRecordModel';
 export * from './videoBroadcastModel';
 export * from './practitionerVideoBroadcastModel';
+export * from './TwilioRoomModel'

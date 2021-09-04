@@ -30,6 +30,7 @@ const TYPES = {
   LafiaMediaService: Symbol('LafiaMediaService'),
   ConsentService: Symbol('ConsentService'),
   VideoBroadcastService: Symbol('VideoBroadcastService'),
+  TwilioRoomService: Symbol('TwilioRoomService'),
 
   // repositories
   UserRepository: Symbol('UserRepository'),
@@ -42,7 +43,8 @@ const TYPES = {
   VideoRecordRepository: Symbol('VideoRecordRepository'),
   VideoBroadcastRepository: Symbol('VideoBroadcastRepository'),
   PractitionerVideoBroadcastRepository: Symbol('PractitionerVideoBroadcastRepository'),
-
+  TwilioRoomRepository: Symbol('TwilioRoomRepository'),
+  
   // middlewares
   AuthMiddleware: Symbol('AuthMiddleware'),
 };
