@@ -2,7 +2,7 @@ import { JSONSchema, RelationMappings } from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
 import { IPractitionerVideoBroadcast } from './interfaces';
-import { VideoBroadcastValidation } from './validation';
+import { PractitionerVideoBroadcastValidation } from './validation';
 
 export class PractitionerVideoBroadcastModel extends BaseModel implements IPractitionerVideoBroadcast {
   practioner_id: IPractitionerVideoBroadcast['practioner_id'];
@@ -13,7 +13,7 @@ export class PractitionerVideoBroadcastModel extends BaseModel implements IPract
   }
 
   static get jsonSchema(): JSONSchema {
-    return VideoBroadcastValidation;
+    return PractitionerVideoBroadcastValidation;
   }
 
   static get relationMappings(): RelationMappings {
