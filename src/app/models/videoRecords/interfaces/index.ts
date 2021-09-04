@@ -39,11 +39,11 @@ export interface IFindVideoBroadcast extends IBase {
 }
 
 export interface IPractitionerVideoBroadcast extends IBase {
-  practioner_id?: string;
+  practitioner_id?: string;
   video_broadcast_id: string;
 }
 
 export interface IFindPractitionerVideoBroadcast extends IBase {
-  practioner_id?: string;
+  practitioner_id?: string;
   video_broadcast_id: string;
 }
