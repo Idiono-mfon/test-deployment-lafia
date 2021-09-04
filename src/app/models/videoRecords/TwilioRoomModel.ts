@@ -1,7 +1,7 @@
 import { JSONSchema, Model } from 'objection';
 import { Schema, Table } from '../../../database';
 import { ITwilioRoom } from './interfaces';
-import { VideoBroadcastValidation } from './validation';
+import { TwilioRoomValidation } from './validation';
 
 export class TwilioRoomModel extends Model implements ITwilioRoom {
   room_sid: ITwilioRoom['room_sid'];
@@ -12,6 +12,6 @@ export class TwilioRoomModel extends Model implements ITwilioRoom {
   }
 
   static get jsonSchema(): JSONSchema {
-    return VideoBroadcastValidation;
+    return TwilioRoomValidation;
   }
 }

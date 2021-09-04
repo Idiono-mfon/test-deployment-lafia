@@ -33,3 +33,13 @@ export const PractitionerVideoBroadcastValidation: JSONSchema = {
     pratitionerId: { type: 'string' }
   }
 };
+
+export const TwilioRoomValidation: JSONSchema = {
+  title: 'Twilio Room Validation',
+  type: 'object',
+  required: ['room_sid'],
+  properties: {
+    room_sid: { type: 'string' },
+    recording_sid: { type: 'string' }
+  }
+};
