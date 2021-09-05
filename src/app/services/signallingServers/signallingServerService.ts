@@ -38,7 +38,13 @@ export class SignallingServerService {
   private static twilioService: any;
   private static videoBroadcastService: VideoBroadcastService;
 
-  constructor(appServer: any, patientService: PatientService, practitionerService: PractitionerService, videoBroadcastService: VideoBroadcastService) {
+  constructor(
+    appServer: any,
+    patientService: PatientService,
+    practitionerService: PractitionerService,
+    videoBroadcastService: VideoBroadcastService,
+    messageBroker: MessageBroker
+  ) {
     SignallingServerService.redisStore = new RedisStore(pubClient, patientService, practitionerService);
     SignallingServerService.onlinePractitionerRoom = 'onlinePractitioners';
     SignallingServerService.twilioService = new TwilioService();
@@ -54,6 +60,7 @@ export class SignallingServerService {
     });
 
     this.io.adapter(createAdapter({ pubClient, subClient }));
+    this.messageBroker = messageBroker;
   }
 
   public initialize(): void {

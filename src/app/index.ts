@@ -40,7 +40,13 @@ appServer.listen(PORT, () => {
   console.log(`Listening on port: ${PORT}`);
 });
 
-const signallingServer  = new SignallingServerService(appServer, patientService, practitionerService, videoBroadcastService);
+const signallingServer  = new SignallingServerService(
+  appServer,
+  patientService,
+  practitionerService,
+  videoBroadcastService,
+  messageBroker
+);
 signallingServer.initialize();
 
 export { app };
