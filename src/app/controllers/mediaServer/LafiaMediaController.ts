@@ -3,8 +3,7 @@ import { inject } from 'inversify';
 import { controller, httpDelete, httpGet, httpPost, request, response } from 'inversify-express-utils';
 import TYPES from '../../config/types';
 import { AuthMiddleware } from '../../middlewares';
-import { FhirServerService, LafiaMediaService, TwilioService } from '../../services';
-import { TwilioRoomService } from '../../services/videoRecords/twilioRoomService';
+import { TwilioRoomService, FhirServerService, LafiaMediaService, TwilioService } from '../../services';
 import { GenericResponseError, HttpStatusCode } from '../../utils';
 import { BaseController } from '../baseController';
 

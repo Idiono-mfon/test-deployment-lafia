@@ -5,7 +5,7 @@ import TYPES from '../../config/types';
 import { ITwilioRoom } from '../../models';
 import { UserRepository } from '../../repository';
 import { GenericResponseError, HttpStatusCode } from '../../utils';
-import { TwilioRoomService } from '../videoRecords/twilioRoomService';
+import { TwilioRoomService } from '../videoRecords';
 
 const env = Env.all();
 const { AccessToken } = jwt;
