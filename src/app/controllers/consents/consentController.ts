@@ -60,7 +60,7 @@ export class ConsentController extends BaseController {
   public async getAllConsent(@request() req: Request, @response() res: Response) {
     try {
       const { user_id } = req.params;
-      let { resource_type } = req.body;
+      let { resource_type } = req.query;
 
       if (!resource_type) {
         throwError('resource_type field is required', error.badRequest);
@@ -72,6 +72,7 @@ export class ConsentController extends BaseController {
         throwError('User with the id not found', error.notFound);
       }
 
+      resource_type = resource_type as string;
       resource_type = resource_type?.toLowerCase() === 'patient' ? 'Patient' : 'Practitioner';
 
       const consents = await this.fhirServerService.executeQuery(
