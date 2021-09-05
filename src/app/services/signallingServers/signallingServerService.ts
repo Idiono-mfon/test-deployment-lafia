@@ -2,7 +2,7 @@ import { inject } from 'inversify';
 import { Server, Socket } from 'socket.io';
 import { createAdapter } from 'socket.io-redis';
 import Redis from 'ioredis';
-import uuid from 'uuid';
+import { v4 as uuid } from 'uuid';
 import { Env } from '../../config/env';
 import TYPES from '../../config/types';
 import { forWho } from '../../utils';
@@ -113,6 +113,7 @@ export class SignallingServerService {
       SignallingServerService.emitNewCareEvent(socket, newCareBroadCast);
 
       const rmqPubMsg = rmqNewBroadcastSuccessResponse(newCareBroadCast, 'New broadcast event emitted successfully');
+      console.log('RmqPubMsg:', rmqPubMsg);
       await this.messageBroker.rmqPublish(JSON.stringify(rmqPubMsg));
 
       if (newCareBroadCast.videoUrl) {
@@ -164,8 +165,10 @@ export class SignallingServerService {
       }
 
 
+      const defaultRoomName = uuid();
+      console.log('DefaultRoom:', defaultRoomName);
       const { token, roomId } = await SignallingServerService.twilioService
-        .generateAccessToken(acceptCare?.practitionerId as string, uuid.v4());
+        .generateAccessToken(acceptCare?.practitionerId as string, defaultRoomName);
       return cb({
         roomId,
         token,
