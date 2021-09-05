@@ -50,5 +50,5 @@ export interface IFindPractitionerVideoBroadcast extends IBase {
 
 export interface ITwilioRoom extends IBase {
   room_sid: string;
-  recording_sid: string;
+  recording_sid?: string;
 }

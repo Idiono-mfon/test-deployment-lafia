@@ -1,16 +1,12 @@
 import { injectable } from 'inversify';
-import {
-  TwilioRoomModel,
-  ITwilioRoom,
-} from '../../models';
+import { ITwilioRoom, TwilioRoomModel, } from '../../models';
 import { InternalServerError } from '../../utils';
 
 @injectable()
 export class TwilioRoomRepository {
 
     public async fetchRoomByID(roomId: string){
-        const vid = await TwilioRoomModel.query().findById(roomId);
-        return vid;
+      return TwilioRoomModel.query().findById(roomId);
     }
 
     public async saveRoom(data: ITwilioRoom): Promise<ITwilioRoom> {
