@@ -50,10 +50,11 @@ export class LafiaMediaController extends BaseController {
       if (event?.StatusCallbackEvent === 'recording-completed') {
         const twilioRoom = await this.twilioRoomService.getOneRoom({ room_sid: event?.RoomSid });
 
-        console.log('twilioRoom:', twilioRoom);
+        console.log('twilioRoomSid:', twilioRoom?.room_sid);
 
         if (!twilioRoom?.room_sid) {
-          console.log('NoRoom:', twilioRoom);
+          console.log('NoRoom:', twilioRoom?.room_sid);
+          console.log('eventRoomSid:', event?.RoomSid);
           await this.twilioService.composeRecordingMedia(event?.RoomSid);
           await this.twilioRoomService.saveRoom({ room_sid: event?.RoomSid, recording_sid: event?.RecordingSid });
         }
