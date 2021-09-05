@@ -8,7 +8,7 @@ export class TwilioRoomModel extends Model implements ITwilioRoom {
   recording_sid: ITwilioRoom['recording_sid'];
 
   static get tableName(): string {
-    return `${Schema.lafiaService}.${Table.video_broadcasts}`;
+    return `${Schema.lafiaService}.${Table.twilio_rooms}`;
   }
 
   static get jsonSchema(): JSONSchema {
