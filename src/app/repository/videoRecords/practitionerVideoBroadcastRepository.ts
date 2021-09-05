@@ -37,7 +37,7 @@ export class PractitionerVideoBroadcastRepository {
         try {
           return await PractitionerVideoBroadcastModel.query()
             .where({ practitioner_id: user_id })
-            .withGraphFetched(`[videoBroadcast]`);
+            .withGraphFetched(`[video_broadcasts]`);
         } catch (e) {
           throw new InternalServerError(e.message);
         }

@@ -18,9 +18,9 @@ export class PractitionerVideoBroadcastModel extends BaseModel implements IPract
 
   static get relationMappings(): RelationMappings {
     return {
-      videoBroadcast: {
-        relation: BaseModel.HasOneRelation,
-        modelClass: './videoBroadcastModel',
+      video_broadcasts: {
+        relation: BaseModel.BelongsToOneRelation,
+        modelClass: '../videoRecords/videoBroadcastModel',
         join: {
           from: `${Schema.lafiaService}.${Table.practitioner_video_broadcasts}.video_broadcast_id`,
           to: `${Schema.lafiaService}.${Table.video_broadcasts}.id`
