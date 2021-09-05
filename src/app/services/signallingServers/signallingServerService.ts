@@ -109,23 +109,11 @@ export class SignallingServerService {
       await SignallingServerService.redisStore.saveBroadcast(newBroadcast);
       const newCareBroadCast = await SignallingServerService.redisStore
         .getBroadcastByVideoUrl(newBroadcast.videoUrl);
-      
+
       SignallingServerService.emitNewCareEvent(socket, newCareBroadCast);
 
       const rmqPubMsg = rmqNewBroadcastSuccessResponse(newCareBroadCast, 'New broadcast event emitted successfully');
       await this.messageBroker.rmqPublish(JSON.stringify(rmqPubMsg));
-
-      const vidBroadcast: IVideoBroadcast = {
-        // patientId: newCareBroadCast.patientId,
-        patient_id: newCareBroadCast.patientId,
-        description: newCareBroadCast.description,
-        initiate_care: String(newCareBroadCast.initiateCare),
-        // initiateCare: newCareBroadCast.initiateCare,
-        // videoUrl: newCareBroadCast.videoUrl,
-        video_url: newCareBroadCast.videoUrl
-      }
-
-      console.log('PersistedBroadcast:', vidBroadcast);
 
       if (newCareBroadCast.videoUrl) {
         const vidBroadcast: IVideoBroadcast = {
@@ -136,7 +124,7 @@ export class SignallingServerService {
         }
 
         const persistedBroadcast = await SignallingServerService.videoBroadcastService.saveBroadcastVideo(vidBroadcast);
-        console.log("persistedBroadcast {}", persistedBroadcast);
+        console.log('persistedBroadcast {}', persistedBroadcast);
       }
     });
   }
@@ -166,15 +154,15 @@ export class SignallingServerService {
         video_url: existingCare.videoUrl
       });
 
-      if(videoBroadcast) {
-        const vidId: string = videoBroadcast.id ? videoBroadcast.id: '';
+      if (videoBroadcast) {
+        const vidId: string = videoBroadcast.id ? videoBroadcast.id : '';
         const data: IPractitionerVideoBroadcast = {
           practitioner_id: acceptCare.practitionerId,
           video_broadcast_id: vidId
         }
         await SignallingServerService.videoBroadcastService.assignBroadcastVideoToPractitioner(data);
       }
-      
+
 
       const { token, roomId } = await SignallingServerService.twilioService
         .generateAccessToken(acceptCare?.practitionerId as string, uuid.v4());
@@ -239,11 +227,11 @@ export class SignallingServerService {
   private static async emitCallEvent(socket: Socket, data: any) {
     console.log('Received Data:', data);
     const reciever: IOnlineUser = await SignallingServerService
-        .redisStore
-        .getUserById(data.reciever);
+      .redisStore
+      .getUserById(data.reciever);
     const sender: IOnlineUser = await SignallingServerService
-        .redisStore
-        .getUserById(data.sender);
+      .redisStore
+      .getUserById(data.sender);
 
     const access = data.type === 'connect' ? await SignallingServerService
       .twilioService
@@ -269,8 +257,8 @@ export class SignallingServerService {
     console.log('RES:', res);
 
     socket
-    .to(reciever.socketId)
-    .emit('call', res);
+      .to(reciever.socketId)
+      .emit('call', res);
 
     console.log('Calling...');
   }
