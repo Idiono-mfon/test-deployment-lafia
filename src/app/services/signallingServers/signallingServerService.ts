@@ -127,9 +127,17 @@ export class SignallingServerService {
 
       console.log('PersistedBroadcast:', vidBroadcast);
 
-      const persistedBroadcast = await SignallingServerService.videoBroadcastService.saveBroadcastVideo(vidBroadcast);
-      console.log("persistedBroadcast {}", persistedBroadcast);
+      if (newCareBroadCast.videoUrl) {
+        const vidBroadcast: IVideoBroadcast = {
+          patient_id: newCareBroadCast.patientId,
+          description: newCareBroadCast.description,
+          initiate_care: String(newCareBroadCast.initiateCare),
+          video_url: newCareBroadCast.videoUrl
+        }
 
+        const persistedBroadcast = await SignallingServerService.videoBroadcastService.saveBroadcastVideo(vidBroadcast);
+        console.log("persistedBroadcast {}", persistedBroadcast);
+      }
     });
   }
 
@@ -161,7 +169,7 @@ export class SignallingServerService {
       if(videoBroadcast) {
         const vidId: string = videoBroadcast.id ? videoBroadcast.id: '';
         const data: IPractitionerVideoBroadcast = {
-          practioner_id: acceptCare.practitionerId,
+          practitioner_id: acceptCare.practitionerId,
           video_broadcast_id: vidId
         }
         await SignallingServerService.videoBroadcastService.assignBroadcastVideoToPractitioner(data);
