@@ -45,6 +45,14 @@ export class VideoBroadcastService {
     }
   }
 
+  public async getAllPractitionerBroadcastVideos(user_id: string): Promise<any> {
+    try {
+      return await this.practitionerVideoBroadcastRepository.getAllPractitionerBroadcastVideos(user_id);
+    } catch (e) {
+      throw new InternalServerError(e.message);
+    }
+  }
+
   public async assignBroadcastVideoToPractitioner(data: IPractitionerVideoBroadcast): Promise<IPractitionerVideoBroadcast> {
     const videoBroadcasts: VideoBroadcastModel = await this.videoBroadcastRepository.fetchBroadcastByID(data.video_broadcast_id);
     if (!videoBroadcasts) {

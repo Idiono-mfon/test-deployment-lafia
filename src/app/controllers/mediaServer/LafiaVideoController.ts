@@ -1,8 +1,14 @@
 import { Request, Response } from 'express';
 import { inject } from 'inversify';
-import { controller, httpDelete, httpGet, httpPost, request, response } from 'inversify-express-utils';
+import {
+  controller,
+  httpGet,
+  request,
+  response
+} from 'inversify-express-utils';
 import TYPES from '../../config/types';
 import { AuthMiddleware } from '../../middlewares';
+import { PractitionerVideoBroadcastRepository } from '../../repository';
 import { VideoBroadcastService } from '../../services';
 import { HttpStatusCode } from '../../utils';
 import { BaseController } from '../baseController';
@@ -47,7 +53,7 @@ export class LafiaVideoController extends BaseController {
       // Retrieve the request's body
       const { practitioner_id } = req.params;
 
-      const videoUrl = await this.videoBroadcastService.getAllVideoRecords(practitioner_id);
+      const videoUrl = await this.videoBroadcastService.getAllPractitionerBroadcastVideos(practitioner_id);
 
       this.success(res, videoUrl, 'broadcast retrieved successfully');
 
