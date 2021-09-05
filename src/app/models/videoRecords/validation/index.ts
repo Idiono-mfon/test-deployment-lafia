@@ -27,10 +27,10 @@ export const VideoBroadcastValidation: JSONSchema = {
 export const PractitionerVideoBroadcastValidation: JSONSchema = {
   title: 'Practitioner Video Broadcast Validation',
   type: 'object',
-  required: ['pratitioner_id'],
+  required: ['practitioner_id'],
   properties: {
-    pratitioner_id: { type: 'string' },
-    pratitionerId: { type: 'string' }
+    practitioner_id: { type: 'string' },
+    practitionerId: { type: 'string' }
   }
 };
 

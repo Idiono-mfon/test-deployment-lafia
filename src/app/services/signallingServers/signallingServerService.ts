@@ -168,6 +168,8 @@ export class SignallingServerService {
           practitioner_id: acceptCare.practitionerId,
           video_broadcast_id: vidId
         }
+        console.log('SavePractitionerVideoBroadcast:', videoBroadcast);
+        console.log('PData:', data);
         await SignallingServerService.videoBroadcastService.assignBroadcastVideoToPractitioner(data);
       }
 
