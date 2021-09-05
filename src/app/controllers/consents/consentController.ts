@@ -80,7 +80,7 @@ export class ConsentController extends BaseController {
         'GET',
       );
 
-      this.success(res, consents, 'Consents retrieved successfully');
+      this.success(res, consents?.data, 'Consents retrieved successfully');
     } catch (e) {
       this.error(res, e);
     }
