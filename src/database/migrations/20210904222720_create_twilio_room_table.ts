@@ -20,10 +20,10 @@ export async function up(knex: Knex): Promise<void> {
                   .primary(`${Table.twilio_rooms}_id`);
                 tableBuilder
                   .string('room_sid')
+                  .unique()
                   .notNullable();
                 tableBuilder
-                  .string('recording_sid')
-                  .notNullable();
+                  .string('recording_sid');
                 tableBuilder
                   .timestamps(true, true);
               });
