@@ -1,20 +1,14 @@
-import { inject, injectable } from 'inversify';
 import { Request } from 'express';
+import { inject, injectable } from 'inversify';
 import jwt from 'jsonwebtoken';
 import { v4 as uuid } from 'uuid';
 import { Env } from '../../config/env';
 import TYPES from '../../config/types';
 import { IFindUser, IUser } from '../../models';
 import { UserRepository } from '../../repository';
-import {
-  error,
-  GenericResponseError,
-  HttpStatusCode,
-  throwError,
-  getE164Format, Validations
-} from '../../utils';
+import { error, GenericResponseError, getE164Format, HttpStatusCode, throwError, Validations } from '../../utils';
 import { Password } from '../../utils/password';
-import { ConsentService, ICreateConsentAccount } from '../consents';
+import { ConsentService } from '../consents';
 import { EmailService, IComposeEmail } from '../email';
 import { FhirServerService } from '../fhirServer';
 import { PlatformSdkService } from '../platformSDK';
@@ -104,19 +98,7 @@ export class UserService {
         id: uuid(),
         ...user,
       };
-      const newUser = await this.userRepository.createUser(data);
-
-      const consentAccount: ICreateConsentAccount = {
-        firstName: data.first_name,
-        lastName: data.last_name,
-        password: data.password,
-        userName: data.email,
-      };
-      await this.consentService.createConsentAccount(consentAccount);
-      await this.consentService.addConsentCategory(consentAccount?.userName, 'newBroadcast');
-      await this.consentService.addConsentCategory(consentAccount?.userName, 'acceptBroadcast');
-
-      return newUser;
+      return await this.userRepository.createUser(data);
     } catch (e) {
       throw new GenericResponseError(e.message, e.code);
     }
