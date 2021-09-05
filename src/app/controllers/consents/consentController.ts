@@ -28,7 +28,7 @@ export class ConsentController extends BaseController {
         req.body
       );
 
-      this.success(res, consentRecord, 'Consent successfully accepted');
+      this.success(res, consentRecord?.data, 'Consent successfully accepted');
     } catch (e) {
       this.error(res, e);
     }
@@ -59,7 +59,8 @@ export class ConsentController extends BaseController {
   @httpGet('/:user_id')
   public async getAllConsent(@request() req: Request, @response() res: Response) {
     try {
-      let { user_id, resource_type } = req.params;
+      const { user_id } = req.params;
+      let { resource_type } = req.body;
 
       if (!resource_type) {
         throwError('resource_type field is required', error.badRequest);
