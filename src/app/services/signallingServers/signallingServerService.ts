@@ -88,9 +88,14 @@ export class SignallingServerService {
       socketId: socket?.id
     } as IOnlineUser;
 
-    await SignallingServerService.redisStore.saveOnlineUser(user);
+    if (user.userId && user.userId !== 'undefined') {
+      await SignallingServerService.redisStore.saveOnlineUser(user);
+    }
 
-    if (user.resourceType === forWho.practitioner && user.userId !== 'undefined') {
+    if (
+      user.resourceType === forWho.practitioner &&
+      (user.userId && user.userId !== 'undefined')
+    ) {
       socket.join(SignallingServerService.onlinePractitionerRoom);
     }
   }
@@ -100,7 +105,10 @@ export class SignallingServerService {
     let onlinePractitioners = [];
 
     for (let user of onlineUsers) {
-      if (user.resourceType === forWho.practitioner) {
+      if (
+        user.resourceType === forWho.practitioner &&
+        (user.userId && user.userId !== 'undefined')
+      ) {
         onlinePractitioners.push(user);
       }
     }

@@ -2,8 +2,10 @@ import { inject, injectable } from 'inversify';
 import twilio, { jwt } from 'twilio';
 import { Env } from '../../config/env';
 import TYPES from '../../config/types';
+import { ITwilioRoom } from '../../models';
 import { UserRepository } from '../../repository';
 import { GenericResponseError, HttpStatusCode } from '../../utils';
+import { TwilioRoomService } from '../videoRecords/twilioRoomService';
 
 const env = Env.all();
 const { AccessToken } = jwt;
@@ -18,6 +20,8 @@ export class TwilioService {
 
   @inject(TYPES.UserRepository)
   private userRepository: UserRepository;
+  @inject(TYPES.TwilioRoomService)
+  private readonly twilioRoomService: TwilioRoomService;
 
   public async generateAccessToken(identity: string, roomId: string, newRoom = false): Promise<{ roomId: string, token: string }> {
     try {
@@ -182,6 +186,20 @@ export class TwilioService {
     } catch (e) {
       console.log(e)
       throw new GenericResponseError(e.message, e.status);
+    }
+  }
+
+  public async triggerMediaComposition(twilioRoom: ITwilioRoom, event: any) {
+    if (!twilioRoom?.room_sid) {
+      try {
+        await this.twilioRoomService.saveRoom({
+          room_sid: event?.RoomSid,
+          recording_sid: event?.RecordingSid
+        });
+      } catch (e) {
+        return;
+      }
+      await this.composeRecordingMedia(event?.RoomSid);
     }
   }
 }
