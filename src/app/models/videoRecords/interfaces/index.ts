@@ -47,3 +47,8 @@ export interface IFindPractitionerVideoBroadcast extends IBase {
   practitioner_id?: string;
   video_broadcast_id: string;
 }
+
+export interface ITwilioRoom extends IBase {
+  room_sid: string;
+  recording_sid: string;
+}
