@@ -50,6 +50,19 @@ export class LafiaMediaService {
     }
   }
 
+  public async addStreamUrlToPatientBroadcast(streamUrl: string, event: any) {
+    if (streamUrl) {
+      const videoRecord = await this.getOneVideoRecord({ streamId: event?.id });
+
+      if (videoRecord) {
+        await this.updateVideoRecord(videoRecord?.id!, {
+          vodId: event?.vodId,
+          stream_url: streamUrl
+        });
+      }
+    }
+  }
+
   public async getOneVideoRecord(data: IFindVideoRecord | any): Promise<IVideoRecord> {
     return this.videoRecordService.getOneVideoRecord(data);
   }

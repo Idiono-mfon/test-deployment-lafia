@@ -4,6 +4,7 @@ import { controller, httpDelete, httpGet, httpPost, request, response } from 'in
 import TYPES from '../../config/types';
 import { AuthMiddleware } from '../../middlewares';
 import { FhirServerService, LafiaMediaService, TwilioService } from '../../services';
+import { TwilioRoomService } from '../../services/videoRecords/twilioRoomService';
 import { GenericResponseError, HttpStatusCode } from '../../utils';
 import { BaseController } from '../baseController';
 
@@ -17,6 +18,8 @@ export class LafiaMediaController extends BaseController {
   private readonly twilioService: TwilioService;
   @inject(TYPES.FhirServerService)
   private readonly fhirServerService: FhirServerService;
+  @inject(TYPES.TwilioRoomService)
+  private readonly twilioRoomService: TwilioRoomService;
 
   @httpPost('/broadcast', TYPES.AuthMiddleware)
   public async createBroadcast(@request() req: Request, @response() res: Response) {
@@ -41,20 +44,16 @@ export class LafiaMediaController extends BaseController {
       if (event?.action === 'vodReady') {
         const streamUrl = await this.lafiaMediaService.getRecordedStream(event?.vodId);
 
-        if (streamUrl) {
-          const videoRecord = await this.lafiaMediaService.getOneVideoRecord({ streamId: event?.id });
-
-          if (videoRecord) {
-            await this.lafiaMediaService.updateVideoRecord(videoRecord?.id!, {
-              vodId: event?.vodId,
-              stream_url: streamUrl
-            });
-          }
-        }
+       await this.lafiaMediaService.addStreamUrlToPatientBroadcast(streamUrl, event);
       }
 
       if (event?.StatusCallbackEvent === 'recording-completed') {
-        await this.twilioService.composeRecordingMedia(event?.RoomSid);
+        const twilioRoom = await this.twilioRoomService.getOneRoom({ room_sid: event?.RoomSid });
+
+        if (!twilioRoom?.room_sid) {
+          await this.twilioService.composeRecordingMedia(event?.RoomSid);
+          await this.twilioRoomService.saveRoom({ room_sid: event?.RoomSid, recording_sid: event?.RecordingSid });
+        }
       }
 
       if (event?.StatusCallbackEvent === 'composition-available') {
@@ -67,7 +66,7 @@ export class LafiaMediaController extends BaseController {
             resourceType: 'Encounter',
             status: 'finished',
             class: {
-              system: 'http://terminology.hl7.org/CodeSystem/v3-ActCode',
+              system: 'https://terminology.hl7.org/CodeSystem/v3-ActCode',
               code: 'VR',
               display: 'virtual'
             },
@@ -107,8 +106,6 @@ export class LafiaMediaController extends BaseController {
           }
 
           const encounter = encounterResponse?.data;
-
-          console.log('Encounter:', encounter);
 
           // Create a media for the encounter
           const mediaResourceData = {
