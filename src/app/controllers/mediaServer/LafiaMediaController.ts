@@ -3,7 +3,14 @@ import { inject } from 'inversify';
 import { controller, httpDelete, httpGet, httpPost, request, response } from 'inversify-express-utils';
 import TYPES from '../../config/types';
 import { AuthMiddleware } from '../../middlewares';
-import { TwilioRoomService, FhirServerService, LafiaMediaService, TwilioService } from '../../services';
+import {
+  TwilioRoomService,
+  FhirServerService,
+  LafiaMediaService,
+  TwilioService,
+  MessageBroker,
+  rmqSuccessResponse
+} from '../../services';
 import { GenericResponseError, HttpStatusCode } from '../../utils';
 import { BaseController } from '../baseController';
 
@@ -19,6 +26,8 @@ export class LafiaMediaController extends BaseController {
   private readonly fhirServerService: FhirServerService;
   @inject(TYPES.TwilioRoomService)
   private readonly twilioRoomService: TwilioRoomService;
+  @inject(TYPES.MessageBroker)
+  private readonly messageBroker: MessageBroker;
 
   @httpPost('/broadcast', TYPES.AuthMiddleware)
   public async createBroadcast(@request() req: Request, @response() res: Response) {
@@ -102,6 +111,11 @@ export class LafiaMediaController extends BaseController {
           }
 
           const encounter = encounterResponse?.data;
+          const resource_type = 'encounter';
+          const publishData = { data: encounter, resource_type };
+
+          const rmqPubMsg = rmqSuccessResponse(publishData, encounter?.id, 'New encounter published successfully');
+          await this.messageBroker.rmqPublish(JSON.stringify(rmqPubMsg));
 
           // Create a media for the encounter
           const mediaResourceData = {
@@ -137,11 +151,18 @@ export class LafiaMediaController extends BaseController {
           }
 
           try {
-            await this.fhirServerService.executeQuery(
+            const mediaResponse = await this.fhirServerService.executeQuery(
               '/Media',
               'POST',
               mediaResourceData
             );
+
+            const media = mediaResponse?.data;
+            const resource_type = 'media';
+            const publishData = { data: media, resource_type };
+
+            const rmqPubMsg = rmqSuccessResponse(publishData, media?.id, 'New media published successfully');
+            await this.messageBroker.rmqPublish(JSON.stringify(rmqPubMsg));
           } catch (e) {
             console.error('MediaError:', e.message);
             throw new GenericResponseError(e.message, e.code);
