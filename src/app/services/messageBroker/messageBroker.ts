@@ -176,6 +176,15 @@ export function rmqSuccessResponse(receivedData: IRmqReceivedMessage, id: string
   };
 }
 
+export function rmqFhirSuccessResponse(receivedData: IRmqReceivedMessage, id: string, message: string) {
+  return {
+    status: 'success',
+    message,
+    id,
+    ...receivedData,
+  };
+}
+
 export function rmqNewBroadcastSuccessResponse(data: any, message: string) {
   return {
     status: 'success',

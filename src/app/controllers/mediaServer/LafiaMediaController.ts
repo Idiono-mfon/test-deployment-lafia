@@ -9,7 +9,7 @@ import {
   LafiaMediaService,
   TwilioService,
   MessageBroker,
-  rmqSuccessResponse
+  rmqFhirSuccessResponse
 } from '../../services';
 import { GenericResponseError, HttpStatusCode } from '../../utils';
 import { BaseController } from '../baseController';
@@ -114,7 +114,7 @@ export class LafiaMediaController extends BaseController {
           const resource_type = 'encounter';
           const publishData = { data: encounter, resource_type };
 
-          const rmqPubMsg = rmqSuccessResponse(publishData, encounter?.id, 'New encounter published successfully');
+          const rmqPubMsg = rmqFhirSuccessResponse(publishData, encounter?.id, 'New encounter published successfully');
           await this.messageBroker.rmqPublish(JSON.stringify(rmqPubMsg));
 
           // Create a media for the encounter
@@ -161,7 +161,7 @@ export class LafiaMediaController extends BaseController {
             const resource_type = 'media';
             const publishData = { data: media, resource_type };
 
-            const rmqPubMsg = rmqSuccessResponse(publishData, media?.id, 'New media published successfully');
+            const rmqPubMsg = rmqFhirSuccessResponse(publishData, media?.id, 'New media published successfully');
             await this.messageBroker.rmqPublish(JSON.stringify(rmqPubMsg));
           } catch (e) {
             console.error('MediaError:', e.message);
