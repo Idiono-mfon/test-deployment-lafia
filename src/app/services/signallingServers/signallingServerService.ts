@@ -128,7 +128,6 @@ export class SignallingServerService {
       SignallingServerService.emitNewCareEvent(socket, newCareBroadCast);
 
       const rmqPubMsg = rmqNewBroadcastSuccessResponse(newCareBroadCast, 'New broadcast event emitted successfully');
-      console.log('RmqPubMsg:', rmqPubMsg);
       await this.messageBroker.rmqPublish(JSON.stringify(rmqPubMsg));
 
       if (newCareBroadCast.videoUrl) {

@@ -4,6 +4,7 @@ import { Env } from '../../config/env';
 import TYPES from '../../config/types';
 import { IPatient, IPractitioner } from '../../models';
 import { forWho } from '../../utils';
+import { Password } from '../../utils/password';
 import { PatientService } from '../patients';
 import { PractitionerService } from '../practitioners';
 import { UserService } from '../users';
@@ -81,7 +82,7 @@ export class MessageBroker {
         console.log(' [x] Received Date: %s', new Date().toString());
         console.log(' [x] Received Data: %s', msgString);
 
-        const { data, resource_type, resource_id } = msgJson;
+        const { data, resource_type, resource_id, email } = msgJson;
 
         if (resource_id && data) {
           console.log(' [x] Received Date: %s', new Date().toString());
@@ -100,6 +101,22 @@ export class MessageBroker {
             await this.rmqPublish(JSON.stringify(rmqPubMsg));
 
             return;
+          }
+        }
+
+        if (email && !_.isEmpty(data)) {
+          const { first_name, last_name, password, gender } = data;
+          const dataToUpdate: any = {};
+
+          if (gender) dataToUpdate.gender = gender;
+          if (last_name) dataToUpdate.last_name = last_name;
+          if (first_name) dataToUpdate.first_name = first_name;
+          if (password) dataToUpdate.password = Password.hash(password);
+
+          const existingUser = await this.userService.getOneUser({ email });
+
+          if (existingUser) {
+            await this.userService.updateUser(existingUser?.id!, dataToUpdate);
           }
         }
 
