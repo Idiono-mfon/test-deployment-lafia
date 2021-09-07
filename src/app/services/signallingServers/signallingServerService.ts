@@ -131,7 +131,12 @@ export class SignallingServerService {
       await this.messageBroker.rmqPublish(JSON.stringify(rmqPubMsg));
 
       if (newCareBroadCast.videoUrl) {
+        const patient: IOnlineUser = await SignallingServerService
+        .redisStore
+        .getUserById(newCareBroadCast.patientId);
+
         const vidBroadcast: IVideoBroadcast = {
+          patient_name: patient.username,
           patient_id: newCareBroadCast.patientId,
           description: newCareBroadCast.description,
           initiate_care: String(newCareBroadCast.initiateCare),

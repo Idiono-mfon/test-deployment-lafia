@@ -4,6 +4,7 @@ import { IVideoBroadcast } from './interfaces';
 import { VideoBroadcastValidation } from './validation';
 
 export class VideoBroadcastModel extends Model implements IVideoBroadcast {
+  patient_name: IVideoBroadcast['patient_name'];
   description: IVideoBroadcast['description'];
   initiate_care?: IVideoBroadcast['initiate_care'];
   // initiateCare?: IVideoBroadcast['initiateCare'];

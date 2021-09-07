@@ -19,7 +19,7 @@ export interface IFindVideoRecord extends IBase {
 }
 
 export interface IVideoBroadcast extends IBase {
-  // patientId?: string;
+  patient_name?: string;
   patient_id?: string;
   description: string;
   initiate_care?: string;
@@ -29,6 +29,7 @@ export interface IVideoBroadcast extends IBase {
 }
 
 export interface IFindVideoBroadcast extends IBase {
+  patient_name?: string;
   patientId?: string;
   patient_id?: string;
   description: string;
