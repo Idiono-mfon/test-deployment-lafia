@@ -17,6 +17,7 @@ export const VideoBroadcastValidation: JSONSchema = {
   type: 'object',
   required: ['patient_id'],
   properties: {
+    patient_name: {type: 'string'},
     patient_id: { type: 'string'  },
     description: { type: 'string' },
     initiate_care: { type: 'string' },
