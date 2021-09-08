@@ -42,4 +42,12 @@ export class PractitionerVideoBroadcastRepository {
           throw new InternalServerError(e.message);
         }
       }
+
+      public async deletePractitionerBroadcastVideos(id: string): Promise<any> {
+        try {
+          return await PractitionerVideoBroadcastModel.query().deleteById(id);
+        } catch (e) {
+          throw new InternalServerError(e.message);
+        }
+      }
 }

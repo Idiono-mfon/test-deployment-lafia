@@ -34,4 +34,12 @@ export class VideoBroadcastRepository {
           throw new InternalServerError(e.message);
         }
       }
+
+      public async deleteBroadcastVideos(id: string): Promise<any> {
+        try {
+          return await VideoBroadcastModel.query().deleteById(id);
+        } catch (e) {
+          throw new InternalServerError(e.message);
+        }
+      }
 }
