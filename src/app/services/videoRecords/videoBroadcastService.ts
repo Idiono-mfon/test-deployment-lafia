@@ -45,6 +45,14 @@ export class VideoBroadcastService {
     }
   }
 
+  public async deleteVideoBroadcastRecords(id: string): Promise<any> {
+    try {
+      return await this.videoBroadcastRepository.deleteBroadcastVideos(id);
+    } catch (e) {
+      throw new InternalServerError(e.message);
+    }
+  }
+
   public async getAllPractitionerBroadcastVideos(user_id: string): Promise<any> {
     try {
       return await this.practitionerVideoBroadcastRepository.getAllPractitionerBroadcastVideos(user_id);
@@ -61,6 +69,19 @@ export class VideoBroadcastService {
 
     try {
       return await this.practitionerVideoBroadcastRepository.savePractitionerBroadcastVideo(data);
+    } catch (e) {
+      throw new InternalServerError(e.message);
+    }
+  }
+
+  public async deletePractitionerBroadcastVideo(id: string): Promise<IPractitionerVideoBroadcast> {
+    const videoBroadcasts: VideoBroadcastModel = await this.videoBroadcastRepository.fetchBroadcastByID(id);
+    if (!videoBroadcasts) {
+      throw new NotFoundError('video broadcasts not found');
+    }
+
+    try {
+      return await this.practitionerVideoBroadcastRepository.deletePractitionerBroadcastVideos(id);
     } catch (e) {
       throw new InternalServerError(e.message);
     }
