@@ -213,9 +213,4 @@ export class LafiaMediaController extends BaseController {
       this.error(res, e);
     }
   }
-
-  @httpPost('/twilio/callback')
-  public async twilioVideoCallback(@request() req: Request, @response() res: Response) {
-
-  }
 }
