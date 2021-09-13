@@ -9,7 +9,6 @@ import {
 } from 'inversify-express-utils';
 import TYPES from '../../config/types';
 import { AuthMiddleware } from '../../middlewares';
-import { PractitionerVideoBroadcastRepository } from '../../repository';
 import { VideoBroadcastService } from '../../services';
 import { HttpStatusCode } from '../../utils';
 import { BaseController } from '../baseController';
@@ -33,7 +32,7 @@ export class LafiaVideoController extends BaseController {
     }
   }
 
-  @httpDelete('/broadcast/:id', TYPES.AuthMiddleware)
+  @httpDelete('/broadcast/:id')
   public async deleteBroadcast(@request() req: Request, @response() res: Response) {
     try {
       const { id } = req.params;
@@ -75,7 +74,7 @@ export class LafiaVideoController extends BaseController {
     }
   }
 
-  @httpDelete('/broadcast/practitioner/:id', TYPES.AuthMiddleware)
+  @httpDelete('/broadcast/practitioner/:id')
   public async deletePactitionerBroadcast(@request() req: Request, @response() res: Response) {
     try {
       const { id } = req.params;
