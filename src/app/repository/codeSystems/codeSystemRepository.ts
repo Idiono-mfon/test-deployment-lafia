@@ -15,7 +15,7 @@ export class CodeSystemRepository {
       }
 
       return await codeSystems;
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
@@ -30,7 +30,7 @@ export class CodeSystemRepository {
         .where({ code })
         .skipUndefined()
         .first();
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }

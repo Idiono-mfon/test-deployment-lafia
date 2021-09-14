@@ -7,7 +7,7 @@ const env = Env.all();
 
 const axiosInstance = axios.create({
   baseURL: `${env.consent_service_base_url}/`,
-  headers : {
+  headers: {
     'Content-Type': 'application/json',
     'Authorization': env.consent_service_auth_code
   }
@@ -72,7 +72,7 @@ export class ConsentService {
       const consents = await axiosInstance.get(`/allConsentDocs?user=${user_email}`);
 
       return consents?.data?.data;
-    } catch(e) {
+    } catch (e: any) {
       console.error(e.response.data);
       throw new GenericResponseError(e.response?.data?.message, e.response?.data?.code);
     }
@@ -83,7 +83,7 @@ export class ConsentService {
       const consents = await axiosInstance.get(`/consentDocsByType?consentType=${consentType}&user=${user_email}`);
 
       return consents.data?.data;
-    } catch(e) {
+    } catch (e: any) {
       console.error(e.response.data);
       throw new GenericResponseError(e.response?.data?.message, e.response?.data?.code);
     }

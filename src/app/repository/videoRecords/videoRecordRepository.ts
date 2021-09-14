@@ -10,7 +10,7 @@ export class VideoRecordRepository {
       return await VideoRecordModel.query()
         .insert(data)
         .returning('*');
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
@@ -18,7 +18,7 @@ export class VideoRecordRepository {
   public async getOneVideoRecord(data: IFindVideoRecord | any): Promise<IVideoRecord> {
     try {
       return await VideoRecordModel.query().findOne(data);
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
@@ -26,7 +26,7 @@ export class VideoRecordRepository {
   public async getAllVideoRecords(user_id: string): Promise<IVideoRecord[]> {
     try {
       return await VideoRecordModel.query().where({ patient_id: user_id });
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
@@ -34,7 +34,7 @@ export class VideoRecordRepository {
   public async deleteVideoRecord(id: string): Promise<any> {
     try {
       return await VideoRecordModel.query().deleteById(id);
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
@@ -43,7 +43,7 @@ export class VideoRecordRepository {
     try {
       return await VideoRecordModel.query()
         .patchAndFetchById(id, data);
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
