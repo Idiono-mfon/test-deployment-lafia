@@ -15,7 +15,7 @@ export class TwilioRoomService {
   public async saveRoom(data: ITwilioRoom): Promise<ITwilioRoom> {
     try {
       return await this.twilioRoomRepository.saveRoom(data);
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
@@ -23,7 +23,7 @@ export class TwilioRoomService {
   public async getOneRoom(data: ITwilioRoom | any): Promise<ITwilioRoom> {
     try {
       return await this.twilioRoomRepository.getOneRoom(data);
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
@@ -31,9 +31,9 @@ export class TwilioRoomService {
   public async getAllRooms(user_id: string): Promise<ITwilioRoom[]> {
     try {
       return await this.twilioRoomRepository.getAllRooms(user_id);
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
-  
+
 }

@@ -81,7 +81,7 @@ class UtilityService {
       month = month < 10 ? `0${month}` : month;
 
       return `${year}-${month}-${day}`;
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
@@ -138,7 +138,7 @@ class UtilityService {
             new Date(nameExtract[dob]),
         }
       };
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
@@ -196,7 +196,7 @@ class UtilityService {
         system,
         display
       };
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
@@ -209,7 +209,7 @@ class UtilityService {
         coding: [coding],
         text: coding.display,
       };
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message + codeType, e.code);
     }
   }
@@ -221,7 +221,7 @@ class UtilityService {
       if (!email) {
         throwError('Email is required!', badRequest);
       }
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
@@ -429,7 +429,7 @@ class UtilityService {
           value: email
         },
       ];
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
@@ -449,7 +449,7 @@ class UtilityService {
         address,
         gender,
       };
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
@@ -476,7 +476,7 @@ class UtilityService {
         issuer,
         period
       };
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
