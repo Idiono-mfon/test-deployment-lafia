@@ -39,7 +39,7 @@ export class PractitionerController extends BaseController {
       const practitioner = await this.practitionerService.updatePractitioner(practitionerId, { id: practitionerId, ...practitionerData });
 
       this.success(res, practitioner, 'Practitioner profile successfully updated');
-    } catch (e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }
@@ -51,7 +51,7 @@ export class PractitionerController extends BaseController {
       const practitioner: IPractitioner = await this.practitionerService.findPractitionerById(id);
 
       this.success(res, practitioner, 'Request completed');
-    } catch (e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }
@@ -73,7 +73,7 @@ export class PractitionerController extends BaseController {
       await this.messageBroker.rmqPublish(JSON.stringify(rmqPubMsg));
 
       this.success(res, practitioner, 'Practitioner registration successful', HttpStatusCode.CREATED);
-    } catch (e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }
@@ -85,18 +85,18 @@ export class PractitionerController extends BaseController {
       const attachment: IAttachment = await this.practitionerService.uploadAttachment(practitionerId, req?.file!);
 
       this.success(res, attachment, 'Request completed successfully');
-    } catch (e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }
 
   @httpGet('/:id/broadcast/videos')
-  public async broadcastVideos(@request() req: Request, @response() res: Response){
+  public async broadcastVideos(@request() req: Request, @response() res: Response) {
     try {
       const { id: practitionerId } = req.params;
       const vids = await this.practitionerService.findAssignedPractitionervideoBroadcast(practitionerId);
       this.success(res, vids, 'Request completed successfully');
-    } catch (e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }

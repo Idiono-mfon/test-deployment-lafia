@@ -36,7 +36,7 @@ export class LafiaMediaController extends BaseController {
       const broadcast = await this.lafiaMediaService.createBroadcast(user?.id);
 
       this.success(res, broadcast, 'Broadcast created successfully', HttpStatusCode.CREATED);
-    } catch (e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }
@@ -52,7 +52,7 @@ export class LafiaMediaController extends BaseController {
       if (event?.action === 'vodReady') {
         const streamUrl = await this.lafiaMediaService.getRecordedStream(event?.vodId);
 
-       await this.lafiaMediaService.addStreamUrlToPatientBroadcast(streamUrl, event);
+        await this.lafiaMediaService.addStreamUrlToPatientBroadcast(streamUrl, event);
       }
 
       if (event?.StatusCallbackEvent === 'recording-completed') {
@@ -106,7 +106,7 @@ export class LafiaMediaController extends BaseController {
               'POST',
               encounterResourceData
             );
-          } catch (e) {
+          } catch (e: any) {
             throw new GenericResponseError(e.message, e.code);
           }
 
@@ -163,7 +163,7 @@ export class LafiaMediaController extends BaseController {
 
             const rmqPubMsg = rmqFhirSuccessResponse(publishData, media?.id, 'New media published successfully');
             await this.messageBroker.rmqPublish(JSON.stringify(rmqPubMsg));
-          } catch (e) {
+          } catch (e: any) {
             console.error('MediaError:', e.message);
             throw new GenericResponseError(e.message, e.code);
           }
@@ -173,7 +173,7 @@ export class LafiaMediaController extends BaseController {
       }
 
       res.sendStatus(200);
-    } catch (e) {
+    } catch (e: any) {
       console.log(e);
     }
   }
@@ -185,7 +185,7 @@ export class LafiaMediaController extends BaseController {
       const broadcast = await this.lafiaMediaService.getOneVideoRecord({ streamId });
 
       this.success(res, broadcast, 'Recorded Video Retrieved successfully', HttpStatusCode.CREATED);
-    } catch (e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }
@@ -197,7 +197,7 @@ export class LafiaMediaController extends BaseController {
       const broadcast = await this.lafiaMediaService.getAllVideoRecords(user?.id!);
 
       this.success(res, broadcast, 'Recorded Video Retrieved successfully', HttpStatusCode.CREATED);
-    } catch (e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }
@@ -209,7 +209,7 @@ export class LafiaMediaController extends BaseController {
       const broadcast = await this.lafiaMediaService.deleteVideoRecord(id);
 
       this.success(res, broadcast, 'Recorded Video deleted successfully', HttpStatusCode.CREATED);
-    } catch (e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }

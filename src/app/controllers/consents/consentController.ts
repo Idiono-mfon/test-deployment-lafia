@@ -29,7 +29,7 @@ export class ConsentController extends BaseController {
       );
 
       this.success(res, consentRecord?.data, 'Consent successfully accepted');
-    } catch (e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }
@@ -51,7 +51,7 @@ export class ConsentController extends BaseController {
       await this.consentService.addConsentCategory(patientDetails?.email, consent_type);
 
       this.success(res, {}, 'Consent category added successfully');
-    } catch (e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }
@@ -81,7 +81,7 @@ export class ConsentController extends BaseController {
       );
 
       this.success(res, consents?.data, 'Consents retrieved successfully');
-    } catch (e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }
