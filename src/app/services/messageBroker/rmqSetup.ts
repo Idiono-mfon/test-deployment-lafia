@@ -43,7 +43,7 @@ export function initRMQ(): Promise<amqp.Channel> {
           // Return the connection and channel
           return resolve(channel);
         });
-      } catch(e) {
+      } catch(e: any) {
         return reject({
           code: e.code || HttpStatusCode.INTERNAL_SERVER_ERROR,
           message: e.message

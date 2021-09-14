@@ -21,6 +21,7 @@ export class PlatformSdkService {
     this.appNamespace = env.platform_app_namespace;
     this.adminToken = env.platform_admin_key;
   }
+
   public async userSignup(data: any): Promise<any> {
     try {
       const { email, first_name, last_name, password } = data;
@@ -36,7 +37,7 @@ export class PlatformSdkService {
       }
 
       return signupResponse;
-    } catch(e) {
+    } catch (e: any) {
       console.log('Error:', e.message);
       throw new GenericResponseError(e.message, e.code);
     }
@@ -55,7 +56,7 @@ export class PlatformSdkService {
       }
 
       return loginProfile;
-    } catch(e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
@@ -65,7 +66,7 @@ export class PlatformSdkService {
       return jwt.verify(token, env.jwt_secrete_key, {
         maxAge: '1hr'
       });
-    } catch (e) {
+    } catch (e: any) {
       if (typeof e.code === 'string' || !e.code) {
         e.code = HttpStatusCode.INTERNAL_SERVER_ERROR;
       }

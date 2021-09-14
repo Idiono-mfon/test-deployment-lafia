@@ -38,7 +38,7 @@ export class MessageBroker {
 
       console.log(' [x] Sent Date: %s', new Date().toString());
       console.log(' [x] Sent Data: %s', msg);
-    } catch (e) {
+    } catch (e: any) {
       console.log(e);
     }
   }
@@ -48,7 +48,7 @@ export class MessageBroker {
 
     try {
       rmqChannel = await initRMQ();
-    } catch (e) {
+    } catch (e: any) {
       const rmqPubMsg = rmqErrorResponse(e.message);
       await this.rmqPublish(JSON.stringify(rmqPubMsg));
 
@@ -72,7 +72,7 @@ export class MessageBroker {
         let msgJson: any = {};
         try {
           msgJson = JSON.parse(msgString);
-        } catch (e) {
+        } catch (e: any) {
           const rmqPubMsg = rmqErrorResponse('The payload is not a valid JSON. Did you remember to stringify it?');
           await this.rmqPublish(JSON.stringify(rmqPubMsg));
 
@@ -96,7 +96,7 @@ export class MessageBroker {
             });
 
             return;
-          } catch (e) {
+          } catch (e: any) {
             const rmqPubMsg = rmqErrorResponse(e.message, resource_type);
             await this.rmqPublish(JSON.stringify(rmqPubMsg));
 
@@ -126,7 +126,7 @@ export class MessageBroker {
           if (resource_type?.toLowerCase() === forWho.patient) {
             try {
               resource = await this.patientService.createPatient(data);
-            } catch (e) {
+            } catch (e: any) {
               const rmqPubMsg = rmqErrorResponse(e.message, resource_type);
               await this.rmqPublish(JSON.stringify(rmqPubMsg));
 
@@ -137,7 +137,7 @@ export class MessageBroker {
           if (resource_type?.toLowerCase() === forWho.practitioner) {
             try {
               resource = await this.practitionerService.createPractitioner(data);
-            } catch (e) {
+            } catch (e: any) {
               const rmqPubMsg = rmqErrorResponse(e.message, resource_type);
               await this.rmqPublish(JSON.stringify(rmqPubMsg));
 

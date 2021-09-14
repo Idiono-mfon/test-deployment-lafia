@@ -1,27 +1,23 @@
-import { inject, injectable } from 'inversify';
 import { Request } from 'express';
+import { inject, injectable } from 'inversify';
 import TYPES from '../../config/types';
-import {
-  IUser,
-  AttachmentModel,
-  IAttachment,
-  PatientsAttachmentModel,
-  IPatient, IFindUser
-} from '../../models';
-import { IUserLoginParams } from '../auth';
-import { S3Service } from '../aws';
-import { CodeSystemService } from '../codeSystems';
+import { AttachmentModel, IAttachment, IFindUser, IPatient, IUser, PatientsAttachmentModel } from '../../models';
 import { PatientRepository } from '../../repository';
-import { FhirServerService } from '../fhirServer';
-import { PlatformSdkService } from '../platformSDK';
 import {
   error,
-  forWho, GenericResponseError,
+  forWho,
+  GenericResponseError,
   getE164Format,
   InternalServerError,
   NotFoundError,
-  throwError, UtilityService
+  throwError,
+  UtilityService
 } from '../../utils';
+import { IUserLoginParams } from '../auth';
+import { S3Service } from '../aws';
+import { CodeSystemService } from '../codeSystems';
+import { FhirServerService } from '../fhirServer';
+import { PlatformSdkService } from '../platformSDK';
 import { UserService } from '../users';
 import { VideoBroadcastService } from '../videoRecords';
 
@@ -61,7 +57,7 @@ export class PatientService {
       );
 
       return patientUpdatedData;
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
@@ -145,7 +141,7 @@ export class PatientService {
         user: patient,
         auth_token: token,
       }
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
@@ -161,7 +157,7 @@ export class PatientService {
       );
 
       return patientData;
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
@@ -201,7 +197,7 @@ export class PatientService {
         });
 
       return attachment;
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
@@ -211,8 +207,7 @@ export class PatientService {
     if ( !patient ) {
       throw new NotFoundError("unknown patient");
     }
-    const practVidBroad = await this.videoBroadcastService.getAllVideoRecords(patientId);
-    return practVidBroad;
+    return await this.videoBroadcastService.getAllVideoRecords(patientId);
   }
 
 }

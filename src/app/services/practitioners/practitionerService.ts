@@ -3,26 +3,29 @@ import TYPES from '../../config/types';
 import {
   AttachmentModel,
   IAttachment,
-  PractitionersAttachmentModel,
+  IFindUser,
   IPractitioner,
-  IUser, IFindUser, PractitionerModel
+  IUser,
+  PractitionersAttachmentModel,
 } from '../../models';
+import { VideoBroadcastModel } from '../../models/videoRecords/videoBroadcastModel';
+import { PractitionerRepository, VideoBroadcastRepository } from '../../repository';
+import { PractitionerVideoBroadcastRepository } from '../../repository/videoRecords/practitionerVideoBroadcastRepository';
+import {
+  error,
+  forWho,
+  GenericResponseError,
+  InternalServerError,
+  NotFoundError,
+  throwError,
+  UtilityService
+} from '../../utils';
 import { IUserLoginParams } from '../auth';
 import { S3Service } from '../aws';
 import { CodeSystemService } from '../codeSystems';
-import { PractitionerRepository, VideoBroadcastRepository } from '../../repository';
-import {
-  error,
-  forWho, GenericResponseError,
-  InternalServerError,
-  NotFoundError,
-  throwError, UtilityService
-} from '../../utils';
 import { FhirServerService } from '../fhirServer';
 import { PlatformSdkService } from '../platformSDK';
 import { UserService } from '../users';
-import { VideoBroadcastModel } from '../../models/videoRecords/videoBroadcastModel';
-import { PractitionerVideoBroadcastRepository } from '../../repository/videoRecords/practitionerVideoBroadcastRepository';
 
 @injectable()
 export class PractitionerService {
@@ -62,7 +65,7 @@ export class PractitionerService {
       )
 
       return practitionerData;
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
@@ -155,7 +158,7 @@ export class PractitionerService {
       );
 
       return practitionerData;
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
@@ -195,7 +198,7 @@ export class PractitionerService {
         });
 
       return attachment;
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
@@ -218,7 +221,6 @@ export class PractitionerService {
     if ( !practitioner ) {
       throw new NotFoundError("unknown practitioner");
     }
-    const practVidBroad = await this.practitionervideoBroadcastRepository.fetchPractitionerBroadcastByID(practitionerId);
-    return practVidBroad;
+    return this.practitionervideoBroadcastRepository.fetchPractitionerBroadcastByID(practitionerId);
   }
 }
