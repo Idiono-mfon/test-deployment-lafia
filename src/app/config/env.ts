@@ -40,6 +40,12 @@ export interface IEnv {
   lafia_media_url: string;
   consent_service_base_url: string;
   consent_service_auth_code: string;
+  safhir_authorization_url: string;
+  safhir_client_id: string;
+  safhir_client_secret: string;
+  safhir_callback_url: string;
+  safhir_token_url: string;
+  safhir_scope: string;
 }
 
 const config: IEnv = {
@@ -82,6 +88,12 @@ const config: IEnv = {
   lafia_media_url: process.env.LAFIA_MEDIA_URL as string,
   consent_service_base_url: process.env.CONSENT_SERVICE_BASE_URL as string,
   consent_service_auth_code: process.env.CONSENT_SERVICE_AUTH_CODE as string,
+  safhir_authorization_url: process.env.SAFHIR_AUTHORIZATION_URL as string,
+  safhir_scope: process.env.SAFHIR_SCOPE as string,
+  safhir_client_secret: process.env.SAFHIR_CLIENT_SECRET as string,
+  safhir_client_id: process.env.SAFHIR_CLIENT_ID as string,
+  safhir_token_url: process.env.SAFHIR_TOKEN_URL as string,
+  safhir_callback_url: process.env.SAFHIR_CALLBACK_URL as string,
 };
 
 export class Env {

@@ -3,17 +3,20 @@ import cors from 'cors';
 import { config as dotConfig } from 'dotenv';
 import express from 'express';
 import { createServer } from 'http';
+import OAuth2Strategy from 'passport-oauth2';
+import passport from 'passport';
 import container from './config/inversify.config';
 import { InversifyExpressServer } from 'inversify-express-utils';
 import { Env } from './config/env';
 import TYPES from './config/types';
 import { PatientService, PractitionerService, MessageBroker, VideoBroadcastService } from './services';
 import { SignallingServerService } from './services/signallingServers';
-import * as swaggerUi  from 'swagger-ui-express';
+import * as swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './config/swagger.config';
 
 dotConfig();
 
+const env = Env.all();
 const app = express();
 const server = new InversifyExpressServer(container, null, null, app);
 const messageBroker = container.get<MessageBroker>(TYPES.MessageBroker);
@@ -26,8 +29,36 @@ server.setConfig((app) => {
   app.use(express.urlencoded({ extended: true }));
   app.use(cors());
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
-    customfavIcon: "https://lafia.io/wp-content/uploads/2021/02/lafia_logo_small.png", customSiteTitle: "lafia.io api docs"
+    customfavIcon: 'https://lafia.io/wp-content/uploads/2021/02/lafia_logo_small.png',
+    customSiteTitle: 'lafia.io api docs'
   }));
+
+  passport.use(new OAuth2Strategy({
+      authorizationURL: env.safhir_authorization_url,
+      tokenURL: env.safhir_token_url,
+      clientID: env.safhir_client_id,
+      clientSecret: env.safhir_client_secret,
+      callbackURL: env.safhir_callback_url,
+      scope: env.safhir_scope,
+    },
+    (accessToken: string, refreshToken: string, profile: any) => {
+      console.log('SaFHIR::Access');
+      console.log({
+        accessToken,
+        refreshToken,
+        profile,
+      });
+    }
+  ));
+
+  app.get('/auth/safhir',
+    passport.authenticate('oauth2'));
+
+  app.get('/safhir',
+    passport.authenticate('oauth2'),
+    (req, res) => {
+      res.redirect(env.safhir_callback_url);
+    });
 });
 
 messageBroker.rmqSubscribe().then().catch(e => console.log('rmq=>', e));
@@ -40,7 +71,7 @@ appServer.listen(PORT, () => {
   console.log(`Listening on port: ${PORT}`);
 });
 
-const signallingServer  = new SignallingServerService(
+const signallingServer = new SignallingServerService(
   appServer,
   patientService,
   practitionerService,
