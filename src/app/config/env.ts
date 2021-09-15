@@ -46,6 +46,7 @@ export interface IEnv {
   safhir_callback_url: string;
   safhir_token_url: string;
   safhir_scope: string;
+  safhir_base_url: string
 }
 
 const config: IEnv | any = {
@@ -94,6 +95,7 @@ const config: IEnv | any = {
   safhir_client_id: process.env.SAFHIR_CLIENT_ID as string,
   safhir_token_url: process.env.SAFHIR_TOKEN_URL as string,
   safhir_callback_url: process.env.SAFHIR_CALLBACK_URL as string,
+  safhir_base_url: process.env.SAFHIR_BASE_URL as string,
 };
 
 export class Env {

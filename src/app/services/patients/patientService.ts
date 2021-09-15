@@ -53,7 +53,7 @@ export class PatientService {
       const { data: patientUpdatedData } = await this.fhirServerService.executeQuery(
         `/Patient/${id}`,
         'PUT',
-        data
+        { data }
       );
 
       return patientUpdatedData;
@@ -121,7 +121,7 @@ export class PatientService {
         ],
       };
 
-      const patientResponse = await this.fhirServerService.executeQuery('/Patient', 'POST', patientData);
+      const patientResponse = await this.fhirServerService.executeQuery('/Patient', 'POST', { data: patientData });
       const patient = patientResponse.data;
       const token = this.userService.generateJwtToken({ email, id: patient.id });
       const userData: IFindUser = {
@@ -152,7 +152,7 @@ export class PatientService {
       if (user.photo === null) {
         delete user.photo;
       }
-      
+
       await this.userService.updateUser(user.id!, {...user, token});
 
       const { data: patientData } = await this.fhirServerService.executeQuery(
@@ -211,7 +211,7 @@ export class PatientService {
     if ( !patient ) {
       throw new NotFoundError("unknown patient");
     }
-    return await this.videoBroadcastService.getAllVideoRecords(patientId);
+    return this.videoBroadcastService.getAllVideoRecords(patientId);
   }
 
 }

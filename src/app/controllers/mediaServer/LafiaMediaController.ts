@@ -104,7 +104,7 @@ export class LafiaMediaController extends BaseController {
             encounterResponse = await this.fhirServerService.executeQuery(
               '/Encounter',
               'POST',
-              encounterResourceData
+              { data: encounterResourceData },
             );
           } catch (e: any) {
             throw new GenericResponseError(e.message, e.code);
@@ -154,7 +154,7 @@ export class LafiaMediaController extends BaseController {
             const mediaResponse = await this.fhirServerService.executeQuery(
               '/Media',
               'POST',
-              mediaResourceData
+              { data: mediaResourceData }
             );
 
             const media = mediaResponse?.data;
