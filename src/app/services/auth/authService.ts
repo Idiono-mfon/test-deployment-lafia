@@ -1,15 +1,14 @@
-import { inject, injectable } from 'inversify';
 import { Request } from 'express';
+import { inject, injectable } from 'inversify';
+import * as _ from 'lodash';
+import { Env } from '../../config/env';
 import TYPES from '../../config/types';
 import { IUser } from '../../models';
-import { forWho, GenericResponseError, getE164Format } from '../../utils';
+import { error, forWho, GenericResponseError, getE164Format, throwError } from '../../utils';
 import { PatientService } from '../patients';
 import { PlatformSdkService } from '../platformSDK';
 import { PractitionerService } from '../practitioners';
 import { UserService } from '../users';
-import * as _ from 'lodash';
-import axios from 'axios';
-import https from 'https'
 
 @injectable()
 export class AuthService {
@@ -33,10 +32,10 @@ export class AuthService {
       }
 
       const loggedInUser: IUser = await this.userService.userLogin(email, password);
-      
+
       const token = this.userService.generateJwtToken({ email, id: loggedInUser.resourceId });
       let loggedInUserData: any;
-      
+
       if (loggedInUser.resourceType === forWho.patient) {
         loggedInUserData = await this.patientService.patientLogin({ user: loggedInUser, token });
       }
@@ -55,23 +54,22 @@ export class AuthService {
     }
   }
 
-  public async getSaFHirAuth(): Promise<any> {
-    // const resp = {
-    //   authUrl: "https://api-dmdh-t31.safhir.io/v1/authorize?client_secret=86Otdvd4gSu1d8TQtAR__729oAezaST-t-&client_id=c1317a46-a048-4402-a181-2221fac4fc99&response_type=code&redirect_uri=https://app.lafia.io/safhir&scope=launch/patient%20fhirUser%20openid%20offline_access%20patient/List.read%20patient/MedicationKnowledge.read%20user/List.read%20user/MedicationKnowledge.read%20user/ExplanationOfBenefit.read%20user/Coverage.read%20user/AllergyIntolerance.read%20user/CarePlan.read%20user/CareTeam.read%20user/Condition.read%20user/Device.read%20user/DiagnosticReport.read%20user/DocumentReference.read%20user/Encounter.read%20user/Goal.read%20user/Immunization.read%20user/Location.read%20user/Medication.read%20user/MedicationRequest.read%20user/Observation.read%20user/Organization.read%20user/Patient.read%20user/Practitioner.read%20user/PractitionerRole.read%20user/Procedure.read%20user/Provenance.read%20patient/ExplanationOfBenefit.read%20patient/Coverage.read%20patient/AllergyIntolerance.read%20patient/CarePlan.read%20patient/CareTeam.read%20patient/Condition.read%20patient/Device.read%20patient/DiagnosticReport.read%20patient/DocumentReference.read%20patient/Encounter.read%20patient/Goal.read%20patient/Immunization.read%20patient/Location.read%20patient/Medication.read%20patient/MedicationRequest.read%20patient/Observation.read%20patient/Organization.read%20patient/Patient.read%20patient/Practitioner.read%20patient/PractitionerRole.read%20patient/Procedure.read%20patient/Provenance.read&aud=09b3d1b7-60c6-4149-ad29-cfbe9220f2de&state="
-    // }
+  public getConnectionCredentials(connectionName: string) {
 
-    // return resp;
-  }
+    if (!connectionName) {
+      throwError('connection name is required', error.badRequest);
+    }
 
-  public async getSaFHirToken(): Promise<any> {
-    // const httpsAgent = new https.Agent({
-    //   rejectUnauthorized: false,
-    // })
-    // axios.defaults.httpsAgent = httpsAgent
-    // axios.post("https://api-dmdh-t31.safhir.io/v1/token", {
-    //   data: ""
-    // }).then( res => console.log(res))
+    const env = Env.all();
+    connectionName = connectionName.toLowerCase();
 
-    //return resp;
+    return {
+      client_secret: env[`${connectionName}_client_secret`],
+      client_id: env[`${connectionName}_client_id`],
+      callback_url: env[`${connectionName}_callback_url`],
+      authorization_url: env[`${connectionName}_authorization_url`],
+      token_url: env[`${connectionName}_token_url`],
+      scope: env[`${connectionName}_scope`]
+    }
   }
 }
