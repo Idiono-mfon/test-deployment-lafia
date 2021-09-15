@@ -31,6 +31,7 @@ const TYPES = {
   ConsentService: Symbol('ConsentService'),
   VideoBroadcastService: Symbol('VideoBroadcastService'),
   TwilioRoomService: Symbol('TwilioRoomService'),
+  ConnectionService: Symbol('ConnectionService'),
 
   // repositories
   UserRepository: Symbol('UserRepository'),
@@ -44,6 +45,7 @@ const TYPES = {
   VideoBroadcastRepository: Symbol('VideoBroadcastRepository'),
   PractitionerVideoBroadcastRepository: Symbol('PractitionerVideoBroadcastRepository'),
   TwilioRoomRepository: Symbol('TwilioRoomRepository'),
+  ConnectionRepository: Symbol('ConnectionRepository'),
   
   // middlewares
   AuthMiddleware: Symbol('AuthMiddleware'),
