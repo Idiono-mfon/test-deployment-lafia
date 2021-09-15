@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import cors from 'cors';
 import { config as dotConfig } from 'dotenv';
-import express from 'express';
+import express, { Request, Response } from 'express';
 import { createServer } from 'http';
 import OAuth2Strategy from 'passport-oauth2';
 import passport from 'passport';
@@ -18,6 +18,7 @@ dotConfig();
 
 const env = Env.all();
 const app = express();
+
 const server = new InversifyExpressServer(container, null, null, app);
 const messageBroker = container.get<MessageBroker>(TYPES.MessageBroker);
 const patientService = container.get<PatientService>(TYPES.PatientService);
@@ -51,14 +52,19 @@ server.setConfig((app) => {
     }
   ));
 
-  app.get('/auth/safhir',
-    passport.authenticate('oauth2'));
+  app.get('/auth/safhir', (req: Request, res: Response) => {
+    passport.authenticate('oauth2',
+      {
+        state: req.query.state as string
+      })(req, res);
+  });
 
   app.get('/safhir',
     passport.authenticate('oauth2'),
     (req, res) => {
       res.redirect(env.safhir_callback_url);
-    });
+    }
+  );
 });
 
 messageBroker.rmqSubscribe().then().catch(e => console.log('rmq=>', e));
