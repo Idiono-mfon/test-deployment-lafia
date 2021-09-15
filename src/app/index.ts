@@ -55,6 +55,9 @@ server.setConfig((app) => {
         refreshToken,
       });
 
+      // @ts-ignore
+      global.accessToken = accessToken;
+
       return cb(null, {
         accessToken,
         refreshToken,
@@ -81,10 +84,12 @@ server.setConfig((app) => {
   app.get('/safhir',
     passport.authenticate('oauth2'),
     (req, res) => {
+
       // @ts-ignore
-      console.log('Session:', req.cookies.session);
-      const redirectURL = `https://app.lafia.io/safhir?state=${req.query.state}&code=${req.query.code}&accessToken=${req.query.accessToken}`;
+      const redirectURL = `https://app.lafia.io/safhir?state=${req.query.state}&code=${req.query.code}&accessToken=${global.accessToken}`;
       console.log('RedirectURL:', redirectURL);
+      // @ts-ignore
+      console.log('AccessToken:', accessToken);
       res.redirect(redirectURL);
     }
   );
