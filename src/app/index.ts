@@ -90,11 +90,11 @@ server.setConfig((app) => {
   });
 
   app.get('/safhir',
-    passport.authenticate('oauth2'),
+    passport.authenticate('oauth2', { failureRedirect: `https://app.lafia.io/safhir?status=error` }),
     (req, res) => {
 
       // @ts-ignore
-      const redirectURL = `https://app.lafia.io/safhir?state=${req.query.state}&accessToken=${global.accessToken}`;
+      const redirectURL = `https://app.lafia.io/safhir?status=success&state=${req.query.state}&access_token=${global.accessToken}`;
 
       res.redirect(redirectURL);
     }
