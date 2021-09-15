@@ -48,7 +48,7 @@ export interface IEnv {
   safhir_scope: string;
 }
 
-const config: IEnv = {
+const config: IEnv | any = {
   port: Number(process.env.PORT),
   environment: process.env.NODE_ENV as string,
   pg_port: Number(process.env.POSTGRES_PORT),
