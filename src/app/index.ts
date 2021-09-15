@@ -14,6 +14,8 @@ import { PatientService, PractitionerService, MessageBroker, VideoBroadcastServi
 import { SignallingServerService } from './services/signallingServers';
 import * as swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './config/swagger.config';
+// @ts-ignore
+import { Strategy as RefreshTokenStrategy } from 'passport-refresh-token';
 
 const httpsAgent = new https.Agent({
   rejectUnauthorized: false,
@@ -66,6 +68,10 @@ server.setConfig((app) => {
 
   passport.use(strategy);
 
+  passport.use(new RefreshTokenStrategy(
+    (token: any, done: any) => done(null, token)
+  ));
+
   passport.serializeUser((user, done) => done(null, user));
 
   passport.deserializeUser((obj: any, done) => done(null, obj));
@@ -80,10 +86,7 @@ server.setConfig((app) => {
       });
     }
 
-    passport.authenticate('oauth2',
-      {
-        state: req.query.state as string
-      })(req, res);
+    passport.authenticate('oauth2', { state })(req, res);
   });
 
   app.get('/safhir',
@@ -94,6 +97,19 @@ server.setConfig((app) => {
       const redirectURL = `https://app.lafia.io/safhir?state=${req.query.state}&accessToken=${global.accessToken}`;
 
       res.redirect(redirectURL);
+    }
+  );
+
+  app.get('/auth/token/refresh',
+    passport.authenticate('refresh_token', { session: false }),
+    (req, res) => {
+      // generate new tokens for req.user
+      // @ts-ignore
+      console.log('Token:', token);
+      // @ts-ignore
+      console.log('Tokens:', tokens);
+      // @ts-ignore
+      res.json(tokens);
     }
   );
 });

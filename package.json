@@ -82,6 +82,7 @@
     "objection-visibility": "^1.1.0",
     "passport": "^0.4.1",
     "passport-oauth2": "^1.6.0",
+    "passport-refresh-token": "^0.0.1",
     "pg": "8.5.1",
     "platform-admin-sdk": "^1.5.0",
     "pm2": "^4.5.5",
