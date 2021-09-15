@@ -12,7 +12,7 @@ export class VideoRecordService {
   public async saveRecordedStream(data: IVideoRecord): Promise<IVideoRecord> {
     try {
       return await this.videoRecordRepo.saveRecordedStream(data);
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
@@ -20,7 +20,7 @@ export class VideoRecordService {
   public async getOneVideoRecord(data: IFindVideoRecord | any): Promise<IVideoRecord> {
     try {
       return await this.videoRecordRepo.getOneVideoRecord(data);
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
@@ -28,7 +28,7 @@ export class VideoRecordService {
   public async getAllVideoRecords(user_id: string): Promise<IVideoRecord[]> {
     try {
       return await this.videoRecordRepo.getAllVideoRecords(user_id);
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
@@ -36,7 +36,7 @@ export class VideoRecordService {
   public async deleteVideoRecord(id: string): Promise<IVideoRecord> {
     try {
       return await this.videoRecordRepo.deleteVideoRecord(id);
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
@@ -44,7 +44,7 @@ export class VideoRecordService {
   public async updateVideoRecord(id: string, data: IFindVideoRecord): Promise<any> {
     try {
       return await this.videoRecordRepo.updateVideoRecord(id, data);
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }

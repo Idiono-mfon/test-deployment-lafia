@@ -24,7 +24,7 @@ export class CodeSystemController extends BaseController {
         .getCodeSystemByType(CODE_SYSTEM_TYPE.MARITAL_STATUS);
 
       this.success(res, maritalStatus, 'Request Successful');
-    } catch(e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }
@@ -36,7 +36,7 @@ export class CodeSystemController extends BaseController {
         .getCodeSystemByType(CODE_SYSTEM_TYPE.LANGUAGE);
 
       this.success(res, languages, 'Request Successful');
-    } catch(e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }
@@ -48,7 +48,7 @@ export class CodeSystemController extends BaseController {
         .getCodeSystemByType(CODE_SYSTEM_TYPE.RELATIONSHIP);
 
       this.success(res, relationships, 'Request Successful');
-    } catch(e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }
@@ -60,7 +60,7 @@ export class CodeSystemController extends BaseController {
         .getCodeSystemByType(CODE_SYSTEM_TYPE.QUALIFICATION);
 
       this.success(res, qualifications, 'Request Successful');
-    } catch(e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }
@@ -72,7 +72,7 @@ export class CodeSystemController extends BaseController {
       const codeSystem: ICodeSystem = await this.codeSystemService.addCodeSystem(data);
 
       this.success(res, codeSystem, 'Code system successfully added', HttpStatusCode.CREATED);
-    } catch(e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }
@@ -84,7 +84,7 @@ export class CodeSystemController extends BaseController {
         .getCodeSystemByType(CODE_SYSTEM_TYPE.DURATION);
 
       this.success(res, durations, 'Request Successful');
-    } catch (e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }

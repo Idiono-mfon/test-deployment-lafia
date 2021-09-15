@@ -23,7 +23,7 @@ export class AuthController extends BaseController {
       const userData = await this.authService.login(email, password, req);
 
       this.success(res, userData, 'Login Successful');
-    } catch (e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }

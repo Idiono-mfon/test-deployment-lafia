@@ -28,7 +28,7 @@ export class EmailService {
         from: `'Lafia Team' <${env.email_address}>`,
         ...data
       });
-    } catch (e) {
+    } catch (e: any) {
       if (typeof e.code === 'string' || !e.code) {
         e.code = HttpStatusCode.INTERNAL_SERVER_ERROR
       }

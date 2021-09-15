@@ -24,7 +24,7 @@ export class VideoBroadcastService {
   public async saveBroadcastVideo(data: IVideoBroadcast): Promise<IVideoBroadcast> {
     try {
       return await this.videoBroadcastRepository.saveBroadcastVideo(data);
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
@@ -32,7 +32,7 @@ export class VideoBroadcastService {
   public async getOneVideoRecord(data: IFindVideoBroadcast | any): Promise<IVideoBroadcast> {
     try {
       return await this.videoBroadcastRepository.getOneBroadcastVideo(data);
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
@@ -40,7 +40,7 @@ export class VideoBroadcastService {
   public async getAllVideoRecords(user_id: string): Promise<IVideoBroadcast[]> {
     try {
       return await this.videoBroadcastRepository.getAllBroadcastVideos(user_id);
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
@@ -48,7 +48,7 @@ export class VideoBroadcastService {
   public async deleteVideoBroadcastRecords(id: string): Promise<any> {
     try {
       return await this.videoBroadcastRepository.deleteBroadcastVideos(id);
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
@@ -56,7 +56,7 @@ export class VideoBroadcastService {
   public async getAllPractitionerBroadcastVideos(user_id: string): Promise<any> {
     try {
       return await this.practitionerVideoBroadcastRepository.getAllPractitionerBroadcastVideos(user_id);
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
@@ -69,7 +69,7 @@ export class VideoBroadcastService {
 
     try {
       return await this.practitionerVideoBroadcastRepository.savePractitionerBroadcastVideo(data);
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
@@ -82,7 +82,7 @@ export class VideoBroadcastService {
 
     try {
       return await this.practitionerVideoBroadcastRepository.deletePractitionerBroadcastVideos(id);
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }

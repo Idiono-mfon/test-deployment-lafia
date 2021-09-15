@@ -50,7 +50,7 @@ export class RedisStore {
       const onlineUsersStr = RedisStore.decodeBase64(encodedOnlineUsers);
 
       return JSON.parse(onlineUsersStr);
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
     }
   }
@@ -73,7 +73,7 @@ export class RedisStore {
       }
 
       return onlineUser;
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
     }
   }
@@ -94,7 +94,7 @@ export class RedisStore {
       const base64Str = RedisStore.encodeBase64(JSON.stringify(onlineUsers));
 
       await this.redisClient.set(this.onlineUsersKey, base64Str);
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
     }
   }
@@ -116,13 +116,13 @@ export class RedisStore {
       }
 
       let username: string = '';
-      
+
       if (user?.resourceType === forWho.patient) {
         try {
           const patient: IPatient = await this.patientService.findPatientById(user.userId);
           // @ts-ignore
           username = patient?.name[0]?.text;
-        } catch (e) {
+        } catch (e: any) {
           console.log(e);
         }
       }
@@ -132,10 +132,10 @@ export class RedisStore {
           const practitioner: IPractitioner = await this.practitionerService.findPractitionerById(user.userId);
           // @ts-ignore
           username = practitioner?.name[0]?.text;
-        } catch (e) {
+        } catch (e: any) {
           console.log(e);
         }
-        
+
       }
 
       if (username) {
@@ -150,7 +150,7 @@ export class RedisStore {
 
       // Save online user
       await this.redisClient.set(this.onlineUsersKey, base64Str);
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
     }
   }
@@ -167,7 +167,7 @@ export class RedisStore {
       const decodedBroadcast = RedisStore.decodeBase64(encodedBroadcast);
 
       return JSON.parse(decodedBroadcast);
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
     }
   }
@@ -190,7 +190,7 @@ export class RedisStore {
       }
 
       return broadCast;
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
     }
   }
@@ -225,7 +225,7 @@ export class RedisStore {
 
       // Update Redis Data
       await this.redisClient.set(this.broadcastStatusKey, base64Str);
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
     }
   }
@@ -255,7 +255,7 @@ export class RedisStore {
 
       // Update Redis Data
       await this.redisClient.set(this.broadcastStatusKey, base64Str);
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
     }
   }
@@ -272,7 +272,7 @@ export class RedisStore {
       const decodedRoom = RedisStore.decodeBase64(encodedRoom);
 
       return JSON.parse(decodedRoom);
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
     }
   }
@@ -295,7 +295,7 @@ export class RedisStore {
       }
 
       return room;
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
     }
   }
@@ -318,7 +318,7 @@ export class RedisStore {
 
       // Update Redis data
       await this.redisClient.set(this.roomKey, base64Str);
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
     }
   }
@@ -336,7 +336,7 @@ export class RedisStore {
 
       // Update Redis data
       await this.redisClient.set(this.roomKey, base64Str);
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
     }
   }

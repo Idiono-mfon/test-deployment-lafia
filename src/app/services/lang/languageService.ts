@@ -8,7 +8,7 @@ import {
   ComponentRepository,
   LabelRepository,
   LanguageRepository
-} from '../../repository/lang';
+} from '../../repository';
 import { BadGatewayError, BadRequestError, ConflictError, NotFoundError } from '../../utils';
 
 @injectable()
@@ -42,7 +42,7 @@ export class LanguageService {
     if ( !language ) {
       throw new NotFoundError("language not found");
     }
-    
+
     return this.languageRepository.fetchLanguageContent(language);
   }
 
@@ -69,13 +69,13 @@ export class LanguageService {
         throw new ConflictError("duplicate label resource");
       }
       return this.labelRepository.addLabel(data);
-    } catch (e) {
+    } catch (e: any) {
       throw new BadGatewayError(e.toSring())
     }
   }
 
   public async addComponent(data: IComponent): Promise<IComponent> {
-    data.feilds = JSON.stringify(data.feilds);  
+    data.feilds = JSON.stringify(data.feilds);
     return this.componentRepository.addComponent(data);
   }
 
@@ -189,11 +189,3 @@ export class LanguageService {
     return this.componentRepository.deleteComponent(id);
   }
 }
-
-
-// exports.up = async function(knex, Promise) {
-//   await knex.schema.alterTable('campaigns', function(table) {
-//       table.timestamp('intake_start_date').alter();
-//       table.timestamp('intake_end_date').alter();
-//   });
-// }

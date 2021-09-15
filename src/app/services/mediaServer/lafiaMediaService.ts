@@ -34,7 +34,7 @@ export class LafiaMediaService {
         rtmp_url: `rtmp://media.lafia.io/WebRTCAppEE`,
         stream_key: `${streamKey}`,
       };
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
@@ -45,7 +45,7 @@ export class LafiaMediaService {
         `${this.env.lafia_media_url}/rest/v2/vods/${id}`
       );
       return `${this.env.lafia_media_url}/${axiosResponse?.data?.filePath}`;
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
   }

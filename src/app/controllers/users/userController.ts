@@ -24,7 +24,7 @@ export class UserController extends BaseController {
       const newUser = await this.userService.createUser(user);
 
       this.success(res, newUser, 'User created', HttpStatusCode.CREATED);
-    } catch (e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }
@@ -35,7 +35,7 @@ export class UserController extends BaseController {
       const newUser = await this.userService.validateUser(req);
 
       this.success(res, newUser, 'User created', HttpStatusCode.CREATED);
-    } catch (e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }
@@ -46,7 +46,7 @@ export class UserController extends BaseController {
       const user = await this.userService.updateUser(req.body.user.id, req.body);
 
       this.success(res, user, 'User updated', HttpStatusCode.CREATED);
-    } catch (e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }
@@ -60,7 +60,7 @@ export class UserController extends BaseController {
       const updatedUser = await this.userService.changePassword(id, old_password, new_password);
 
       this.success(res, updatedUser, 'User password changed successfully');
-    } catch (e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }
@@ -73,7 +73,7 @@ export class UserController extends BaseController {
       await this.userService.resetPassword(email);
 
       this.success(res, [], 'Password reset guide successfully sent to the users email');
-    } catch (e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }
@@ -87,8 +87,8 @@ export class UserController extends BaseController {
 
       const exist = !!user;
 
-      this.success(res, {exist}, 'user checked successfully');
-    } catch (e) {
+      this.success(res, { exist }, 'user checked successfully');
+    } catch (e: any) {
       this.error(res, e);
     }
   }
@@ -99,7 +99,7 @@ export class UserController extends BaseController {
       const { phone } = req.body;
       const otp = await this.twilioService.sendOTP(phone);
       this.success(res, otp, 'OTP sent');
-    } catch (e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }
@@ -110,7 +110,7 @@ export class UserController extends BaseController {
       const { phone, code } = req.body;
       const verify = await this.twilioService.verifyOTP(phone, code);
       this.success(res, verify, 'OTP verification checked');
-    } catch (e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }
@@ -118,11 +118,11 @@ export class UserController extends BaseController {
   @httpPost('/existing')
   public async checkExistingUser(@request() req: Request, @response() res: Response) {
     try {
-        await this.userService.checkExistingUser(req.body);
+      await this.userService.checkExistingUser(req.body);
 
       this.success(res, {}, 'User does not exist');
-    } catch (e) {
-        this.error(res, e);
+    } catch (e: any) {
+      this.error(res, e);
     }
   }
 
@@ -132,7 +132,7 @@ export class UserController extends BaseController {
       const { identity, room } = req.body;
       const verify = await this.twilioService.generateAccessToken(identity, room, true);
       this.success(res, verify, 'Access Token');
-    } catch (e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }

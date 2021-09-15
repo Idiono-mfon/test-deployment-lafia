@@ -14,7 +14,7 @@ export class PractitionerRepository {
       return await transaction(PractitionerModel, async (PractitionerModel) => {
         return PractitionerModel.query().upsertGraphAndFetch(data);
       });
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
       throw new GenericResponseError(e.message, HttpStatusCode.BAD_REQUEST);
     }
@@ -59,7 +59,7 @@ export class PractitionerRepository {
           .skipUndefined()
           .first();
       });
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
@@ -110,7 +110,7 @@ export class PractitionerRepository {
           .skipUndefined()
           .first();
       });
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
@@ -121,13 +121,13 @@ export class PractitionerRepository {
         return PractitionerModel.query().upsertGraphAndFetch(data)
           .first();
       });
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
       throw new GenericResponseError(e.message, HttpStatusCode.BAD_REQUEST);
     }
   }
 
   public async attachBroadcastVideos(practitionerID: string, broadcastVideoId: string): Promise<any> {
-    return await PractitionerModel.relatedQuery('broadcastVideos').for(practitionerID).relate(broadcastVideoId);                  
+    return PractitionerModel.relatedQuery('broadcastVideos').for(practitionerID).relate(broadcastVideoId);
   }
 }

@@ -49,8 +49,7 @@ export class AuthService {
         user: loggedInUserData,
         auth_token: token
       }
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
       throw new GenericResponseError(e.toString(), e.code);
     }
   }

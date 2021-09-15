@@ -31,7 +31,7 @@ export class S3Service {
       if (!file) {
         throwError('File upload failed!', error.internalServer);
       }
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
     }
 
@@ -56,10 +56,8 @@ export class S3Service {
 
       // Return object link
       return `https://${uploadParams.Bucket}.s3.amazonaws.com/${uploadParams.Key}`;
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, e.code || 500);
     }
   }
-
-
 }

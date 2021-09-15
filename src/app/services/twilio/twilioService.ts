@@ -31,7 +31,7 @@ export class TwilioService {
       if (newRoom) {
         try {
           await TwilioService.createRoom(newRoomId);
-        } catch (e) {
+        } catch (e: any) {
           console.log('Error creating room');
           throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
@@ -54,7 +54,7 @@ export class TwilioService {
         token: token.toJwt(),
       };
 
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
@@ -75,7 +75,7 @@ export class TwilioService {
         .update({ rules: [{ 'type': 'include', 'all': true }] });
 
       return roomSid;
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
 
@@ -88,7 +88,7 @@ export class TwilioService {
         .update({ status: 'completed' });
 
       return room?.sid;
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
@@ -100,9 +100,9 @@ export class TwilioService {
 
       const [,participants] = room?.uniqueName?.split(':');
       const [practitioner, ...patients] = participants?.split('-');
-      
+
       return { practitioner, patients, };
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
@@ -113,7 +113,7 @@ export class TwilioService {
       const twilioRecordResponse = await twilioClient.request({ method: 'GET', uri });
 
       return twilioRecordResponse?.body?.redirect_to;
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
@@ -133,7 +133,7 @@ export class TwilioService {
       })
 
       return composition.sid;
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
@@ -148,7 +148,7 @@ export class TwilioService {
       const compositionFileResponse = await twilioClient.request({ method: 'GET', uri })
 
       return compositionFileResponse?.body?.redirect_to;
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
@@ -163,7 +163,7 @@ export class TwilioService {
         .create({ to: phone, channel: 'sms' });
       //.then(verification => console.log(verification.status));
       return { to, channel, status, valid };
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, e.status);
     }
 
@@ -183,7 +183,7 @@ export class TwilioService {
       // }
       //.then(verification_check => console.log(verification_check.status));
       return { to, channel, status, valid };
-    } catch (e) {
+    } catch (e: any) {
       console.log(e)
       throw new GenericResponseError(e.message, e.status);
     }
@@ -196,7 +196,7 @@ export class TwilioService {
           room_sid: event?.RoomSid,
           recording_sid: event?.RecordingSid
         });
-      } catch (e) {
+      } catch (e: any) {
         return;
       }
       await this.composeRecordingMedia(event?.RoomSid);

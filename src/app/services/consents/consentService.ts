@@ -7,7 +7,7 @@ const env = Env.all();
 
 const axiosInstance = axios.create({
   baseURL: `${env.consent_service_base_url}/`,
-  headers : {
+  headers: {
     'Content-Type': 'application/json',
     'Authorization': env.consent_service_auth_code
   }
@@ -21,7 +21,7 @@ export class ConsentService {
       data.consentApplication = 'LafiaConsent';
 
       await axiosInstance.post('/createUserConsentApplication', data);
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
     }
   }
@@ -29,7 +29,7 @@ export class ConsentService {
   public async addConsentCategory(user_email: string, category = 'careNow') {
     try {
       await axiosInstance.put(`/addConsentCategory/${category}?user=${user_email}`);
-    } catch (e) {
+    } catch (e: any) {
       console.error(e.response.data);
       throw new GenericResponseError(e.response?.data?.message, e.response?.data?.code);
     }
@@ -38,7 +38,7 @@ export class ConsentService {
   public async removeConsentCategory(user_email: string, category: string) {
     try {
       await axiosInstance.put(`/removeConsentCategory/${category}?user=${user_email}`);
-    } catch (e) {
+    } catch (e: any) {
       console.error(e.response.data);
       throw new GenericResponseError(e.response?.data?.message, e.response?.data?.code);
     }
@@ -61,7 +61,7 @@ export class ConsentService {
       const consents = await axiosInstance.post(`/processNewConsent?user=${user_email}`, data);
 
       return consents?.data?.data?.data;
-    } catch (e) {
+    } catch (e: any) {
       console.error(e.response.data);
       throw new GenericResponseError(e.response?.data?.message, e.response?.data?.code);
     }
@@ -72,7 +72,7 @@ export class ConsentService {
       const consents = await axiosInstance.get(`/allConsentDocs?user=${user_email}`);
 
       return consents?.data?.data;
-    } catch(e) {
+    } catch (e: any) {
       console.error(e.response.data);
       throw new GenericResponseError(e.response?.data?.message, e.response?.data?.code);
     }
@@ -83,7 +83,7 @@ export class ConsentService {
       const consents = await axiosInstance.get(`/consentDocsByType?consentType=${consentType}&user=${user_email}`);
 
       return consents.data?.data;
-    } catch(e) {
+    } catch (e: any) {
       console.error(e.response.data);
       throw new GenericResponseError(e.response?.data?.message, e.response?.data?.code);
     }

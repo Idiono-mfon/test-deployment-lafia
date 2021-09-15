@@ -14,7 +14,7 @@ export class UserRepository {
       return await UserModel.query()
         .insert(user)
         .returning('*');
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
@@ -22,7 +22,7 @@ export class UserRepository {
   public async getOneUser(data: IFindUser | any): Promise<IUser> {
     try {
       return await UserModel.query().findOne(data);
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
@@ -30,7 +30,7 @@ export class UserRepository {
   public async getOneBy(field: string, value:string): Promise<IUser> {
     try {
       return await UserModel.query().where(field, value).first();
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
@@ -38,7 +38,7 @@ export class UserRepository {
   public async getUserByEmailOrPhone(value:string): Promise<IUser> {
     try {
       return await UserModel.query().where("email", value).orWhere("phone", value).first();
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
@@ -47,7 +47,7 @@ export class UserRepository {
     try {
       return await UserModel.query()
         .patchAndFetchById(id, data);
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
@@ -58,7 +58,7 @@ export class UserRepository {
         .where({ id })
         .orWhere({ resource_id: id })
         .patchAndFetch({ token: undefined });
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }

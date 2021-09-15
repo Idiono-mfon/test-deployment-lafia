@@ -40,7 +40,7 @@ export class PatientController extends BaseController {
       const patient = await this.patientService.updatePatient(patientId, { id: patientId, ...patientData });
 
       this.success(res, patient, 'Patient profile successfully updated');
-    } catch (e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }
@@ -52,7 +52,7 @@ export class PatientController extends BaseController {
       const patient: IPatient = await this.patientService.findPatientById(id);
 
       this.success(res, patient, 'Request completed');
-    } catch(e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }
@@ -75,7 +75,7 @@ export class PatientController extends BaseController {
       await this.messageBroker.rmqPublish(JSON.stringify(rmqPubMsg));
 
       this.success(res, patient, 'Patient registration successful', HttpStatusCode.CREATED);
-    } catch(e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }
@@ -89,18 +89,18 @@ export class PatientController extends BaseController {
       const attachment: IAttachment = await this.patientService.uploadAttachment(patientId, file!);
 
       this.success(res, attachment, 'Request completed successfully');
-    } catch(e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }
 
   @httpGet('/:id/broadcast/videos')
-  public async broadcastVideos(@request() req: Request, @response() res: Response){
+  public async broadcastVideos(@request() req: Request, @response() res: Response) {
     try {
       const { id: patientId } = req.params;
       const vids = await this.patientService.findPatientVideoBroadcast(patientId);
       this.success(res, vids, 'Request completed successfully');
-    } catch (e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }

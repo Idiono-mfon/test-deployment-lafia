@@ -27,7 +27,7 @@ export class LafiaVideoController extends BaseController {
       const broadcast = await this.videoBroadcastService.getAllVideoRecords(user?.id);
 
       this.success(res, broadcast, 'Broadcast fetched successfully', HttpStatusCode.OK);
-    } catch (e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }
@@ -36,10 +36,10 @@ export class LafiaVideoController extends BaseController {
   public async deleteBroadcast(@request() req: Request, @response() res: Response) {
     try {
       const { id } = req.params;
-      const broadcast = await this.videoBroadcastService.deleteVideoBroadcastRecords( id );
+      const broadcast = await this.videoBroadcastService.deleteVideoBroadcastRecords(id);
 
       this.success(res, broadcast, 'Broadcast delete successfully', HttpStatusCode.OK);
-    } catch (e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }
@@ -54,7 +54,7 @@ export class LafiaVideoController extends BaseController {
 
       this.success(res, videoUrl, 'broadcast retrieved successfully');
 
-    } catch (e) {
+    } catch (e: any) {
       console.log(e);
     }
   }
@@ -69,19 +69,19 @@ export class LafiaVideoController extends BaseController {
 
       this.success(res, videoUrl, 'broadcast retrieved successfully');
 
-    } catch (e) {
+    } catch (e: any) {
       console.log(e);
     }
   }
 
   @httpDelete('/broadcast/practitioner/:id')
-  public async deletePactitionerBroadcast(@request() req: Request, @response() res: Response) {
+  public async deletePractitionerBroadcast(@request() req: Request, @response() res: Response) {
     try {
       const { id } = req.params;
-      const broadcast = await this.videoBroadcastService.deletePractitionerBroadcastVideo( id );
+      const broadcast = await this.videoBroadcastService.deletePractitionerBroadcastVideo(id);
 
       this.success(res, broadcast, 'Broadcast delete successfully', HttpStatusCode.OK);
-    } catch (e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }

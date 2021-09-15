@@ -48,7 +48,7 @@ export class UserService {
         const ERROR_MESSAGE = 'a user with this email already exist';
         throwError(ERROR_MESSAGE, error.badRequest);
       }
-      
+
 
       user.phone = getE164Format(user.phone!, req);
 
@@ -63,7 +63,7 @@ export class UserService {
       await this.twilioService.sendOTP(user.phone);
 
       return true;
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
@@ -99,7 +99,7 @@ export class UserService {
         ...user,
       };
       return await this.userRepository.createUser(data);
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
@@ -134,7 +134,7 @@ export class UserService {
 
       }
 
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
@@ -168,7 +168,7 @@ export class UserService {
       }
 
       return user;
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
@@ -184,7 +184,7 @@ export class UserService {
       return jwt.sign(data, env.jwt_secrete_key, {
         audience: id,
       });
-    } catch (e) {
+    } catch (e: any) {
       if (typeof e.code === 'string' || !e.code) {
         e.code = HttpStatusCode.INTERNAL_SERVER_ERROR;
       }
@@ -195,7 +195,7 @@ export class UserService {
   public decodeJwtToken(token: string): object | string | IJwtPayload {
     try {
       return jwt.verify(token, env.jwt_secrete_key);
-    } catch (e) {
+    } catch (e: any) {
       if (typeof e.code === 'string' || !e.code) {
         e.code = HttpStatusCode.INTERNAL_SERVER_ERROR;
       }
@@ -238,7 +238,7 @@ export class UserService {
       delete updatedUser.password;
 
       return updatedUser;
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
@@ -288,7 +288,7 @@ export class UserService {
       }
 
       await this.emailService.sendEmail(composedEmail);
-    } catch (e) {
+    } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
   }

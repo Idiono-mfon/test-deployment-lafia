@@ -14,7 +14,7 @@ export class PatientRepository {
       return await transaction(PatientModel, async (PatientModel) => {
         return PatientModel.query().upsertGraphAndFetch(data, { relate: true, unrelate: true });
       });
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
       throw new GenericResponseError(e.message, HttpStatusCode.BAD_REQUEST);
     }
@@ -59,7 +59,7 @@ export class PatientRepository {
             .skipUndefined()
             .first();
         });
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
@@ -104,7 +104,7 @@ export class PatientRepository {
             .skipUndefined()
             .first();
         });
-    } catch (e) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
@@ -114,7 +114,7 @@ export class PatientRepository {
       return await transaction(PatientModel, async (PatientModel) => {
         return PatientModel.query().insertGraphAndFetch(data);
       });
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
       throw new GenericResponseError(e.message, HttpStatusCode.BAD_REQUEST);
     }

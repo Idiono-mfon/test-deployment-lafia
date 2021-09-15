@@ -36,7 +36,7 @@ export class FhirServerService implements IFhirServer {
         headers,
         data: responseData,
       };
-    } catch (e) {
+    } catch (e: any) {
       delete e.response.headers['transfer-encoding'];
       e.response.headers['x-powered-by'] = 'LAFIA FHIR 5.4.0 REST Server (FHIR Server; FHIR 4.0.1/R4)';
       throw new GenericResponseError(e.message, e.response);
