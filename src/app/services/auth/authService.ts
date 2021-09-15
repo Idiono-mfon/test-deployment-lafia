@@ -49,7 +49,6 @@ export class AuthService {
         auth_token: token
       }
     } catch (e: any) {
-      console.log(e);
       throw new GenericResponseError(e.toString(), e.code);
     }
   }

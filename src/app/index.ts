@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import cors from 'cors';
 import { config as dotConfig } from 'dotenv';
-import express, { Request, Response } from 'express';
+import express from 'express';
 import { createServer } from 'http';
 import * as https from 'https';
 import OAuth2Strategy from 'passport-oauth2';
@@ -10,13 +10,13 @@ import container from './config/inversify.config';
 import { InversifyExpressServer } from 'inversify-express-utils';
 import { Env } from './config/env';
 import TYPES from './config/types';
+import { AuthMiddleware } from './middlewares';
 import { PatientService, PractitionerService, MessageBroker, VideoBroadcastService } from './services';
 import { SignallingServerService } from './services/signallingServers';
 import * as swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './config/swagger.config';
 // @ts-ignore
 import { Strategy as RefreshTokenStrategy } from 'passport-refresh-token';
-import { AuthMiddleware } from './middlewares';
 
 const httpsAgent = new https.Agent({
   rejectUnauthorized: false,
@@ -32,6 +32,7 @@ const messageBroker = container.get<MessageBroker>(TYPES.MessageBroker);
 const patientService = container.get<PatientService>(TYPES.PatientService);
 const videoBroadcastService = container.get<VideoBroadcastService>(TYPES.VideoBroadcastService);
 const practitionerService = container.get<PractitionerService>(TYPES.PractitionerService);
+const authMiddleware = container.get<AuthMiddleware>(TYPES.AuthMiddleware);
 
 server.setConfig((app) => {
   app.use(express.json());
@@ -42,7 +43,7 @@ server.setConfig((app) => {
     customfavIcon: 'https://lafia.io/wp-content/uploads/2021/02/lafia_logo_small.png',
     customSiteTitle: 'lafia.io api docs'
   }));
-  app.use(AuthMiddleware.parseThirdPartyConnection);
+  app.use(authMiddleware.parseThirdPartyConnection);
 
   const strategy = new OAuth2Strategy({
       authorizationURL: env.safhir_authorization_url,
@@ -77,43 +78,6 @@ server.setConfig((app) => {
   passport.serializeUser((user, done) => done(null, user));
 
   passport.deserializeUser((obj: any, done) => done(null, obj));
-
-  app.get('/auth/safhir', (req: Request, res: Response) => {
-    const state = req.query.state as string;
-
-    if (!state) {
-      return res.status(400).send({
-        status: 'error',
-        message: 'state is a required param which should hold the patient id',
-      });
-    }
-
-    passport.authenticate('oauth2', { state })(req, res);
-  });
-
-  app.get('/safhir',
-    passport.authenticate('oauth2', { failureRedirect: `https://app.lafia.io/safhir?status=error` }),
-    (req, res) => {
-
-      // @ts-ignore
-      const redirectURL = `https://app.lafia.io/safhir?status=success&state=${req.query.state}&access_token=${global.accessToken}`;
-
-      res.redirect(redirectURL);
-    }
-  );
-
-  app.get('/auth/token/refresh',
-    passport.authenticate('refresh_token', { session: false }),
-    (req, res) => {
-      // generate new tokens for req.user
-      // @ts-ignore
-      console.log('Token:', token);
-      // @ts-ignore
-      console.log('Tokens:', tokens);
-      // @ts-ignore
-      res.json(tokens);
-    }
-  );
 });
 
 messageBroker.rmqSubscribe().then().catch(e => console.log('rmq=>', e));

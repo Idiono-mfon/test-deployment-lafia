@@ -49,10 +49,8 @@ export class AuthMiddleware extends BaseMiddleware {
   public authenticate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const jwtPayload: CastJWTDecodedType = this.decodeJwtToken(req);
-      const user = await this.getUserPayload(jwtPayload);
 
-      //res.locals.token = jwtPayload.token as string;
-      res.locals.user = user;
+      res.locals.user = await this.getUserPayload(jwtPayload);
 
       next();
     } catch (e: any) {
@@ -83,13 +81,12 @@ export class AuthMiddleware extends BaseMiddleware {
     return decoded as CastJWTDecodedType;
   }
 
-  public static parseThirdPartyConnection = (req: Request, res: Response, next: NextFunction): void => {
+  public parseThirdPartyConnection = (req: Request, res: Response, next: NextFunction): void => {
     const oauth: string = req.headers['x-oauth'] as string;
     const connectionName: string = req.headers['x-connection-name'] as string;
-    if (!oauth) {
-      next();
-    }
+
     res.locals.connection = { "x-oauth": oauth, "x-connection-name": connectionName }
+
     next()
   }
 
