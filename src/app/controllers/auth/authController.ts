@@ -1,6 +1,7 @@
 import { inject } from 'inversify';
 import {
   controller,
+  httpGet,
   httpPost,
   request,
   response
@@ -26,4 +27,29 @@ export class AuthController extends BaseController {
       this.error(res, e);
     }
   }
+
+  @httpGet('/sapphir')
+  public async getSapphirAuth(@request() req: Request, @response() res: Response): Promise<void> {
+    try {
+      // get auth and decode jwt for the resource id
+      const resp = await this.authService.getSapphirAuth();
+
+      this.success(res, resp, 'Login Successful');
+    } catch (e) {
+      this.error(res, e);
+    }
+  }
+
+  @httpPost('/sapphir')
+  public async getSapphirToken(@request() req: Request, @response() res: Response): Promise<void> {
+    try {
+      // get auth and decode jwt for the resource id
+      this.authService.getSapphirToken();
+
+      this.success(res, [], 'Login Successful');
+    } catch (e) {
+      this.error(res, e);
+    }
+  }
+
 }

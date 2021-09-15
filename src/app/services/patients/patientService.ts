@@ -149,6 +149,10 @@ export class PatientService {
   public async patientLogin(data: IUserLoginParams): Promise<any> {
     try {
       const { user, token } = data;
+      if (user.photo === null) {
+        delete user.photo;
+      }
+      
       await this.userService.updateUser(user.id!, {...user, token});
 
       const { data: patientData } = await this.fhirServerService.executeQuery(
