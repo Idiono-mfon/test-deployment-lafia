@@ -56,21 +56,21 @@ export class AuthService {
   }
 
   public async getSaFHirAuth(): Promise<any> {
-    const resp = {
-      authUrl: "https://api-dmdh-t31.safhir.io/v1/authorize?client_secret=86Otdvd4gSu1d8TQtAR__729oAezaST-t-&client_id=c1317a46-a048-4402-a181-2221fac4fc99&response_type=code&redirect_uri=https://app.lafia.io/safhir&scope=launch/patient%20fhirUser%20openid%20offline_access%20patient/List.read%20patient/MedicationKnowledge.read%20user/List.read%20user/MedicationKnowledge.read%20user/ExplanationOfBenefit.read%20user/Coverage.read%20user/AllergyIntolerance.read%20user/CarePlan.read%20user/CareTeam.read%20user/Condition.read%20user/Device.read%20user/DiagnosticReport.read%20user/DocumentReference.read%20user/Encounter.read%20user/Goal.read%20user/Immunization.read%20user/Location.read%20user/Medication.read%20user/MedicationRequest.read%20user/Observation.read%20user/Organization.read%20user/Patient.read%20user/Practitioner.read%20user/PractitionerRole.read%20user/Procedure.read%20user/Provenance.read%20patient/ExplanationOfBenefit.read%20patient/Coverage.read%20patient/AllergyIntolerance.read%20patient/CarePlan.read%20patient/CareTeam.read%20patient/Condition.read%20patient/Device.read%20patient/DiagnosticReport.read%20patient/DocumentReference.read%20patient/Encounter.read%20patient/Goal.read%20patient/Immunization.read%20patient/Location.read%20patient/Medication.read%20patient/MedicationRequest.read%20patient/Observation.read%20patient/Organization.read%20patient/Patient.read%20patient/Practitioner.read%20patient/PractitionerRole.read%20patient/Procedure.read%20patient/Provenance.read&aud=09b3d1b7-60c6-4149-ad29-cfbe9220f2de&state="
-    }
+    // const resp = {
+    //   authUrl: "https://api-dmdh-t31.safhir.io/v1/authorize?client_secret=86Otdvd4gSu1d8TQtAR__729oAezaST-t-&client_id=c1317a46-a048-4402-a181-2221fac4fc99&response_type=code&redirect_uri=https://app.lafia.io/safhir&scope=launch/patient%20fhirUser%20openid%20offline_access%20patient/List.read%20patient/MedicationKnowledge.read%20user/List.read%20user/MedicationKnowledge.read%20user/ExplanationOfBenefit.read%20user/Coverage.read%20user/AllergyIntolerance.read%20user/CarePlan.read%20user/CareTeam.read%20user/Condition.read%20user/Device.read%20user/DiagnosticReport.read%20user/DocumentReference.read%20user/Encounter.read%20user/Goal.read%20user/Immunization.read%20user/Location.read%20user/Medication.read%20user/MedicationRequest.read%20user/Observation.read%20user/Organization.read%20user/Patient.read%20user/Practitioner.read%20user/PractitionerRole.read%20user/Procedure.read%20user/Provenance.read%20patient/ExplanationOfBenefit.read%20patient/Coverage.read%20patient/AllergyIntolerance.read%20patient/CarePlan.read%20patient/CareTeam.read%20patient/Condition.read%20patient/Device.read%20patient/DiagnosticReport.read%20patient/DocumentReference.read%20patient/Encounter.read%20patient/Goal.read%20patient/Immunization.read%20patient/Location.read%20patient/Medication.read%20patient/MedicationRequest.read%20patient/Observation.read%20patient/Organization.read%20patient/Patient.read%20patient/Practitioner.read%20patient/PractitionerRole.read%20patient/Procedure.read%20patient/Provenance.read&aud=09b3d1b7-60c6-4149-ad29-cfbe9220f2de&state="
+    // }
 
-    return resp;
+    // return resp;
   }
 
   public async getSaFHirToken(): Promise<any> {
-    const httpsAgent = new https.Agent({
-      rejectUnauthorized: false,
-    })
-    axios.defaults.httpsAgent = httpsAgent
-    axios.post("https://api-dmdh-t31.safhir.io/v1/token", {
-      data: ""
-    }).then( res => console.log(res))
+    // const httpsAgent = new https.Agent({
+    //   rejectUnauthorized: false,
+    // })
+    // axios.defaults.httpsAgent = httpsAgent
+    // axios.post("https://api-dmdh-t31.safhir.io/v1/token", {
+    //   data: ""
+    // }).then( res => console.log(res))
 
     //return resp;
   }

@@ -82,6 +82,13 @@ export class AuthMiddleware extends BaseMiddleware {
     return decoded as CastJWTDecodedType;
   }
 
+  private parseThirdPartyConnection = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    const oauth: string = req.headers['x-oauth'] as string;
+    const connectionName: string = req.headers['x-connection-name'] as string;
+    res.locals.connection = { "x-oauth": oauth, "x-connection-name": connectionName }
+    next();
+  }
+
   private async getUserPayload(payload: CastJWTDecodedType): Promise<IUser | IPatient | IPractitioner> {
     let user: IUser | IPatient | IPractitioner = await this.patientService.findPatientById(payload.aud);
 

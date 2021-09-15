@@ -25,6 +25,7 @@ import {
   VideoBroadcastRepository,
   PractitionerVideoBroadcastRepository,
 } from '../repository';
+import { ConnectionRepository } from '../repository/auth';
 import { TwilioRoomRepository } from '../repository/videoRecords/twilioRoomRepository';
 import {
   S3Service,
@@ -216,6 +217,10 @@ container
 container
   .bind<TwilioRoomRepository>(TYPES.TwilioRoomRepository)
   .to(TwilioRoomRepository)
+  .inSingletonScope();
+container
+  .bind<ConnectionRepository>(TYPES.ConnectionRepository)
+  .to(ConnectionRepository)
   .inSingletonScope();
 
 // middleware
