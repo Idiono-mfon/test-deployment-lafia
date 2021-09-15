@@ -74,7 +74,9 @@ server.setConfig((app) => {
   app.get('/safhir',
     passport.authenticate('oauth2'),
     (req, res) => {
-      res.redirect(`https://app.lafia.io/safhir?state=${req.query.state}&code=${req.query.code}&accessToken=${req.query.accessToken}`);
+      const redirectURL = `https://app.lafia.io/safhir?state=${req.query.state}&code=${req.query.code}&accessToken=${req.query.accessToken}`;
+      console.log('RedirectURL:', redirectURL);
+      res.redirect(redirectURL);
     }
   );
 });
