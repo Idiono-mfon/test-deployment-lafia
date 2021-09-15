@@ -49,14 +49,10 @@ server.setConfig((app) => {
       scope: env.safhir_scope,
     },
     (accessToken: string, refreshToken: string, profile: any, cb: any) => {
-      console.log('SaFHIR::Access');
-      console.log({
-        accessToken,
-        refreshToken,
-      });
-
       // @ts-ignore
       global.accessToken = accessToken;
+      // @ts-ignore
+      global.refreshToken = refreshToken;
 
       return cb(null, {
         accessToken,
@@ -75,6 +71,15 @@ server.setConfig((app) => {
   passport.deserializeUser((obj: any, done) => done(null, obj));
 
   app.get('/auth/safhir', (req: Request, res: Response) => {
+    const state = req.query.state as string;
+
+    if (!state) {
+      return res.status(400).send({
+        status: 'error',
+        message: 'state is a required param which should hold the patient id',
+      });
+    }
+
     passport.authenticate('oauth2',
       {
         state: req.query.state as string
@@ -86,10 +91,8 @@ server.setConfig((app) => {
     (req, res) => {
 
       // @ts-ignore
-      const redirectURL = `https://app.lafia.io/safhir?state=${req.query.state}&code=${req.query.code}&accessToken=${global.accessToken}`;
-      console.log('RedirectURL:', redirectURL);
-      // @ts-ignore
-      console.log('AccessToken:', accessToken);
+      const redirectURL = `https://app.lafia.io/safhir?state=${req.query.state}&accessToken=${global.accessToken}`;
+
       res.redirect(redirectURL);
     }
   );
