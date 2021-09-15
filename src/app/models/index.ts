@@ -39,3 +39,4 @@ export * from './referencesIdentifiers';
 export * from './users';
 export * from './fhirServer';
 export * from './videoRecords';
+export * from './auth';
