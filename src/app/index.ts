@@ -3,6 +3,7 @@ import cors from 'cors';
 import { config as dotConfig } from 'dotenv';
 import express, { Request, Response } from 'express';
 import { createServer } from 'http';
+import * as https from 'https';
 import OAuth2Strategy from 'passport-oauth2';
 import passport from 'passport';
 import container from './config/inversify.config';
@@ -13,6 +14,10 @@ import { PatientService, PractitionerService, MessageBroker, VideoBroadcastServi
 import { SignallingServerService } from './services/signallingServers';
 import * as swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './config/swagger.config';
+
+const httpsAgent = new https.Agent({
+  rejectUnauthorized: false,
+});
 
 dotConfig();
 
@@ -34,7 +39,7 @@ server.setConfig((app) => {
     customSiteTitle: 'lafia.io api docs'
   }));
 
-  passport.use(new OAuth2Strategy({
+  const strategy = new OAuth2Strategy({
       authorizationURL: env.safhir_authorization_url,
       tokenURL: env.safhir_token_url,
       clientID: env.safhir_client_id,
@@ -50,7 +55,20 @@ server.setConfig((app) => {
         profile,
       });
     }
-  ));
+  );
+
+  // const HttpsProxyAgent = require('https-proxy-agent');
+  // if (process.env.https_proxy) {
+  //   const httpsProxyAgent = new HttpsProxyAgent(process.env.https_proxy);
+  // }
+
+  // @ts-ignore
+  strategy._oauth2.setAgent(httpsAgent);
+  passport.use(strategy);
+
+  passport.serializeUser((user, done) => done(null, user));
+
+  passport.deserializeUser((obj: any, done) => done(null, obj));
 
   app.get('/auth/safhir', (req: Request, res: Response) => {
     passport.authenticate('oauth2',
