@@ -16,6 +16,7 @@ import * as swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './config/swagger.config';
 // @ts-ignore
 import { Strategy as RefreshTokenStrategy } from 'passport-refresh-token';
+import { AuthMiddleware } from './middlewares';
 
 const httpsAgent = new https.Agent({
   rejectUnauthorized: false,
@@ -41,6 +42,7 @@ server.setConfig((app) => {
     customfavIcon: 'https://lafia.io/wp-content/uploads/2021/02/lafia_logo_small.png',
     customSiteTitle: 'lafia.io api docs'
   }));
+  app.use(AuthMiddleware.parseThirdPartyConnection);
 
   const strategy = new OAuth2Strategy({
       authorizationURL: env.safhir_authorization_url,
