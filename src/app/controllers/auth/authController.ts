@@ -28,26 +28,26 @@ export class AuthController extends BaseController {
     }
   }
 
-  @httpGet('/sapphir')
-  public async getSapphirAuth(@request() req: Request, @response() res: Response): Promise<void> {
+  @httpGet('/safhir')
+  public async getSaFHirAuth(@request() req: Request, @response() res: Response): Promise<void> {
     try {
       // get auth and decode jwt for the resource id
-      const resp = await this.authService.getSapphirAuth();
+      const resp = await this.authService.getSaFHirAuth();
 
       this.success(res, resp, 'Login Successful');
-    } catch (e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }
 
-  @httpPost('/sapphir')
-  public async getSapphirToken(@request() req: Request, @response() res: Response): Promise<void> {
+  @httpPost('/safhir')
+  public async getSaFHirToken(@request() req: Request, @response() res: Response): Promise<void> {
     try {
       // get auth and decode jwt for the resource id
-      this.authService.getSapphirToken();
+      this.authService.getSaFHirToken();
 
       this.success(res, [], 'Login Successful');
-    } catch (e) {
+    } catch (e: any) {
       this.error(res, e);
     }
   }
