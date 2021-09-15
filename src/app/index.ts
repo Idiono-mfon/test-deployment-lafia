@@ -47,14 +47,11 @@ server.setConfig((app) => {
       callbackURL: env.safhir_callback_url,
       scope: env.safhir_scope,
     },
-    (accessToken: string, refreshToken: string, result: any, profile: any, verifyFun) => {
+    (accessToken: string, refreshToken: string) => {
       console.log('SaFHIR::Access');
       console.log({
         accessToken,
         refreshToken,
-        profile,
-        result,
-        verifyFun
       });
     }
   );
@@ -77,8 +74,7 @@ server.setConfig((app) => {
   app.get('/safhir',
     passport.authenticate('oauth2'),
     (req, res) => {
-      // res.redirect(env.safhir_callback_url);
-      console.log('Callback::::URL');
+      res.redirect(`https://app.lafia.io/safhir?state=${req.query.state}&code=${req.query.code}&accessToken=${req.query.accessToken}`);
     }
   );
 });
