@@ -27,6 +27,7 @@ export class AuthMiddleware extends BaseMiddleware {
 
   public async handler(req: Request, res: Response, next: NextFunction) {
     try {
+
       const jwtPayload: CastJWTDecodedType = this.decodeJwtToken(req);
       const user = await this.getUserPayload(jwtPayload);
 
@@ -80,6 +81,16 @@ export class AuthMiddleware extends BaseMiddleware {
     const decoded = jwt.verify(token, env.jwt_secrete_key);
 
     return decoded as CastJWTDecodedType;
+  }
+
+  public static parseThirdPartyConnection = (req: Request, res: Response, next: NextFunction): void => {
+    const oauth: string = req.headers['x-oauth'] as string;
+    const connectionName: string = req.headers['x-connection-name'] as string;
+    if (!oauth) {
+      next();
+    }
+    res.locals.connection = { "x-oauth": oauth, "x-connection-name": connectionName }
+    next()
   }
 
   private async getUserPayload(payload: CastJWTDecodedType): Promise<IUser | IPatient | IPractitioner> {

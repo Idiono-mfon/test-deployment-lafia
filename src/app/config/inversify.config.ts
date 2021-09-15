@@ -24,8 +24,9 @@ import {
   PractitionerRepository,
   VideoBroadcastRepository,
   PractitionerVideoBroadcastRepository,
+  ConnectionRepository,
+  TwilioRoomRepository
 } from '../repository';
-import { TwilioRoomRepository } from '../repository/videoRecords/twilioRoomRepository';
 import {
   S3Service,
   UserService,
@@ -43,8 +44,8 @@ import {
   VideoRecordService,
   PractitionerService,
   VideoBroadcastService,
+  TwilioRoomService
 } from '../services';
-import { TwilioRoomService } from '../services/videoRecords/twilioRoomService';
 import { UtilityService } from '../utils';
 import TYPES from './types';
 
@@ -216,6 +217,10 @@ container
 container
   .bind<TwilioRoomRepository>(TYPES.TwilioRoomRepository)
   .to(TwilioRoomRepository)
+  .inSingletonScope();
+container
+  .bind<ConnectionRepository>(TYPES.ConnectionRepository)
+  .to(ConnectionRepository)
   .inSingletonScope();
 
 // middleware
