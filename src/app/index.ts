@@ -34,6 +34,7 @@ server.setConfig((app) => {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(cors());
+  app.use(passport.initialize());
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
     customfavIcon: 'https://lafia.io/wp-content/uploads/2021/02/lafia_logo_small.png',
     customSiteTitle: 'lafia.io api docs'
@@ -63,6 +64,7 @@ server.setConfig((app) => {
 
   // @ts-ignore
   strategy._oauth2.setAgent(httpsAgent);
+
   passport.use(strategy);
 
   passport.serializeUser((user, done) => done(null, user));
