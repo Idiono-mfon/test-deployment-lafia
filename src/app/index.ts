@@ -82,7 +82,7 @@ server.setConfig((app) => {
     passport.authenticate('oauth2'),
     (req, res) => {
       // @ts-ignore
-      console.log('Session:', req.user.session!);
+      console.log('Session:', req.cookies.session);
       const redirectURL = `https://app.lafia.io/safhir?state=${req.query.state}&code=${req.query.code}&accessToken=${req.query.accessToken}`;
       console.log('RedirectURL:', redirectURL);
       res.redirect(redirectURL);
