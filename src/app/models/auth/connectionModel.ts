@@ -14,7 +14,7 @@ export class ConnectionModel extends BaseModel implements IConnection {
   connection_name!: IConnection['connection_name'];
 
   static get tableName(): string {
-    return `${Schema.lafiaService}.${Table.codings}`;
+    return `${Schema.lafiaService}.${Table.connections}`;
   }
 
   static get jsonSchema(): JSONSchema {
@@ -29,7 +29,7 @@ export class ConnectionModel extends BaseModel implements IConnection {
     return {
       selectId(builder: QueryBuilder<any, any[]>) {
         builder.select(
-          `${Schema.lafiaService}.${Table.codings}.id`
+          `${Schema.lafiaService}.${Table.connections}.id`
         );
       },
     };
