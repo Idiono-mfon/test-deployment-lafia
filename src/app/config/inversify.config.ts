@@ -24,9 +24,9 @@ import {
   PractitionerRepository,
   VideoBroadcastRepository,
   PractitionerVideoBroadcastRepository,
+  ConnectionRepository,
+  TwilioRoomRepository
 } from '../repository';
-import { ConnectionRepository } from '../repository/auth';
-import { TwilioRoomRepository } from '../repository/videoRecords/twilioRoomRepository';
 import {
   S3Service,
   UserService,
@@ -44,8 +44,8 @@ import {
   VideoRecordService,
   PractitionerService,
   VideoBroadcastService,
+  TwilioRoomService
 } from '../services';
-import { TwilioRoomService } from '../services/videoRecords/twilioRoomService';
 import { UtilityService } from '../utils';
 import TYPES from './types';
 
