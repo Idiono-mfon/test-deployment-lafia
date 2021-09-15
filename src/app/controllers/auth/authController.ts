@@ -45,13 +45,18 @@ export class AuthController extends BaseController {
     }
   }
 
-  @httpPost('/safhir')
+  @httpPost('/safhir', passport.authenticate('oauth2', { failureRedirect: `https://app.lafia.io/safhir?status=error` }))
   public async getSaFHirToken(@request() req: Request, @response() res: Response): Promise<void> {
     try {
       // get auth and decode jwt for the resource id
-      this.authService.getSaFHirToken();
+      // this.authService.getSaFHirToken();
 
-      this.success(res, [], 'Login Successful');
+      // @ts-ignore
+      const redirectURL = `https://app.lafia.io/safhir?status=success&state=${req.query.state}&access_token=${global.accessToken}`;
+
+      res.redirect(redirectURL);
+
+      // this.success(res, [], 'Login Successful');
     } catch (e: any) {
       this.error(res, e);
     }
