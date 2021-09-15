@@ -37,18 +37,6 @@ export class ConnectionModel extends BaseModel implements IConnection {
 
   static get relationMappings(): RelationMappings {
     return {
-      codeableConcept: {
-        relation: BaseModel.ManyToManyRelation,
-        modelClass: '../codeableConcepts',
-        join: {
-          from: `${Schema.lafiaService}.${Table.codings}.id`,
-          through: {
-            from: `${Schema.lafiaService}.${Table.codeable_concepts_codings}.codeable_concept_id`,
-            to: `${Schema.lafiaService}.${Table.codeable_concepts_codings}.coding_id`
-          },
-          to: `${Schema.lafiaService}.${Table.codeable_concepts}.id`
-        }
-      }
     }
   }
 }

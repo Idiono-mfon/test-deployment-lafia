@@ -19,7 +19,8 @@ export async function up(knex: Knex): Promise<void> {
                   .defaultTo(knex.raw('gen_random_uuid()'))
                   .primary(`${Table.connections}_id`);
                 tableBuilder
-                  .uuid('patient_id');
+                  .string('patient_id')
+                  .notNullable();
                 tableBuilder
                   .string('access_token')
                   .notNullable();
@@ -31,13 +32,6 @@ export async function up(knex: Knex): Promise<void> {
                   .nullable();
                 tableBuilder
                   .timestamps(true, true);
-
-                  // Set foreign keys
-                tableBuilder
-                    .foreign('patient_id')
-                    .references('id')
-                    .inTable(`${Schema.lafiaService}.${Table.connections}`)
-                    .onUpdate('CASCADE');
               });
           }
         }))
