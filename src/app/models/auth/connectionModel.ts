@@ -25,18 +25,4 @@ export class ConnectionModel extends BaseModel implements IConnection {
     return ['updatedAt', 'createdAt'];
   }
 
-  static get modifiers(): Modifiers {
-    return {
-      selectId(builder: QueryBuilder<any, any[]>) {
-        builder.select(
-          `${Schema.lafiaService}.${Table.connections}.id`
-        );
-      },
-    };
-  }
-
-  static get relationMappings(): RelationMappings {
-    return {
-    }
-  }
 }
