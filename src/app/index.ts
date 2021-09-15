@@ -62,7 +62,8 @@ server.setConfig((app) => {
   app.get('/safhir',
     passport.authenticate('oauth2'),
     (req, res) => {
-      res.redirect(env.safhir_callback_url);
+      // res.redirect(env.safhir_callback_url);
+      console.log('Callback::::URL');
     }
   );
 });
