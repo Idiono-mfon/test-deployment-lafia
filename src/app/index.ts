@@ -47,20 +47,17 @@ server.setConfig((app) => {
       callbackURL: env.safhir_callback_url,
       scope: env.safhir_scope,
     },
-    (accessToken: string, refreshToken: string, profile: any) => {
+    (accessToken: string, refreshToken: string, result: any, profile: any, verifyFun) => {
       console.log('SaFHIR::Access');
       console.log({
         accessToken,
         refreshToken,
         profile,
+        result,
+        verifyFun
       });
     }
   );
-
-  // const HttpsProxyAgent = require('https-proxy-agent');
-  // if (process.env.https_proxy) {
-  //   const httpsProxyAgent = new HttpsProxyAgent(process.env.https_proxy);
-  // }
 
   // @ts-ignore
   strategy._oauth2.setAgent(httpsAgent);
