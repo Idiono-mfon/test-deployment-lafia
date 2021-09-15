@@ -47,9 +47,14 @@ server.setConfig((app) => {
       callbackURL: env.safhir_callback_url,
       scope: env.safhir_scope,
     },
-    (accessToken: string, refreshToken: string) => {
+    (accessToken: string, refreshToken: string, profile: any, cb: any) => {
       console.log('SaFHIR::Access');
       console.log({
+        accessToken,
+        refreshToken,
+      });
+
+      return cb(null, {
         accessToken,
         refreshToken,
       });
