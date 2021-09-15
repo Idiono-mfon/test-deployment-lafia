@@ -17,7 +17,7 @@ export async function up(knex: Knex): Promise<void> {
 
 export async function down(knex: Knex): Promise<void> {
     return knex.schema.withSchema(Schema.lafiaService)
-    .table(Table.video_broadcasts, (tableBuilder: Knex.TableBuilder) => {
+    .table(Table.users, (tableBuilder: Knex.TableBuilder) => {
         tableBuilder.dropColumn('photo');
     });
 }
