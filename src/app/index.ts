@@ -133,4 +133,4 @@ const signallingServer = new SignallingServerService(
 );
 signallingServer.initialize();
 
-export { app };
+export { app, passport };

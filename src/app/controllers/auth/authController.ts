@@ -45,16 +45,38 @@ export class AuthController extends BaseController {
     }
   }
 
-  @httpPost('/safhir')
+  @httpGet('/safhir/token', passport.authenticate('oauth2', { failureRedirect: `https://app.lafia.io/safhir?status=error` }))
   public async getSaFHirToken(@request() req: Request, @response() res: Response): Promise<void> {
     try {
       // get auth and decode jwt for the resource id
-      this.authService.getSaFHirToken();
+      // this.authService.getSaFHirToken();
 
-      this.success(res, [], 'Login Successful');
+      // @ts-ignore
+      const redirectURL = `https://app.lafia.io/safhir?status=success&state=${req.query.state}&access_token=${global.accessToken}`;
+
+      res.redirect(redirectURL);
+
+      // this.success(res, [], 'Login Successful');
     } catch (e: any) {
       this.error(res, e);
     }
   }
+
+  @httpGet('/safhir/refresh', passport.authenticate('refresh_token', { session: false }))
+  public async refreshSaFHirToken(@request() req: Request, @response() res: Response): Promise<void> {
+    try {
+      // generate new tokens for req.user
+      // @ts-ignore
+      console.log('Token:', token);
+      // @ts-ignore
+      console.log('Tokens:', tokens);
+      // @ts-ignore
+      res.json(tokens);
+    } catch (e: any) {
+      this.error(res, e);
+    }
+  }
+
+
 
 }
