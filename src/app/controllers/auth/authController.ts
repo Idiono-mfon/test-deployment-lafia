@@ -38,7 +38,8 @@ export class AuthController extends BaseController {
         throw new Error('state is a required param which should hold the patient id');
       }
 
-      return passport.authenticate('oauth2', { state })(req, res);
+      passport.use(this.authService.getStrategy('safhir'));
+      passport.authenticate('oauth2', { state })(req, res);
     } catch (e: any) {
       this.error(res, e);
     }

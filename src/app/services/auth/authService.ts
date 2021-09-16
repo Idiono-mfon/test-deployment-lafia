@@ -1,6 +1,8 @@
 import { Request } from 'express';
+import * as https from 'https';
 import { inject, injectable } from 'inversify';
 import * as _ from 'lodash';
+import OAuth2Strategy from 'passport-oauth2';
 import { Env } from '../../config/env';
 import TYPES from '../../config/types';
 import { IUser } from '../../models';
@@ -9,6 +11,10 @@ import { PatientService } from '../patients';
 import { PlatformSdkService } from '../platformSDK';
 import { PractitionerService } from '../practitioners';
 import { UserService } from '../users';
+
+const httpsAgent = new https.Agent({
+  rejectUnauthorized: false,
+});
 
 @injectable()
 export class AuthService {
@@ -28,7 +34,7 @@ export class AuthService {
     try {
 
       if (_.isNumber(email)) {
-          email = getE164Format(email, req);
+        email = getE164Format(email, req);
       }
 
       const loggedInUser: IUser = await this.userService.userLogin(email, password);
@@ -63,12 +69,34 @@ export class AuthService {
     connectionName = connectionName.toLowerCase();
 
     return {
-      client_secret: env[`${connectionName}_client_secret`],
-      client_id: env[`${connectionName}_client_id`],
-      callback_url: env[`${connectionName}_callback_url`],
-      authorization_url: env[`${connectionName}_authorization_url`],
-      token_url: env[`${connectionName}_token_url`],
+      clientSecret: env[`${connectionName}_client_secret`],
+      clientID: env[`${connectionName}_client_id`],
+      callbackURL: env[`${connectionName}_callback_url`],
+      authorizationURL: env[`${connectionName}_authorization_url`],
+      tokenURL: env[`${connectionName}_token_url`],
       scope: env[`${connectionName}_scope`]
     }
+  }
+
+  public getStrategy(connectionName: string) {
+    const credentials = this.getConnectionCredentials(connectionName);
+    const strategy = new OAuth2Strategy(credentials,
+      (accessToken: string, refreshToken: string, profile: any, cb: any) => {
+        // @ts-ignore
+        global.accessToken = accessToken;
+        // @ts-ignore
+        global.refreshToken = refreshToken;
+
+        return cb(null, {
+          accessToken,
+          refreshToken,
+        });
+      }
+    );
+
+    // @ts-ignore
+    strategy._oauth2.setAgent(httpsAgent);
+
+    return strategy;
   }
 }

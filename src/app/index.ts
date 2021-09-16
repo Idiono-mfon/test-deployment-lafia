@@ -3,8 +3,6 @@ import cors from 'cors';
 import { config as dotConfig } from 'dotenv';
 import express from 'express';
 import { createServer } from 'http';
-import * as https from 'https';
-import OAuth2Strategy from 'passport-oauth2';
 import passport from 'passport';
 import container from './config/inversify.config';
 import { InversifyExpressServer } from 'inversify-express-utils';
@@ -15,16 +13,12 @@ import { PatientService, PractitionerService, MessageBroker, VideoBroadcastServi
 import { SignallingServerService } from './services/signallingServers';
 import * as swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './config/swagger.config';
+
 // @ts-ignore
 import { Strategy as RefreshTokenStrategy } from 'passport-refresh-token';
 
-const httpsAgent = new https.Agent({
-  rejectUnauthorized: false,
-});
-
 dotConfig();
 
-const env = Env.all();
 const app = express();
 
 const server = new InversifyExpressServer(container, null, null, app);
@@ -44,32 +38,6 @@ server.setConfig((app) => {
     customSiteTitle: 'lafia.io api docs'
   }));
   app.use(authMiddleware.parseThirdPartyConnection);
-
-  const strategy = new OAuth2Strategy({
-      authorizationURL: env.safhir_authorization_url,
-      tokenURL: env.safhir_token_url,
-      clientID: env.safhir_client_id,
-      clientSecret: env.safhir_client_secret,
-      callbackURL: env.safhir_callback_url,
-      scope: env.safhir_scope,
-    },
-    (accessToken: string, refreshToken: string, profile: any, cb: any) => {
-      // @ts-ignore
-      global.accessToken = accessToken;
-      // @ts-ignore
-      global.refreshToken = refreshToken;
-
-      return cb(null, {
-        accessToken,
-        refreshToken,
-      });
-    }
-  );
-
-  // @ts-ignore
-  strategy._oauth2.setAgent(httpsAgent);
-
-  passport.use(strategy);
 
   passport.use(new RefreshTokenStrategy(
     (token: any, done: any) => done(null, token)
