@@ -84,8 +84,15 @@ export class AuthMiddleware extends BaseMiddleware {
   public parseThirdPartyConnection = (req: Request, res: Response, next: NextFunction): void => {
     const oauth: string = req.headers['x-oauth'] as string;
     const connectionName: string = req.headers['x-connection-name'] as string;
+    const ig: string = req.headers['x-ig'] as string;
+    const textResource: string = req.headers['x-test-resource'] as string;
 
-    res.locals.connection = { "x-oauth": oauth, "x-connection-name": connectionName }
+    res.locals.connection = { 
+      "x-oauth": oauth, 
+      "x-connection-name": connectionName,
+      "x-ig": ig,
+      "x-test-resource": textResource
+    }
 
     next()
   }

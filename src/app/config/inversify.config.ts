@@ -11,6 +11,8 @@ import {
   CodeSystemController,
   LafiaMediaController,
   PractitionerController,
+  ImplementationGuideController,
+  FhirResourceController,
 } from '../controllers';
 import { AuthMiddleware } from '../middlewares';
 import {
@@ -25,7 +27,9 @@ import {
   VideoBroadcastRepository,
   PractitionerVideoBroadcastRepository,
   ConnectionRepository,
-  TwilioRoomRepository
+  TwilioRoomRepository,
+  ImplementationGuideRepository,
+  FhirResourceRepository
 } from '../repository';
 import {
   S3Service,
@@ -44,7 +48,9 @@ import {
   VideoRecordService,
   PractitionerService,
   VideoBroadcastService,
-  TwilioRoomService
+  TwilioRoomService,
+  ImplementationGuideService,
+  FhirResourceService
 } from '../services';
 import { UtilityService } from '../utils';
 import TYPES from './types';
@@ -95,6 +101,14 @@ container
 container
   .bind<ConsentController>(TYPES.ConsentController)
   .to(ConsentController)
+  .inSingletonScope();
+container
+  .bind<ImplementationGuideController>(TYPES.ImplementationGuideController)
+  .to(ImplementationGuideController)
+  .inSingletonScope();
+container
+  .bind<FhirResourceController>(TYPES.FhirResourceController)
+  .to(FhirResourceController)
   .inSingletonScope();
 
 
@@ -171,6 +185,14 @@ container
   .bind<TwilioRoomService>(TYPES.TwilioRoomService)
   .to(TwilioRoomService)
   .inSingletonScope();
+container
+  .bind<ImplementationGuideService>(TYPES.ImplementationGuideService)
+  .to(ImplementationGuideService)
+  .inSingletonScope();
+container
+  .bind<FhirResourceService>(TYPES.FhirResourceService)
+  .to(FhirResourceService)
+  .inSingletonScope();
 
 
 // repositories
@@ -221,6 +243,14 @@ container
 container
   .bind<ConnectionRepository>(TYPES.ConnectionRepository)
   .to(ConnectionRepository)
+  .inSingletonScope();
+container
+  .bind<ImplementationGuideRepository>(TYPES.ImplementationGuideRepository)
+  .to(ImplementationGuideRepository)
+  .inSingletonScope();
+container
+  .bind<FhirResourceRepository>(TYPES.FhirResourceRepository)
+  .to(FhirResourceRepository)
   .inSingletonScope();
 
 // middleware

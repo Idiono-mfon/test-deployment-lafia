@@ -11,6 +11,8 @@ const TYPES = {
   FhirServerController: Symbol('FhirServerController'),
   LafiaMediaController: Symbol('LafiaMediaController'),
   ConsentController: Symbol('ConsentController'),
+  ImplementationGuideController: Symbol('ImplementationGuideController'),
+  FhirResourceController: Symbol('FhirResourceController'),
 
   // service
   UserService: Symbol('UserService'),
@@ -32,6 +34,8 @@ const TYPES = {
   VideoBroadcastService: Symbol('VideoBroadcastService'),
   TwilioRoomService: Symbol('TwilioRoomService'),
   ConnectionService: Symbol('ConnectionService'),
+  ImplementationGuideService: Symbol('ImplementationGuideService'),
+  FhirResourceService: Symbol('FhirResourceService'),
 
   // repositories
   UserRepository: Symbol('UserRepository'),
@@ -46,6 +50,8 @@ const TYPES = {
   PractitionerVideoBroadcastRepository: Symbol('PractitionerVideoBroadcastRepository'),
   TwilioRoomRepository: Symbol('TwilioRoomRepository'),
   ConnectionRepository: Symbol('ConnectionRepository'),
+  ImplementationGuideRepository: Symbol('ImplementationGuideRepository'),
+  FhirResourceRepository: Symbol('FhirResourceRepository'),
   
   // middlewares
   AuthMiddleware: Symbol('AuthMiddleware'),

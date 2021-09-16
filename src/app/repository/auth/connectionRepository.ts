@@ -33,7 +33,7 @@ export class ConnectionRepository {
     try {
       return await ConnectionModel.query().insertAndFetch(data);
     }
-    catch (e) {
+    catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }

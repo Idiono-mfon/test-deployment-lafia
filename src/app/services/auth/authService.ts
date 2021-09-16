@@ -9,7 +9,6 @@ import { IConnection, IFindConnection, IUser } from '../../models';
 import { ConnectionRepository } from '../../repository';
 import { error, forWho, GenericResponseError, getE164Format, throwError } from '../../utils';
 import { PatientService } from '../patients';
-import { PlatformSdkService } from '../platformSDK';
 import { PractitionerService } from '../practitioners';
 import { UserService } from '../users';
 
@@ -25,8 +24,6 @@ export class AuthService {
   private readonly practitionerService: PractitionerService;
   @inject(TYPES.UserService)
   private userService: UserService;
-  @inject(TYPES.PlatformSdkService)
-  private platformSdkService: PlatformSdkService;
   @inject(TYPES.ConnectionRepository)
   private connectionRepository: ConnectionRepository;
 
@@ -41,6 +38,10 @@ export class AuthService {
 
       const token = this.userService.generateJwtToken({ email, id: loggedInUser.resourceId });
       let loggedInUserData: any;
+
+      if (loggedInUser.photo === null) {
+        delete loggedInUser.photo;
+      }
 
       if (loggedInUser.resourceType === forWho.patient) {
         loggedInUserData = await this.patientService.patientLogin({ user: loggedInUser, token });
