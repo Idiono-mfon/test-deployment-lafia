@@ -1,6 +1,7 @@
 import { inject } from 'inversify';
 import {
   controller,
+  httpDelete,
   httpGet,
   httpPost,
   request,
@@ -111,6 +112,18 @@ export class AuthController extends BaseController {
       const connections = await this.authService.getConnectionByPatientId(state as string);
 
       this.success(res, connections, 'Connections retrieved successfully');
+    } catch (e: any) {
+      this.error(res, e);
+    }
+  }
+
+  @httpDelete('/connections/:id')
+  public async deleteConnection(@request() req: Request, @response() res: Response) {
+    try {
+      const { id } = req.params;
+      const connections = await this.authService.getConnectionByFields({ id });
+
+      this.success(res, connections, 'Connection deleted successfully');
     } catch (e: any) {
       this.error(res, e);
     }
