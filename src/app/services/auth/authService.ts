@@ -1,42 +1,47 @@
-import { inject, injectable } from 'inversify';
 import { Request } from 'express';
+import * as https from 'https';
+import { inject, injectable } from 'inversify';
+import * as _ from 'lodash';
+import OAuth2Strategy from 'passport-oauth2';
+import { Env } from '../../config/env';
 import TYPES from '../../config/types';
-import { IUser } from '../../models';
-import { forWho, GenericResponseError, getE164Format } from '../../utils';
+import { IConnection, IFindConnection, IUser } from '../../models';
+import { ConnectionRepository } from '../../repository';
+import { error, forWho, GenericResponseError, getE164Format, throwError } from '../../utils';
 import { PatientService } from '../patients';
 import { PlatformSdkService } from '../platformSDK';
 import { PractitionerService } from '../practitioners';
 import { UserService } from '../users';
-import * as _ from 'lodash';
-import axios from 'axios';
-import https from 'https'
+
+const httpsAgent = new https.Agent({
+  rejectUnauthorized: false,
+});
 
 @injectable()
 export class AuthService {
   @inject(TYPES.PatientService)
   private readonly patientService: PatientService;
-
   @inject(TYPES.PractitionerService)
   private readonly practitionerService: PractitionerService;
-
   @inject(TYPES.UserService)
   private userService: UserService;
-
   @inject(TYPES.PlatformSdkService)
   private platformSdkService: PlatformSdkService;
+  @inject(TYPES.ConnectionRepository)
+  private connectionRepository: ConnectionRepository;
 
   public async login(email: string, password: string, req: Request): Promise<any> {
     try {
 
       if (_.isNumber(email)) {
-          email = getE164Format(email, req);
+        email = getE164Format(email, req);
       }
 
       const loggedInUser: IUser = await this.userService.userLogin(email, password);
-      
+
       const token = this.userService.generateJwtToken({ email, id: loggedInUser.resourceId });
       let loggedInUserData: any;
-      
+
       if (loggedInUser.resourceType === forWho.patient) {
         loggedInUserData = await this.patientService.patientLogin({ user: loggedInUser, token });
       }
@@ -50,28 +55,72 @@ export class AuthService {
         auth_token: token
       }
     } catch (e: any) {
-      console.log(e);
       throw new GenericResponseError(e.toString(), e.code);
     }
   }
 
-  public async getSaFHirAuth(): Promise<any> {
-    const resp = {
-      authUrl: "https://api-dmdh-t31.safhir.io/v1/authorize?client_secret=86Otdvd4gSu1d8TQtAR__729oAezaST-t-&client_id=c1317a46-a048-4402-a181-2221fac4fc99&response_type=code&redirect_uri=https://app.lafia.io/safhir&scope=launch/patient%20fhirUser%20openid%20offline_access%20patient/List.read%20patient/MedicationKnowledge.read%20user/List.read%20user/MedicationKnowledge.read%20user/ExplanationOfBenefit.read%20user/Coverage.read%20user/AllergyIntolerance.read%20user/CarePlan.read%20user/CareTeam.read%20user/Condition.read%20user/Device.read%20user/DiagnosticReport.read%20user/DocumentReference.read%20user/Encounter.read%20user/Goal.read%20user/Immunization.read%20user/Location.read%20user/Medication.read%20user/MedicationRequest.read%20user/Observation.read%20user/Organization.read%20user/Patient.read%20user/Practitioner.read%20user/PractitionerRole.read%20user/Procedure.read%20user/Provenance.read%20patient/ExplanationOfBenefit.read%20patient/Coverage.read%20patient/AllergyIntolerance.read%20patient/CarePlan.read%20patient/CareTeam.read%20patient/Condition.read%20patient/Device.read%20patient/DiagnosticReport.read%20patient/DocumentReference.read%20patient/Encounter.read%20patient/Goal.read%20patient/Immunization.read%20patient/Location.read%20patient/Medication.read%20patient/MedicationRequest.read%20patient/Observation.read%20patient/Organization.read%20patient/Patient.read%20patient/Practitioner.read%20patient/PractitionerRole.read%20patient/Procedure.read%20patient/Provenance.read&aud=09b3d1b7-60c6-4149-ad29-cfbe9220f2de&state="
+  public getConnectionCredentials(connectionName: string) {
+
+    if (!connectionName) {
+      throwError('connection name is required', error.badRequest);
     }
 
-    return resp;
+    const env = Env.all();
+    connectionName = connectionName.toLowerCase();
+
+    return {
+      clientSecret: env[`${connectionName}_client_secret`],
+      clientID: env[`${connectionName}_client_id`],
+      callbackURL: env[`${connectionName}_callback_url`],
+      authorizationURL: env[`${connectionName}_authorization_url`],
+      tokenURL: env[`${connectionName}_token_url`],
+      scope: env[`${connectionName}_scope`]
+    }
   }
 
-  public async getSaFHirToken(): Promise<any> {
-    const httpsAgent = new https.Agent({
-      rejectUnauthorized: false,
-    })
-    axios.defaults.httpsAgent = httpsAgent
-    axios.post("https://api-dmdh-t31.safhir.io/v1/token", {
-      data: ""
-    }).then( res => console.log(res))
+  public getStrategy(connectionName: string) {
+    const credentials = this.getConnectionCredentials(connectionName);
+    const strategy = new OAuth2Strategy(credentials,
+      (accessToken: string, refreshToken: string, profile: any, cb: any) => {
+        // @ts-ignore
+        global.accessToken = accessToken;
+        // @ts-ignore
+        global.refreshToken = refreshToken;
 
-    //return resp;
+        return cb(null, {
+          accessToken,
+          refreshToken,
+        });
+      }
+    );
+
+    // @ts-ignore
+    strategy._oauth2.setAgent(httpsAgent);
+
+    return strategy;
+  }
+
+  public async getConnectionByType(connectionType: object): Promise<IConnection[]> {
+    return this.connectionRepository.getConnectionByType(connectionType);
+  }
+
+  public async getConnectionByFields(fields: IFindConnection): Promise<IConnection> {
+    return this.connectionRepository.getConnectionByFields(fields);
+  }
+
+  public async addConnection(data: IConnection): Promise<IConnection> {
+    return this.connectionRepository.addConnection(data);
+  }
+
+  public async getConnectionByPatientId(patient_id: string): Promise<IConnection[]> {
+    return this.connectionRepository.getConnectionByPatientId(patient_id);
+  }
+
+  public async updateConnection(data: IFindConnection): Promise<IConnection> {
+    return this.connectionRepository.updateConnection(data);
+  }
+
+  public async deleteConnection(id: string) {
+    return this.connectionRepository.deleteConnection(id);
   }
 }

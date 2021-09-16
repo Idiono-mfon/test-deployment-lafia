@@ -7,10 +7,13 @@ import {
   IPractitioner,
   IUser,
   PractitionersAttachmentModel,
+  VideoBroadcastModel,
 } from '../../models';
-import { VideoBroadcastModel } from '../../models/videoRecords/videoBroadcastModel';
-import { PractitionerRepository, VideoBroadcastRepository } from '../../repository';
-import { PractitionerVideoBroadcastRepository } from '../../repository/videoRecords/practitionerVideoBroadcastRepository';
+import {
+  PractitionerRepository,
+  VideoBroadcastRepository,
+  PractitionerVideoBroadcastRepository
+} from '../../repository';
 import {
   error,
   forWho,
@@ -125,7 +128,7 @@ export class PractitionerService {
     const practitionerResponse = await this.fhirServerService.executeQuery(
       '/Practitioner',
       'POST',
-      practitionerData
+      { data: practitionerData }
     );
     const practitioner = practitionerResponse.data;
     const token = this.userService.generateJwtToken({ email, id: practitioner.id });

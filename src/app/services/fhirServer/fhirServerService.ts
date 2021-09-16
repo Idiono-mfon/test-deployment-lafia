@@ -1,14 +1,23 @@
+import * as https from 'https';
 import { injectable } from 'inversify';
 import axios, { Method } from 'axios';
 import { Env } from '../../config/env';
 import { IFhirServer } from '../../models';
 import { GenericResponseError } from '../../utils';
 
+const env = Env.all();
+
+const httpsAgent = new https.Agent({
+  rejectUnauthorized: false,
+});
+
+
 const axiosInstance = axios.create({
-  baseURL: `${Env.all().fhir_server_base_url}/`,
-  headers : {
-      'Content-Type': 'application/fhir+json'
-  }
+  headers: {
+    'Content-Type': 'application/fhir+json'
+  },
+
+  httpsAgent,
 });
 
 axiosInstance.interceptors.request.use((config: any) => {
@@ -20,10 +29,41 @@ axiosInstance.interceptors.request.use((config: any) => {
 @injectable()
 export class FhirServerService implements IFhirServer {
 
-  public async executeQuery(resourceQuery: string, httpMethod: Method, data?: any): Promise<any> {
+  private static chooseMethodFromConnectionName(connectionName: string): string {
+    let [part1, part2] = connectionName.toLowerCase().split('fhir');
+    let others = ''
+
+    if (part2) {
+      others = part2[0].toUpperCase();
+      others += part2.substring(1);
+    }
+
+    return `${part1}Fhir${others}`
+  }
+
+
+  public async executeQuery(resourceQuery: string, httpMethod: Method, props: FhirProperties = {}): Promise<any> {
     try {
+      let { connectionName } = props!;
+
+      connectionName = connectionName || 'lafia';
+
+      const selectMethod = FhirServerService.chooseMethodFromConnectionName(connectionName);
+
+      // @ts-ignore
+      return await this[selectMethod](resourceQuery, httpMethod, props);
+
+    } catch (e: any) {
+      throw new GenericResponseError(e.message, e.response);
+    }
+  }
+
+  public async lafiaFhir(resourceQuery: string, httpMethod: Method, props?: FhirProperties): Promise<any> {
+    try {
+      const { data } = props!;
       const { status, data: responseData, headers } = await axiosInstance({
         url: resourceQuery,
+        baseURL: `${env.fhir_server_base_url}/`,
         method: httpMethod,
         data,
       });
@@ -42,4 +82,38 @@ export class FhirServerService implements IFhirServer {
       throw new GenericResponseError(e.message, e.response);
     }
   }
+
+  public async saFhir(resourceQuery: string, httpMethod: Method, props?: FhirProperties): Promise<any> {
+    try {
+      let { data, token, ig } = props!;
+
+      if (!ig) ig = 'uscore';
+
+      const { status, data: responseData } = await axiosInstance({
+        url: resourceQuery,
+        method: httpMethod,
+        baseURL: `${env.safhir_base_url}/${ig}/`,
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        data,
+      });
+
+      return {
+        status,
+        data: responseData,
+      };
+    } catch (e: any) {
+      delete e.response.headers['transfer-encoding'];
+      throw new GenericResponseError(e.message, e.response);
+    }
+  }
+}
+
+
+export interface FhirProperties {
+  data?: any,
+  token?: string,
+  connectionName?: string,
+  ig?: string,
 }
