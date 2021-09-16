@@ -41,6 +41,7 @@ export class ConnectionRepository {
   public async getConnectionByPatientId(patient_id: string): Promise<IConnection[]> {
     try {
       return await ConnectionModel.query()
+        .select(['id', 'patient_id', 'connection_name', 'access_token'])
         .where({ patient_id })
         .skipUndefined();
     } catch (e: any) {
