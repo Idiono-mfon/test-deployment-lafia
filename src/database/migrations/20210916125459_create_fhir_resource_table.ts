@@ -1,9 +1,9 @@
-import * as Knex from "knex";
-import { Schema, Table } from "..";
+import * as Knex from 'knex';
+import { Schema, Table } from '..';
 
 
 export async function up(knex: Knex): Promise<void> {
-    return knex
+  return knex
     .transaction(async (trx: Knex.Transaction) => trx.schema
       .createSchemaIfNotExists(Schema.lafiaService)
       .then(() => trx.schema.hasTable(Table.fhir_resources)
@@ -36,6 +36,6 @@ export async function up(knex: Knex): Promise<void> {
 
 
 export async function down(knex: Knex): Promise<void> {
-    return knex.schema.withSchema(Schema.lafiaService).dropTableIfExists(Table.fhir_resources);
+  return knex.schema.withSchema(Schema.lafiaService).dropTableIfExists(Table.fhir_resources);
 }
 
