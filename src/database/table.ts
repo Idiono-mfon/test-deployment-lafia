@@ -28,6 +28,7 @@ export class Table {
   public static patient_contacts = 'patient_contacts';
   public static codeable_concepts = 'codeable_concepts';
   public static language_label:string = 'language_label';
+  public static fhir_resources: string = 'fhir_resources';
   public static patients_references = 'patients_references';
   public static patients_attachments = 'patients_attachments';
   public static patients_identifiers = 'patients_identifiers';
@@ -44,6 +45,7 @@ export class Table {
   public static practitioners_human_names = 'practitioners_human_names';
   public static practitioners_identifiers = 'practitioners_identifiers';
   public static encounter_class_histories = 'encounter_class_histories';
+  public static implementation_guides: string = 'implementation_guides';
   public static encounter_status_histories = 'encounter_status_histories';
   public static qualifications_identifiers = 'qualifications_identifiers';
   public static practitioners_contact_points = 'practitioners_contact_points';
@@ -52,4 +54,5 @@ export class Table {
   public static practitioner_video_broadcasts = 'practitioner_video_broadcasts';
   public static patient_contacts_contact_points = 'patient_contacts_contact_points';
   public static patient_contacts_codeable_concepts = 'patient_contacts_codeable_concepts';
+  public static implementation_guide_fhir_resource: string = 'implementation_guide_fhir_resource';
 }
