@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import { transaction } from 'objection';
-import { ConnectionModel, IConnection } from '../../models';
+import { ConnectionModel, IConnection, IFindConnection } from '../../models';
 import { GenericResponseError, HttpStatusCode, InternalServerError } from '../../utils';
 
 @injectable()
@@ -21,8 +21,21 @@ export class ConnectionRepository {
     }
   }
 
+  public async getConnectionByFields(fields: IFindConnection): Promise<IConnection> {
+    try {
+      return await ConnectionModel.query().where(fields).skipUndefined().first();
+    } catch (e: any) {
+      throw new InternalServerError(e.message);
+    }
+  }
+
   public async addConnection(data: IConnection): Promise<IConnection> {
-    return ConnectionModel.query().insertAndFetch(data);
+    try {
+      return await ConnectionModel.query().insertAndFetch(data);
+    }
+    catch (e) {
+      throw new InternalServerError(e.message);
+    }
   }
 
   public async getConnectionByPatientId(patient_id: string): Promise<IConnection> {

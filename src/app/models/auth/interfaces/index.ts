@@ -6,3 +6,10 @@ export interface IConnection extends IBase {
   refresh_token?: string;
   connection_name?: boolean;
 }
+
+export interface IFindConnection extends IBase {
+  patient_id?: string;
+  access_token?: string;
+  refresh_token?: string;
+  connection_name?: boolean;
+}
