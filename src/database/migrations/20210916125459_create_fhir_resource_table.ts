@@ -22,11 +22,10 @@ export async function up(knex: Knex): Promise<void> {
                   .string('name')
                   .notNullable();
                 tableBuilder
-                  .text('slug')
+                  .string('slug')
                   .nullable();
                 tableBuilder
-                  .json('examples')
-                  .nullable();
+                  .json('examples');
                 tableBuilder
                   .timestamps(true, true);
               });

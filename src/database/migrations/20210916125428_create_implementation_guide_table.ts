@@ -22,7 +22,7 @@ export async function up(knex: Knex): Promise<void> {
                   .string('name')
                   .notNullable();
                 tableBuilder
-                  .text('slug')
+                  .string('slug')
                   .notNullable();
                 tableBuilder
                   .timestamps(true, true);
