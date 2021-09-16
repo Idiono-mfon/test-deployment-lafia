@@ -153,6 +153,11 @@ export class PractitionerService {
   public async practitionerLogin(data: IUserLoginParams): Promise<any> {
     try {
       const { user, token } = data;
+
+      if (user.photo === null) {
+        delete user.photo;
+      }
+
       await this.userService.updateUser(user.id!, {...user, token});
 
       const { data: practitionerData } = await this.fhirServerService.executeQuery(
