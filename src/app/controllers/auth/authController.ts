@@ -9,6 +9,7 @@ import {
 import { Request, Response } from 'express';
 import TYPES from '../../config/types';
 import { AuthService } from '../../services';
+import { error, throwError } from '../../utils';
 import { BaseController } from '../baseController';
 import { passport } from '../..';
 
@@ -93,6 +94,23 @@ export class AuthController extends BaseController {
       console.log('Tokens:', tokens);
       // @ts-ignore
       res.json(tokens);
+    } catch (e: any) {
+      this.error(res, e);
+    }
+  }
+
+  @httpGet('/connections')
+  public async getConnections(@request() req: Request, @response() res: Response) {
+    try {
+      const { state } = req.query;
+
+      if (!state) {
+        throwError('state is a required param which represents the patient ID', error.badRequest);
+      }
+
+      const connections = await this.authService.getConnectionByPatientId(state as string);
+
+      this.success(res, connections, 'Connections retrieved successfully');
     } catch (e: any) {
       this.error(res, e);
     }

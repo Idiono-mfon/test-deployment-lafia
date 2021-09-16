@@ -38,12 +38,11 @@ export class ConnectionRepository {
     }
   }
 
-  public async getConnectionByPatientId(patient_id: string): Promise<IConnection> {
+  public async getConnectionByPatientId(patient_id: string): Promise<IConnection[]> {
     try {
       return await ConnectionModel.query()
         .where({ patient_id })
-        .skipUndefined()
-        .first();
+        .skipUndefined();
     } catch (e: any) {
       throw new InternalServerError(e.message);
     }

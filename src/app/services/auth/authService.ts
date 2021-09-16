@@ -112,7 +112,7 @@ export class AuthService {
     return this.connectionRepository.addConnection(data);
   }
 
-  public async getConnectionByPatientId(patient_id: string): Promise<IConnection> {
+  public async getConnectionByPatientId(patient_id: string): Promise<IConnection[]> {
     return this.connectionRepository.getConnectionByPatientId(patient_id);
   }
 
