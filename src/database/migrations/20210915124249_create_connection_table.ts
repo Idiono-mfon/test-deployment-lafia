@@ -22,10 +22,10 @@ export async function up(knex: Knex): Promise<void> {
                   .string('patient_id')
                   .notNullable();
                 tableBuilder
-                  .string('access_token')
+                  .text('access_token')
                   .notNullable();
                 tableBuilder
-                  .string('refresh_token')
+                  .text('refresh_token')
                   .nullable();
                 tableBuilder
                   .string('connection_name')
