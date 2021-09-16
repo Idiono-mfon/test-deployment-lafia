@@ -5,7 +5,8 @@ import * as _ from 'lodash';
 import OAuth2Strategy from 'passport-oauth2';
 import { Env } from '../../config/env';
 import TYPES from '../../config/types';
-import { IUser } from '../../models';
+import { IConnection, IFindConnection, IUser } from '../../models';
+import { ConnectionRepository } from '../../repository';
 import { error, forWho, GenericResponseError, getE164Format, throwError } from '../../utils';
 import { PatientService } from '../patients';
 import { PlatformSdkService } from '../platformSDK';
@@ -20,15 +21,14 @@ const httpsAgent = new https.Agent({
 export class AuthService {
   @inject(TYPES.PatientService)
   private readonly patientService: PatientService;
-
   @inject(TYPES.PractitionerService)
   private readonly practitionerService: PractitionerService;
-
   @inject(TYPES.UserService)
   private userService: UserService;
-
   @inject(TYPES.PlatformSdkService)
   private platformSdkService: PlatformSdkService;
+  @inject(TYPES.ConnectionRepository)
+  private connectionRepository: ConnectionRepository;
 
   public async login(email: string, password: string, req: Request): Promise<any> {
     try {
@@ -98,5 +98,29 @@ export class AuthService {
     strategy._oauth2.setAgent(httpsAgent);
 
     return strategy;
+  }
+
+  public async getConnectionByType(connectionType: object): Promise<IConnection[]> {
+    return this.connectionRepository.getConnectionByType(connectionType);
+  }
+
+  public async getConnectionByFields(fields: IFindConnection): Promise<IConnection> {
+    return this.connectionRepository.getConnectionByFields(fields);
+  }
+
+  public async addConnection(data: IConnection): Promise<IConnection> {
+    return this.connectionRepository.addConnection(data);
+  }
+
+  public async getConnectionByPatientId(patient_id: string): Promise<IConnection> {
+    return this.connectionRepository.getConnectionByPatientId(patient_id);
+  }
+
+  public async updateConnection(data: IFindConnection): Promise<IConnection> {
+    return this.connectionRepository.updateConnection(data);
+  }
+
+  public async deleteConnection(id: string) {
+    return this.connectionRepository.deleteConnection(id);
   }
 }

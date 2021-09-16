@@ -46,10 +46,36 @@ export class AuthController extends BaseController {
   }
 
   @httpGet('/safhir', passport.authenticate('oauth2', { failureRedirect: `https://app.lafia.io/safhir?status=error` }))
-  public getSaFHirToken(@request() req: Request, @response() res: Response) {
+  public async getSaFHirToken(@request() req: Request, @response() res: Response) {
     try {
+      const { state } = req.query;
+      const existingConnection = await this.authService.getConnectionByFields({
+        patient_id: state as string,
+        connection_name: 'safhir',
+      });
+
+      if (existingConnection) {
+        await this.authService.updateConnection({
+            // @ts-ignore
+            refresh_token: global.refreshToken,
+            // @ts-ignore
+            access_token: global.accessToken,
+            ...existingConnection
+          }
+        );
+      } else {
+        await this.authService.addConnection({
+          connection_name: 'safhir',
+          patient_id: state as string,
+          // @ts-ignore
+          refresh_token: global.refreshToken,
+          // @ts-ignore
+          access_token: global.accessToken,
+        });
+      }
+
       // @ts-ignore
-      const redirectURL = `https://app.lafia.io/safhir?status=success&state=${req.query.state}&access_token=${global.accessToken}`;
+      const redirectURL = `https://app.lafia.io/safhir?status=success&state=${state}&access_token=${global.accessToken}`;
 
       res.redirect(redirectURL);
     } catch (e: any) {

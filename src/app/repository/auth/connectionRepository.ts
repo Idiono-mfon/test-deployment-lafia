@@ -49,7 +49,7 @@ export class ConnectionRepository {
     }
   }
 
-  public async updateConnection(data: IConnection): Promise<IConnection> {
+  public async updateConnection(data: IFindConnection): Promise<IConnection> {
     try {
       return await transaction(ConnectionModel, async (ConnectionModel) => {
         return ConnectionModel.query().upsertGraphAndFetch(data, { relate: true, unrelate: true });

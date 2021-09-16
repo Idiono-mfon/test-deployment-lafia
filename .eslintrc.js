@@ -72,5 +72,6 @@ module.exports = {
     '@typescript-eslint/ban-types': 0,
     '@typescript-eslint/no-non-null-asserted-optional-chain': 0,
     '@typescript-eslint/no-unnecessary-type-assertion': 0,
+    '@typescript-eslint/require-await': 0,
   },
 };
