@@ -25,7 +25,7 @@ export class ConsentController extends BaseController {
       const consentRecord = await this.fhirServerService.executeQuery(
         `/Consent`,
         'POST',
-        req.body
+        { data: req.body }
       );
 
       this.success(res, consentRecord?.data, 'Consent successfully accepted');
