@@ -121,7 +121,7 @@ export class AuthController extends BaseController {
   public async deleteConnection(@request() req: Request, @response() res: Response) {
     try {
       const { id } = req.params;
-      const connections = await this.authService.getConnectionByFields({ id });
+      const connections = await this.authService.deleteConnection(id);
 
       this.success(res, connections, 'Connection deleted successfully');
     } catch (e: any) {
