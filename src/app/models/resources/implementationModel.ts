@@ -1,5 +1,5 @@
 import {
-  JSONSchema, Modifiers, QueryBuilder,
+  JSONSchema,
   RelationMappings
 } from 'objection';
 import { FhirResourceModel } from '.';
@@ -20,34 +20,20 @@ export class ImplementationGuideModel extends BaseModel implements IImplementati
     return ImplementationGuideValidation;
   }
 
-  static get hidden(): string[] {
-    return ['updatedAt', 'createdAt'];
-  }
-
-  static get modifiers(): Modifiers {
-    return {
-      selectId(builder: QueryBuilder<any, any[]>) {
-        builder.select(
-          `${Schema.lafiaService}.${Table.implementation_guides}.id`
-        );
-      },
-    };
-  }
-
   static get relationMappings(): RelationMappings {
     return {
       fhirResources: {
         relation: BaseModel.ManyToManyRelation,
-          modelClass: FhirResourceModel,
-          join: {
-              from: `${Schema.lafiaService}.${Table.fhir_resources}.id`,
-              through: {
-                  from: `${Schema.lafiaService}.${Table.implementation_guide_fhir_resource}.ig_id`,
-                  to: `${Schema.lafiaService}.${Table.implementation_guide_fhir_resource}.fr_id`
-              },
-              to: `${Schema.lafiaService}.${Table.implementation_guides}.id`
-          }
+        modelClass: FhirResourceModel,
+        join: {
+          from: `${Schema.lafiaService}.${Table.fhir_resources}.id`,
+          through: {
+            from: `${Schema.lafiaService}.${Table.implementation_guide_fhir_resource}.ig_id`,
+            to: `${Schema.lafiaService}.${Table.implementation_guide_fhir_resource}.fr_id`
+          },
+          to: `${Schema.lafiaService}.${Table.implementation_guides}.id`
         }
+      }
     }
   }
 }
