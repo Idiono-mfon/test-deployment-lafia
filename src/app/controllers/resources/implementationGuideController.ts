@@ -1,6 +1,6 @@
 import { inject } from 'inversify';
 import { Request, Response } from 'express';
-import { controller, httpDelete, httpGet, httpPost, httpPut, request, response} from 'inversify-express-utils';
+import { controller, httpDelete, httpGet, httpPost, httpPut, request, response } from 'inversify-express-utils';
 import TYPES from '../../config/types';
 import { ImplementationGuideService } from '../../services';
 
@@ -16,8 +16,16 @@ export class ImplementationGuideController extends BaseController {
   public async fetchImplementationGuides(@request() req: Request, @response() res: Response) {
     try {
       const { slug } = req.query;
-      const implementationGuide = await this.implementationGuideService.getOneImplementationGuide({ slug: slug as string });
-      this.success(res, implementationGuide, 'implementation guides successfully fetched');
+      let implementationGuide: IFindImplementationGuide | IFindImplementationGuide[];
+
+      if (slug) {
+        implementationGuide = await this.implementationGuideService.getOneImplementationGuide({ slug: slug as string });
+      } else {
+        implementationGuide = await this.implementationGuideService.fetchImplementationGuide();
+      }
+
+
+        return this.success(res, implementationGuide, 'implementation guides successfully fetched');
     } catch (e: any) {
       this.error(res, e);
     }
@@ -27,7 +35,7 @@ export class ImplementationGuideController extends BaseController {
   public async fetchImplementationGuide(@request() req: Request, @response() res: Response) {
     try {
       const { id: implementationGuide } = req.params;
-      const find: IFindImplementationGuide = {id: implementationGuide};
+      const find: IFindImplementationGuide = { id: implementationGuide };
       const resp = await this.implementationGuideService.getOneImplementationGuide(find);
       this.success(res, resp, 'fimplementation guide successfully fetched');
     } catch (e: any) {
