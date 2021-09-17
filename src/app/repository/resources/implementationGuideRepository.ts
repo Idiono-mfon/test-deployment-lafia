@@ -4,10 +4,11 @@ import { InternalServerError } from '../../utils';
 
 @injectable()
 export class ImplementationGuideRepository {
-  
+
   public async fetchImplementationGuide(): Promise<IImplementationGuide[]> {
     try {
-      return await ImplementationGuideModel.query();
+      return await ImplementationGuideModel.query()
+        .withGraphFetched('fhirResources(defaultSelects)')
     } catch (e: any) {
       throw new InternalServerError(e.message);
     }

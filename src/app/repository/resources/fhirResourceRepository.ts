@@ -4,7 +4,7 @@ import { InternalServerError } from '../../utils';
 
 @injectable()
 export class FhirResourceRepository {
-  
+
   public async fetchFhirResources(): Promise<IFhirResource[]> {
     try {
       return await FhirResourceModel.query();

@@ -1,5 +1,5 @@
 import {
-  JSONSchema,
+  JSONSchema, QueryBuilder,
   RelationMappings
 } from 'objection';
 import { ImplementationGuideModel } from '.';
@@ -20,6 +20,12 @@ export class FhirResourceModel extends BaseModel implements IFhirResource {
   static get jsonSchema(): JSONSchema {
     return FHirResourceValidation;
   }
+
+  static modifiers = {
+    defaultSelects(query: QueryBuilder<any, any>) {
+      query.select(`${Table.fhir_resources}.id`, 'name', 'slug');
+    }
+  };
 
   static get relationMappings(): RelationMappings {
     return {
