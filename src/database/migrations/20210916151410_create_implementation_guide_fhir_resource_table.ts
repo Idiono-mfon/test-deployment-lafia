@@ -26,19 +26,6 @@ export async function up(knex: Knex): Promise<void> {
                   .notNullable();
                 tableBuilder
                   .timestamps(true, true);
-
-                // Set foreign key
-                tableBuilder
-                  .foreign('ig_id')
-                  .references('id')
-                  .inTable(`${Schema.lafiaService}.${Table.implementation_guides}`)
-                  .onUpdate('CASCADE')
-                  .onDelete('CASCADE');
-                tableBuilder
-                  .foreign('fr_id')
-                  .references('id')
-                  .inTable(`${Schema.lafiaService}.${Table.fhir_resources}`)
-                  .onUpdate('CASCADE');
               });
           }
         }))
