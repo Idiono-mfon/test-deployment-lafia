@@ -107,6 +107,7 @@ export class FhirServerService implements IFhirServer {
       return {
         status,
         data: responseData,
+        headers: { 'Content-Type': 'application/fhir+json' }
       };
     } catch (e: any) {
       delete e.response.headers['transfer-encoding'];
