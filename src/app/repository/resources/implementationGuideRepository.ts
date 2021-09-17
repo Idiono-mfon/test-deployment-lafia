@@ -26,7 +26,7 @@ export class ImplementationGuideRepository {
 
   public async getOneImplementationGuide(data: IFindImplementationGuide | any): Promise<IImplementationGuide> {
     try {
-      return await ImplementationGuideModel.query().withGraphFetched('fhirResources(defaultSelects').findOne(data);
+      return await ImplementationGuideModel.query().withGraphFetched('fhirResources(defaultSelects)').findOne(data);
     } catch (e: any) {
       throw new InternalServerError(e.message);
     }
