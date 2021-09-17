@@ -24,8 +24,7 @@ export class ImplementationGuideController extends BaseController {
         implementationGuide = await this.implementationGuideService.fetchImplementationGuide();
       }
 
-
-        return this.success(res, implementationGuide, 'implementation guides successfully fetched');
+      return this.success(res, implementationGuide, 'implementation guides successfully fetched');
     } catch (e: any) {
       this.error(res, e);
     }
