@@ -9,7 +9,7 @@ import { InversifyExpressServer } from 'inversify-express-utils';
 import { Env } from './config/env';
 import TYPES from './config/types';
 import { AuthMiddleware } from './middlewares';
-import { PatientService, PractitionerService, MessageBroker, VideoBroadcastService } from './services';
+import { PatientService, PractitionerService, MessageBroker, VideoBroadcastService, AuthService } from './services';
 import { SignallingServerService } from './services/signallingServers';
 import * as swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './config/swagger.config';
@@ -27,6 +27,9 @@ const patientService = container.get<PatientService>(TYPES.PatientService);
 const videoBroadcastService = container.get<VideoBroadcastService>(TYPES.VideoBroadcastService);
 const practitionerService = container.get<PractitionerService>(TYPES.PractitionerService);
 const authMiddleware = container.get<AuthMiddleware>(TYPES.AuthMiddleware);
+const authService = container.get<AuthService>(TYPES.AuthService);
+
+const saFhirStrategy = authService.getStrategy('safhir');
 
 server.setConfig((app) => {
   app.use(express.json());
@@ -38,6 +41,8 @@ server.setConfig((app) => {
     customSiteTitle: 'lafia.io api docs'
   }));
   app.use(authMiddleware.parseThirdPartyConnection);
+
+  passport.use(saFhirStrategy);
 
   passport.use(new RefreshTokenStrategy(
     (token: any, done: any) => done(null, token)
