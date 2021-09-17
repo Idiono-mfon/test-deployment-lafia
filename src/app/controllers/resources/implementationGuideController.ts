@@ -15,7 +15,8 @@ export class ImplementationGuideController extends BaseController {
   @httpGet('')
   public async fetchImplementationGuides(@request() req: Request, @response() res: Response) {
     try {
-      const implementationGuide = await this.implementationGuideService.fetchImplementationGuide();
+      const { slug } = req.query;
+      const implementationGuide = await this.implementationGuideService.getOneImplementationGuide({ slug: slug as string });
       this.success(res, implementationGuide, 'implementation guides successfully fetched');
     } catch (e: any) {
       this.error(res, e);
