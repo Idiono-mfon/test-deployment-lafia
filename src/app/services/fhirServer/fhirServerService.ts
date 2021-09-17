@@ -1,9 +1,11 @@
 import * as https from 'https';
-import { injectable } from 'inversify';
+import { inject, injectable } from 'inversify';
 import axios, { Method } from 'axios';
 import { Env } from '../../config/env';
+import TYPES from '../../config/types';
 import { IFhirServer } from '../../models';
 import { GenericResponseError } from '../../utils';
+import { FhirResourceService } from '../resources';
 
 const env = Env.all();
 
@@ -28,6 +30,9 @@ axiosInstance.interceptors.request.use((config: any) => {
 
 @injectable()
 export class FhirServerService implements IFhirServer {
+
+  @inject(TYPES.FhirResourceService)
+  private readonly fhirResourceService: FhirResourceService;
 
   private static chooseMethodFromConnectionName(connectionName: string): string {
     let [part1, part2] = connectionName.toLowerCase().split('fhir');
@@ -105,6 +110,16 @@ export class FhirServerService implements IFhirServer {
       };
     } catch (e: any) {
       delete e.response.headers['transfer-encoding'];
+      throw new GenericResponseError(e.message, e.response);
+    }
+  }
+
+  public async fetchSampleResources(resourceName: string): Promise<any> {
+    try {
+      const fhirSampleResources = await this.fhirResourceService.getOneFhirResource({ slug: resourceName.toLocaleLowerCase()});
+
+      return fhirSampleResources?.examples;
+    } catch (e: any) {
       throw new GenericResponseError(e.message, e.response);
     }
   }

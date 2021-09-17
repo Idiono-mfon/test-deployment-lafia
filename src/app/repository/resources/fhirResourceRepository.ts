@@ -25,7 +25,6 @@ export class FhirResourceRepository {
 
   public async getOneFhirResource(data: IFindFhirResource | any): Promise<IFhirResource> {
     try {
-      console.log(data)
       return await FhirResourceModel.query().withGraphFetched('implementationGuides').findOne(data);
     } catch (e: any) {
       throw new InternalServerError(e.message);
