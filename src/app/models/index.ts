@@ -40,3 +40,4 @@ export * from './users';
 export * from './fhirServer';
 export * from './videoRecords';
 export * from './auth';
+export * from './resources';

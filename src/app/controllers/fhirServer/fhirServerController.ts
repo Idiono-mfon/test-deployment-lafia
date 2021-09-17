@@ -22,12 +22,25 @@ export class FhirServerController extends BaseController {
   @httpGet('*')
   public async fhirResourceGetMethode(@request() req: Request, @response() res: Response) {
     try {
-      const { 'x-oauth': token, 'x-connection-name': connectionName } = res.locals?.connection;
+      const {
+        'x-oauth': token,
+        'x-connection-name': connectionName,
+        'x-ig': ig,
+        'x-test-resource': resourceName
+      } = res.locals?.connection;
+
+      if (resourceName) {
+        const sampleResource = await this.fhirServerService.fetchSampleResources(resourceName);
+
+        return this.success(res, sampleResource, '', 200, { 'Content-Type': 'application/fhir+json' });
+      }
+
       const props: FhirProperties = {
         token,
         connectionName,
         data: req.body,
-      }
+        ig
+      };
 
       const [, requestUrl] = req.url.split('fhir');
       const {
@@ -45,11 +58,12 @@ export class FhirServerController extends BaseController {
   @httpPost('*')
   public async fhirResourcePostMethode(@request() req: Request, @response() res: Response) {
     try {
-      const { 'x-oauth': token, 'x-connection-name': connectionName } = res.locals?.connection;
+      const { 'x-oauth': token, 'x-connection-name': connectionName, ig } = res.locals?.connection;
       const props: FhirProperties = {
         token,
         connectionName,
         data: req.body,
+        ig
       }
 
       const [, requestUrl] = req.url.split('fhir');
@@ -68,11 +82,12 @@ export class FhirServerController extends BaseController {
   @httpPut('*')
   public async fhirResourcePutMethode(@request() req: Request, @response() res: Response) {
     try {
-      const { 'x-oauth': token, 'x-connection-name': connectionName } = res.locals?.connection;
+      const { 'x-oauth': token, 'x-connection-name': connectionName, ig } = res.locals?.connection;
       const props: FhirProperties = {
         token,
         connectionName,
         data: req.body,
+        ig
       }
 
       const [, requestUrl] = req.url.split('fhir');
@@ -91,11 +106,12 @@ export class FhirServerController extends BaseController {
   @httpPatch('*')
   public async fhirResourcePatchMethode(@request() req: Request, @response() res: Response) {
     try {
-      const { 'x-oauth': token, 'x-connection-name': connectionName } = res.locals?.connection;
+      const { 'x-oauth': token, 'x-connection-name': connectionName, ig } = res.locals?.connection;
       const props: FhirProperties = {
         token,
         connectionName,
         data: req.body,
+        ig
       }
 
       const [, requestUrl] = req.url.split('fhir');
@@ -114,11 +130,12 @@ export class FhirServerController extends BaseController {
   @httpDelete('*')
   public async fhirResourceDeleteMethode(@request() req: Request, @response() res: Response) {
     try {
-      const { 'x-oauth': token, 'x-connection-name': connectionName } = res.locals?.connection;
+      const { 'x-oauth': token, 'x-connection-name': connectionName, ig } = res.locals?.connection;
       const props: FhirProperties = {
         token,
         connectionName,
         data: req.body,
+        ig
       }
 
       const [, requestUrl] = req.url.split('fhir');
