@@ -87,7 +87,7 @@ export class FhirServerService implements IFhirServer {
     try {
       let { data, token, ig } = props!;
 
-      if (!ig) ig = 'uscore';
+      if (!ig) ig = 'pdex';
 
       const { status, data: responseData } = await axiosInstance({
         url: resourceQuery,
