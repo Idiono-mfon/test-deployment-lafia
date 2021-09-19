@@ -59,7 +59,7 @@ export class FhirServerService implements IFhirServer {
       return await this[selectMethod](resourceQuery, httpMethod, props);
 
     } catch (e: any) {
-      throw new GenericResponseError(e.message, e.response);
+      throw new GenericResponseError(e.message, e.code);
     }
   }
 
@@ -110,7 +110,7 @@ export class FhirServerService implements IFhirServer {
         headers: { 'Content-Type': 'application/fhir+json' }
       };
     } catch (e: any) {
-      delete e.response.headers['transfer-encoding'];
+      e.response.headers['content-type'] = 'application/fhir+json';
       throw new GenericResponseError(e.message, e.response);
     }
   }
