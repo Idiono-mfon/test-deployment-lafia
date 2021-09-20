@@ -45,3 +45,7 @@ export interface IFindUser extends IBase {
   has_verified_phone?: boolean;
   has_verified_email?: boolean;
 }
+
+export interface IUserPhoto extends IBase {
+  photo?: string;
+}
