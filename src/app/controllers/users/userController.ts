@@ -4,7 +4,7 @@ import {
   controller, httpPost, httpPut, request, response
 } from 'inversify-express-utils';
 import TYPES from '../../config/types';
-import { IUser } from '../../models';
+import { IUser, IUserPhoto } from '../../models';
 import { TwilioService, UserService } from '../../services';
 import { HttpStatusCode } from '../../utils';
 import { BaseController } from '../baseController';
@@ -35,6 +35,30 @@ export class UserController extends BaseController {
       const newUser = await this.userService.validateUser(req);
 
       this.success(res, newUser, 'User created', HttpStatusCode.CREATED);
+    } catch (e: any) {
+      this.error(res, e);
+    }
+  }
+
+  @httpPost('/photo', TYPES.AuthMiddleware)
+  public async getUserPhoto(@request() req: Request, @response() res: Response) {
+    try {
+      const photo: IUserPhoto = req.body
+      const user = await this.userService.getOneUser({id: req.body.user.id});
+
+      this.success(res, user.photo, 'Photo fetched', HttpStatusCode.OK);
+    } catch (e: any) {
+      this.error(res, e);
+    }
+  }
+
+  @httpPost('/photo', TYPES.AuthMiddleware)
+  public async updatePhoto(@request() req: Request, @response() res: Response) {
+    try {
+      const photo: IUserPhoto = req.body
+      const user = await this.userService.updateUser(req.body.user.id, photo);
+
+      this.success(res, user, 'Photo updated', HttpStatusCode.CREATED);
     } catch (e: any) {
       this.error(res, e);
     }
