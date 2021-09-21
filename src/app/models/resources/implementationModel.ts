@@ -11,6 +11,7 @@ import { ImplementationGuideValidation } from './validation';
 export class ImplementationGuideModel extends BaseModel implements IImplementationGuide {
   name!: IImplementationGuide['name'];
   slug!: IImplementationGuide['slug'];
+  photo!: IImplementationGuide['photo'];
 
   static get tableName(): string {
     return `${Schema.lafiaService}.${Table.implementation_guides}`;

@@ -12,6 +12,7 @@ export class FhirResourceModel extends BaseModel implements IFhirResource {
   name!: IFhirResource['name'];
   slug!: IFhirResource['slug'];
   examples!: IFhirResource['examples'];
+  photo!: IFhirResource['photo'];
 
   static get tableName(): string {
     return `${Schema.lafiaService}.${Table.fhir_resources}`;

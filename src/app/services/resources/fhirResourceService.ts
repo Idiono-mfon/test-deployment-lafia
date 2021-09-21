@@ -26,7 +26,6 @@ export class FhirResourceService {
   }
 
   public async getOneFhirResource(data: IFindFhirResource): Promise<IFhirResource> {
-    console.log(data)
     return this.fhirResourceRepository.getOneFhirResource(data);
   }
 
