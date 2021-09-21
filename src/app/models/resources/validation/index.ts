@@ -6,7 +6,8 @@ export const ImplementationGuideValidation: JSONSchema = {
   required: ['name', 'slug'],
   properties: {
     name: { type: 'string' },
-    slug: { type: 'string' }
+    slug: { type: 'string' },
+    photo: { type: 'string' }
   }
 }
 
@@ -17,6 +18,7 @@ export const FHirResourceValidation: JSONSchema = {
   properties: {
     name: { type: 'string' },
     slug: { type: 'string' },
-    examples: { type: 'object' }
+    examples: { type: 'object' },
+    photo: { type: 'string' }
   }
 }
