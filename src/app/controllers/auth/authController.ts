@@ -49,9 +49,10 @@ export class AuthController extends BaseController {
   @httpGet('/safhir', passport.authenticate('oauth2', { failureRedirect: `https://app.lafia.io/safhir?status=error` }))
   public async getSaFHirToken(@request() req: Request, @response() res: Response) {
     try {
-      const { state } = req.query;
+      const state = req.query.state as string;
+      const [stateValue,] = state?.split('?')!;
       const existingConnection = await this.authService.getConnectionByFields({
-        patient_id: state as string,
+        patient_id: stateValue,
         connection_name: 'safhir',
       });
 
@@ -67,7 +68,7 @@ export class AuthController extends BaseController {
       } else {
         await this.authService.addConnection({
           connection_name: 'safhir',
-          patient_id: state as string,
+          patient_id: stateValue,
           // @ts-ignore
           refresh_token: global.refreshToken,
           // @ts-ignore
