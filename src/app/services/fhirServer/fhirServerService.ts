@@ -1,6 +1,7 @@
 import * as https from 'https';
 import { inject, injectable } from 'inversify';
 import axios, { Method } from 'axios';
+import { isEmpty } from 'lodash';
 import { Env } from '../../config/env';
 import TYPES from '../../config/types';
 import { IFhirServer } from '../../models';
@@ -34,7 +35,7 @@ export class FhirServerService implements IFhirServer {
   @inject(TYPES.FhirResourceService)
   private readonly fhirResourceService: FhirResourceService;
 
-  private static chooseMethodFromConnectionName(connectionName: string): string {
+  private static chooseMethodFromConnectionName(connectionName = 'lafia'): string {
     let [part1, part2] = connectionName.toLowerCase().split('fhir');
     let others = ''
 
@@ -46,6 +47,88 @@ export class FhirServerService implements IFhirServer {
     return `${part1}Fhir${others}`
   }
 
+  private static extractYear(date: string) {
+    return new Date(date).getFullYear();
+  }
+
+  private async fetchResource(fetchProps: FetchProps): Promise<any>{
+    let { resourceQuery, selectMethod, fetchSampleResource, token, data } = fetchProps;
+    try {
+      let resourceData: any = {};
+
+      if (fetchSampleResource) {
+        resourceData.data = await this.fetchSampleResources(resourceQuery);
+      } else {
+        // @ts-ignore
+        resourceData = await this[selectMethod](
+          resourceQuery,
+          'GET',
+          { token }
+        );
+      }
+
+      return resourceData.data;
+    } catch (e) {
+    const [resourceName,] = resourceQuery.split('?');
+      data.failed.push({ resourceName, message: e.message });
+      console.log(`Error fetching ${resourceQuery} resource:`, e.message);
+    }
+  }
+
+  private static groupResource(resourceData: any, data: AggregatedData, resourceDateField: string, resourceName: string) {
+    for (let entry of resourceData?.entry) {
+
+      const date = entry.resource ? entry.resource[resourceDateField] : entry[resourceDateField];
+
+      const entryResource = entry?.resource ? entry.resource : entry;
+
+      if (date) {
+        const year = FhirServerService.extractYear(date);
+
+        if (data.groupedEntries[year]) {
+          // @ts-ignore
+          data.groupedEntries[year].push({ resourceName, resourceValue: entryResource });
+        } else {
+          data.groupedEntries[year] = [{ resourceName, resourceValue: entryResource }];
+        }
+      } else {
+        data.ungroupedEntries.push(entryResource);
+      }
+    }
+  }
+
+  private static organizeResourceByDate(data: AggregatedData) {
+    const resourceByDates: IndexAccessor | any = {};
+
+    for (let year in data.groupedEntries) {
+
+      const resourceEntries: IndexAccessor = {}
+      for (const entry of data.groupedEntries[year]) {
+
+        if (resourceEntries[entry.resourceName]) {
+          resourceEntries[entry.resourceName].push(entry.resourceValue);
+        } else {
+          resourceEntries[entry.resourceName] = [entry.resourceValue];
+        }
+      }
+
+      if (resourceByDates[year]) {
+        resourceByDates[year].push(resourceEntries);
+      } else {
+        resourceByDates[year] = [resourceEntries];
+      }
+    }
+
+    if (!isEmpty(resourceByDates)) data.grouped = [resourceByDates];
+
+    const grouped = [];
+
+    for (let year in data.grouped[0]) {
+      grouped.push({ [year]: data.grouped[0][year] });
+    }
+
+    data.grouped = grouped;
+  }
 
   public async executeQuery(resourceQuery: string, httpMethod: Method, props: FhirProperties = {}): Promise<any> {
     try {
@@ -117,19 +200,106 @@ export class FhirServerService implements IFhirServer {
 
   public async fetchSampleResources(resourceName: string): Promise<any> {
     try {
-      const fhirSampleResources = await this.fhirResourceService.getOneFhirResource({ slug: resourceName.toLocaleLowerCase()});
+      const fhirSampleResources = await this.fhirResourceService.getOneFhirResource({ slug: resourceName.toLocaleLowerCase() });
 
       return fhirSampleResources?.examples;
     } catch (e: any) {
       throw new GenericResponseError(e.message, e.response);
     }
   }
+
+  public async aggregateFhirData(props: FhirProperties): Promise<any> {
+    const { connectionName, token, patient_id } = props;
+    const data: AggregatedData = {
+      grouped: [],
+      ungrouped: [],
+      groupedEntries: {},
+      ungroupedEntries: [],
+      failed: [],
+    }
+
+    let fetchSampleResource = false;
+    if (connectionName?.toLowerCase() === 'test' || connectionName?.toLocaleLowerCase() === 'sample') {
+      fetchSampleResource = true;
+    }
+
+      const selectMethod = FhirServerService.chooseMethodFromConnectionName(connectionName!);
+
+    const resourceDateFieldAndReference: IndexAccessor = {
+      Procedure: ['performedDateTime', 'subject'],
+      Condition: ['recordedDate', 'subject'],
+      Observation: ['issued', 'subject'],
+      DiagnosticReport: ['issued', 'subject'],
+      MedicationDispense: ['whenHandedOver', 'subject'],
+      Medication: ['', ''],
+      Immunization: ['occurrenceDateTime', 'patient'],
+      DocumentReference: ['date', 'subject'],
+      AllergyIntolerance: ['recordedDate', 'patient'],
+      MedicationRequest: ['authoredOn', 'subject'],
+    }
+
+    const resourceNames = [
+      'Procedure', 'Condition',
+      'Observation', 'DiagnosticReport',
+      'MedicationDispense', 'Medication',
+      'Immunization', 'DocumentReference',
+      'AllergyIntolerance', 'MedicationRequest'
+    ];
+
+    for (let resourceName of resourceNames) {
+      const [resourceDateField, resourceReference] = resourceDateFieldAndReference[resourceName];
+      const searchParam = resourceReference ? `${resourceReference}=Patient/${patient_id}` : '';
+
+      let resourceQuery = !connectionName || connectionName?.toLocaleLowerCase() === 'lafia' ?
+        `${resourceName}?${searchParam}` : `${resourceName}`;
+
+      const resourceData = await this.fetchResource({ resourceQuery, selectMethod, token, fetchSampleResource, data });
+
+      if (resourceData?.entry) {
+        FhirServerService.groupResource(resourceData, data, resourceDateField, resourceName);
+      }
+
+      if (data.ungroupedEntries.length) {
+        data.ungrouped.push({ [resourceName]: data.ungroupedEntries });
+        data.ungroupedEntries = [];
+      }
+
+      FhirServerService.organizeResourceByDate(data);
+    }
+
+    return {
+      failed: data.failed,
+      ungrouped: data.ungrouped,
+      grouped: data.grouped || [],
+    }
+
+  }
 }
 
+interface FetchProps {
+  resourceQuery: string;
+  selectMethod: any;
+  data: AggregatedData;
+  fetchSampleResource?: boolean
+  token?: string;
+}
 
 export interface FhirProperties {
   data?: any,
   token?: string,
   connectionName?: string,
   ig?: string,
+  patient_id?: string,
+}
+
+interface IndexAccessor {
+  [key: string]: string[] | any;
+}
+
+interface AggregatedData {
+  grouped: IndexAccessor[],
+  ungrouped: IndexAccessor[],
+  groupedEntries: IndexAccessor,
+  failed: IndexAccessor[],
+  ungroupedEntries: any[],
 }

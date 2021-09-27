@@ -19,6 +19,30 @@ export class FhirServerController extends BaseController {
   @inject(TYPES.FhirServerService)
   private readonly fhirServerService: FhirServerService;
 
+  @httpGet('/Aggregate', TYPES.AuthMiddleware)
+  public async getFhirResourceAggregatedData(@request() req: Request, @response() res: Response) {
+    try {
+      const { user } = res.locals;
+      const {
+        'x-oauth': token,
+        'x-connection-name': connectionName,
+        'x-ig': ig,
+      } = res.locals?.connection;
+
+      const props: FhirProperties = {
+        token, connectionName, ig,
+        patient_id: user.id,
+      };
+      let resource: any;
+
+      resource = await this.fhirServerService.aggregateFhirData(props);
+
+      this.success(res, resource, 'Data aggregated successfully');
+    } catch (e: any) {
+      this.error(res, e);
+    }
+  }
+
   @httpGet('*')
   public async fhirResourceGetMethode(@request() req: Request, @response() res: Response) {
     try {
