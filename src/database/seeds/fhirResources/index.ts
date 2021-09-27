@@ -32,7 +32,6 @@ import {
   procedureBundle,
   provenanceBundle
 } from '../fhirSampleBundles';
-import { getListOfImplementationsGuides } from '../implementationGuides';
 
 export const fhirResource: IFhirResource[] = [
   {

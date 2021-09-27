@@ -60,6 +60,12 @@ export class AuthService {
     }
   }
 
+  public getHttpsAgent() {
+    return new https.Agent({
+      rejectUnauthorized: false,
+    });
+  }
+
   public getConnectionCredentials(connectionName: string) {
 
     if (!connectionName) {
