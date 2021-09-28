@@ -51,7 +51,7 @@ export class FhirServerService implements IFhirServer {
     return new Date(date).getFullYear();
   }
 
-  private async fetchResource(fetchProps: FetchProps): Promise<any>{
+  private async fetchResource(fetchProps: FetchProps): Promise<any> {
     let { resourceQuery, selectMethod, fetchSampleResource, token, data } = fetchProps;
     try {
       let resourceData: any = {};
@@ -69,7 +69,7 @@ export class FhirServerService implements IFhirServer {
 
       return resourceData.data;
     } catch (e) {
-    const [resourceName,] = resourceQuery.split('?');
+      const [resourceName,] = resourceQuery.split('?');
       data.failed.push({ resourceName, message: e.message });
       console.log(`Error fetching ${resourceQuery} resource:`, e.message);
     }
@@ -122,9 +122,22 @@ export class FhirServerService implements IFhirServer {
     if (!isEmpty(resourceByDates)) data.grouped = [resourceByDates];
 
     const grouped = [];
+    const groupedData = data.grouped[0]
+    let groupedYear: IndexAccessor = {};
 
-    for (let year in data.grouped[0]) {
-      grouped.push({ [year]: data.grouped[0][year] });
+    for (let year in groupedData) {
+      groupedYear[year] = [];
+      for (let data of groupedData[year]) {
+        for (let resourceName in data) {
+          groupedYear[year].push({
+            resourceName,
+            resourceValue: data[resourceName]
+          });
+        }
+      }
+
+      grouped.push(groupedYear)
+      groupedYear = {}
     }
 
     data.grouped = grouped;
@@ -223,7 +236,7 @@ export class FhirServerService implements IFhirServer {
       fetchSampleResource = true;
     }
 
-      const selectMethod = FhirServerService.chooseMethodFromConnectionName(connectionName!);
+    const selectMethod = FhirServerService.chooseMethodFromConnectionName(connectionName!);
 
     const resourceDateFieldAndReference: IndexAccessor = {
       Procedure: ['performedDateTime', 'subject'],
@@ -260,7 +273,7 @@ export class FhirServerService implements IFhirServer {
       }
 
       if (data.ungroupedEntries.length) {
-        data.ungrouped.push({ [resourceName]: data.ungroupedEntries });
+        data.ungrouped.push({ resourceName, resourceValue: data.ungroupedEntries });
         data.ungroupedEntries = [];
       }
 

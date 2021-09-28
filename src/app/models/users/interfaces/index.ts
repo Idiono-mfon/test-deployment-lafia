@@ -17,6 +17,7 @@ export interface IUser extends IBase {
   token?: string;
   phone?: string;
   photo?: string;
+  provider?: string;
   hasVerifiedPhone?: boolean;
   hasVerifiedEmail?: boolean;
   has_verified_phone?: boolean;
@@ -40,6 +41,7 @@ export interface IFindUser extends IBase {
   token?: string;
   phone?: string;
   photo?: string;
+  provider?: string;
   hasVerifiedPhone?: boolean;
   hasVerifiedEmail?: boolean;
   has_verified_phone?: boolean;
