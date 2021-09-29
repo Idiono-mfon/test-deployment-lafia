@@ -136,7 +136,9 @@ export class FhirServerService implements IFhirServer {
         }
       }
 
-      grouped.push(groupedYear)
+
+
+      grouped.push({ year, data: groupedYear[year] });
       groupedYear = {}
     }
 
