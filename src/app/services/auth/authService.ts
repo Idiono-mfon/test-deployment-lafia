@@ -43,6 +43,10 @@ export class AuthService {
         delete loggedInUser.photo;
       }
 
+      if (loggedInUser.provider === null) {
+        delete loggedInUser.provider;
+      }
+
       if (loggedInUser.resourceType === forWho.patient) {
         loggedInUserData = await this.patientService.patientLogin({ user: loggedInUser, token });
       }
