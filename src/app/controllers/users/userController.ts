@@ -43,7 +43,7 @@ export class UserController extends BaseController {
   @httpGet('/photo', TYPES.AuthMiddleware)
   public async getUserPhoto(@request() req: Request, @response() res: Response) {
     try {
-      const user = await this.userService.getOneUser({id: req.body.user.id});
+      const user = await this.userService.getOneUser({resource_id: req.body.user.id});
 
       this.success(res, user.photo, 'Photo fetched', HttpStatusCode.OK);
     } catch (e: any) {
