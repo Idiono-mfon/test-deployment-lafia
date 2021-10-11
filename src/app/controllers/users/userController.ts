@@ -54,8 +54,12 @@ export class UserController extends BaseController {
   @httpPost('/photo', TYPES.AuthMiddleware)
   public async updatePhoto(@request() req: Request, @response() res: Response) {
     try {
+      const id = req.body.user.id;
+      if ( req.body.user ) {
+        delete req.body.user;
+      }
       const photo: IUserPhoto = req.body
-      const user = await this.userService.updateUser(req.body.user.id, photo);
+      const user = await this.userService.updateUser( id, photo );
 
       this.success(res, user, 'Photo updated', HttpStatusCode.CREATED);
     } catch (e: any) {
