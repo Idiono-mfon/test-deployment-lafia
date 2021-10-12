@@ -47,8 +47,8 @@ export class UserRepository {
     try {
       return await UserModel.query()
         .patch(data)
-        .where({ id })
-        .orWhere({ resource_id: id })
+        // .where({ id })
+        .where({ resource_id: id })
         .returning("*")
         .first()
         ;
