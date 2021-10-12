@@ -5,7 +5,7 @@ import { isEmpty } from 'lodash';
 import { Env } from '../../config/env';
 import TYPES from '../../config/types';
 import { IFhirServer } from '../../models';
-import { GenericResponseError } from '../../utils';
+import { GenericResponseError, logger } from '../../utils';
 import { FhirResourceService } from '../resources';
 
 const env = Env.all();
@@ -36,6 +36,7 @@ export class FhirServerService implements IFhirServer {
   private readonly fhirResourceService: FhirResourceService;
 
   private static chooseMethodFromConnectionName(connectionName = 'lafia'): string {
+    logger.info('Executing FhirServerService::chooseMethodFromConnectionName');
     let [part1, part2] = connectionName.toLowerCase().split('fhir');
     let others = ''
 
@@ -48,10 +49,12 @@ export class FhirServerService implements IFhirServer {
   }
 
   private static extractYear(date: string) {
+    logger.info('Executing FhirServerService::extractYear');
     return new Date(date).getFullYear();
   }
 
   private async fetchResource(fetchProps: FetchProps): Promise<any> {
+    logger.info('Executing FhirServerService::fetchResource');
     let { resourceQuery, selectMethod, fetchSampleResource, token, data } = fetchProps;
     try {
       let resourceData: any = {};
@@ -71,11 +74,12 @@ export class FhirServerService implements IFhirServer {
     } catch (e) {
       const [resourceName,] = resourceQuery.split('?');
       data.failed.push({ resourceName, message: e.message });
-      console.log(`Error fetching ${resourceQuery} resource:`, e.message);
+      logger.error(`Error fetching ${resourceQuery} resource: ${e.message}`);
     }
   }
 
   private static groupResource(resourceData: any, data: AggregatedData, resourceDateField: string, resourceName: string) {
+    logger.info('Executing FhirServerService::groupResource');
     for (let entry of resourceData?.entry) {
 
       const date = entry.resource ? entry.resource[resourceDateField] : entry[resourceDateField];
@@ -98,6 +102,7 @@ export class FhirServerService implements IFhirServer {
   }
 
   private static organizeResourceByDate(data: AggregatedData) {
+    logger.info('Executing FhirServerService::organizeResourceByDate');
     const resourceByDates: IndexAccessor | any = {};
 
     for (let year in data.groupedEntries) {
@@ -146,6 +151,7 @@ export class FhirServerService implements IFhirServer {
   }
 
   public async executeQuery(resourceQuery: string, httpMethod: Method, props: FhirProperties = {}): Promise<any> {
+    logger.info('Executing FhirServerService::executeQuery');
     try {
       let { connectionName } = props!;
 
@@ -157,11 +163,13 @@ export class FhirServerService implements IFhirServer {
       return await this[selectMethod](resourceQuery, httpMethod, props);
 
     } catch (e: any) {
+      logger.error(`Unable to execute fhir resource Query: ${e}`)
       throw new GenericResponseError(e.message, e.code);
     }
   }
 
   public async lafiaFhir(resourceQuery: string, httpMethod: Method, props?: FhirProperties): Promise<any> {
+    logger.info('Executing FhirServerService::lafiaFhir');
     try {
       const { data } = props!;
       const { status, data: responseData, headers } = await axiosInstance({
@@ -182,11 +190,13 @@ export class FhirServerService implements IFhirServer {
     } catch (e: any) {
       delete e.response.headers['transfer-encoding'];
       e.response.headers['x-powered-by'] = 'LAFIA FHIR 5.4.0 REST Server (FHIR Server; FHIR 4.0.1/R4)';
+      logger.error(`Could not fetch lafia resource: ${e}`);
       throw new GenericResponseError(e.message, e.response);
     }
   }
 
   public async saFhir(resourceQuery: string, httpMethod: Method, props?: FhirProperties): Promise<any> {
+    logger.info('Executing FhirServerService::saFhir');
     try {
       let { data, token, ig } = props!;
 
@@ -208,22 +218,26 @@ export class FhirServerService implements IFhirServer {
         headers: { 'Content-Type': 'application/fhir+json' }
       };
     } catch (e: any) {
+      logger.error(`Could not fetch safhir resource: ${e}`);
       e.response.headers['content-type'] = 'application/fhir+json';
       throw new GenericResponseError(e.message, e.response);
     }
   }
 
   public async fetchSampleResources(resourceName: string): Promise<any> {
+    logger.info('Executing FhirServerService::fetchSampleResources');
     try {
       const fhirSampleResources = await this.fhirResourceService.getOneFhirResource({ slug: resourceName.toLocaleLowerCase() });
 
       return fhirSampleResources?.examples;
     } catch (e: any) {
+      logger.error(`Error fetching sample resources: ${e}`);
       throw new GenericResponseError(e.message, e.response);
     }
   }
 
   public async aggregateFhirData(props: FhirProperties): Promise<any> {
+    logger.info('Executing FhirServerService::aggregateFhirData');
     const { connectionName, token, patient_id } = props;
     const data: AggregatedData = {
       grouped: [],

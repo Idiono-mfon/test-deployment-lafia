@@ -10,7 +10,7 @@ import {
 import { Request, Response } from 'express';
 import TYPES from '../../config/types';
 import { AuthService } from '../../services';
-import { error, throwError } from '../../utils';
+import { error, logger, throwError } from '../../utils';
 import { BaseController } from '../baseController';
 import { passport } from '../..';
 
@@ -21,18 +21,21 @@ export class AuthController extends BaseController {
 
   @httpPost('/auth/login')
   public async login(@request() req: Request, @response() res: Response): Promise<void> {
+    logger.info('Executing AuthController::login');
     try {
       const { email, password } = req.body;
       const userData = await this.authService.login(email, password, req);
 
       this.success(res, userData, 'Login Successful');
     } catch (e: any) {
+      logger.error(`Unable to login: ${e.message}`);
       this.error(res, e);
     }
   }
 
   @httpGet('/auth/safhir')
   public getSaFHirAuth(@request() req: Request, @response() res: Response) {
+    logger.info('Executing AuthController::getSaFHirAuth');
     const state = req.query.state as string;
 
     try {
@@ -42,12 +45,14 @@ export class AuthController extends BaseController {
 
       passport.authenticate('oauth2', { state })(req, res);
     } catch (e: any) {
+      logger.error(`Unable to authenticate with safhir: e.message`);
       this.error(res, e);
     }
   }
 
   @httpGet('/safhir', passport.authenticate('oauth2', { failureRedirect: `https://app.lafia.io/safhir?status=error` }))
   public async getSaFHirToken(@request() req: Request, @response() res: Response) {
+    logger.info('Executing FhirServerController::getSaFHirToken');
     try {
       const state = req.query.state as string;
       const [stateValue,] = state?.split('?')!;
@@ -81,27 +86,14 @@ export class AuthController extends BaseController {
 
       res.redirect(redirectURL);
     } catch (e: any) {
-      this.error(res, e);
-    }
-  }
-
-  @httpGet('/auth/safhir/token/refresh', passport.authenticate('refresh_token', { session: false }))
-  public refreshSaFHirToken(@request() req: Request, @response() res: Response) {
-    try {
-      // generate new tokens for req.user
-      // @ts-ignore
-      console.log('Token:', token);
-      // @ts-ignore
-      console.log('Tokens:', tokens);
-      // @ts-ignore
-      res.json(tokens);
-    } catch (e: any) {
+      logger.error(`Unable to get SaFHIR token:: ${e.message}`);
       this.error(res, e);
     }
   }
 
   @httpGet('/connections')
   public async getConnections(@request() req: Request, @response() res: Response) {
+    logger.info('Executing FhirServerController::getConnections');
     try {
       const { state } = req.query;
 
@@ -113,18 +105,21 @@ export class AuthController extends BaseController {
 
       this.success(res, connections, 'Connections retrieved successfully');
     } catch (e: any) {
+      logger.error(`Unable to get SaFHIR Connections: ${e.message}`);
       this.error(res, e);
     }
   }
 
   @httpDelete('/connections/:id')
   public async deleteConnection(@request() req: Request, @response() res: Response) {
+    logger.info('Executing FhirServerController::deleteConnection');
     try {
       const { id } = req.params;
       const connections = await this.authService.deleteConnection(id);
 
       this.success(res, connections, 'Connection deleted successfully');
     } catch (e: any) {
+      logger.error(`Unable to delete a connection: ${e.message}`);
       this.error(res, e);
     }
   }
