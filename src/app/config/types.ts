@@ -52,9 +52,12 @@ const TYPES = {
   ConnectionRepository: Symbol('ConnectionRepository'),
   ImplementationGuideRepository: Symbol('ImplementationGuideRepository'),
   FhirResourceRepository: Symbol('FhirResourceRepository'),
-  
+
   // middlewares
   AuthMiddleware: Symbol('AuthMiddleware'),
+
+  // Utils
+  TokenUtil: Symbol('TokenUtil'),
 };
 
 export default TYPES;

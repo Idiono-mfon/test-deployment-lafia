@@ -11,23 +11,54 @@ import {
   response
 } from 'inversify-express-utils';
 import TYPES from '../../config/types';
-import { FhirProperties, FhirServerService } from '../../services';
+import { AuthService, FhirProperties, FhirServerService } from '../../services';
+import { error, throwError, TokenUtil } from '../../utils';
 import { BaseController } from '../baseController';
 
 @controller('/fhir')
 export class FhirServerController extends BaseController {
   @inject(TYPES.FhirServerService)
   private readonly fhirServerService: FhirServerService;
+  @inject(TYPES.AuthService)
+  private readonly authService: AuthService;
+  @inject(TYPES.TokenUtil)
+  private readonly tokenUtil: TokenUtil;
 
   @httpGet('/Aggregate', TYPES.AuthMiddleware)
   public async getFhirResourceAggregatedData(@request() req: Request, @response() res: Response) {
     try {
       const { user } = res.locals;
-      const {
+      let {
         'x-oauth': token,
         'x-connection-name': connectionName,
         'x-ig': ig,
       } = res.locals?.connection;
+
+
+      // Refresh access_token if it's expired
+      const isTokenExpired = this.tokenUtil.isTokenExpired(token);
+      let accessToken: string;
+
+      if (isTokenExpired) {
+        try {
+          const connection = await this.authService.getConnectionByFields({ access_token: token });
+
+          if (!connection) {
+            throwError('Could not verify connection with the access token', error.forbidden)
+          }
+
+          const { access_token } = await this.tokenUtil.refresh(connection.refreshToken!);
+
+          accessToken = access_token;
+        } catch (e) {
+          throwError('Could not refresh access token', error.forbidden);
+        }
+      }
+
+      // @ts-ignore
+      if (accessToken) {
+        token = accessToken;
+      }
 
       const props: FhirProperties = {
         token, connectionName, ig,
@@ -36,6 +67,9 @@ export class FhirServerController extends BaseController {
       let resource: any;
 
       resource = await this.fhirServerService.aggregateFhirData(props);
+
+      // @ts-ignore
+      resource = accessToken ? { access_token: accessToken, ...resource } : { ...resource };
 
       this.success(res, resource, 'Data aggregated successfully');
     } catch (e: any) {

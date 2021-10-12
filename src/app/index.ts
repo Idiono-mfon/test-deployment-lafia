@@ -44,7 +44,6 @@ server.setConfig((app) => {
   refreshOauth2Token.use(saFhirStrategy, {
     // @ts-ignore
     setRefreshOAuth2({ strategyOAuth2, refreshOAuth2 }) {
-      console.log(strategyOAuth2);
       // These named parameters are set for most strategies.
       // The `refreshOAuth2` instance is a clone of the one supplied by the strategy, inheriting most of its config.
       // Customise it here and return if necessary.
@@ -53,32 +52,6 @@ server.setConfig((app) => {
       return refreshOAuth2;
     },
   });
-
-  refreshOauth2Token.requestNewAccessToken(
-    'oauth2',
-    'eyJhbGciOiJSUzI1NiIsImtpZCI6IjU3MjA0RUQ4MEM0RDFCMkJCODA2MDg5MzM5MkFCMjIxMzZFNkVGNzQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL295c2ZkbWRodDMxdGVuYW50YjJjLmIyY2xvZ2luLmNvbS83ZWRlMmQwMS1mYjAyLTRhZDItYTVkYS1jMmZiMjU4NTI3YWYvdjIuMC8iLCJleHAiOjE2MzI0NDkwODgsIm5iZiI6MTYzMjQ0NTQ4OCwiYXVkIjoiNzQwYTUxYTctNGYwMi00MmIyLTg5ODctOTNjMTBjMDAxZTQ3IiwiZW1haWwiOiJ0ZXN0MzAwODFAZG1kLmNvbSIsIm5hbWUiOiJBbmdlbGlhIEFiZXJuYXRoeSIsImlkcCI6Imh0dHBzOi8vZGV2LTE0NjUzMjkub2t0YS5jb20vb2F1dGgyL2RlZmF1bHQiLCJzdWIiOiI0OTVmOWQxMy1jZjMwLTQ3MTEtYjM1YS04NDIxNGI5N2M5OWIiLCJNZW1iZXJJZCI6IjFiNDVjZTNiLWYxYjctNGVjMC1iNGFlLWQ3Yzk1YTFjY2RkMCIsImZoaXJVc2VyIjoiaHR0cHM6Ly9hcGktZG1kaC10MzEuc2FmaGlyLmlvL3YxL2FwaS9maGlyVXNlci9QYXRpZW50LzdjZjA3N2U4LTRlNTUtNDJkMC1hZTk1LTVlMjI1NTExYWI0MyIsInRpZCI6IjdlZGUyZDAxLWZiMDItNGFkMi1hNWRhLWMyZmIyNTg1MjdhZiIsInNjcCI6InBhdGllbnQvQWxsZXJneUludG9sZXJhbmNlLnJlYWQgcGF0aWVudC9DYXJlUGxhbi5yZWFkIHBhdGllbnQvQ2FyZVRlYW0ucmVhZCBwYXRpZW50L0NvbmRpdGlvbi5yZWFkIHBhdGllbnQvRGV2aWNlLnJlYWQgcGF0aWVudC9EaWFnbm9zdGljUmVwb3J0LnJlYWQgcGF0aWVudC9Eb2N1bWVudFJlZmVyZW5jZS5yZWFkIHBhdGllbnQvRW5jb3VudGVyLnJlYWQgcGF0aWVudC9Hb2FsLnJlYWQgcGF0aWVudC9JbW11bml6YXRpb24ucmVhZCBwYXRpZW50L0xvY2F0aW9uLnJlYWQgcGF0aWVudC9NZWRpY2F0aW9uLnJlYWQgcGF0aWVudC9NZWRpY2F0aW9uUmVxdWVzdC5yZWFkIHBhdGllbnQvT2JzZXJ2YXRpb24ucmVhZCBwYXRpZW50L09yZ2FuaXphdGlvbi5yZWFkIHBhdGllbnQvUGF0aWVudC5yZWFkIHBhdGllbnQvUHJhY3RpdGlvbmVyLnJlYWQgcGF0aWVudC9QcmFjdGl0aW9uZXJSb2xlLnJlYWQgcGF0aWVudC9Qcm9jZWR1cmUucmVhZCBwYXRpZW50L1Byb3ZlbmFuY2UucmVhZCBvcGVuaWQgb2ZmbGluZV9hY2Nlc3MgbGF1bmNoL3BhdGllbnQgZmhpclVzZXIiLCJhenAiOiJjMTMxN2E0Ni1hMDQ4LTQ0MDItYTE4MS0yMjIxZmFjNGZjOTkiLCJ2ZXIiOiIxLjAiLCJpYXQiOjE2MzI0NDU0ODh9.CK3voNxUjz7tic8rvb_3MmboQ2GN-rAHuPGFruVfsPN7m0qjCqemqwaukbx29el0clirfwM_QSwgvtBXaqYZszKuJBO30Jl2rdljk7qlRETJWz367afjN8rO1GPk4BFFu6aWfkaXefV95xflq9Cu-l-S1xL_OePwgUP00cHGu0Iwm8c6-HRBfqht8rJ_pmeENTWY33r1D2xN9Cx0O05dSyH2EyJOJu3hS-QBiMqX4piBmIampezq1znaoUMmhvIUtO9zEyc6RLdn64-U90ZMTxQg_CHnkpBFXbikpElhvWrtOE7nIQFcSeQb-vQG1-Yd4dDtR4RpEU-Rl3ygNTyAhg',
-    (err: any, accessToken: string, refreshToken: string, result: any) => {
-
-      // console.log({
-      //   err: err.message,
-      //   accessToken,
-      //   refreshToken,
-      //   result,
-      // })
-
-      return {
-        err,
-        accessToken,
-        refreshToken,
-        result,
-      }
-      // You have a new access token, store it in the user object,
-      // or use it to make a new request.
-      // `refreshToken` may or may not exist, depending on the strategy you are using.
-      // You probably don't need it anyway, as according to the OAuth 2.0 spec,
-      // it should be the same as the initial refresh token.
-    },
-  );
 
   passport.serializeUser((user, done) => done(null, user));
 
@@ -104,4 +77,4 @@ const signallingServer = new SignallingServerService(
 );
 signallingServer.initialize();
 
-export { app, passport };
+export { app, passport, refreshOauth2Token };

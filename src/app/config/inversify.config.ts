@@ -52,7 +52,7 @@ import {
   ImplementationGuideService,
   FhirResourceService
 } from '../services';
-import { UtilityService } from '../utils';
+import { TokenUtil, UtilityService } from '../utils';
 import TYPES from './types';
 
 const container = new Container();
@@ -257,6 +257,12 @@ container
 container
   .bind<AuthMiddleware>(TYPES.AuthMiddleware)
   .to(AuthMiddleware)
+  .inSingletonScope();
+
+// Utils
+container
+  .bind<TokenUtil>(TYPES.TokenUtil)
+  .to(TokenUtil)
   .inSingletonScope();
 
 export default container;

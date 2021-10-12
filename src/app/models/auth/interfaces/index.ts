@@ -5,6 +5,9 @@ export interface IConnection extends IBase {
   access_token: string;
   refresh_token?: string;
   connection_name?: string;
+  accessToken?: string;
+  refreshToken?: string;
+  connectionName?: string;
 }
 
 export interface IFindConnection extends IBase {
@@ -12,4 +15,7 @@ export interface IFindConnection extends IBase {
   access_token?: string;
   refresh_token?: string;
   connection_name?: string;
+  accessToken?: string;
+  refreshToken?: string;
+  connectionName?: string;
 }
