@@ -46,7 +46,12 @@ export class UserRepository {
   public async updateUser(id: string, data: IFindUser): Promise<any> {
     try {
       return await UserModel.query()
-        .patchAndFetchById(id, data);
+        .patch(data)
+        .where({ id })
+        .orWhere({ resource_id: id })
+        .returning("*")
+        .first()
+        ;
     } catch (e: any) {
       throw new InternalServerError(e.message);
     }
