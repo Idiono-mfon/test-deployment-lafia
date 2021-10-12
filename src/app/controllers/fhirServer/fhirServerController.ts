@@ -11,21 +11,20 @@ import {
   response
 } from 'inversify-express-utils';
 import TYPES from '../../config/types';
-import { AuthService, FhirProperties, FhirServerService } from '../../services';
-import { error, throwError, TokenUtil } from '../../utils';
+import { FhirProperties, FhirServerService } from '../../services';
+import { error, logger, throwError, TokenUtil } from '../../utils';
 import { BaseController } from '../baseController';
 
 @controller('/fhir')
 export class FhirServerController extends BaseController {
   @inject(TYPES.FhirServerService)
   private readonly fhirServerService: FhirServerService;
-  @inject(TYPES.AuthService)
-  private readonly authService: AuthService;
   @inject(TYPES.TokenUtil)
   private readonly tokenUtil: TokenUtil;
 
   @httpGet('/Aggregate', TYPES.AuthMiddleware)
   public async getFhirResourceAggregatedData(@request() req: Request, @response() res: Response) {
+    logger.info('Executing FhirServerController::getFhirResourceAggregatedData');
     try {
       const { user } = res.locals;
       let {
@@ -36,23 +35,15 @@ export class FhirServerController extends BaseController {
 
 
       // Refresh access_token if it's expired
-      const isTokenExpired = this.tokenUtil.isTokenExpired(token);
       let accessToken: string;
-
-      if (isTokenExpired) {
-        try {
-          const connection = await this.authService.getConnectionByFields({ access_token: token });
-
-          if (!connection) {
-            throwError('Could not verify connection with the access token', error.forbidden)
-          }
-
-          const { access_token } = await this.tokenUtil.refresh(connection.refreshToken!);
+      try {
+        if (token) {
+          const { access_token } = await this.tokenUtil.refreshAccessToken(token) as { access_token: string };
 
           accessToken = access_token;
-        } catch (e) {
-          throwError('Could not refresh access token', error.forbidden);
         }
+      } catch (e) {
+        throwError('Could not refreshAccessToken access token', error.forbidden);
       }
 
       // @ts-ignore
@@ -73,19 +64,36 @@ export class FhirServerController extends BaseController {
 
       this.success(res, resource, 'Data aggregated successfully');
     } catch (e: any) {
+      logger.error(e.message)
       this.error(res, e);
     }
   }
 
   @httpGet('*')
   public async fhirResourceGetMethode(@request() req: Request, @response() res: Response) {
+    logger.info('Executing FhirServerController::fhirResourceGetMethode');
     try {
-      const {
+      let {
         'x-oauth': token,
         'x-connection-name': connectionName,
         'x-ig': ig,
         'x-test-resource': resourceName
       } = res.locals?.connection;
+
+      // Refresh access_token if it's expired
+      let accessToken: string;
+      try {
+        const { access_token } = await this.tokenUtil.refreshAccessToken(token) as { access_token: string };
+
+        accessToken = access_token;
+      } catch (e) {
+        throwError('Could not refreshAccessToken access token', error.forbidden);
+      }
+
+      // @ts-ignore
+      if (accessToken) {
+        token = accessToken;
+      }
 
       if (resourceName) {
         const sampleResource = await this.fhirServerService.fetchSampleResources(resourceName);
@@ -115,8 +123,25 @@ export class FhirServerController extends BaseController {
 
   @httpPost('*')
   public async fhirResourcePostMethode(@request() req: Request, @response() res: Response) {
+    logger.info('Executing FhirServerController::fhirResourcePostMethode');
     try {
-      const { 'x-oauth': token, 'x-connection-name': connectionName, ig } = res.locals?.connection;
+      let { 'x-oauth': token, 'x-connection-name': connectionName, ig } = res.locals?.connection;
+
+      // Refresh access_token if it's expired
+      let accessToken: string;
+      try {
+        const { access_token } = await this.tokenUtil.refreshAccessToken(token) as { access_token: string };
+
+        accessToken = access_token;
+      } catch (e) {
+        throwError('Could not refreshAccessToken access token', error.forbidden);
+      }
+
+      // @ts-ignore
+      if (accessToken) {
+        token = accessToken;
+      }
+
       const props: FhirProperties = {
         token,
         connectionName,
@@ -139,8 +164,28 @@ export class FhirServerController extends BaseController {
 
   @httpPut('*')
   public async fhirResourcePutMethode(@request() req: Request, @response() res: Response) {
+    logger.info('Executing FhirServerController::fhirResourcePutMethode');
     try {
-      const { 'x-oauth': token, 'x-connection-name': connectionName, ig } = res.locals?.connection;
+      let {
+        'x-oauth': token,
+        'x-connection-name': connectionName, ig,
+      } = res.locals?.connection;
+
+      // Refresh access_token if it's expired
+      let accessToken: string;
+      try {
+        const { access_token } = await this.tokenUtil.refreshAccessToken(token) as { access_token: string };
+
+        accessToken = access_token;
+      } catch (e) {
+        throwError('Could not refreshAccessToken access token', error.forbidden);
+      }
+
+      // @ts-ignore
+      if (accessToken) {
+        token = accessToken;
+      }
+
       const props: FhirProperties = {
         token,
         connectionName,
@@ -163,8 +208,25 @@ export class FhirServerController extends BaseController {
 
   @httpPatch('*')
   public async fhirResourcePatchMethode(@request() req: Request, @response() res: Response) {
+    logger.info('Executing FhirServerController::fhirResourcePatchMethode');
     try {
-      const { 'x-oauth': token, 'x-connection-name': connectionName, ig } = res.locals?.connection;
+      let { 'x-oauth': token, 'x-connection-name': connectionName, ig } = res.locals?.connection;
+
+      // Refresh access_token if it's expired
+      let accessToken: string;
+      try {
+        const { access_token } = await this.tokenUtil.refreshAccessToken(token) as { access_token: string };
+
+        accessToken = access_token;
+      } catch (e) {
+        throwError('Could not refreshAccessToken access token', error.forbidden);
+      }
+
+      // @ts-ignore
+      if (accessToken) {
+        token = accessToken;
+      }
+
       const props: FhirProperties = {
         token,
         connectionName,
@@ -187,8 +249,25 @@ export class FhirServerController extends BaseController {
 
   @httpDelete('*')
   public async fhirResourceDeleteMethode(@request() req: Request, @response() res: Response) {
+    logger.info('Executing FhirServerController::fhirResourceDeleteMethode');
     try {
-      const { 'x-oauth': token, 'x-connection-name': connectionName, ig } = res.locals?.connection;
+      let { 'x-oauth': token, 'x-connection-name': connectionName, ig } = res.locals?.connection;
+
+      // Refresh access_token if it's expired
+      let accessToken: string;
+      try {
+        const { access_token } = await this.tokenUtil.refreshAccessToken(token) as { access_token: string };
+
+        accessToken = access_token;
+      } catch (e) {
+        throwError('Could not refreshAccessToken access token', error.forbidden);
+      }
+
+      // @ts-ignore
+      if (accessToken) {
+        token = accessToken;
+      }
+
       const props: FhirProperties = {
         token,
         connectionName,

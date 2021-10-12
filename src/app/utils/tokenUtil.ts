@@ -2,6 +2,8 @@ import { inject, injectable } from 'inversify';
 import TYPES from '../config/types';
 import { refreshOauth2Token } from '../index';
 import { AuthService } from '../services';
+import { error, throwError } from './errors';
+import { logger } from './loggerUtil';
 
 @injectable()
 export class TokenUtil {
@@ -9,20 +11,31 @@ export class TokenUtil {
   private readonly authService: AuthService;
 
   public isTokenExpired(token: string): boolean {
+    logger.info('Executing TokenUtil::isTokenExpired');
     return (Date.now() >= JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString()).exp * 1000)
   }
 
-  public async refresh(refreshToken: string, provider: string = 'oauth2') {
-    const existingConnection = await this.authService.getConnectionByFields({ refresh_token: refreshToken });
+  public async refreshAccessToken(token: string, provider: string = 'oauth2') {
+    logger.info('Executing TokenUtil::refreshAccessToken');
+
+    const isTokenExpired = this.isTokenExpired(token);
+
+    if (!isTokenExpired) {
+      return { access_token: token };
+    }
+
+    const existingConnection = await this.authService.getConnectionByFields({ access_token: token });
 
     return new Promise<{ access_token: string }>((resolve, reject) => {
       if (!existingConnection) {
-        return reject('Invalid refresh token provided');
+        return reject('Invalid refreshAccessToken token provided');
       }
+
+      const { refreshToken } = existingConnection;
 
       refreshOauth2Token.requestNewAccessToken(
         provider,
-        refreshToken,
+        refreshToken!,
         async (err: any, accessToken: string, refreshToken: string, result: any) => {
 
           if (err) {
@@ -34,7 +47,7 @@ export class TokenUtil {
           // or use it to make a new request.
           // `refreshToken` may or may not exist, depending on the strategy you are using.
           // You probably don't need it anyway, as according to the OAuth 2.0 spec,
-          // it should be the same as the initial refresh token.
+          // it should be the same as the initial refreshAccessToken token.
           const { access_token, refresh_token } = result;
           await this.authService.updateConnection({
             ...existingConnection,
