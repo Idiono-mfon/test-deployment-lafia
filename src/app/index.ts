@@ -3,15 +3,13 @@ import cors from 'cors';
 import { config as dotConfig } from 'dotenv';
 import express from 'express';
 import { createServer } from 'http';
-import morgan from 'morgan';
-import { logger } from './utils/loggerUtil';
 import passport from 'passport';
 import refreshOauth2Token from 'passport-oauth2-refresh';
 import container from './config/inversify.config';
 import { InversifyExpressServer } from 'inversify-express-utils';
 import { Env } from './config/env';
 import TYPES from './config/types';
-import { AuthMiddleware } from './middlewares';
+import { AuthMiddleware, morganMiddleware } from './middlewares';
 import { PatientService, PractitionerService, MessageBroker, VideoBroadcastService, AuthService } from './services';
 import { SignallingServerService } from './services/signallingServers';
 import * as swaggerUi from 'swagger-ui-express';
@@ -37,7 +35,7 @@ server.setConfig((app) => {
   app.use(cors());
   // @ts-ignore
   // eslint-disable-next-line @typescript-eslint/unbound-method
-  app.use(morgan('combined', { stream: logger.stream }));
+  app.use(morganMiddleware);
   app.use(passport.initialize());
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
     customfavIcon: 'https://lafia.io/wp-content/uploads/2021/02/lafia_logo_small.png',
