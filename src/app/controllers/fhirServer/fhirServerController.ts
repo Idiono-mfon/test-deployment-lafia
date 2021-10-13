@@ -23,18 +23,20 @@ export class FhirServerController extends BaseController {
   private readonly tokenUtil: TokenUtil;
 
   private async refreshAccessToken(token: string): Promise<string | undefined> {
+    logger.info('Running FhirServerController::refreshAccessToken');
     try {
       const { access_token } = await this.tokenUtil.refreshAccessToken(token);
 
       return access_token;
     } catch (e) {
+      logger.error(`Unable to refresh access token`);
       throwError(e.message, error.forbidden);
     }
   }
 
   @httpGet('/Aggregate', TYPES.AuthMiddleware)
   public async getFhirResourceAggregatedData(@request() req: Request, @response() res: Response) {
-    logger.info('Executing FhirServerController::getFhirResourceAggregatedData');
+    logger.info('Running FhirServerController::getFhirResourceAggregatedData');
     try {
       const { user } = res.locals;
       let {
@@ -65,14 +67,14 @@ export class FhirServerController extends BaseController {
 
       this.success(res, resource, 'Data aggregated successfully');
     } catch (e: any) {
-      logger.error(e.message)
+      logger.error(`${e.message}`);
       this.error(res, e);
     }
   }
 
   @httpGet('*')
-  public async fhirResourceGetMethode(@request() req: Request, @response() res: Response) {
-    logger.info('Executing FhirServerController::fhirResourceGetMethode');
+  public async fhirResourceGetMethod(@request() req: Request, @response() res: Response) {
+    logger.info('Running FhirServerController::fhirResourceGetMethod');
     try {
       let {
         'x-oauth': token,
@@ -111,13 +113,14 @@ export class FhirServerController extends BaseController {
 
       this.success(res, data, '', statusCode, headers);
     } catch (e: any) {
+      logger.error(`${e.message}`);
       this.error(res, e);
     }
   }
 
   @httpPost('*')
   public async fhirResourcePostMethode(@request() req: Request, @response() res: Response) {
-    logger.info('Executing FhirServerController::fhirResourcePostMethode');
+    logger.info('Running FhirServerController::fhirResourcePostMethode');
     try {
       let { 'x-oauth': token, 'x-connection-name': connectionName, ig } = res.locals?.connection;
 
@@ -145,13 +148,14 @@ export class FhirServerController extends BaseController {
 
       this.success(res, data, '', statusCode, headers);
     } catch (e: any) {
+      logger.error(`${e.message}`);
       this.error(res, e);
     }
   }
 
   @httpPut('*')
   public async fhirResourcePutMethode(@request() req: Request, @response() res: Response) {
-    logger.info('Executing FhirServerController::fhirResourcePutMethode');
+    logger.info('Running FhirServerController::fhirResourcePutMethode');
     try {
       let {
         'x-oauth': token,
@@ -182,13 +186,14 @@ export class FhirServerController extends BaseController {
 
       this.success(res, data, '', statusCode, headers);
     } catch (e: any) {
+      logger.error(`${e.message}`);
       this.error(res, e);
     }
   }
 
   @httpPatch('*')
   public async fhirResourcePatchMethode(@request() req: Request, @response() res: Response) {
-    logger.info('Executing FhirServerController::fhirResourcePatchMethode');
+    logger.info('Running FhirServerController::fhirResourcePatchMethode');
     try {
       let { 'x-oauth': token, 'x-connection-name': connectionName, ig } = res.locals?.connection;
 
@@ -216,13 +221,14 @@ export class FhirServerController extends BaseController {
 
       this.success(res, data, '', statusCode, headers);
     } catch (e: any) {
+      logger.error(`${e.message}`);
       this.error(res, e);
     }
   }
 
   @httpDelete('*')
   public async fhirResourceDeleteMethode(@request() req: Request, @response() res: Response) {
-    logger.info('Executing FhirServerController::fhirResourceDeleteMethode');
+    logger.info('Running FhirServerController::fhirResourceDeleteMethode');
     try {
       let { 'x-oauth': token, 'x-connection-name': connectionName, ig } = res.locals?.connection;
 
@@ -250,6 +256,7 @@ export class FhirServerController extends BaseController {
 
       this.success(res, data, '', statusCode, headers);
     } catch (e: any) {
+      logger.error(`${e.message}`);
       this.error(res, e);
     }
   }

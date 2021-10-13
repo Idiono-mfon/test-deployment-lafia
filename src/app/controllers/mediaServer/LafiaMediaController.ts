@@ -11,7 +11,7 @@ import {
   MessageBroker,
   rmqFhirSuccessResponse
 } from '../../services';
-import { GenericResponseError, HttpStatusCode } from '../../utils';
+import { GenericResponseError, HttpStatusCode, logger } from '../../utils';
 import { BaseController } from '../baseController';
 
 @controller('/media')
@@ -31,23 +31,24 @@ export class LafiaMediaController extends BaseController {
 
   @httpPost('/broadcast', TYPES.AuthMiddleware)
   public async createBroadcast(@request() req: Request, @response() res: Response) {
+    logger.info('Running LafiaMediaController::createBroadcast');
     try {
       const { user } = res.locals;
       const broadcast = await this.lafiaMediaService.createBroadcast(user?.id);
 
       this.success(res, broadcast, 'Broadcast created successfully', HttpStatusCode.CREATED);
     } catch (e: any) {
+      logger.error(`Could not create broadcast -`, e);
       this.error(res, e);
     }
   }
 
   @httpPost('/events')
   public async listenForMediaServerEvent(@request() req: Request, @response() res: Response): Promise<void> {
+    logger.info('Running LafiaMediaController::listenForMediaServerEvent');
     try {
       // Retrieve the request's body
       const event = req.body;
-
-      console.log('Event:', event);
 
       if (event?.action === 'vodReady') {
         const streamUrl = await this.lafiaMediaService.getRecordedStream(event?.vodId);
@@ -107,6 +108,7 @@ export class LafiaMediaController extends BaseController {
               { data: encounterResourceData },
             );
           } catch (e: any) {
+            logger.error(`Could not create telehealth encounter -`, e);
             throw new GenericResponseError(e.message, e.code);
           }
 
@@ -164,52 +166,58 @@ export class LafiaMediaController extends BaseController {
             const rmqPubMsg = rmqFhirSuccessResponse(publishData, media?.id, 'New media published successfully');
             await this.messageBroker.rmqPublish(JSON.stringify(rmqPubMsg));
           } catch (e: any) {
-            console.error('MediaError:', e.message);
+            logger.error(`Could not create telehealth encounter media -`, e);
             throw new GenericResponseError(e.message, e.code);
           }
         }
 
-        console.log('TeleHealth Record encounter successfully saved');
+        logger.info('TeleHealth Record encounter successfully saved');
       }
 
       res.sendStatus(200);
     } catch (e: any) {
-      console.log(e);
+      logger.error(`${e}`);
     }
   }
 
   @httpGet('/broadcast/:streamId', TYPES.AuthMiddleware)
   public async getRecordedStream(@request() req: Request, @response() res: Response) {
+    logger.info('Running LafiaMediaController::getRecordedStream');
     try {
       const { streamId } = req.params;
       const broadcast = await this.lafiaMediaService.getOneVideoRecord({ streamId });
 
       this.success(res, broadcast, 'Recorded Video Retrieved successfully', HttpStatusCode.CREATED);
     } catch (e: any) {
+      logger.error(`Unable to get recorded stream -`, e);
       this.error(res, e);
     }
   }
 
   @httpGet('/broadcast', TYPES.AuthMiddleware)
   public async getAllRecordedStream(@request() req: Request, @response() res: Response) {
+    logger.info('Running LafiaMediaController::getAllRecordedStream');
     try {
       const { user } = res.locals;
       const broadcast = await this.lafiaMediaService.getAllVideoRecords(user?.id!);
 
       this.success(res, broadcast, 'Recorded Video Retrieved successfully', HttpStatusCode.CREATED);
     } catch (e: any) {
+      logger.error(`Unable to get all recorded stream -`, e);
       this.error(res, e);
     }
   }
 
   @httpDelete('/broadcast/:id', TYPES.AuthMiddleware)
   public async getRecordedStreamUrl(@request() req: Request, @response() res: Response) {
+    logger.info('Running LafiaMediaController::getRecordedStreamUrl');
     try {
       const { id } = req.params;
       const broadcast = await this.lafiaMediaService.deleteVideoRecord(id);
 
       this.success(res, broadcast, 'Recorded Video deleted successfully', HttpStatusCode.CREATED);
     } catch (e: any) {
+      logger.error(`Unable to get recorded stream url -`, e);
       this.error(res, e);
     }
   }
