@@ -3,37 +3,14 @@ import { Env } from '../config/env';
 
 require('winston-daily-rotate-file');
 
-// @ts-ignore
-const dailyRotateFileTransportError = new winston.transports.DailyRotateFile({
-  filename: `./logs/%DATE%-error.log`,
-  datePattern: 'YYYY-MM-DD',
-  level: 'error',
-});
-
-// @ts-ignore
-const dailyRotateFileTransportWarning = new winston.transports.DailyRotateFile({
-  filename: `./logs/%DATE%-warning.log`,
-  datePattern: 'YYYY-MM-DD',
-  level: 'warning',
-});
-
-// @ts-ignore
-const dailyRotateFileTransportAll = new winston.transports.DailyRotateFile({
-  filename: `./logs/%DATE%-all.log`,
-  datePattern: 'YYYY-MM-DD',
-});
-
-// @ts-ignore
-const dailyRotateFileTransportRejection = new winston.transports.DailyRotateFile({
-  filename: `./logs/%DATE%-rejections.log`,
-  datePattern: 'YYYY-MM-DD'
-});
-
-// @ts-ignore
-const dailyRotateFileTransportException = new winston.transports.DailyRotateFile({
-  filename: `./logs/%DATE%-exceptions.log`,
-  datePattern: 'YYYY-MM-DD'
-});
+const getDailyRotateFileTransport = (type: string, level?: string) => {
+  // @ts-ignore
+  return new winston.transports.DailyRotateFile({
+    filename: `./logs/%DATE%/${type}.log`,
+    datePattern: 'YYYY-MM-DD',
+    level
+  });
+}
 
 const env = Env.all();
 
@@ -77,15 +54,17 @@ winston.addColors(colors)
 const format = winston.format.combine(
   // Align the logs
   winston.format.align(),
-  // Make the log print pretty
-  winston.format.prettyPrint({ colorize: true }),
+  // Log error stack track
+  winston.format.errors({ stack: true }),
+  // Transform log to json format
+  winston.format.json({ space: 2 }),
   // Add the message timestamp with the preferred format
   winston.format.timestamp({ format: 'DD-MMM-YYYY HH:mm:ss:ms' }),
   // Tell Winston that the logs must be colored
   winston.format.colorize({ all: true }),
   // Define the format of the message showing the timestamp, the level and the message
   winston.format.printf(
-    (info) => `[${info.timestamp}] ${info.level}: ${info.message}`,
+    (info) => `[${info.timestamp}] [${info.level}]: ${info.message}`,
   ),
 )
 
@@ -93,12 +72,12 @@ const format = winston.format.combine(
 // In this example, we are using three different transports
 const transports = [
   // Allow to print all the error level messages inside the error.log file
-  dailyRotateFileTransportError,
+  getDailyRotateFileTransport('error', 'error'),
   // Allow to print all the warning level messages inside the warning.log file
-  dailyRotateFileTransportWarning,
+  getDailyRotateFileTransport('warning', 'warning'),
   // Allow to print all the error message inside the all.log file
   // (also the error log that are also printed inside the error.log(
-  dailyRotateFileTransportAll,
+  getDailyRotateFileTransport('all'),
 ]
 
 // Create the logger instance that has to be exported
@@ -109,9 +88,9 @@ const logger = winston.createLogger({
   levels,
   format,
   transports,
-  exceptionHandlers: [dailyRotateFileTransportException],
+  exceptionHandlers: [getDailyRotateFileTransport('exception')],
   // @ts-ignore
-  rejectionHandlers: [dailyRotateFileTransportRejection],
+  rejectionHandlers: [getDailyRotateFileTransport('rejection')],
 });
 
 // If we're not in production then log to the `console`
