@@ -22,6 +22,16 @@ export class FhirServerController extends BaseController {
   @inject(TYPES.TokenUtil)
   private readonly tokenUtil: TokenUtil;
 
+  private async refreshAccessToken(token: string): Promise<string | undefined> {
+    try {
+      const { access_token } = await this.tokenUtil.refreshAccessToken(token);
+
+      return access_token;
+    } catch (e) {
+      throwError(e.message, error.forbidden);
+    }
+  }
+
   @httpGet('/Aggregate', TYPES.AuthMiddleware)
   public async getFhirResourceAggregatedData(@request() req: Request, @response() res: Response) {
     logger.info('Executing FhirServerController::getFhirResourceAggregatedData');
@@ -35,16 +45,7 @@ export class FhirServerController extends BaseController {
 
 
       // Refresh access_token if it's expired
-      let accessToken: string;
-      try {
-        if (token) {
-          const { access_token } = await this.tokenUtil.refreshAccessToken(token) as { access_token: string };
-
-          accessToken = access_token;
-        }
-      } catch (e) {
-        throwError('Could not refreshAccessToken access token', error.forbidden);
-      }
+      let accessToken = await this.refreshAccessToken(token);
 
       // @ts-ignore
       if (accessToken) {
@@ -81,14 +82,7 @@ export class FhirServerController extends BaseController {
       } = res.locals?.connection;
 
       // Refresh access_token if it's expired
-      let accessToken: string;
-      try {
-        const { access_token } = await this.tokenUtil.refreshAccessToken(token) as { access_token: string };
-
-        accessToken = access_token;
-      } catch (e) {
-        throwError('Could not refreshAccessToken access token', error.forbidden);
-      }
+      let accessToken = await this.refreshAccessToken(token);
 
       // @ts-ignore
       if (accessToken) {
@@ -128,14 +122,7 @@ export class FhirServerController extends BaseController {
       let { 'x-oauth': token, 'x-connection-name': connectionName, ig } = res.locals?.connection;
 
       // Refresh access_token if it's expired
-      let accessToken: string;
-      try {
-        const { access_token } = await this.tokenUtil.refreshAccessToken(token) as { access_token: string };
-
-        accessToken = access_token;
-      } catch (e) {
-        throwError('Could not refreshAccessToken access token', error.forbidden);
-      }
+      let accessToken = await this.refreshAccessToken(token);
 
       // @ts-ignore
       if (accessToken) {
@@ -172,14 +159,7 @@ export class FhirServerController extends BaseController {
       } = res.locals?.connection;
 
       // Refresh access_token if it's expired
-      let accessToken: string;
-      try {
-        const { access_token } = await this.tokenUtil.refreshAccessToken(token) as { access_token: string };
-
-        accessToken = access_token;
-      } catch (e) {
-        throwError('Could not refreshAccessToken access token', error.forbidden);
-      }
+      let accessToken = await this.refreshAccessToken(token);
 
       // @ts-ignore
       if (accessToken) {
@@ -213,14 +193,7 @@ export class FhirServerController extends BaseController {
       let { 'x-oauth': token, 'x-connection-name': connectionName, ig } = res.locals?.connection;
 
       // Refresh access_token if it's expired
-      let accessToken: string;
-      try {
-        const { access_token } = await this.tokenUtil.refreshAccessToken(token) as { access_token: string };
-
-        accessToken = access_token;
-      } catch (e) {
-        throwError('Could not refreshAccessToken access token', error.forbidden);
-      }
+      let accessToken = await this.refreshAccessToken(token);
 
       // @ts-ignore
       if (accessToken) {
@@ -254,14 +227,7 @@ export class FhirServerController extends BaseController {
       let { 'x-oauth': token, 'x-connection-name': connectionName, ig } = res.locals?.connection;
 
       // Refresh access_token if it's expired
-      let accessToken: string;
-      try {
-        const { access_token } = await this.tokenUtil.refreshAccessToken(token) as { access_token: string };
-
-        accessToken = access_token;
-      } catch (e) {
-        throwError('Could not refreshAccessToken access token', error.forbidden);
-      }
+      let accessToken = await this.refreshAccessToken(token);
 
       // @ts-ignore
       if (accessToken) {

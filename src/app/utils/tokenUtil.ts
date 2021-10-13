@@ -2,7 +2,6 @@ import { inject, injectable } from 'inversify';
 import TYPES from '../config/types';
 import { refreshOauth2Token } from '../index';
 import { AuthService } from '../services';
-import { error, throwError } from './errors';
 import { logger } from './loggerUtil';
 
 @injectable()
@@ -12,7 +11,12 @@ export class TokenUtil {
 
   public isTokenExpired(token: string): boolean {
     logger.info('Executing TokenUtil::isTokenExpired');
-    return (Date.now() >= JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString()).exp * 1000)
+
+    if (!token) {
+      return false;
+    }
+
+    return (Date.now() >= JSON.parse(Buffer.from(token?.split('.')[1], 'base64').toString()).exp * 1000);
   }
 
   public async refreshAccessToken(token: string, provider: string = 'oauth2') {
