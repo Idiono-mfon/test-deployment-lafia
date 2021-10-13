@@ -6,6 +6,7 @@ import { Env } from '../config/env';
 import TYPES from '../config/types';
 import { IPatient, IPractitioner, IUser } from '../models';
 import { PatientService, PractitionerService, UserService } from '../services';
+import { logger } from '../utils';
 
 interface CastJWTDecodedType {
   email: string;
@@ -26,6 +27,7 @@ export class AuthMiddleware extends BaseMiddleware {
   private readonly practitionerService: PractitionerService;
 
   public async handler(req: Request, res: Response, next: NextFunction) {
+    logger.info('Running AuthMiddleware::handler');
     try {
 
       const jwtPayload: CastJWTDecodedType = this.decodeJwtToken(req);
@@ -37,7 +39,7 @@ export class AuthMiddleware extends BaseMiddleware {
 
       next();
     } catch (e: any) {
-      console.log('Error:', e);
+      logger.error(`Authentication failed -`, e);
       res.status(401).send({
         status: 'error',
         code: 401,
@@ -47,6 +49,7 @@ export class AuthMiddleware extends BaseMiddleware {
   }
 
   public authenticate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    logger.info('Running AuthMiddleware::authenticate');
     try {
       const jwtPayload: CastJWTDecodedType = this.decodeJwtToken(req);
 
@@ -54,7 +57,7 @@ export class AuthMiddleware extends BaseMiddleware {
 
       next();
     } catch (e: any) {
-      console.log('Error:', e);
+      logger.error(`Authentication failed -`, e);
       res.status(401).send({
         status: 'error',
         code: 401,
@@ -64,6 +67,7 @@ export class AuthMiddleware extends BaseMiddleware {
   }
 
   private decodeJwtToken(req: Request): CastJWTDecodedType {
+    logger.info('Running AuthMiddleware::decodeJwtToken');
     const requestHeaderAuthorization: string = req.headers.authorization as string;
 
     if (!requestHeaderAuthorization) {
@@ -82,13 +86,14 @@ export class AuthMiddleware extends BaseMiddleware {
   }
 
   public parseThirdPartyConnection = (req: Request, res: Response, next: NextFunction): void => {
+    logger.info('Running AuthMiddleware::parseThirdPartyConnection');
     const oauth: string = req.headers['x-oauth'] as string;
     const connectionName: string = req.headers['x-connection-name'] as string;
     const ig: string = req.headers['x-ig'] as string;
     const textResource: string = req.headers['x-test-resource'] as string;
 
-    res.locals.connection = { 
-      "x-oauth": oauth, 
+    res.locals.connection = {
+      "x-oauth": oauth,
       "x-connection-name": connectionName,
       "x-ig": ig,
       "x-test-resource": textResource
@@ -98,6 +103,7 @@ export class AuthMiddleware extends BaseMiddleware {
   }
 
   private async getUserPayload(payload: CastJWTDecodedType): Promise<IUser | IPatient | IPractitioner> {
+    logger.info('Running AuthMiddleware::getUserPayload');
     let user: IUser | IPatient | IPractitioner = await this.patientService.findPatientById(payload.aud);
 
     if (!user) {
