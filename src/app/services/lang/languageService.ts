@@ -9,7 +9,7 @@ import {
   LabelRepository,
   LanguageRepository
 } from '../../repository';
-import { BadGatewayError, BadRequestError, ConflictError, NotFoundError } from '../../utils';
+import { BadGatewayError, BadRequestError, ConflictError, logger, NotFoundError } from '../../utils';
 
 @injectable()
 export class LanguageService {
@@ -26,18 +26,22 @@ export class LanguageService {
   // create
 
   public async fetchLanguage(): Promise<ILangauge[]> {
+    logger.info('Running LanguageService.fetchLanguage');
     return this.languageRepository.fetchLanguages();
   }
 
   public async fetchLabel(): Promise<ILabel[]> {
+    logger.info('Running LanguageService.fetchLabel');
     return this.labelRepository.fetchLabels();
   }
 
   public async fetchComponent(): Promise<IComponent[]> {
+    logger.info('Running LanguageService.fetchComponent');
     return this.componentRepository.fetchComponents();
   }
 
   public async fetchLanguagesWithContent(code: string): Promise<ILangauge> {
+    logger.info('Running LanguageService.fetchLanguagesWithContent');
     const language: LanguageModel = await this.languageRepository.fetchLanguageByCode(code);
     if ( !language ) {
       throw new NotFoundError("language not found");
@@ -49,6 +53,7 @@ export class LanguageService {
   // create
 
   public async addLanguage(data: ILangauge): Promise<ILangauge> {
+    logger.info('Running LanguageService.addLanguage');
     if ( !data.name || !data.code ) {
       throw new BadRequestError("language name and code are required feilds");
     }
@@ -60,6 +65,7 @@ export class LanguageService {
   }
 
   public async addLabel(data: ILabel): Promise<ILabel | any> {
+    logger.info('Running LanguageService.addLabel');
     if ( !data.name ) {
       throw new BadRequestError("label name is required");
     }
@@ -70,16 +76,18 @@ export class LanguageService {
       }
       return this.labelRepository.addLabel(data);
     } catch (e: any) {
-      throw new BadGatewayError(e.toSring())
+      throw new BadGatewayError(e.message);
     }
   }
 
   public async addComponent(data: IComponent): Promise<IComponent> {
+    logger.info('Running LanguageService.addComponent');
     data.feilds = JSON.stringify(data.feilds);
     return this.componentRepository.addComponent(data);
   }
 
   public async addComponentToLabel(labelId: string, data: IComponent): Promise<any> {
+    logger.info('Running LanguageService.addComponentToLabel');
     const label: LabelModel = await this.labelRepository.fetchLabelByID(labelId);
     if ( !label ) {
       throw new NotFoundError("label not found");
@@ -88,6 +96,7 @@ export class LanguageService {
   }
 
   public async attachComponentToLanguage(languageId: string, componentId: string): Promise<any> {
+    logger.info('Running LanguageService.attachComponentToLanguage');
     const language: LanguageModel = await this.languageRepository.fetchLanguageByID(languageId);
     if ( !language ) {
       throw new NotFoundError("language not found");
@@ -100,6 +109,7 @@ export class LanguageService {
   }
 
   public async detachComponentFromLanguage(languageId: string, componentId: string): Promise<any> {
+    logger.info('Running LanguageService.detachComponentFromLanguage');
     const language: LanguageModel = await this.languageRepository.fetchLanguageByID(languageId);
     if ( !language ) {
       throw new NotFoundError("language not found");
@@ -113,6 +123,7 @@ export class LanguageService {
 
 
   public async attachComponentToLabel(labelId: string, componentId: string): Promise<any> {
+    logger.info('Running LanguageService.attachComponentToLabel');
     const label: LabelModel = await this.labelRepository.fetchLabelByID(labelId);
     if ( !label ) {
       throw new NotFoundError("label not found");
@@ -125,6 +136,7 @@ export class LanguageService {
   }
 
   public async detachComponentFromLabel(labelId: string, componentId: string): Promise<any> {
+    logger.info('Running LanguageService.detachComponentFromLabel');
     const label: LabelModel = await this.labelRepository.fetchLabelByID(labelId);
     if ( !label ) {
       throw new NotFoundError("label not found");
@@ -138,6 +150,7 @@ export class LanguageService {
 
 
   public async attachLabelToLanguage(languageId: string, labelId: string): Promise<any> {
+    logger.info('Running LanguageService.attachLabelToLanguage');
     const label: LabelModel = await this.labelRepository.fetchLabelByID(labelId);
     if ( !label ) {
       throw new NotFoundError("label not found");
@@ -150,6 +163,7 @@ export class LanguageService {
   }
 
   public async detachLabelFromLanguage(languageId: string, labelId: string): Promise<any> {
+    logger.info('Running LanguageService.detachLabelFromLanguage');
     const label: LabelModel = await this.labelRepository.fetchLabelByID(labelId);
     if ( !label ) {
       throw new NotFoundError("label not found");
@@ -164,28 +178,34 @@ export class LanguageService {
   // update
 
   public async updateLanguage(id: string, data: ILangauge): Promise<ILangauge> {
+    logger.info('Running LanguageService.updateLanguage');
     return this.languageRepository.updateLanguage(id, data);
   }
 
   public async updateLabel(id: string, data: ILabel): Promise<ILabel> {
+    logger.info('Running LanguageService.updateLabel');
     return this.labelRepository.updateLabel(id, data);
   }
 
   public async updateComponent(id: string, data: IComponent): Promise<IComponent> {
+    logger.info('Running LanguageService.updateComponent');
     return this.componentRepository.updateComponent(id, data);
   }
 
   // delete
 
   public async deleteLanguage(id: string): Promise<number> {
+    logger.info('Running LanguageService.deleteLanguage');
     return this.languageRepository.deleteLanguage(id);
   }
 
   public async deleteLabel(id: string): Promise<number> {
+    logger.info('Running LanguageService.deleteLabel');
     return this.labelRepository.deleteLabel(id);
   }
 
   public async deleteComponent(id: string): Promise<number> {
+    logger.info('Running LanguageService.deleteComponent');
     return this.componentRepository.deleteComponent(id);
   }
 }

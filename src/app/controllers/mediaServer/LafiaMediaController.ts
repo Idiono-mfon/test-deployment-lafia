@@ -57,12 +57,14 @@ export class LafiaMediaController extends BaseController {
       }
 
       if (event?.StatusCallbackEvent === 'recording-completed') {
+        logger.info('Twilio Recording completed');
         const twilioRoom = await this.twilioRoomService.getOneRoom({ room_sid: event?.RoomSid });
 
         await this.twilioService.triggerMediaComposition(twilioRoom, event);
       }
 
       if (event?.StatusCallbackEvent === 'composition-available') {
+        logger.info('Twilio video composition available');
         const recordedFileUrl = await this.twilioService.getVideoRecordingFile(event?.CompositionSid);
         const { practitioner, patients } = await this.twilioService.getParticipantsByRoomSid(event?.RoomSid);
 
@@ -201,7 +203,7 @@ export class LafiaMediaController extends BaseController {
       const { user } = res.locals;
       const broadcast = await this.lafiaMediaService.getAllVideoRecords(user?.id!);
 
-      this.success(res, broadcast, 'Recorded Video Retrieved successfully', HttpStatusCode.CREATED);
+      this.success(res, broadcast, 'Recorded Video Retrieved successfully', HttpStatusCode.OK);
     } catch (e: any) {
       logger.error(`Unable to get all recorded stream -`, e);
       this.error(res, e);

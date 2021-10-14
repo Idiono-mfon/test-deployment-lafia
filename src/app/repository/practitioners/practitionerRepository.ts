@@ -4,23 +4,24 @@ import { IPractitioner, PractitionerModel } from '../../models';
 import {
   GenericResponseError,
   HttpStatusCode,
-  InternalServerError
+  InternalServerError, logger
 } from '../../utils';
 
 @injectable()
 export class PractitionerRepository {
   public async updatePractitioner(data: IPractitioner): Promise<IPractitioner> {
+    logger.info('Running PractitionerRepository::updatePractitioner');
     try {
       return await transaction(PractitionerModel, async (PractitionerModel) => {
         return PractitionerModel.query().upsertGraphAndFetch(data);
       });
     } catch (e: any) {
-      console.error(e);
       throw new GenericResponseError(e.message, HttpStatusCode.BAD_REQUEST);
     }
   }
 
   public async findPractitionerById(id: string): Promise<IPractitioner> {
+    logger.info('Running PractitionerRepository::findPractitionerById');
     try {
       return await transaction(PractitionerModel, async(PractitionerModel) => {
         return PractitionerModel.query()
@@ -65,6 +66,7 @@ export class PractitionerRepository {
   }
 
   public async getIds(id: string): Promise<any> {
+    logger.info('Running PractitionerRepository::getIds');
     try {
       return await transaction(PractitionerModel, async(PractitionerModel) => {
         return PractitionerModel.query()
@@ -116,18 +118,19 @@ export class PractitionerRepository {
   }
 
   public async createPractitioner(data: any): Promise<IPractitioner> {
+    logger.info('Running PractitionerRepository::createPractitioner');
     try {
       return await transaction(PractitionerModel, async (PractitionerModel) => {
         return PractitionerModel.query().upsertGraphAndFetch(data)
           .first();
       });
     } catch (e: any) {
-      console.error(e);
       throw new GenericResponseError(e.message, HttpStatusCode.BAD_REQUEST);
     }
   }
 
   public async attachBroadcastVideos(practitionerID: string, broadcastVideoId: string): Promise<any> {
+    logger.info('Running PractitionerRepository::attachBroadcastVideos');
     return PractitionerModel.relatedQuery('broadcastVideos').for(practitionerID).relate(broadcastVideoId);
   }
 }

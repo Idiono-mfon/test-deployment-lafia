@@ -14,6 +14,7 @@ import { PatientService, PractitionerService, MessageBroker, VideoBroadcastServi
 import { SignallingServerService } from './services/signallingServers';
 import * as swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './config/swagger.config';
+import { logger } from './utils';
 
 dotConfig();
 
@@ -33,8 +34,6 @@ server.setConfig((app) => {
   app.use(express.json({limit: '50mb'}));
   app.use(express.urlencoded({limit: "50mb", extended: true, parameterLimit:50000}));
   app.use(cors());
-  // @ts-ignore
-  // eslint-disable-next-line @typescript-eslint/unbound-method
   app.use(morganMiddleware);
   app.use(passport.initialize());
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
@@ -68,7 +67,7 @@ const PORT = Env.all().port;
 const appServer = createServer(serverInstance);
 
 appServer.listen(PORT, () => {
-  console.log(`Listening on port: ${PORT}`);
+  logger.debug(`Listening on port: ${PORT}`);
 });
 
 const signallingServer = new SignallingServerService(

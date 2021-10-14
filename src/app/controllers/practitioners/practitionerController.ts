@@ -41,7 +41,7 @@ export class PractitionerController extends BaseController {
 
       this.success(res, practitioner, 'Practitioner profile successfully updated');
     } catch (e: any) {
-      logger.error(`Unable to update practitioner data -`, e);
+      logger.error(`Error updating practitioner data`, e);
       this.error(res, e);
     }
   }
@@ -55,7 +55,7 @@ export class PractitionerController extends BaseController {
 
       this.success(res, practitioner, 'Request completed');
     } catch (e: any) {
-      logger.error(`Unable to find practitioner with id - ${req?.params?.id} -`, e);
+      logger.error(`Error finding practitioner with id - ${req?.params?.id}`, e);
       this.error(res, e);
     }
   }
@@ -79,7 +79,7 @@ export class PractitionerController extends BaseController {
 
       this.success(res, practitioner, 'Practitioner registration successful', HttpStatusCode.CREATED);
     } catch (e: any) {
-      logger.error(`Unable to create practitioner -`, e);
+      logger.error(`Error creating practitioner`, e);
       this.error(res, e);
     }
   }
@@ -93,7 +93,7 @@ export class PractitionerController extends BaseController {
 
       this.success(res, attachment, 'Request completed successfully');
     } catch (e: any) {
-      logger.error(`Unable to upload attachment -`, e);
+      logger.error(`Error uploading attachment`, e);
       this.error(res, e);
     }
   }
@@ -103,10 +103,10 @@ export class PractitionerController extends BaseController {
     logger.info('Running PractitionerController::broadcastVideos');
     try {
       const { id: practitionerId } = req.params;
-      const vid = await this.practitionerService.findAssignedPractitionervideoBroadcast(practitionerId);
+      const vid = await this.practitionerService.findAssignedPractitionerVideoBroadcast(practitionerId);
       this.success(res, vid, 'Request completed successfully');
     } catch (e: any) {
-      logger.error(`Unable to broadcast video -`, e);
+      logger.error(`Error broadcasting video`, e);
       this.error(res, e);
     }
   }

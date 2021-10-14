@@ -20,7 +20,6 @@ export class ConsentController extends BaseController {
     logger.info('Running ConsentController::acceptConsent');
     try {
       if (req.body?.resourceType !== 'Consent') {
-        logger.error('Invalid FHIR Consent Resource Received!');
         throwError('Invalid FHIR Consent Resource Received!', error.badRequest);
       }
 
@@ -49,7 +48,6 @@ export class ConsentController extends BaseController {
       });
 
       if (!patientDetails) {
-        logger.error('Patient with the id not found');
         throwError('Patient with the id not found', error.notFound);
       }
 
@@ -70,14 +68,12 @@ export class ConsentController extends BaseController {
       let { resource_type } = req.query;
 
       if (!resource_type) {
-        logger.error('resource_type field is required');
         throwError('resource_type field is required', error.badRequest);
       }
 
       const userDetails = await this.userService.getOneUser({ resource_id: user_id });
 
       if (!userDetails) {
-        logger.error('User with the id not found');
         throwError('User with the id not found', error.notFound);
       }
 

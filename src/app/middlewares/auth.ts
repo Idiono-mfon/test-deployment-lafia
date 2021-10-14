@@ -39,7 +39,7 @@ export class AuthMiddleware extends BaseMiddleware {
 
       next();
     } catch (e: any) {
-      logger.error(`Authentication failed -`, e);
+      logger.error(`Authentication failed`, e);
       res.status(401).send({
         status: 'error',
         code: 401,
@@ -57,7 +57,7 @@ export class AuthMiddleware extends BaseMiddleware {
 
       next();
     } catch (e: any) {
-      logger.error(`Authentication failed -`, e);
+      logger.error(`Authentication failed`, e);
       res.status(401).send({
         status: 'error',
         code: 401,

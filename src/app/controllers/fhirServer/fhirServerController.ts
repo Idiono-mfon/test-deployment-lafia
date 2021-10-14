@@ -28,8 +28,8 @@ export class FhirServerController extends BaseController {
       const { access_token } = await this.tokenUtil.refreshAccessToken(token);
 
       return access_token;
-    } catch (e) {
-      logger.error(`Unable to refresh access token`);
+    } catch (e: any) {
+      logger.error(`Unable to refresh access token`, e);
       throwError(e.message, error.forbidden);
     }
   }

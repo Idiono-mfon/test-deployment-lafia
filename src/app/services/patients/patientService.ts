@@ -8,7 +8,7 @@ import {
   forWho,
   GenericResponseError,
   getE164Format,
-  InternalServerError,
+  InternalServerError, logger,
   NotFoundError,
   throwError,
   UtilityService
@@ -48,6 +48,7 @@ export class PatientService {
   private readonly fhirServerService: FhirServerService;
 
   public async updatePatient(id: string, data: any): Promise<IPatient> {
+    logger.info('Running PatientService.updatePatient');
     try {
 
       const { data: patientUpdatedData } = await this.fhirServerService.executeQuery(
@@ -56,6 +57,8 @@ export class PatientService {
         { data }
       );
 
+      logger.info(`Successfully updated patient data with an id - ${id}`);
+
       return patientUpdatedData;
     } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
@@ -63,12 +66,14 @@ export class PatientService {
   }
 
   public async findPatientById(id: string): Promise<IPatient> {
+    logger.info('Running PatientService.findPatientById');
     const patient = await this.fhirServerService.executeQuery(`/Patient/${id}`, 'GET');
 
     return patient.data;
   }
 
   public async createPatient(req: Request): Promise<any> {
+    logger.info('Running PatientService.createPatient');
     try {
 
       const data: any = req.body;
@@ -137,6 +142,8 @@ export class PatientService {
         ...userData,
       });
 
+      logger.info(`A new patient with id - ${patient.id} - has been created`);
+
       return {
         user: patient,
         auth_token: token,
@@ -147,6 +154,7 @@ export class PatientService {
   }
 
   public async patientLogin(data: IUserLoginParams): Promise<any> {
+    logger.info('Running PatientService.patientLogin');
     try {
       const { user, token } = data;
       if (user.photo === null) {
@@ -167,6 +175,7 @@ export class PatientService {
   }
 
   public async uploadAttachment(patientId: string, file: Express.Multer.File): Promise<IAttachment> {
+    logger.info('Running PatientService.uploadAttachment');
     try {
       const patient: any = await this.findPatientById(patientId);
 
@@ -207,6 +216,7 @@ export class PatientService {
   }
 
   public async findPatientVideoBroadcast(patientId: string) {
+    logger.info('Running PatientService.findPatientVideoBroadcast');
     const patient = this.findPatientById(patientId)
     if ( !patient ) {
       throw new NotFoundError("unknown patient");

@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { Env } from '../../config/env';
 import TYPES from '../../config/types';
 import { IPatient, IPractitioner } from '../../models';
-import { forWho } from '../../utils';
+import { forWho, logger } from '../../utils';
 import { Password } from '../../utils/password';
 import { PatientService } from '../patients';
 import { PractitionerService } from '../practitioners';
@@ -30,20 +30,21 @@ export class MessageBroker {
   }
 
   public async rmqPublish(msg: any) {
+    logger.info('Running MessageBroker.rmqPublish');
     try {
       const rmqChannel = await initRMQ();
 
       rmqChannel.assertQueue(this.pubQueue, { durable: false });
       rmqChannel.sendToQueue(this.pubQueue, Buffer.from(msg));
 
-      console.log(' [x] Sent Date: %s', new Date().toString());
-      console.log(' [x] Sent Data: %s', msg);
+      logger.info(`[x] Sent Data: ${msg}`);
     } catch (e: any) {
       console.log(e);
     }
   }
 
   public async rmqSubscribe() {
+    logger.info('Running MessageBroker.rmqSubscribe');
     let rmqChannel: any;
 
     try {
@@ -79,15 +80,11 @@ export class MessageBroker {
           return;
         }
 
-        console.log(' [x] Received Date: %s', new Date().toString());
-        console.log(' [x] Received Data: %s', msgString);
+        logger.info(`[x] Received Data: ${msgString}`);
 
         const { data, resource_type, resource_id, email } = msgJson;
 
         if (resource_id && data) {
-          console.log(' [x] Received Date: %s', new Date().toString());
-          console.log(' [x] Received Data: %s', msgString);
-
           try {
             await this.userService.createUser({
               resource_id,
@@ -157,6 +154,7 @@ export class MessageBroker {
 }
 
 export function rmqErrorResponse(message: string, resource_type = undefined): IRmqMessageResponse {
+  logger.info('Running MessageBroker.rmqErrorResponse');
   return {
     status: 'error',
     message,
@@ -166,6 +164,7 @@ export function rmqErrorResponse(message: string, resource_type = undefined): IR
 }
 
 export function rmqSuccessResponse(receivedData: IRmqReceivedMessage, id: string, message: string): IRmqMessageResponse {
+  logger.info('Running MessageBroker.rmqSuccessResponse');
   const { resource_type, data } = receivedData;
   return {
     status: 'success',
@@ -177,6 +176,7 @@ export function rmqSuccessResponse(receivedData: IRmqReceivedMessage, id: string
 }
 
 export function rmqFhirSuccessResponse(receivedData: IRmqReceivedMessage, id: string, message: string) {
+  logger.info('Running MessageBroker.rmqFhirSuccessResponse');
   return {
     status: 'success',
     message,
@@ -186,6 +186,7 @@ export function rmqFhirSuccessResponse(receivedData: IRmqReceivedMessage, id: st
 }
 
 export function rmqNewBroadcastSuccessResponse(data: any, message: string) {
+  logger.info('Running MessageBroker.rmqNewBroadcastSuccessResponse');
   return {
     status: 'success',
     message,

@@ -16,6 +16,7 @@ import {
   throwError,
   GenericResponseError
 } from './errors';
+import { logger } from './loggerUtil';
 
 const { badRequest } = error;
 
@@ -64,6 +65,8 @@ class UtilityService {
   private readonly codeSystemService: CodeSystemService;
 
   public extractDateOfBirth(data: any, forWho: string): string {
+    logger.info('Running UtilityService.extractDateOfBirth');
+
     const dateOfBirth: any = data[`${forWho}_date_of_birth`];
     try {
       if (!dateOfBirth &&
@@ -87,6 +90,7 @@ class UtilityService {
   }
 
   public extractName(data: any, forWho: string): IHumanName {
+    logger.info('Running UtilityService.extractName');
     try {
       const firstName = `${forWho}_first_name`;
       const lastName = `${forWho}_last_name`;
@@ -144,6 +148,8 @@ class UtilityService {
   }
 
   public extractAddress(data: any, forWho: string): IAddress {
+    logger.info('Running UtilityService.extractAddress');
+
     const country = `${forWho}_country`;
     const city = `${forWho}_city`;
     const state = `${forWho}_state`;
@@ -182,6 +188,8 @@ class UtilityService {
   }
 
   public async getCoding(code: string): Promise<ICoding> {
+    logger.info('Running UtilityService.getCoding');
+
     try {
       const codeSystem: ICodeSystem = await this.codeSystemService.getCodeSystemByCode(code);
 
@@ -202,6 +210,8 @@ class UtilityService {
   }
 
   public async extractCodeableConcept(data: any, forWho: string, codeType: string): Promise<ICodeableConcept> {
+    logger.info('Running UtilityService.extractCodeableConcept');
+
     try {
       const code = data[`${forWho}_${codeType}`];
       const coding = await this.getCoding(code);
@@ -215,6 +225,8 @@ class UtilityService {
   }
 
   public checkForRequiredFields(data: any) {
+    logger.info('Running UtilityService.checkForRequiredFields');
+
     try {
       const { email } = data;
 
@@ -227,6 +239,8 @@ class UtilityService {
   }
 
   public removeFalsyProps(data: any): void {
+    logger.info('Running UtilityService.removeFalsyProps');
+
     for (let prop in data) {
       if (!data[prop] || data[prop].length === 0) {
         delete data[prop];
@@ -246,6 +260,8 @@ class UtilityService {
   }
 
   public mergeDataForUpdate(source: any, mergeWith: any): void {
+    logger.info('Running UtilityService.mergeDataForUpdate');
+
     if (source) {
       source.id = mergeWith.id;
     }
@@ -402,6 +418,8 @@ class UtilityService {
   }
 
   public extractContactPoint(data: any, forWho: string): IContactPoint[] {
+    logger.info('Running UtilityService.extractContactPoint');
+
     try {
       const phone = data[`${forWho}_phone`];
       const email = data[`${forWho}_email`];
@@ -435,6 +453,8 @@ class UtilityService {
   }
 
   public async getContact(data: any, forWho: string, codeType: ICodeType): Promise<any> {
+    logger.info('Running UtilityService.getContact');
+
     try {
       const relationship: ICodeableConcept = await this.extractCodeableConcept(data, forWho, codeType.relationship);
       const name: IHumanName = this.extractName(data, forWho);
@@ -455,6 +475,8 @@ class UtilityService {
   }
 
   public getReference(resourceType: string, refName: string): IReference {
+    logger.info('Running UtilityService.getReference');
+
     return {
       type: resourceType,
       display: refName,
@@ -462,6 +484,8 @@ class UtilityService {
   }
 
   public async getQualification(data: any, forWho: string, codeType: string): Promise<IQualification> {
+    logger.info('Running UtilityService.getQualification');
+
     try {
       const code: ICodeableConcept = await this.extractCodeableConcept(data, forWho, codeType);
       const date = data[`${forWho}_qualification_issued_date`];

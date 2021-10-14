@@ -6,7 +6,15 @@ import { Env } from '../../config/env';
 import TYPES from '../../config/types';
 import { IFindUser, IUser } from '../../models';
 import { UserRepository } from '../../repository';
-import { error, GenericResponseError, getE164Format, HttpStatusCode, throwError, Validations } from '../../utils';
+import {
+  error,
+  GenericResponseError,
+  getE164Format,
+  HttpStatusCode,
+  logger,
+  throwError,
+  Validations
+} from '../../utils';
 import { Password } from '../../utils/password';
 import { ConsentService } from '../consents';
 import { EmailService, IComposeEmail } from '../email';
@@ -38,6 +46,7 @@ export class UserService {
   private readonly consentService: ConsentService;
 
   public async validateUser(req: Request): Promise<boolean> {
+    logger.info('Running UserService.validateUser');
 
     const user: IUser = req.body
     try {
@@ -69,6 +78,7 @@ export class UserService {
   }
 
   public async createUser(user: IUser): Promise< IUser> {
+    logger.info('Running UserService.createUser');
 
     try {
       // Validate Email
@@ -105,10 +115,12 @@ export class UserService {
   }
 
   public async getUserByField(field: string, data: string): Promise<IUser> {
+    logger.info('Running UserService.getUserByField');
     return this.userRepository.getOneUser({ [field]: data });
   }
 
   public async checkExistingUser(data: IFindUser): Promise<any> {
+    logger.info('Running UserService.checkExistingUser');
 
     // Get User By Phone
     let existingUser: IUser = await this.getOneUser({ phone: data.phone });
@@ -140,19 +152,23 @@ export class UserService {
   }
 
   public async getOneUser(data: IFindUser): Promise<IUser> {
+    logger.info('Running UserService.getOneUser');
     return this.userRepository.getOneUser(data);
   }
 
   public async getOneBy(field: string, value: string): Promise<IUser> {
+    logger.info('Running UserService.getOneBy');
     return this.userRepository.getOneBy(field, value);
   }
 
   public async updateUser(id: string, data: IFindUser): Promise<IFindUser> {
+    logger.info('Running UserService.updateUser');
     data.gender = data.gender?.toLowerCase();
     return this.userRepository.updateUser(id, data);
   }
 
   public async userLogin(data: string, password: string): Promise<IUser> {
+    logger.info('Running UserService.userLogin');
     try {
       // Login with email and phone?
       let user = await this.userRepository.getUserByEmailOrPhone( data );
@@ -174,10 +190,12 @@ export class UserService {
   }
 
   public async userLogout(id: string): Promise<IUser> {
+    logger.info('Running UserService.userLogout');
     return this.userRepository.userLogout(id);
   }
 
   public generateJwtToken(data: IJwtPayload): string {
+    logger.info('Running UserService.generateJwtToken');
     try {
       const { id } = data;
       delete data.id;
@@ -193,6 +211,7 @@ export class UserService {
   }
 
   public decodeJwtToken(token: string): object | string | IJwtPayload {
+    logger.info('Running UserService.decodeJwtToken');
     try {
       return jwt.verify(token, env.jwt_secrete_key);
     } catch (e: any) {
@@ -204,6 +223,7 @@ export class UserService {
   }
 
   public async changePassword(id: string, oldPassword: string, newPassword: string): Promise<IUser> {
+    logger.info('Running UserService.changePassword');
     try {
       let user = await this.userRepository.getOneUser({ id });
 
@@ -244,6 +264,7 @@ export class UserService {
   }
 
   public async resetPassword(email: string): Promise<any> {
+    logger.info('Running UserService.resetPassword');
     try {
       if (!email) {
         throwError('Please provide an email address to reset your password', error.badRequest);

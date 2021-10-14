@@ -1,14 +1,12 @@
 import winston from 'winston';
+import DailyRotateFile from 'winston-daily-rotate-file';
 import { Env } from '../config/env';
 
-require('winston-daily-rotate-file');
-
 const getDailyRotateFileTransport = (type: string, level?: string) => {
-  // @ts-ignore
-  return new winston.transports.DailyRotateFile({
+  return new DailyRotateFile({
     filename: `./logs/%DATE%/${type}.log`,
     datePattern: 'YYYY-MM-DD',
-    level
+    level,
   });
 }
 
@@ -50,23 +48,32 @@ const colors = {
 // defined above to the severity levels.
 winston.addColors(colors)
 
+// Custom print
+const customPrint = winston.format.printf(info => {
+  const { level, ...rest } = info;
+  let rtn = `[${info.timestamp}] [${level}]:`;
+  if (rest.stack) {
+    rtn = `${rtn} ${rest.message.replace(rest.stack.split('\n')[0].substr(7), '')}
+[${info.timestamp}] [${level}]:    ${rest.stack.replace(/\n/g, `\n[${info.timestamp}] [${level}]:\t`)}`;
+  } else {
+    rtn = `${rtn} ${rest.message}`;
+  }
+  return rtn;
+});
+
 // Chose the aspect of your log customizing the log format.
 const format = winston.format.combine(
-  // Align the logs
-  winston.format.align(),
-  // Log error stack track
-  winston.format.errors({ stack: true }),
-  // Transform log to json format
-  winston.format.json({ space: 2 }),
-  // Add the message timestamp with the preferred format
-  winston.format.timestamp({ format: 'DD-MMM-YYYY HH:mm:ss:ms' }),
-  // Tell Winston that the logs must be colored
-  winston.format.colorize({ all: true }),
-  // Define the format of the message showing the timestamp, the level and the message
-  winston.format.printf(
-    (info) => `[${info.timestamp}] [${info.level}]: ${info.message}`,
-  ),
-)
+    // Align the logs
+    winston.format.align(),
+    // Use simple format for the logs
+    winston.format.simple(),
+    // Log error stack track
+    winston.format.errors({ stack: true }),
+    // Add the message timestamp with the preferred format
+    winston.format.timestamp({ format: 'DD-MMM-YYYY HH:mm:ss:ms' }),
+    // Define the format of the message showing the timestamp, the level and the message
+    customPrint,
+  );
 
 // Define which transports the logger must use to print out messages.
 // In this example, we are using three different transports
@@ -94,7 +101,26 @@ const logger = winston.createLogger({
 });
 
 // If we're not in production then log to the `console`
-if (env.environment !== 'production') logger.add(new winston.transports.Console());
+if (env.environment !== 'production') logger.add(new winston.transports.Console({
+  format: winston.format.combine(
+    // Align the logs
+    winston.format.align(),
+    // Use simple format for the logs
+    winston.format.simple(),
+    // Log error stack track
+    winston.format.errors({ stack: true }),
+    // Add the message timestamp with the preferred format
+    winston.format.timestamp({ format: 'DD-MMM-YYYY HH:mm:ss:ms' }),
+    // Define the format of the message showing the timestamp, the level and the message
+    winston.format.colorize({ all: true}),
+    customPrint,
+  )
+}));
+
+// Handle node warning, unhandledRejection and uncaughtException
+process.on('unhandledRejection', (reason: any, promise: Promise<any>) => logger.debug(reason));
+process.on('uncaughtException', (err: Error) => logger.debug(err));
+process.on('warning', (e: Error) => logger.warn(e.stack));
 
 
 export { logger };

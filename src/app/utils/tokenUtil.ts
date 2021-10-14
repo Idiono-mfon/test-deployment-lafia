@@ -10,7 +10,7 @@ export class TokenUtil {
   private readonly authService: AuthService;
 
   public isTokenExpired(token: string): boolean {
-    logger.info('Executing TokenUtil::isTokenExpired');
+    logger.info('Running TokenUtil.isTokenExpired');
 
     if (!token) {
       return false;
@@ -20,7 +20,7 @@ export class TokenUtil {
   }
 
   public async refreshAccessToken(token: string, provider: string = 'oauth2') {
-    logger.info('Executing TokenUtil::refreshAccessToken');
+    logger.info('Running TokenUtil.refreshAccessToken');
 
     const isTokenExpired = this.isTokenExpired(token);
 
@@ -32,7 +32,10 @@ export class TokenUtil {
 
     return new Promise<{ access_token: string }>((resolve, reject) => {
       if (!existingConnection) {
-        return reject('Invalid refreshAccessToken token provided');
+        return reject({
+          message: 'Invalid refreshAccessToken token provided',
+          code: 403
+        });
       }
 
       const { refreshToken } = existingConnection;

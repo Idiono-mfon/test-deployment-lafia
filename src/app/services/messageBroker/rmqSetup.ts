@@ -1,10 +1,11 @@
 import amqp, { Connection } from 'amqplib/callback_api';
 import { Env } from '../../config/env';
-import { HttpStatusCode } from '../../utils';
+import { HttpStatusCode, logger } from '../../utils';
 
 const env = Env.all();
 
 export function initRMQ(): Promise<amqp.Channel> {
+  logger.info('Running MessageBroker.initRMQ');
   const connectionURL = env.rmq_connection;
 
   return new Promise((resolve, reject) => {
@@ -44,6 +45,7 @@ export function initRMQ(): Promise<amqp.Channel> {
           return resolve(channel);
         });
       } catch(e: any) {
+        logger.error(e.message, e);
         return reject({
           code: e.code || HttpStatusCode.INTERNAL_SERVER_ERROR,
           message: e.message

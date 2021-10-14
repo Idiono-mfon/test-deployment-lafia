@@ -3,7 +3,7 @@ import { Types } from 'mongoose';
 import { inject, injectable } from 'inversify';
 import { Env, IEnv } from '../../config/env';
 import { IFindVideoRecord, IVideoRecord } from '../../models';
-import { GenericResponseError } from '../../utils';
+import { GenericResponseError, logger } from '../../utils';
 import TYPES from '../../config/types';
 import { VideoRecordService } from '../videoRecords';
 
@@ -20,6 +20,7 @@ export class LafiaMediaService {
   }
 
   public async createBroadcast(patient_id: string) {
+    logger.info('Running LafiaMediaService.createBroadcast');
     try {
       const axiosResponse: AxiosResponse = await axios.post(
         `${this.env.lafia_media_url}/rest/v2/broadcasts/create`,
@@ -40,6 +41,7 @@ export class LafiaMediaService {
   }
 
   public async getRecordedStream(id: string) {
+    logger.info('Running LafiaMediaService.getRecordedStream');
     try {
       const axiosResponse: AxiosResponse = await axios.get(
         `${this.env.lafia_media_url}/rest/v2/vods/${id}`
@@ -51,6 +53,7 @@ export class LafiaMediaService {
   }
 
   public async addStreamUrlToPatientBroadcast(streamUrl: string, event: any) {
+    logger.info('Running LafiaMediaService.addStreamUrlToPatientBroadcast');
     if (streamUrl) {
       const videoRecord = await this.getOneVideoRecord({ streamId: event?.id });
 
@@ -64,18 +67,22 @@ export class LafiaMediaService {
   }
 
   public async getOneVideoRecord(data: IFindVideoRecord | any): Promise<IVideoRecord> {
+    logger.info('Running LafiaMediaService.getOneVideoRecord');
     return this.videoRecordService.getOneVideoRecord(data);
   }
 
   public async getAllVideoRecords(user_id: string): Promise<IVideoRecord[]> {
+    logger.info('Running LafiaMediaService.getAllVideoRecords');
     return this.videoRecordService.getAllVideoRecords(user_id);
   }
 
   public async deleteVideoRecord(id: string): Promise<any> {
+    logger.info('Running LafiaMediaService.deleteVideoRecord');
     return this.videoRecordService.deleteVideoRecord(id);
   }
 
   public async updateVideoRecord(id: string, data: IFindVideoRecord): Promise<any> {
+    logger.info('Running LafiaMediaService.updateVideoRecord');
     return this.videoRecordService.updateVideoRecord(id, data);
   }
 }

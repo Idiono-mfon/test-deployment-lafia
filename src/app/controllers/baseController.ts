@@ -13,7 +13,7 @@ export abstract class BaseController {
     const error = validationSchema.validate(requestBody);
 
     if (error.error) {
-      logger.error(`Unable to validate request -`, error.error.details[0]);
+      logger.error(`Unable to validate request`, error.error.details[0]);
       return error.error.details[0].message;
     }
   }
