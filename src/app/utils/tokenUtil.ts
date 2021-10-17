@@ -25,7 +25,7 @@ export class TokenUtil {
     const isTokenExpired = this.isTokenExpired(token);
 
     if (!isTokenExpired) {
-      return { access_token: token };
+      return { access_token: null };
     }
 
     const existingConnection = await this.authService.getConnectionByFields({ access_token: token });
@@ -33,7 +33,7 @@ export class TokenUtil {
     return new Promise<{ access_token: string }>((resolve, reject) => {
       if (!existingConnection) {
         return reject({
-          message: 'Invalid refreshAccessToken token provided',
+          message: 'Invalid access token provided',
           code: 403
         });
       }
