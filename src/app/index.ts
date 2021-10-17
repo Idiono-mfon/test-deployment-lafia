@@ -31,7 +31,7 @@ dotConfig();
 const app = express();
 
 // @ts-ignore
-const server = new InversifyExpressServer(container as any, null, null, app);
+const server = new InversifyExpressServer(container, null, null, app);
 const messageBroker = container.get<MessageBroker>(TYPES.MessageBroker);
 const patientService = container.get<PatientService>(TYPES.PatientService);
 const videoBroadcastService = container.get<VideoBroadcastService>(TYPES.VideoBroadcastService);
