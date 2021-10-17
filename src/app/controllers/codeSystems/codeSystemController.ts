@@ -26,7 +26,7 @@ export class CodeSystemController extends BaseController {
 
       this.success(res, maritalStatus, 'Request Successful');
     } catch (e: any) {
-      logger.error(`Could not get maritalStatus -`, e);
+      logger.error(`Could not get maritalStatus:`, e);
       this.error(res, e);
     }
   }
@@ -40,7 +40,7 @@ export class CodeSystemController extends BaseController {
 
       this.success(res, languages, 'Request Successful');
     } catch (e: any) {
-      logger.error(`Could not get languages -`, e);
+      logger.error(`Could not get languages:`, e);
       this.error(res, e);
     }
   }
@@ -54,7 +54,7 @@ export class CodeSystemController extends BaseController {
 
       this.success(res, relationships, 'Request Successful');
     } catch (e: any) {
-      logger.error(`Could not get relationships -`, e);
+      logger.error(`Could not get relationships:`, e);
       this.error(res, e);
     }
   }
@@ -68,7 +68,7 @@ export class CodeSystemController extends BaseController {
 
       this.success(res, qualifications, 'Request Successful');
     } catch (e: any) {
-      logger.error(`Could not get qualifications -`, e);
+      logger.error(`Could not get qualifications:`, e);
       this.error(res, e);
     }
   }
@@ -82,7 +82,7 @@ export class CodeSystemController extends BaseController {
 
       this.success(res, codeSystem, 'Code system successfully added', HttpStatusCode.CREATED);
     } catch (e: any) {
-      logger.error(`Could not get systems -`, e);
+      logger.error(`Could not get systems:`, e);
       this.error(res, e);
     }
   }
@@ -96,7 +96,7 @@ export class CodeSystemController extends BaseController {
 
       this.success(res, durations, 'Request Successful');
     } catch (e: any) {
-      logger.error(`Could not get durations -`, e);
+      logger.error(`Could not get durations:`, e);
       this.error(res, e);
     }
   }

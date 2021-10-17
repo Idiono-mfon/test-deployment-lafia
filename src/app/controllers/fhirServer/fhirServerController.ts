@@ -1,3 +1,4 @@
+import { Method } from 'axios';
 import { Request, Response } from 'express';
 import { inject } from 'inversify';
 import {
@@ -22,7 +23,7 @@ export class FhirServerController extends BaseController {
   @inject(TYPES.TokenUtil)
   private readonly tokenUtil: TokenUtil;
 
-  private async refreshAccessToken(token: string): Promise<string | undefined> {
+  private async refreshAccessToken(token: string): Promise<string | null> {
     logger.info('Running FhirServerController::refreshAccessToken');
     try {
       const { access_token } = await this.tokenUtil.refreshAccessToken(token);
@@ -32,6 +33,8 @@ export class FhirServerController extends BaseController {
       logger.error(`Unable to refresh access token`, e);
       throwError(e.message, error.forbidden);
     }
+
+    return  null;
   }
 
   @httpGet('/Aggregate', TYPES.AuthMiddleware)
@@ -67,7 +70,7 @@ export class FhirServerController extends BaseController {
 
       this.success(res, resource, 'Data aggregated successfully');
     } catch (e: any) {
-      logger.error(`${e.message}`);
+      logger.error(`${e.message}`, e);
       this.error(res, e);
     }
   }
@@ -109,11 +112,11 @@ export class FhirServerController extends BaseController {
         status: statusCode,
         headers,
         data
-      } = await this.fhirServerService.executeQuery(requestUrl, 'GET', props);
+      } = await this.fhirServerService.executeQuery(requestUrl, req.method as Method, props);
 
       this.success(res, data, '', statusCode, headers);
     } catch (e: any) {
-      logger.error(`${e.message}`);
+      logger.error(`${e.message}`, e);
       this.error(res, e);
     }
   }
@@ -148,7 +151,7 @@ export class FhirServerController extends BaseController {
 
       this.success(res, data, '', statusCode, headers);
     } catch (e: any) {
-      logger.error(`${e.message}`);
+      logger.error(`${e.message}`, e);
       this.error(res, e);
     }
   }
@@ -186,7 +189,7 @@ export class FhirServerController extends BaseController {
 
       this.success(res, data, '', statusCode, headers);
     } catch (e: any) {
-      logger.error(`${e.message}`);
+      logger.error(`${e.message}`, e);
       this.error(res, e);
     }
   }
@@ -221,7 +224,7 @@ export class FhirServerController extends BaseController {
 
       this.success(res, data, '', statusCode, headers);
     } catch (e: any) {
-      logger.error(`${e.message}`);
+      logger.error(`${e.message}`, e);
       this.error(res, e);
     }
   }
@@ -256,7 +259,7 @@ export class FhirServerController extends BaseController {
 
       this.success(res, data, '', statusCode, headers);
     } catch (e: any) {
-      logger.error(`${e.message}`);
+      logger.error(`${e.message}`, e);
       this.error(res, e);
     }
   }
