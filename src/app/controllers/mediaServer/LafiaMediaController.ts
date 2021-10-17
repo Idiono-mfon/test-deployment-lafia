@@ -31,7 +31,7 @@ export class LafiaMediaController extends BaseController {
 
   @httpPost('/broadcast', TYPES.AuthMiddleware)
   public async createBroadcast(@request() req: Request, @response() res: Response) {
-    logger.info('Running LafiaMediaController::createBroadcast');
+    logger.info('Running LafiaMediaController.createBroadcast');
     try {
       const { user } = res.locals;
       const broadcast = await this.lafiaMediaService.createBroadcast(user?.id);
@@ -45,7 +45,7 @@ export class LafiaMediaController extends BaseController {
 
   @httpPost('/events')
   public async listenForMediaServerEvent(@request() req: Request, @response() res: Response): Promise<void> {
-    logger.info('Running LafiaMediaController::listenForMediaServerEvent');
+    logger.info('Running LafiaMediaController.listenForMediaServerEvent');
     try {
       // Retrieve the request's body
       const event = req.body;
@@ -184,7 +184,7 @@ export class LafiaMediaController extends BaseController {
 
   @httpGet('/broadcast/:streamId', TYPES.AuthMiddleware)
   public async getRecordedStream(@request() req: Request, @response() res: Response) {
-    logger.info('Running LafiaMediaController::getRecordedStream');
+    logger.info('Running LafiaMediaController.getRecordedStream');
     try {
       const { streamId } = req.params;
       const broadcast = await this.lafiaMediaService.getOneVideoRecord({ streamId });
@@ -198,7 +198,7 @@ export class LafiaMediaController extends BaseController {
 
   @httpGet('/broadcast', TYPES.AuthMiddleware)
   public async getAllRecordedStream(@request() req: Request, @response() res: Response) {
-    logger.info('Running LafiaMediaController::getAllRecordedStream');
+    logger.info('Running LafiaMediaController.getAllRecordedStream');
     try {
       const { user } = res.locals;
       const broadcast = await this.lafiaMediaService.getAllVideoRecords(user?.id!);
@@ -212,7 +212,7 @@ export class LafiaMediaController extends BaseController {
 
   @httpDelete('/broadcast/:id', TYPES.AuthMiddleware)
   public async getRecordedStreamUrl(@request() req: Request, @response() res: Response) {
-    logger.info('Running LafiaMediaController::getRecordedStreamUrl');
+    logger.info('Running LafiaMediaController.getRecordedStreamUrl');
     try {
       const { id } = req.params;
       const broadcast = await this.lafiaMediaService.deleteVideoRecord(id);
