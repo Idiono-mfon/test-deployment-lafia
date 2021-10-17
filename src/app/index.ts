@@ -11,10 +11,19 @@ import { Env } from './config/env';
 import TYPES from './config/types';
 import { AuthMiddleware, morganMiddleware } from './middlewares';
 import { PatientService, PractitionerService, MessageBroker, VideoBroadcastService, AuthService } from './services';
+import { KafkaService } from './services/kafka';
 import { SignallingServerService } from './services/signallingServers';
 import * as swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './config/swagger.config';
 import { logger } from './utils';
+
+process.setMaxListeners(0);
+
+KafkaService.producer('creatResource', {resourceType: 'Patient', data: {name: 'Name'}}).then(e => logger.info(e));
+
+KafkaService
+  .consumer()
+  .then();
 
 dotConfig();
 
@@ -68,6 +77,7 @@ const appServer = createServer(serverInstance);
 
 appServer.listen(PORT, () => {
   logger.debug(`Listening on port: ${PORT}`);
+  logger.debug('');
 });
 
 const signallingServer = new SignallingServerService(
