@@ -71,7 +71,7 @@ export class FhirServerService implements IFhirServer {
       }
 
       return resourceData.data;
-    } catch (e) {
+    } catch (e: any) {
       const [resourceName,] = resourceQuery.split('?');
       data.failed.push({ resourceName, message: e.message });
     }
