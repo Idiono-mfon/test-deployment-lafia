@@ -3,8 +3,8 @@ import TYPES from '../../config/types';
 import {
   ITwilioRoom,
 } from '../../models';
-import { TwilioRoomRepository } from '../../repository/videoRecords/twilioRoomRepository';
-import { InternalServerError } from '../../utils';
+import { TwilioRoomRepository } from '../../repository';
+import { InternalServerError, logger } from '../../utils';
 
 @injectable()
 export class TwilioRoomService {
@@ -13,6 +13,7 @@ export class TwilioRoomService {
 
 
   public async saveRoom(data: ITwilioRoom): Promise<ITwilioRoom> {
+    logger.info('Running TwilioRoomService.saveRoom');
     try {
       return await this.twilioRoomRepository.saveRoom(data);
     } catch (e: any) {
@@ -21,6 +22,7 @@ export class TwilioRoomService {
   }
 
   public async getOneRoom(data: ITwilioRoom | any): Promise<ITwilioRoom> {
+    logger.info('Running TwilioRoomService.getOneRoom');
     try {
       return await this.twilioRoomRepository.getOneRoom(data);
     } catch (e: any) {
@@ -29,6 +31,7 @@ export class TwilioRoomService {
   }
 
   public async getAllRooms(user_id: string): Promise<ITwilioRoom[]> {
+    logger.info('Running TwilioRoomService.getAllRooms');
     try {
       return await this.twilioRoomRepository.getAllRooms(user_id);
     } catch (e: any) {

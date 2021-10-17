@@ -5,7 +5,7 @@ import Redis from 'ioredis';
 import { v4 as uuid } from 'uuid';
 import { Env } from '../../config/env';
 import TYPES from '../../config/types';
-import { forWho } from '../../utils';
+import { forWho, logger } from '../../utils';
 import { MessageBroker, rmqNewBroadcastSuccessResponse } from '../messageBroker';
 import { PatientService } from '../patients';
 import { PractitionerService } from '../practitioners';
@@ -64,6 +64,7 @@ export class SignallingServerService {
   }
 
   public initialize(): void {
+    logger.info('Running SignallingServerService.initialize');
     this.io.on('connection', async (socket: Socket) => {
       await SignallingServerService.listenForConnectionEvent(socket);
       await SignallingServerService.emitOnlinePractitionersEvent(this.io);
@@ -79,6 +80,7 @@ export class SignallingServerService {
   }
 
   private static async listenForConnectionEvent(socket: Socket) {
+    logger.info('Running SignallingServerService.listenForConnectionEvent');
     let { userId, resourceType } = socket.handshake.query;
     resourceType = resourceType as unknown as string;
     resourceType = resourceType.toLowerCase();
@@ -101,6 +103,7 @@ export class SignallingServerService {
   }
 
   private static async emitOnlinePractitionersEvent(socket: Socket) {
+    logger.info('Running SignallingServerService.emitOnlinePractitionersEvent');
     const onlineUsers = await SignallingServerService.redisStore.getOnlineUsers();
     let onlinePractitioners = [];
 
@@ -113,13 +116,14 @@ export class SignallingServerService {
       }
     }
 
-    console.log('OnlinePractitioners:', onlinePractitioners);
-    console.log('OnlineUsers:', onlineUsers);
+    logger.info(`OnlinePractitioners: ${JSON.stringify(onlinePractitioners)}`);
+    logger.info(`OnlineUsers: ${JSON.stringify(onlineUsers)}`);
 
     socket.emit('onlinePractitioners', onlinePractitioners);
   }
 
   private listenForNewVideoBroadcastEvent(socket: Socket) {
+    logger.info('Running SignallingServerService.listenForNewVideoBroadcastEvent');
     socket.on('newVideoBroadcast', async (newBroadcast: INewBroadcast) => {
       await SignallingServerService.redisStore.saveBroadcast(newBroadcast);
       const newCareBroadCast = await SignallingServerService.redisStore
@@ -143,18 +147,19 @@ export class SignallingServerService {
           video_url: newCareBroadCast.videoUrl
         }
 
-        const persistedBroadcast = await SignallingServerService.videoBroadcastService.saveBroadcastVideo(vidBroadcast);
-        console.log('persistedBroadcast {}', persistedBroadcast);
+        await SignallingServerService.videoBroadcastService.saveBroadcastVideo(vidBroadcast);
       }
     });
   }
 
   private static emitNewCareEvent(socket: Socket, newCareBroadcast: INewCare) {
+    logger.info('Running SignallingServerService.emitNewCareEvent');
     socket.to(SignallingServerService.onlinePractitionerRoom)
       .emit('newCare', newCareBroadcast);
   }
 
   private static listenForAcceptCareEvent(socket: Socket) {
+    logger.info('Running SignallingServerService.listenForAcceptCareEvent');
     socket.on('acceptCare', async (acceptCare: IAcceptCare, cb) => {
       const existingCare = await SignallingServerService.redisStore.getBroadcastByVideoUrl(acceptCare.videoUrl);
 
@@ -180,14 +185,12 @@ export class SignallingServerService {
           practitioner_id: acceptCare.practitionerId,
           video_broadcast_id: vidId
         }
-        console.log('SavePractitionerVideoBroadcast:', videoBroadcast);
-        console.log('PData:', data);
+
         await SignallingServerService.videoBroadcastService.assignBroadcastVideoToPractitioner(data);
       }
 
 
       const defaultRoomName = uuid();
-      console.log('DefaultRoom:', defaultRoomName);
       const { token, roomId } = await SignallingServerService.twilioService
         .generateAccessToken(acceptCare?.practitionerId as string, defaultRoomName);
       return cb({
@@ -200,6 +203,7 @@ export class SignallingServerService {
   }
 
   private static listenForPatientOnlineStatusEvent(socket: Socket) {
+    logger.info('Running SignallingServerService.listenForPatientOnlineStatusEvent');
     socket.on('patientOnlineStatus', async (data, cb) => {
       const userData: IOnlineUser = await SignallingServerService
         .redisStore
@@ -221,12 +225,14 @@ export class SignallingServerService {
   }
 
   private static listenForCallUserEvent(socket: Socket) {
+    logger.info('Running SignallingServerService.listenForCallUserEvent');
     socket.on('callUser', async (data) => {
       await SignallingServerService.emitCallMadeEvent(socket, data);
     });
   }
 
   private static async emitCallMadeEvent(socket: Socket, data: any) {
+    logger.info('Running SignallingServerService.emitCallMadeEvent');
     const { token } = await SignallingServerService
       .twilioService
       .generateAccessToken(
@@ -243,13 +249,14 @@ export class SignallingServerService {
   }
 
   private static listenForCallEvent(socket: Socket) {
+    logger.info('Running SignallingServerService.listenForCallEvent');
     socket.on('call', async (data) => {
       await SignallingServerService.emitCallEvent(socket, data);
     });
   }
 
   private static async emitCallEvent(socket: Socket, data: any) {
-    console.log('Received Data:', data);
+    logger.info('Running SignallingServerService.emitCallEvent');
     const reciever: IOnlineUser = await SignallingServerService
       .redisStore
       .getUserById(data.reciever);
@@ -264,9 +271,6 @@ export class SignallingServerService {
         data.room
       ) : null;
 
-    console.log('Access RoomId:', access?.roomId);
-    console.log('Received RoomId:', data?.room);
-
     const res = {
       room: data.room,
       token: access?.token,
@@ -278,16 +282,15 @@ export class SignallingServerService {
       socket: socket?.id,
     };
 
-    console.log('RES:', res);
+    logger.debug(`EmitCallEvent Data: ${JSON.stringify(res)}`);
 
     socket
       .to(reciever.socketId)
       .emit('call', res);
-
-    console.log('Calling...');
   }
 
   private static listenForMakeAnswerEvent(socket: Socket) {
+    logger.info('Running SignallingServerService.listenForMakeAnswerEvent');
     socket.on('makeAnswer', async data => {
       await SignallingServerService.emitOnlinePractitionersEvent(socket);
       SignallingServerService.emitAnswerMadeEvent(socket, data);
@@ -295,6 +298,7 @@ export class SignallingServerService {
   }
 
   private static emitAnswerMadeEvent(socket: Socket, data: any) {
+    logger.info('Running SignallingServerService.emitAnswerMadeEvent');
     socket.to(data.to).emit('answerMade', {
       socket: socket?.id,
       answer: data.answer,
@@ -302,12 +306,14 @@ export class SignallingServerService {
   }
 
   private static listenForIceCandidateEvent(socket: Socket) {
+    logger.info('Running SignallingServerService.listenForIceCandidateEvent');
     socket.on('iceCandidate', data => {
       SignallingServerService.emitCandidateSharedEvent(socket, data);
     });
   }
 
   private static emitCandidateSharedEvent(socket: Socket, data: any) {
+    logger.info('Running SignallingServerService.emitCandidateSharedEvent');
     socket.to(data.to).emit('candidateShared', {
       candidate: data.candidate,
       socket: socket?.id,
@@ -315,6 +321,7 @@ export class SignallingServerService {
   }
 
   private static listenForDisconnectEvent(io: Socket, socket: Socket) {
+    logger.info('Running SignallingServerService.listenForDisconnectEvent');
     socket.on('disconnect', async () => {
       let { userId, resourceType } = socket.handshake.query;
       resourceType = resourceType as unknown as string;

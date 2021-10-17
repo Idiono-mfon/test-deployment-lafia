@@ -4,23 +4,24 @@ import { IPatient, PatientModel } from '../../models';
 import {
   GenericResponseError,
   HttpStatusCode,
-  InternalServerError
+  InternalServerError, logger
 } from '../../utils';
 
 @injectable()
 export class PatientRepository {
   public async updatePatient(data: IPatient): Promise<IPatient> {
+    logger.info('Running PatientRepository::updatePatient');
     try {
       return await transaction(PatientModel, async (PatientModel) => {
         return PatientModel.query().upsertGraphAndFetch(data, { relate: true, unrelate: true });
       });
     } catch (e: any) {
-      console.error(e);
       throw new GenericResponseError(e.message, HttpStatusCode.BAD_REQUEST);
     }
   }
 
   public async findPatientById(id: string): Promise<IPatient> {
+    logger.info('Running PatientRepository::findPatientById');
     try {
       return await transaction(PatientModel, async(PatientModel) => {
           return PatientModel.query()
@@ -65,6 +66,7 @@ export class PatientRepository {
   }
 
   public async getIds(id: string): Promise<any> {
+    logger.info('Running PatientRepository::getIds');
     try {
       return await transaction(PatientModel, async(PatientModel) => {
           return PatientModel.query()
@@ -110,12 +112,12 @@ export class PatientRepository {
   }
 
   public async createPatient(data: any): Promise<IPatient> {
+    logger.info('Running PatientRepository::getIds');
     try {
       return await transaction(PatientModel, async (PatientModel) => {
         return PatientModel.query().insertGraphAndFetch(data);
       });
     } catch (e: any) {
-      console.error(e);
       throw new GenericResponseError(e.message, HttpStatusCode.BAD_REQUEST);
     }
   }

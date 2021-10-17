@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { IPatient, IPractitioner } from '../../models';
-import { forWho, GenericResponseError, HttpStatusCode } from '../../utils';
+import { forWho, GenericResponseError, HttpStatusCode, logger } from '../../utils';
 import { PatientService } from '../patients';
 import { PractitionerService } from '../practitioners';
 import { IBroadcastStatus, IOnlineUser, IRoom, IRooms } from './interfaces';
@@ -23,6 +23,7 @@ export class RedisStore {
   }
 
   private static encodeBase64(data: any): string {
+    logger.info('Running RedisStore.encodeBase64');
     // Create buffer object, specifying utf8 as encoding
     const bufferObj = Buffer.from(data, 'utf8');
 
@@ -31,6 +32,7 @@ export class RedisStore {
   }
 
   private static decodeBase64(base64Str: string): any {
+    logger.info('Running RedisStore.decodeBase64');
     // Create a buffer from the string
     const bufferObj = Buffer.from(base64Str, 'base64');
 
@@ -39,6 +41,7 @@ export class RedisStore {
   }
 
   public async getOnlineUsers(): Promise<IOnlineUser[]> {
+    logger.info('Running RedisStore.getOnlineUsers');
     try {
       const encodedOnlineUsers = await this.redisClient.get(this.onlineUsersKey);
 
@@ -56,6 +59,7 @@ export class RedisStore {
   }
 
   public async getUserById(userId: string): Promise<IOnlineUser | any> {
+    logger.info('Running RedisStore.getUserById');
     try {
       // Get All Online Users
       let onlineUsers: IOnlineUser[] | any = await this.getOnlineUsers();
@@ -79,6 +83,7 @@ export class RedisStore {
   }
 
   public async removeUserBYId(userId: string): Promise<void> {
+    logger.info('Running RedisStore.removeUserBYId');
     try {
       // Get All Online Users
       const onlineUsers: IOnlineUser[] | any = await this.getOnlineUsers();
@@ -100,7 +105,7 @@ export class RedisStore {
   }
 
   public async saveOnlineUser(user: IOnlineUser): Promise<void> {
-    // console.log(user)
+    logger.info('Running RedisStore.saveOnlineUser');
     try {
       // Get All Online Users
       let onlineUsers: IOnlineUser[] = await this.getOnlineUsers();
@@ -156,6 +161,7 @@ export class RedisStore {
   }
 
   public async getAllBroadcasts(): Promise<IBroadcastStatus[]> {
+    logger.info('Running RedisStore.getAllBroadcasts');
     try {
       const encodedBroadcast = await this.redisClient.get(this.broadcastStatusKey);
 
@@ -173,6 +179,7 @@ export class RedisStore {
   }
 
   public async getBroadcastByVideoUrl(videoUrl: string): Promise<IBroadcastStatus | any> {
+    logger.info('Running RedisStore.getBroadcastByVideoUrl');
     try {
       // Get All Broadcast
       let broadcastStatus: IBroadcastStatus[] | any = await this.getAllBroadcasts();
@@ -196,6 +203,7 @@ export class RedisStore {
   }
 
   public async saveBroadcast(broadcast: IBroadcastStatus): Promise<void> {
+    logger.info('Running RedisStore.saveBroadcast');
     try {
       // Get All Broadcast
       let broadcastStatus: IBroadcastStatus[] = await this.getAllBroadcasts();
@@ -231,6 +239,7 @@ export class RedisStore {
   }
 
   public async updateBroadcast(broadcast: IBroadcastStatus): Promise<void> {
+    logger.info('Running RedisStore.updateBroadcast');
     try {
       // Get All Broadcast
       let broadcastStatus: IBroadcastStatus[] = await this.getAllBroadcasts();
@@ -261,6 +270,7 @@ export class RedisStore {
   }
 
   public async getAllRooms(): Promise<IRooms> {
+    logger.info('Running RedisStore.getAllRooms');
     try {
       const encodedRoom = await this.redisClient.get(this.roomKey);
 
@@ -278,6 +288,7 @@ export class RedisStore {
   }
 
   public async getRoomById(id: string): Promise<IRoom | any> {
+    logger.info('Running RedisStore.getRoomById');
     try {
       // Get All Rooms
       let rooms = await this.getAllRooms();
@@ -301,6 +312,7 @@ export class RedisStore {
   }
 
   public async deleteRoomById(roomId: string): Promise<void> {
+    logger.info('Running RedisStore.deleteRoomById');
     try {
       // Get All Rooms
       const rooms: IRooms = await this.getAllRooms();
@@ -324,6 +336,7 @@ export class RedisStore {
   }
 
   public async addRoom(roomId: string, room: IRoom): Promise<void> {
+    logger.info('Running RedisStore.addRoom');
     try {
       // Get All Rooms
       let rooms: IRooms = await this.getAllRooms();

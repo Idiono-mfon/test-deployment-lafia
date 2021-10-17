@@ -1,10 +1,11 @@
 import { injectable } from 'inversify';
 import { CodeSystemModel, ICodeSystem } from '../../models';
-import { InternalServerError } from '../../utils';
+import { InternalServerError, logger } from '../../utils';
 
 @injectable()
 export class CodeSystemRepository {
   public async getCodeSystemByType(codeType: string): Promise<ICodeSystem[]> {
+    logger.info('Running CodeSystemRepository::getCodeSystemByType');
     try {
       let codeSystems = CodeSystemModel.query();
 
@@ -21,10 +22,12 @@ export class CodeSystemRepository {
   }
 
   public async addCodeSystem(data: ICodeSystem): Promise<ICodeSystem> {
+    logger.info('Running CodeSystemRepository::addCodeSystem');
     return CodeSystemModel.query().insertAndFetch(data);
   }
 
   public async getCodeSystemByCode(code: string): Promise<ICodeSystem> {
+    logger.info('Running CodeSystemRepository::getCodeSystemByCode');
     try {
       return await CodeSystemModel.query()
         .where({ code })

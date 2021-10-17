@@ -19,7 +19,7 @@ import {
   rmqSuccessResponse,
   PractitionerService
 } from '../../services';
-import { HttpStatusCode } from '../../utils';
+import { HttpStatusCode, logger } from '../../utils';
 import { BaseController } from '../baseController';
 
 @controller('/practitioners')
@@ -32,6 +32,7 @@ export class PractitionerController extends BaseController {
 
   @httpPut('/:id')
   public async updatePractitioner(@request() req: Request, @response() res: Response) {
+    logger.info('Running PractitionerController::updatePractitioner');
     try {
       const { id: practitionerId } = req.params;
       const practitionerData: IPractitioner = req.body;
@@ -40,24 +41,28 @@ export class PractitionerController extends BaseController {
 
       this.success(res, practitioner, 'Practitioner profile successfully updated');
     } catch (e: any) {
+      logger.error(`Error updating practitioner data`, e);
       this.error(res, e);
     }
   }
 
   @httpGet('/:id')
   public async findPractitionerById(@request() req: Request, @response() res: Response) {
+    logger.info('Running PractitionerController::findPractitionerById');
     try {
       const { id } = req.params;
       const practitioner: IPractitioner = await this.practitionerService.findPractitionerById(id);
 
       this.success(res, practitioner, 'Request completed');
     } catch (e: any) {
+      logger.error(`Error finding practitioner with id - ${req?.params?.id}`, e);
       this.error(res, e);
     }
   }
 
   @httpPost('')
   public async createPractitioner(@request() req: Request, @response() res: Response) {
+    logger.info('Running PractitionerController::createPractitioner');
     try {
       const practitionerData: any = req.body;
       const practitioner: IPractitionerWithToken = await this.practitionerService.createPractitioner(practitionerData);
@@ -74,29 +79,34 @@ export class PractitionerController extends BaseController {
 
       this.success(res, practitioner, 'Practitioner registration successful', HttpStatusCode.CREATED);
     } catch (e: any) {
+      logger.error(`Error creating practitioner`, e);
       this.error(res, e);
     }
   }
 
   @httpPost('/:id/attachments', uploadFile.single('file'))
   public async uploadAttachment(@request() req: Request, @response() res: Response) {
+    logger.info('Running PractitionerController::uploadAttachment');
     try {
       const { id: practitionerId } = req.params;
       const attachment: IAttachment = await this.practitionerService.uploadAttachment(practitionerId, req?.file!);
 
       this.success(res, attachment, 'Request completed successfully');
     } catch (e: any) {
+      logger.error(`Error uploading attachment`, e);
       this.error(res, e);
     }
   }
 
   @httpGet('/:id/broadcast/videos')
   public async broadcastVideos(@request() req: Request, @response() res: Response) {
+    logger.info('Running PractitionerController::broadcastVideos');
     try {
       const { id: practitionerId } = req.params;
-      const vids = await this.practitionerService.findAssignedPractitionervideoBroadcast(practitionerId);
-      this.success(res, vids, 'Request completed successfully');
+      const vid = await this.practitionerService.findAssignedPractitionerVideoBroadcast(practitionerId);
+      this.success(res, vid, 'Request completed successfully');
     } catch (e: any) {
+      logger.error(`Error broadcasting video`, e);
       this.error(res, e);
     }
   }

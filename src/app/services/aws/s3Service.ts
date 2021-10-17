@@ -5,7 +5,7 @@ import { Env } from '../../config/env';
 import {
   error,
   GenericResponseError,
-  HttpStatusCode,
+  HttpStatusCode, logger,
   throwError
 } from '../../utils';
 
@@ -27,6 +27,7 @@ export class S3Service {
   }
 
   public async uploadFile(file: Express.Multer.File): Promise<string> {
+    logger.info('Running S3Service::uploadFile');
     try {
       if (!file) {
         throwError('File upload failed!', error.internalServer);
@@ -37,15 +38,13 @@ export class S3Service {
 
     const { buffer: fileBuffer, mimetype } = file;
 
-    console.log('File:', file);
-
     // Extract file extension
-    const [type, ext] = mimetype.split('/');
+    const [, ext] = mimetype.split('/');
 
     // Set S3 params
     const uploadParams = {
       Bucket: `${env.aws_bucket}`,
-      Key: `videos/${uuidV4()}.${ext}`,
+      Key: `lafia-service/videos/${uuidV4()}.${ext}`,
       Body: fileBuffer,
       ACL: 'public-read'
     };

@@ -3,7 +3,7 @@ import { inject } from 'inversify';
 import { controller, httpGet, httpPost, httpPut, request, response } from 'inversify-express-utils';
 import TYPES from '../../config/types';
 import { ConsentService, FhirServerService, UserService } from '../../services';
-import { error, throwError } from '../../utils';
+import { error, logger, throwError } from '../../utils';
 import { BaseController } from '../baseController';
 
 @controller('/consents')
@@ -17,6 +17,7 @@ export class ConsentController extends BaseController {
 
   @httpPost('/accept')
   public async acceptConsent(@request() req: Request, @response() res: Response) {
+    logger.info('Running ConsentController::acceptConsent');
     try {
       if (req.body?.resourceType !== 'Consent') {
         throwError('Invalid FHIR Consent Resource Received!', error.badRequest);
@@ -30,12 +31,14 @@ export class ConsentController extends BaseController {
 
       this.success(res, consentRecord?.data, 'Consent successfully accepted');
     } catch (e: any) {
+      logger.error(`Unable to accept consent -`, e);
       this.error(res, e);
     }
   }
 
   @httpPut('/type')
   public async addConsentCategory(@request() req: Request, @response() res: Response) {
+    logger.info('Running ConsentController::addConsentCategory');
     try {
       const { consent_type, patient_id } = req.body;
 
@@ -52,12 +55,14 @@ export class ConsentController extends BaseController {
 
       this.success(res, {}, 'Consent category added successfully');
     } catch (e: any) {
+      logger.error(`Unable to add consent category -`, e);
       this.error(res, e);
     }
   }
 
   @httpGet('/:user_id')
   public async getAllConsent(@request() req: Request, @response() res: Response) {
+    logger.info('Running ConsentController::getAllConsent');
     try {
       const { user_id } = req.params;
       let { resource_type } = req.query;
@@ -82,6 +87,7 @@ export class ConsentController extends BaseController {
 
       this.success(res, consents?.data, 'Consents retrieved successfully');
     } catch (e: any) {
+      logger.error(`Unable to retrieve consents -`, e);
       this.error(res, e);
     }
   }

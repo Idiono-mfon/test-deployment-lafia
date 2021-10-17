@@ -1,12 +1,15 @@
 import bcrypt from 'bcryptjs';
+import { logger } from './loggerUtil';
 
 export class Password {
   public static async hash(password: string): Promise<string> {
+    logger.info('Running Password.Password');
     const salt = await bcrypt.genSalt(10);
     return bcrypt.hash(password, salt);
   }
 
   public static async compare(plainPassword: string, hashedPassword: string): Promise<boolean> {
+    logger.info('Running Password.compare');
     return bcrypt.compare(plainPassword, hashedPassword);
   }
 
@@ -18,6 +21,7 @@ export class Password {
   * 5. Must at least contain 1 digit
   */
   public static validatePassword(password: string): boolean {
+    logger.info('Running Password.validatePassword');
     const regex = /(?=.*\d)(?=.*[a-z])(?=.*[!@#$%^&-.+=()])(?=.*[A-Z]).{6,}/;
 
     return regex.test(password);

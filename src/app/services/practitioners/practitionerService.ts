@@ -18,7 +18,7 @@ import {
   error,
   forWho,
   GenericResponseError,
-  InternalServerError,
+  InternalServerError, logger,
   NotFoundError,
   throwError,
   UtilityService
@@ -60,12 +60,15 @@ export class PractitionerService {
   private readonly practitionervideoBroadcastRepository: PractitionerVideoBroadcastRepository;
 
   public async updatePractitioner(id: string, data: any): Promise<IPractitioner> {
+    logger.info('Running PractitionerService.updatePractitioner');
     try {
       const { data: practitionerData } = await this.fhirServerService.executeQuery(
         `/Practitioner/${id}`,
         'PUT',
-        data
-      )
+        { data }
+      );
+
+      logger.info(`Successfully updated practitioner data with an id - ${id}`);
 
       return practitionerData;
     } catch (e: any) {
@@ -74,12 +77,14 @@ export class PractitionerService {
   }
 
   public async findPractitionerById(id: string): Promise<IPractitioner> {
+    logger.info('Running PractitionerService.findPractitionerById');
     const practitioner = await this.fhirServerService.executeQuery(`/Practitioner/${id}`, 'GET');
 
     return practitioner.data;
   }
 
   public async createPractitioner(data: any): Promise<any> {
+    logger.info('Running PractitionerService.createPractitioner');
     this.utilService.checkForRequiredFields(data);
 
     const {
@@ -144,6 +149,8 @@ export class PractitionerService {
       ...userData
     });
 
+    logger.info(`A new practitioner with id - ${practitioner.id} - has been created`);
+
     return {
       user: practitioner,
       auth_token: token,
@@ -151,6 +158,7 @@ export class PractitionerService {
   }
 
   public async practitionerLogin(data: IUserLoginParams): Promise<any> {
+    logger.info('Running PractitionerService.practitionerLogin');
     try {
       const { user, token } = data;
 
@@ -172,6 +180,7 @@ export class PractitionerService {
   }
 
   public async uploadAttachment(practitionerId: string, file: Express.Multer.File): Promise<IAttachment> {
+    logger.info('Running PractitionerService.uploadAttachment');
     try {
       const practitioner: any = await this.findPractitionerById(practitionerId);
 
@@ -211,20 +220,22 @@ export class PractitionerService {
     }
   }
 
-  public async attachBroadCastVideo(practictionerId: string, videoBroadcastId: string): Promise<any> {
+  public async attachBroadCastVideo(practitionerId: string, videoBroadcastId: string): Promise<any> {
+    logger.info('Running PractitionerService.attachBroadCastVideo');
 
     const videoBroadcasts: VideoBroadcastModel = await this.videoBroadcastRepository.fetchBroadcastByID(videoBroadcastId);
     if ( !videoBroadcasts ) {
       throw new NotFoundError("video broadcasts not found");
     }
-    const practitioner: IPractitioner = await this.practitionerRepo.findPractitionerById(practictionerId);
+    const practitioner: IPractitioner = await this.practitionerRepo.findPractitionerById(practitionerId);
     if ( !practitioner ) {
       throw new NotFoundError("practitioner not found");
     }
-    return this.practitionerRepo.attachBroadcastVideos(practictionerId, videoBroadcastId);
+    return this.practitionerRepo.attachBroadcastVideos(practitionerId, videoBroadcastId);
   }
 
-  public async findAssignedPractitionervideoBroadcast(practitionerId: string) {
+  public async findAssignedPractitionerVideoBroadcast(practitionerId: string) {
+    logger.info('Running PractitionerService.findAssignedPractitionerVideoBroadcast');
     const practitioner = this.findPractitionerById(practitionerId)
     if ( !practitioner ) {
       throw new NotFoundError("unknown practitioner");

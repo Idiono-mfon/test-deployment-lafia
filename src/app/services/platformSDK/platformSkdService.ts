@@ -6,7 +6,7 @@ import { Env } from '../../config/env';
 import {
   error,
   GenericResponseError,
-  HttpStatusCode,
+  HttpStatusCode, logger,
   throwError
 } from '../../utils';
 
@@ -23,6 +23,7 @@ export class PlatformSdkService {
   }
 
   public async userSignup(data: any): Promise<any> {
+    logger.info('Running PlatformSdkService.userSignup');
     try {
       const { email, first_name, last_name, password } = data;
 
@@ -38,12 +39,12 @@ export class PlatformSdkService {
 
       return signupResponse;
     } catch (e: any) {
-      console.log('Error:', e.message);
       throw new GenericResponseError(e.message, e.code);
     }
   }
 
   public async userLogin(email: string, password: string): Promise<any> {
+    logger.info('Running PlatformSdkService.userLogin');
     try {
       // Get the platform connection object
       const connection = new PlatformConnection(this.appNamespace, email, this.adminToken);
@@ -62,6 +63,7 @@ export class PlatformSdkService {
   }
 
   public verifyJwtToken(token: string): any {
+    logger.info('Running PlatformSdkService.verifyJwtToken');
     try {
       return jwt.verify(token, env.jwt_secrete_key, {
         maxAge: '1hr'

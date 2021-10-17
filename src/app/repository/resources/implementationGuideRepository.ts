@@ -1,11 +1,12 @@
 import { injectable } from 'inversify';
 import { FhirResourceModel, IFindImplementationGuide, IImplementationGuide, ImplementationGuideModel } from '../../models';
-import { InternalServerError } from '../../utils';
+import { InternalServerError, logger } from '../../utils';
 
 @injectable()
 export class ImplementationGuideRepository {
 
   public async fetchImplementationGuide(): Promise<IImplementationGuide[]> {
+    logger.info('Running ImplementationGuideRepository::fetchImplementationGuide');
     try {
       return await ImplementationGuideModel.query()
         .withGraphFetched('fhirResources(defaultSelects)')
@@ -15,6 +16,7 @@ export class ImplementationGuideRepository {
   }
 
   public async createImplementationGuide(implementationGuide: IImplementationGuide): Promise<IImplementationGuide> {
+    logger.info('Running ImplementationGuideRepository::createImplementationGuide');
     try {
       return await ImplementationGuideModel.query()
         .insert(implementationGuide)
@@ -25,6 +27,7 @@ export class ImplementationGuideRepository {
   }
 
   public async getOneImplementationGuide(data: IFindImplementationGuide | any): Promise<IImplementationGuide> {
+    logger.info('Running ImplementationGuideRepository::getOneImplementationGuide');
     try {
       return await ImplementationGuideModel.query().withGraphFetched('fhirResources(defaultSelects)').findOne(data);
     } catch (e: any) {
@@ -33,6 +36,7 @@ export class ImplementationGuideRepository {
   }
 
   public async updateImplementationGuide(id: string, data: IFindImplementationGuide): Promise<any> {
+    logger.info('Running ImplementationGuideRepository::updateImplementationGuide');
     try {
       return await ImplementationGuideModel.query()
         .patchAndFetchById(id, data);
@@ -42,16 +46,19 @@ export class ImplementationGuideRepository {
   }
 
   public async attachFhirResource(implementationGuideId: string, fhirResourceId: string): Promise<any> {
+    logger.info('Running ImplementationGuideRepository::attachFhirResource');
     return (await ImplementationGuideModel.query().findById(implementationGuideId)).$relatedQuery('fhirResources')
       .relate(await FhirResourceModel.query().findById(fhirResourceId));
   }
 
   public async detachFhirResource(ig_id: string, fr_id: string) {
+    logger.info('Running ImplementationGuideRepository::detachFhirResource');
     return (await ImplementationGuideModel.query().findById( ig_id )).$relatedQuery('fhirResources')
       .unrelate().where('id', fr_id);
   }
 
   public async deleteImplementationGuide(id: string): Promise<any> {
+    logger.info('Running ImplementationGuideRepository::deleteImplementationGuide');
     try {
       return await ImplementationGuideModel.query().deleteById(id);
     } catch (e: any) {
