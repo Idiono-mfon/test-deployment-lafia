@@ -23,15 +23,14 @@ export class FhirServerController extends BaseController {
   @inject(TYPES.TokenUtil)
   private readonly tokenUtil: TokenUtil;
 
-  private async refreshAccessToken(token: string): Promise<string | null> {
+  private async refreshAccessToken(token: string): Promise<any> {
     logger.info('Running FhirServerController::refreshAccessToken');
     try {
-      const { access_token } = await this.tokenUtil.refreshAccessToken(token);
+      const { access_token, is_refresh_token_expired } = await this.tokenUtil.refreshAccessToken(token);
 
-      return access_token;
+      return { access_token, is_refresh_token_expired };
     } catch (e: any) {
-      logger.error(`Unable to refresh access token`, e);
-      throwError(e.message, error.forbidden);
+      throwError(`Unable to refresh access token: ${e.message}`, error.forbidden);
     }
 
     return  null;
@@ -50,11 +49,11 @@ export class FhirServerController extends BaseController {
 
 
       // Refresh access_token if it's expired
-      let accessToken = await this.refreshAccessToken(token);
+      let newToken = await this.refreshAccessToken(token);
 
       // @ts-ignore
-      if (accessToken) {
-        token = accessToken;
+      if (newToken?.access_token) {
+        token = newToken?.access_token;
       }
 
       const props: FhirProperties = {
@@ -66,7 +65,13 @@ export class FhirServerController extends BaseController {
       resource = await this.fhirServerService.aggregateFhirData(props);
 
       // @ts-ignore
-      resource = accessToken ? { access_token: accessToken, ...resource } : { ...resource };
+      resource = {
+        token: {
+          access_token: newToken?.access_token,
+          is_refresh_token_expired: newToken?.is_refresh_token_expired,
+        },
+        ...resource
+      };
 
       this.success(res, resource, 'Data aggregated successfully');
     } catch (e: any) {

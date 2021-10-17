@@ -6,7 +6,7 @@ import { GenericResponseError, HttpStatusCode, InternalServerError, logger } fro
 @injectable()
 export class ConnectionRepository {
   public async getConnectionByType(connectionType: object): Promise<IConnection[]> {
-    logger.info('Running ConnectionRepository::getConnectionByType');
+    logger.info('Running ConnectionRepository.getConnectionByType');
     try {
       let connections = ConnectionModel.query();
 
@@ -23,7 +23,7 @@ export class ConnectionRepository {
   }
 
   public async getConnectionByFields(fields: IFindConnection): Promise<IConnection> {
-    logger.info('Running ConnectionRepository::getConnectionByFields');
+    logger.info('Running ConnectionRepository.getConnectionByFields');
     try {
       return await ConnectionModel.query().where(fields).skipUndefined().first();
     } catch (e: any) {
@@ -32,7 +32,7 @@ export class ConnectionRepository {
   }
 
   public async addConnection(data: IConnection): Promise<IConnection> {
-    logger.info('Running ConnectionRepository::addConnection');
+    logger.info('Running ConnectionRepository.addConnection');
     try {
       return await ConnectionModel.query().insertAndFetch(data);
     }
@@ -42,7 +42,7 @@ export class ConnectionRepository {
   }
 
   public async getConnectionByPatientId(patient_id: string): Promise<IConnection[]> {
-    logger.info('Running ConnectionRepository::getConnectionByPatientId');
+    logger.info('Running ConnectionRepository.getConnectionByPatientId');
     try {
       return await ConnectionModel.query()
         .select(['id', 'patient_id', 'connection_name', 'access_token'])
@@ -54,7 +54,7 @@ export class ConnectionRepository {
   }
 
   public async updateConnection(data: IFindConnection): Promise<IConnection> {
-    logger.info('Running ConnectionRepository::updateConnection');
+    logger.info('Running ConnectionRepository.updateConnection');
     try {
       return await transaction(ConnectionModel, async (ConnectionModel) => {
         return ConnectionModel.query().upsertGraphAndFetch(data, { relate: true, unrelate: true });
@@ -65,6 +65,7 @@ export class ConnectionRepository {
   }
 
   public async deleteConnection(id: string) {
+    logger.info('Running ConnectionRepository.deleteConnection');
     return ConnectionModel.query().deleteById(id);
   }
 }

@@ -25,20 +25,21 @@ export class TokenUtil {
     const isTokenExpired = this.isTokenExpired(token);
 
     if (!isTokenExpired) {
-      return { access_token: null };
+      return { access_token: null, is_refresh_token_expired: false };
     }
 
     const existingConnection = await this.authService.getConnectionByFields({ access_token: token });
 
-    return new Promise<{ access_token: string }>((resolve, reject) => {
+    return new Promise<{ access_token: string | null, is_refresh_token_expired: boolean }>((resolve, reject) => {
       if (!existingConnection) {
         return reject({
-          message: 'Invalid access token provided',
+          message: 'There is no existing connection with the provided access token',
           code: 403
         });
       }
 
       const { refreshToken } = existingConnection;
+      let is_refresh_token_expired = false;
 
       refreshOauth2Token.requestNewAccessToken(
         provider,
@@ -46,7 +47,13 @@ export class TokenUtil {
         async (err: any, accessToken: string, refreshToken: string, result: any) => {
 
           if (err) {
-            return reject(err);
+            logger.warn('Refresh token expired');
+            is_refresh_token_expired = true;
+
+            // Remove the connection as it has expired
+            await this.authService.deleteConnection(existingConnection?.id!);
+
+            return resolve({ access_token: null, is_refresh_token_expired });
           }
 
 
@@ -62,7 +69,7 @@ export class TokenUtil {
             refresh_token
           });
 
-          return resolve({ access_token });
+          return resolve({ access_token, is_refresh_token_expired });
         },
       );
     });
