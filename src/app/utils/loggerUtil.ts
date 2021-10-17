@@ -63,17 +63,17 @@ const customPrint = winston.format.printf(info => {
 
 // Chose the aspect of your log customizing the log format.
 const format = winston.format.combine(
-    // Align the logs
-    winston.format.align(),
-    // Use simple format for the logs
-    winston.format.simple(),
-    // Log error stack track
-    winston.format.errors({ stack: true }),
-    // Add the message timestamp with the preferred format
-    winston.format.timestamp({ format: 'DD-MMM-YYYY HH:mm:ss:ms' }),
-    // Define the format of the message showing the timestamp, the level and the message
-    customPrint,
-  );
+  // Align the logs
+  winston.format.align(),
+  // Use simple format for the logs
+  winston.format.simple(),
+  // Log error stack track
+  winston.format.errors({ stack: true }),
+  // Add the message timestamp with the preferred format
+  winston.format.timestamp({ format: 'DD-MMM-YYYY HH:mm:ss:ms' }),
+  // Define the format of the message showing the timestamp, the level and the message
+  customPrint,
+);
 
 // Define which transports the logger must use to print out messages.
 // In this example, we are using three different transports
@@ -101,7 +101,8 @@ const logger = winston.createLogger({
 });
 
 // If we're not in production then log to the `console`
-if (env.environment !== 'production') logger.add(new winston.transports.Console({
+// if (env.environment !== 'production') logger.add(new winston.transports.Console({
+logger.add(new winston.transports.Console({
   format: winston.format.combine(
     // Align the logs
     winston.format.align(),
@@ -112,7 +113,7 @@ if (env.environment !== 'production') logger.add(new winston.transports.Console(
     // Add the message timestamp with the preferred format
     winston.format.timestamp({ format: 'DD-MMM-YYYY HH:mm:ss:ms' }),
     // Define the format of the message showing the timestamp, the level and the message
-    winston.format.colorize({ all: true}),
+    winston.format.colorize({ all: true }),
     customPrint,
   )
 }));
