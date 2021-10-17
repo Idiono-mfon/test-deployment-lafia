@@ -3,6 +3,7 @@ import cors from 'cors';
 import { config as dotConfig } from 'dotenv';
 import express from 'express';
 import { createServer } from 'http';
+import { interfaces } from 'inversify';
 import passport from 'passport';
 import refreshOauth2Token from 'passport-oauth2-refresh';
 import container from './config/inversify.config';
@@ -29,7 +30,7 @@ dotConfig();
 
 const app = express();
 
-const server = new InversifyExpressServer(container, null, null, app);
+const server = new InversifyExpressServer(container as interfaces.Container, null, null, app);
 const messageBroker = container.get<MessageBroker>(TYPES.MessageBroker);
 const patientService = container.get<PatientService>(TYPES.PatientService);
 const videoBroadcastService = container.get<VideoBroadcastService>(TYPES.VideoBroadcastService);
