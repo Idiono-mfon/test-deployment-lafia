@@ -4,11 +4,10 @@ import TYPES from '../config/types';
 import {
   IAddress,
   ICodeableConcept,
+  IHumanName, IPeriod,
   ICodeSystem, ICodeType,
   ICoding, IContactPoint,
-  IHumanName, INarrative,
-  IPeriod, IQualification,
-  IReference,
+  IQualification, IReference,
 } from '../models';
 import { CodeSystemService } from '../services';
 import {
@@ -19,25 +18,6 @@ import {
 import { logger } from './loggerUtil';
 
 const { badRequest } = error;
-
-function resourceNarrative(name: string, managingOrg: string, mrValue: string): INarrative {
-  const summaryText = `
-      <div xmlns=\\"http://www.w3.org/1999/xhtml\\">
-
-        \\n\\t\\t\\t
-
-          <p>Patient ${name} @ ${managingOrg}. 
-
-              MR = ${mrValue}</p>
-
-      </div> 
-    `;
-
-  return {
-    status: 'generated',
-    div: summaryText,
-  };
-}
 
 interface ForWho {
   patient: string;
@@ -236,185 +216,6 @@ class UtilityService {
     } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
-  }
-
-  public removeFalsyProps(data: any): void {
-    logger.info('Running UtilityService.removeFalsyProps');
-
-    for (let prop in data) {
-      if (!data[prop] || data[prop].length === 0) {
-        delete data[prop];
-      }
-
-      if (prop === 'name' || prop === 'telecom') {
-        for (let _props of data[prop]) {
-          for (let _prop in _props) {
-            if (!_props[_prop] ||
-              _props[_prop].length === 0) {
-              delete _props[_prop];
-            }
-          }
-        }
-      }
-    }
-  }
-
-  public mergeDataForUpdate(source: any, mergeWith: any): void {
-    logger.info('Running UtilityService.mergeDataForUpdate');
-
-    if (source) {
-      source.id = mergeWith.id;
-    }
-    if (mergeWith?.text) {
-      if (_.isEmpty(source?.text)) {
-        source.text = mergeWith?.text;
-      } else {
-        source.text.id = mergeWith?.text?.id;
-      }
-    }
-    if (mergeWith.name) {
-      source.name = [source.name];
-      for (let i = 0; i < mergeWith?.name.length; i++) {
-        if (mergeWith?.name[i]) {
-          if (_.isEmpty(source?.name[i])) {
-            source.name[i] = mergeWith?.name[i];
-          } else {
-            source.name[i].id = mergeWith?.name[i]?.id;
-          }
-        }
-        if (mergeWith?.name[i]?.period) {
-          if (_.isEmpty(source?.name[i]?.period)) {
-            source.name[i].period = mergeWith?.name[i]?.period;
-          } else {
-            source.name[i].period.id = mergeWith?.name[i]?.period?.id;
-          }
-        }
-      }
-    }
-    if (mergeWith.communication) {
-      source.communication = [source.communication];
-      for (let i = 0; i < mergeWith?.communication.length; i++) {
-        if (mergeWith?.communication[i]) {
-          if (_.isEmpty(source?.communication[i])) {
-            source.communication[i] = mergeWith?.communication[i];
-          } else {
-            source.communication[i].id = mergeWith?.communication[i]?.id;
-          }
-        }
-        if (mergeWith?.communication[i]?.language) {
-          if (_.isEmpty(source?.communication[i]?.language)) {
-            source.communication[i].language = mergeWith?.communication[i]?.language;
-          } else {
-            source.communication[i].language.id = mergeWith.communication[i].language.id;
-          }
-        }
-        if (mergeWith.communication[i]?.language?.coding) {
-          for (let i = 0; i < mergeWith.communication[i]?.language?.coding.length; i++) {
-            if (mergeWith?.communication[i]?.language?.coding[i]) {
-              if (_.isEmpty(source?.communication[i]?.language?.coding[i])) {
-                source.communication[i].language.coding[i] = mergeWith?.communication[i]?.language?.coding[i];
-              } else {
-                source.communication[i].language.coding[i].id = mergeWith?.communication[i]?.language?.coding[i]?.id;
-              }
-            }
-          }
-        }
-      }
-    }
-    if (mergeWith.qualification) {
-      source.qualification = [source.qualification];
-      for (let i = 0; i < mergeWith?.qualification.length; i++) {
-        if (mergeWith?.qualification[i]) {
-          if (_.isEmpty(source?.qualification[i])) {
-            source.qualification[i] = mergeWith?.qualification[i];
-          } else {
-            source.qualification[i].id = mergeWith?.qualification[i]?.id;
-          }
-        }
-        if (mergeWith?.qualification[i]?.issuer) {
-          if (_.isEmpty(source?.qualification[i]?.issuer)) {
-            source.qualification[i].issuer = mergeWith?.qualification[i].issuer;
-          } else {
-            source.qualification[i].issuer.id = mergeWith?.qualification[i]?.issuer?.id;
-          }
-        }
-        if (mergeWith?.qualification[i]?.period) {
-          if (_.isEmpty(source?.qualification[i]?.period)) {
-            source.qualification[i].period = mergeWith?.qualification[i].period;
-          } else {
-            source.qualification[i].period.id = mergeWith?.qualification[i]?.period?.id;
-          }
-        }
-        if (mergeWith?.qualification[i]?.code) {
-          if (_.isEmpty(source?.qualification[i]?.code)) {
-            source.qualification[i].code = mergeWith?.qualification[i]?.code;
-          } else {
-            source.qualification[i].code.id = mergeWith.qualification[i].code.id;
-          }
-        }
-        if (mergeWith.qualification[i]?.code?.coding) {
-          for (let i = 0; i < mergeWith.qualification[i]?.code?.coding.length; i++) {
-            if (mergeWith?.qualification[i]?.code?.coding[i]) {
-              if (_.isEmpty(source?.qualification[i]?.code?.coding[i])) {
-                source.qualification[i].code.coding[i] = mergeWith?.qualification[i]?.code?.coding[i];
-              } else {
-                source.qualification[i].code.coding[i].id = mergeWith?.qualification[i]?.code?.coding[i]?.id;
-              }
-            }
-          }
-        }
-      }
-    }
-    if (mergeWith?.maritalStatus) {
-      if (_.isEmpty(source?.maritalStatus)) {
-        source.maritalStatus = mergeWith?.maritalStatus;
-      } else {
-        source.maritalStatus.id = mergeWith.maritalStatus.id;
-        if (mergeWith.maritalStatus?.coding) {
-          for (let i = 0; i < mergeWith.maritalStatus?.coding.length; i++) {
-            if (mergeWith?.maritalStatus?.coding[i]) {
-              if (_.isEmpty(source?.maritalStatus?.coding[i])) {
-                source.maritalStatus.coding[i] = mergeWith?.maritalStatus?.coding[i];
-              } else {
-                source.maritalStatus.coding[i].id = mergeWith?.maritalStatus?.coding[i]?.id;
-              }
-            }
-          }
-        }
-      }
-    }
-    if (mergeWith.address) {
-      source.address = [source.address];
-      for (let i = 0; i < mergeWith?.address.length; i++) {
-        if (mergeWith?.address[i]) {
-          if (_.isEmpty(source?.address[i])) {
-            source.address[i] = mergeWith?.address[i];
-          } else {
-            source.address[i].id = mergeWith?.address[i]?.id;
-          }
-        }
-        if (mergeWith?.address[i]?.period) {
-          if (_.isEmpty(source?.address[i]?.period)) {
-            source.address[i].period = mergeWith?.address[i]?.period;
-          } else {
-            source.address[i].period.id = mergeWith?.address[i]?.period.id;
-          }
-        }
-      }
-    }
-    if (mergeWith.telecom) {
-      for (let i = 0; i < mergeWith?.telecom.length; i++) {
-        if (mergeWith?.telecom[i]) {
-          if (_.isEmpty(source?.telecom[i])) {
-            source.telecom[i] = mergeWith?.telecom[i];
-          } else {
-            source.telecom[i].id = mergeWith?.telecom[i]?.id;
-          }
-        }
-      }
-    }
-
-    // todo: implement mergeWith.contact
   }
 
   public extractContactPoint(data: any, forWho: string): IContactPoint[] {
