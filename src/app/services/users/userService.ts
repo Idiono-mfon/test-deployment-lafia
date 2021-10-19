@@ -1,4 +1,3 @@
-import { Request } from 'express';
 import { inject, injectable } from 'inversify';
 import jwt from 'jsonwebtoken';
 import { v4 as uuid } from 'uuid';
@@ -45,10 +44,10 @@ export class UserService {
   @inject(TYPES.ConsentService)
   private readonly consentService: ConsentService;
 
-  public async validateUser(req: Request): Promise<boolean> {
+  public async validateUser(data: IUser, ip?: string): Promise<boolean> {
     logger.info('Running UserService.validateUser');
 
-    const user: IUser = req.body
+    const user: IUser = data;
     try {
       // find user by email
       let emailUser = await this.getUserByField('email', user.email);
@@ -59,7 +58,7 @@ export class UserService {
       }
 
 
-      user.phone = getE164Format(user.phone!, req);
+      user.phone = getE164Format(user.phone!, ip);
 
       // find user by phone number
       let phoneUser = await this.getUserByField('phone', user.phone!);

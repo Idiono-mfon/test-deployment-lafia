@@ -8,6 +8,7 @@ import {
   response,
   request,
 } from 'inversify-express-utils';
+import { Env } from '../../config/env';
 import TYPES from '../../config/types';
 import { uploadFile } from '../../middlewares';
 import {
@@ -17,23 +18,27 @@ import {
 } from '../../models';
 import {
   PatientService,
-  MessageBroker,
-  rmqSuccessResponse
+  successResponseType,
+  KafkaService,
+  KafkaSetup
 } from '../../services';
 import { HttpStatusCode, logger } from '../../utils';
 import { BaseController } from '../baseController';
+
+const env = Env.all();
 
 @controller('/patients')
 export class PatientController extends BaseController {
   @inject(TYPES.PatientService)
   private readonly patientService: PatientService;
-
-  @inject(TYPES.MessageBroker)
-  private readonly messageBroker: MessageBroker;
+  @inject(TYPES.KafkaService)
+  private readonly kafkaService: KafkaService;
+  @inject(TYPES.KafkaSetup)
+  private readonly kafkaSetup: KafkaSetup;
 
   @httpPut('/:id')
   public async updatePatient(@request() req: Request, @response() res: Response) {
-    logger.info('Running PatientController::updatePatient');
+    logger.info('Running PatientController.updatePatient');
     try {
       const { id: patientId } = req.params;
       const patientData: IPatient = req.body;
@@ -42,53 +47,52 @@ export class PatientController extends BaseController {
 
       this.success(res, patient, 'Patient profile successfully updated');
     } catch (e: any) {
-      logger.error(`Unable to update patient data -`, e);
+      logger.error(`Error updating patient data:`, e);
       this.error(res, e);
     }
   }
 
   @httpGet('/:id')
   public async findPatientById(@request() req: Request, @response() res: Response) {
-    logger.info('Running PatientController::findPatientById');
+    logger.info('Running PatientController.findPatientById');
     try {
       const { id } = req.params;
       const patient: IPatient = await this.patientService.findPatientById(id);
 
       this.success(res, patient, 'Request completed');
     } catch (e: any) {
-      logger.error(`Unable to find patient with id - ${req?.params?.id} -`, e);
+      logger.error(`Error finding patient with id - ${req?.params?.id}:`, e);
       this.error(res, e);
     }
   }
 
   @httpPost('/')
   public async createPatient(@request() req: Request, @response() res: Response) {
-    logger.info('Running PatientController::createPatient');
+    logger.info('Running PatientController.createPatient');
     try {
       const patientData: any = req.body;
+      // @ts-ignore
+      const ip: string = req.headers['x-forwarded-for']?.split(',').shift() || req.socket?.remoteAddress;
 
-      const patient: IPatientWithToken = await this.patientService.createPatient(req);
-      const rmqData = {
+      const patient: IPatientWithToken = await this.patientService.createPatient(patientData, ip);
+      const responseData = {
         data: patientData,
         resource_type: patient?.user?.resourceType as string
-      }
-      const rmqPubMsg = rmqSuccessResponse(
-        rmqData,
-        patient?.user?.id as string,
-        'Resource created successfully'
-      );
-      await this.messageBroker.rmqPublish(JSON.stringify(rmqPubMsg));
+      };
+
+      const kafkaProducerMsg = this.kafkaSetup.structureSuccessData(successResponseType.default, responseData, 'Resource created successfully', patient?.user?.id);
+      await this.kafkaService.producer(env.kafka_erpnext_producer_topic, kafkaProducerMsg);
 
       this.success(res, patient, 'Patient registration successful', HttpStatusCode.CREATED);
     } catch (e: any) {
-      logger.error(`Unable to create patient -`, e);
+      logger.error(`Error creating patient:`, e);
       this.error(res, e);
     }
   }
 
   @httpPost('/:id/attachments', uploadFile.single('file'))
   public async uploadAttachment(@request() req: Request, @response() res: Response) {
-    logger.info('Running PatientController::uploadAttachment');
+    logger.info('Running PatientController.uploadAttachment');
     try {
       const { id: patientId } = req.params;
       const { file } = req;
@@ -97,20 +101,20 @@ export class PatientController extends BaseController {
 
       this.success(res, attachment, 'Request completed successfully');
     } catch (e: any) {
-      logger.error(`Unable to upload attachment -`, e);
+      logger.error(`Error uploading attachment:`, e);
       this.error(res, e);
     }
   }
 
   @httpGet('/:id/broadcast/videos')
   public async broadcastVideos(@request() req: Request, @response() res: Response) {
-    logger.info('Running PatientController::broadcastVideos');
+    logger.info('Running PatientController.broadcastVideos');
     try {
       const { id: patientId } = req.params;
       const vid = await this.patientService.findPatientVideoBroadcast(patientId);
       this.success(res, vid, 'Request completed successfully');
     } catch (e: any) {
-      logger.error(`Unable to broadcast patient video -`, e);
+      logger.error(`Error broadcasting patient video:`, e);
       this.error(res, e);
     }
   }

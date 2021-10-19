@@ -1,10 +1,29 @@
-import Kafka, { HighLevelProducer, KafkaConsumer, ProducerGlobalConfig } from 'node-rdkafka';
+import { injectable } from 'inversify';
+import { HighLevelProducer, KafkaConsumer, ProducerGlobalConfig } from 'node-rdkafka';
+import { Env } from '../../config/env';
 import { logger } from '../../utils';
 
+const env = Env.all();
+console.log('KafakConnection:', env.kafka_connection);
+
+@injectable()
 export class KafkaSetup {
-  private static kafkaProducerGlobalConfig = {
-    "client.id": 'kafka',
-    'metadata.broker.list': 'localhost:9092',
+  private readonly globalConfig = {
+    'security.protocol': 'SASL_SSL',
+    'client.id': 'lafia-service',
+    // 'ssl.endpoint.identification.algorithm': 'none',
+    'bootstrap.servers': env.kafka_connection,
+
+    'session.timeout.ms': 6000,
+
+    'sasl.mechanisms': 'SCRAM-SHA-256',
+
+    'sasl.username': 'ms48nmc7',
+
+    'sasl.password': 'rd9RwmTYPoYgSWR5ZCaS8xhmfSU5IJve',
+  }
+  private readonly kafkaProducerGlobalConfig = {
+    ...this.globalConfig,
     'compression.type': 'gzip',
     'retry.backoff.ms': 200,
     'message.send.max.retries': 10,
@@ -16,31 +35,32 @@ export class KafkaSetup {
     'request.required.acks': 1
   };
 
-  private static kafkaConsumerGlobalConfig = {
-    "group.id": 'kafka',
-    'metadata.broker.list': 'localhost:9092',
-    "allow.auto.create.topics": true,
+  private readonly kafkaConsumerGlobalConfig = {
+    ...this.globalConfig,
+    'group.id': 'kafka',
+    'allow.auto.create.topics': true,
     'consume.callback.max.messages': 10
   };
 
-  public static instantiateKafkaProducer(): HighLevelProducer {
+  public instantiateKafkaProducer(): HighLevelProducer {
     logger.info('Running KafkaSetup.instantiateKafkaProducer');
 
-    return new HighLevelProducer(KafkaSetup.kafkaProducerGlobalConfig as ProducerGlobalConfig);
+    return new HighLevelProducer(this.kafkaProducerGlobalConfig as ProducerGlobalConfig);
   }
 
-  public static instantiateKafkaConsumer() {
+  public instantiateKafkaConsumer() {
     logger.info('Running KafkaSetup.instantiateKafkaConsumer');
 
-    return new KafkaConsumer(KafkaSetup.kafkaConsumerGlobalConfig,{"auto.offset.reset": 'latest'});
+    // @ts-ignore
+    return new KafkaConsumer(this.kafkaConsumerGlobalConfig, { 'auto.offset.reset': 'latest' });
   }
 
-  public static structureSuccessData(
+  public structureSuccessData(
     responseType: string,
-    receivedData: IRmqReceivedMessage,
+    receivedData: IKafkaReceivedMessage,
     message: string,
     id?: string
-  ): IRmqMessageResponse| any {
+  ): IKafkaMessageResponse | any {
     logger.info('Running KafkaSetup.structureSuccessData');
 
     if (responseType === successResponseType.default) {
@@ -73,7 +93,7 @@ export class KafkaSetup {
 
   }
 
-  public static structureErrorData(message: string, resource_type = undefined): IRmqMessageResponse {
+  public structureErrorData(message: string, resource_type = undefined): IKafkaMessageResponse {
     logger.info('Running KafkaSetup.structureErrorData');
 
     return {
@@ -85,12 +105,12 @@ export class KafkaSetup {
   }
 }
 
-export interface IRmqReceivedMessage {
+export interface IKafkaReceivedMessage {
   resource_type: string;
-  data: IRmqMessageData;
+  data: IKafkaMessageData;
 }
 
-export interface IRmqMessageData {
+export interface IKafkaMessageData {
   first_name?: string;
   last_name?: string;
   email?: string;
@@ -98,7 +118,7 @@ export interface IRmqMessageData {
   gender?: string;
 }
 
-export interface IRmqMessageResponse extends IRmqMessageData {
+export interface IKafkaMessageResponse extends IKafkaMessageData {
   status: string;
   message: string;
   resource_type?: string;

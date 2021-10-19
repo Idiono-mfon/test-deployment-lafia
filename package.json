@@ -51,12 +51,8 @@
   },
   "homepage": "https://github.com/parallelscore/lafia-service#readme",
   "dependencies": {
-    "@aws-sdk/client-ivs": "^3.24.0",
-    "@aws-sdk/client-medialive": "^3.23.0",
-    "@aws-sdk/client-mediapackage": "^3.23.0",
     "@aws-sdk/client-s3": "^3.11.0",
     "@types/ioredis": "^4.26.0",
-    "amqplib": "0.7.0",
     "axios": "^0.21.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
@@ -86,7 +82,6 @@
     "passport-oauth2": "^1.6.0",
     "passport-oauth2-refresh": "^2.1.0",
     "pg": "8.5.1",
-    "platform-admin-sdk": "^1.5.0",
     "pm2": "^4.5.5",
     "reflect-metadata": "^0.1.13",
     "short-uuid": "^4.1.0",
@@ -102,7 +97,6 @@
     "yarn": "^1.22.10"
   },
   "devDependencies": {
-    "@types/amqplib": "^0.5.17",
     "@types/bcryptjs": "^2.4.2",
     "@types/chai": "^4.2.7",
     "@types/chai-http": "^4.2.0",

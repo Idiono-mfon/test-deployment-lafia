@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { inject } from 'inversify';
 import { controller, httpDelete, httpGet, httpPost, request, response } from 'inversify-express-utils';
+import { Env } from '../../config/env';
 import TYPES from '../../config/types';
 import { AuthMiddleware } from '../../middlewares';
 import {
@@ -8,11 +9,14 @@ import {
   FhirServerService,
   LafiaMediaService,
   TwilioService,
-  MessageBroker,
-  rmqFhirSuccessResponse
+  KafkaService,
+  KafkaSetup,
+  successResponseType
 } from '../../services';
 import { GenericResponseError, HttpStatusCode, logger } from '../../utils';
 import { BaseController } from '../baseController';
+
+const env = Env.all();
 
 @controller('/media')
 export class LafiaMediaController extends BaseController {
@@ -26,8 +30,10 @@ export class LafiaMediaController extends BaseController {
   private readonly fhirServerService: FhirServerService;
   @inject(TYPES.TwilioRoomService)
   private readonly twilioRoomService: TwilioRoomService;
-  @inject(TYPES.MessageBroker)
-  private readonly messageBroker: MessageBroker;
+  @inject(TYPES.KafkaService)
+  private readonly kafkaService: KafkaService;
+  @inject(TYPES.KafkaSetup)
+  private readonly kafkaSetup: KafkaSetup;
 
   @httpPost('/broadcast', TYPES.AuthMiddleware)
   public async createBroadcast(@request() req: Request, @response() res: Response) {
@@ -38,7 +44,7 @@ export class LafiaMediaController extends BaseController {
 
       this.success(res, broadcast, 'Broadcast created successfully', HttpStatusCode.CREATED);
     } catch (e: any) {
-      logger.error(`Could not create broadcast -`, e);
+      logger.error(`Error creating broadcast:`, e);
       this.error(res, e);
     }
   }
@@ -110,7 +116,7 @@ export class LafiaMediaController extends BaseController {
               { data: encounterResourceData },
             );
           } catch (e: any) {
-            logger.error(`Could not create telehealth encounter -`, e);
+            logger.error(`Could not create telehealth encounter:`, e);
             throw new GenericResponseError(e.message, e.code);
           }
 
@@ -118,8 +124,8 @@ export class LafiaMediaController extends BaseController {
           const resource_type = 'encounter';
           const publishData = { data: encounter, resource_type };
 
-          const rmqPubMsg = rmqFhirSuccessResponse(publishData, encounter?.id, 'New encounter published successfully');
-          await this.messageBroker.rmqPublish(JSON.stringify(rmqPubMsg));
+          const kafkaProducerMsg = this.kafkaSetup.structureSuccessData(successResponseType.fhir, publishData, 'New encounter published successfully', encounter?.id);
+          await this.kafkaService.producer(env.kafka_erpnext_producer_topic, kafkaProducerMsg);
 
           // Create a media for the encounter
           const mediaResourceData = {
@@ -165,10 +171,10 @@ export class LafiaMediaController extends BaseController {
             const resource_type = 'media';
             const publishData = { data: media, resource_type };
 
-            const rmqPubMsg = rmqFhirSuccessResponse(publishData, media?.id, 'New media published successfully');
-            await this.messageBroker.rmqPublish(JSON.stringify(rmqPubMsg));
+            const kafkaProducerMsg = this.kafkaSetup.structureSuccessData(successResponseType.fhir, publishData, 'New media published successfully', media?.id);
+            await this.kafkaService.producer(env.kafka_erpnext_producer_topic, kafkaProducerMsg);
           } catch (e: any) {
-            logger.error(`Could not create telehealth encounter media -`, e);
+            logger.error(`Could not create telehealth encounter media:`, e);
             throw new GenericResponseError(e.message, e.code);
           }
         }
@@ -191,7 +197,7 @@ export class LafiaMediaController extends BaseController {
 
       this.success(res, broadcast, 'Recorded Video Retrieved successfully', HttpStatusCode.CREATED);
     } catch (e: any) {
-      logger.error(`Unable to get recorded stream -`, e);
+      logger.error(`Error getting recorded stream:`, e);
       this.error(res, e);
     }
   }
@@ -205,7 +211,7 @@ export class LafiaMediaController extends BaseController {
 
       this.success(res, broadcast, 'Recorded Video Retrieved successfully', HttpStatusCode.OK);
     } catch (e: any) {
-      logger.error(`Unable to get all recorded stream -`, e);
+      logger.error(`Error getting all recorded stream:`, e);
       this.error(res, e);
     }
   }
@@ -219,7 +225,7 @@ export class LafiaMediaController extends BaseController {
 
       this.success(res, broadcast, 'Recorded Video deleted successfully', HttpStatusCode.CREATED);
     } catch (e: any) {
-      logger.error(`Unable to get recorded stream url -`, e);
+      logger.error(`Error getting recorded stream url:`, e);
       this.error(res, e);
     }
   }

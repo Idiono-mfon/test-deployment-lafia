@@ -3,7 +3,7 @@ import cors from 'cors';
 import { config as dotConfig } from 'dotenv';
 import express from 'express';
 import { createServer } from 'http';
-import { interfaces } from 'inversify';
+import event from 'events';
 import passport from 'passport';
 import refreshOauth2Token from 'passport-oauth2-refresh';
 import container from './config/inversify.config';
@@ -11,20 +11,21 @@ import { InversifyExpressServer } from 'inversify-express-utils';
 import { Env } from './config/env';
 import TYPES from './config/types';
 import { AuthMiddleware, morganMiddleware } from './middlewares';
-import { PatientService, PractitionerService, MessageBroker, VideoBroadcastService, AuthService } from './services';
-import { KafkaService } from './services/kafka';
-import { SignallingServerService } from './services/signallingServers';
+import {
+  PatientService,
+  PractitionerService,
+  VideoBroadcastService,
+  AuthService,
+  KafkaService,
+  SignallingServerService
+} from './services';
 import * as swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './config/swagger.config';
 import { logger } from './utils';
 
+const emitter = new event.EventEmitter();
+emitter.setMaxListeners(0);
 process.setMaxListeners(0);
-
-KafkaService.producer('creatResource', {resourceType: 'Patient', data: {name: 'Name'}}).then(e => logger.info(e));
-
-KafkaService
-  .consumer()
-  .then();
 
 dotConfig();
 
@@ -32,18 +33,18 @@ const app = express();
 
 // @ts-ignore
 const server = new InversifyExpressServer(container, null, null, app);
-const messageBroker = container.get<MessageBroker>(TYPES.MessageBroker);
 const patientService = container.get<PatientService>(TYPES.PatientService);
 const videoBroadcastService = container.get<VideoBroadcastService>(TYPES.VideoBroadcastService);
 const practitionerService = container.get<PractitionerService>(TYPES.PractitionerService);
 const authMiddleware = container.get<AuthMiddleware>(TYPES.AuthMiddleware);
 const authService = container.get<AuthService>(TYPES.AuthService);
+const kafkaService = container.get<KafkaService>(TYPES.KafkaService);
 
 const saFhirStrategy = authService.getStrategy('safhir');
 
 server.setConfig((app) => {
-  app.use(express.json({limit: '50mb'}));
-  app.use(express.urlencoded({limit: "50mb", extended: true, parameterLimit:50000}));
+  app.use(express.json({ limit: '50mb' }));
+  app.use(express.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 }));
   app.use(cors());
   app.use(morganMiddleware);
   app.use(passport.initialize());
@@ -71,7 +72,8 @@ server.setConfig((app) => {
   passport.deserializeUser((obj: any, done) => done(null, obj));
 });
 
-messageBroker.rmqSubscribe().then().catch(e => console.log('rmq=>', e));
+kafkaService.consumer();
+
 const serverInstance = server.build();
 const PORT = Env.all().port;
 
@@ -87,7 +89,7 @@ const signallingServer = new SignallingServerService(
   patientService,
   practitionerService,
   videoBroadcastService,
-  messageBroker
+  kafkaService
 );
 signallingServer.initialize();
 

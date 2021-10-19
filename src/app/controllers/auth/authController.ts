@@ -23,8 +23,11 @@ export class AuthController extends BaseController {
   public async login(@request() req: Request, @response() res: Response): Promise<void> {
     logger.info('Running AuthController::login');
     try {
+      // @ts-ignore
+      const ip: string = req.headers['x-forwarded-for']?.split(',').shift() || req.socket?.remoteAddress;
+
       const { email, password } = req.body;
-      const userData = await this.authService.login(email, password, req);
+      const userData = await this.authService.login(email, password, ip);
 
       this.success(res, userData, 'Login Successful');
     } catch (e: any) {

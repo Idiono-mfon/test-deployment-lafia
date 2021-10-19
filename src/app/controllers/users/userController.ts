@@ -35,7 +35,10 @@ export class UserController extends BaseController {
   public async validateUser(@request() req: Request, @response() res: Response) {
     logger.info('Running UserController::validateUser');
     try {
-      const newUser = await this.userService.validateUser(req);
+      // @ts-ignore
+      const ip: string = req.headers['x-forwarded-for']?.split(',').shift() || req.socket?.remoteAddress;
+
+      const newUser = await this.userService.validateUser(req.body, ip);
 
       this.success(res, newUser, 'User created', HttpStatusCode.CREATED);
     } catch (e: any) {

@@ -33,10 +33,11 @@ import {
 } from '../repository';
 import {
   S3Service,
+  KafkaSetup,
   UserService,
   AuthService,
+  KafkaService,
   EmailService,
-  MessageBroker,
   TwilioService,
   ConsentService,
   PatientService,
@@ -45,12 +46,12 @@ import {
   FhirServerService,
   LafiaMediaService,
   PlatformSdkService,
+  TwilioRoomService,
   VideoRecordService,
+  FhirResourceService,
   PractitionerService,
   VideoBroadcastService,
-  TwilioRoomService,
   ImplementationGuideService,
-  FhirResourceService
 } from '../services';
 import { TokenUtil, UtilityService } from '../utils';
 import TYPES from './types';
@@ -130,10 +131,6 @@ container
   .to(CodeSystemService)
   .inSingletonScope();
 container
-  .bind<MessageBroker>(TYPES.MessageBroker)
-  .to(MessageBroker)
-  .inSingletonScope();
-container
   .bind<S3Service>(TYPES.S3Service)
   .to(S3Service)
   .inSingletonScope();
@@ -192,6 +189,14 @@ container
 container
   .bind<FhirResourceService>(TYPES.FhirResourceService)
   .to(FhirResourceService)
+  .inSingletonScope();
+container
+  .bind<KafkaService>(TYPES.KafkaService)
+  .to(KafkaService)
+  .inSingletonScope();
+container
+  .bind<KafkaSetup>(TYPES.KafkaSetup)
+  .to(KafkaSetup)
   .inSingletonScope();
 
 

@@ -1,4 +1,3 @@
-import { Request } from 'express';
 import { inject, injectable } from 'inversify';
 import TYPES from '../../config/types';
 import { AttachmentModel, IAttachment, IFindUser, IPatient, IUser, PatientsAttachmentModel } from '../../models';
@@ -72,11 +71,9 @@ export class PatientService {
     return patient.data;
   }
 
-  public async createPatient(req: Request): Promise<any> {
+  public async createPatient(data: IUser, ip?: string): Promise<any> {
     logger.info('Running PatientService.createPatient');
     try {
-
-      const data: any = req.body;
 
       this.utilService.checkForRequiredFields(data);
 
@@ -90,7 +87,7 @@ export class PatientService {
       let { phone } = data;
 
       if (phone) {
-        phone = getE164Format(phone!, req);
+        phone = getE164Format(phone!, ip);
       }
 
       const existingUser: IUser = await this.userService.getOneUser({ email });
@@ -103,7 +100,7 @@ export class PatientService {
         resourceType: 'Patient',
         id: phone,
         active: true,
-        gender: gender.toLowerCase(),
+        gender: gender?.toLowerCase()!,
         name: {
           use: 'official',
           text: `${first_name} ${last_name}`,

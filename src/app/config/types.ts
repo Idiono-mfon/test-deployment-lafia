@@ -19,7 +19,6 @@ const TYPES = {
   PatientService: Symbol('PatientService'),
   PractitionerService: Symbol('PractitionerService'),
   CodeSystemService: Symbol('CodeSystemService'),
-  MessageBroker: Symbol('MessageBroker'),
   S3Service: Symbol('S3Service'),
   UtilityService: Symbol('UtilityService'),
   PlatformSdkService: Symbol('PlatformSdkService'),
@@ -36,6 +35,8 @@ const TYPES = {
   ConnectionService: Symbol('ConnectionService'),
   ImplementationGuideService: Symbol('ImplementationGuideService'),
   FhirResourceService: Symbol('FhirResourceService'),
+  KafkaService: Symbol('KafkaService'),
+  KafkaSetup: Symbol('KafkaSetup'),
 
   // repositories
   UserRepository: Symbol('UserRepository'),

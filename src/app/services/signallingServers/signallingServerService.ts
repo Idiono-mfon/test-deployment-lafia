@@ -6,7 +6,7 @@ import { v4 as uuid } from 'uuid';
 import { Env } from '../../config/env';
 import TYPES from '../../config/types';
 import { forWho, logger } from '../../utils';
-import { MessageBroker, rmqNewBroadcastSuccessResponse } from '../messageBroker';
+import { KafkaService, KafkaSetup, successResponseType } from '../kafka';
 import { PatientService } from '../patients';
 import { PractitionerService } from '../practitioners';
 import { VideoBroadcastService } from '../videoRecords';
@@ -30,8 +30,10 @@ const pubClient = new Redis({
 const subClient = pubClient.duplicate();
 
 export class SignallingServerService {
-  @inject(TYPES.MessageBroker)
-  private readonly messageBroker: MessageBroker;
+  @inject(TYPES.KafkaService)
+  private readonly kafkaService: KafkaService;
+  @inject(TYPES.KafkaSetup)
+  private readonly kafkaSetup: KafkaSetup;
   private readonly io: any;
   private static redisStore: RedisStore;
   private static onlinePractitionerRoom: string;
@@ -43,7 +45,7 @@ export class SignallingServerService {
     patientService: PatientService,
     practitionerService: PractitionerService,
     videoBroadcastService: VideoBroadcastService,
-    messageBroker: MessageBroker
+    kafkaService: KafkaService
   ) {
     SignallingServerService.redisStore = new RedisStore(pubClient, patientService, practitionerService);
     SignallingServerService.onlinePractitionerRoom = 'onlinePractitioners';
@@ -60,7 +62,7 @@ export class SignallingServerService {
     });
 
     this.io.adapter(createAdapter({ pubClient, subClient }));
-    this.messageBroker = messageBroker;
+    this.kafkaService = kafkaService;
   }
 
   public initialize(): void {
@@ -131,8 +133,12 @@ export class SignallingServerService {
 
       SignallingServerService.emitNewCareEvent(socket, newCareBroadCast);
 
-      const rmqPubMsg = rmqNewBroadcastSuccessResponse(newCareBroadCast, 'New broadcast event emitted successfully');
-      await this.messageBroker.rmqPublish(JSON.stringify(rmqPubMsg));
+      const kafkaProducerMsg = this.kafkaSetup.structureSuccessData(
+        successResponseType.broadcast,
+        newCareBroadCast,
+        'New broadcast event emitted successfully'
+      );
+      await this.kafkaService.producer(env.kafka_erpnext_producer_topic, kafkaProducerMsg);
 
       if (newCareBroadCast.videoUrl) {
         const patient: IOnlineUser = await SignallingServerService

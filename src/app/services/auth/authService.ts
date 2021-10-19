@@ -1,4 +1,3 @@
-import { Request } from 'express';
 import * as https from 'https';
 import { inject, injectable } from 'inversify';
 import * as _ from 'lodash';
@@ -27,12 +26,12 @@ export class AuthService {
   @inject(TYPES.ConnectionRepository)
   private connectionRepository: ConnectionRepository;
 
-  public async login(email: string, password: string, req: Request): Promise<any> {
+  public async login(email: string, password: string, ip?: string): Promise<any> {
     logger.info('Running AuthService.login');
     try {
 
       if (_.isNumber(email)) {
-        email = getE164Format(email, req);
+        email = getE164Format(email, ip);
       }
 
       const loggedInUser: IUser = await this.userService.userLogin(email, password);

@@ -228,7 +228,7 @@ class UtilityService {
     logger.info('Running UtilityService.checkForRequiredFields');
 
     try {
-      const { email } = data;
+      const email = data?.email;
 
       if (!email) {
         throwError('Email is required!', badRequest);
