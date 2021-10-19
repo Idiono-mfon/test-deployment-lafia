@@ -21,7 +21,6 @@ const TYPES = {
   CodeSystemService: Symbol('CodeSystemService'),
   S3Service: Symbol('S3Service'),
   UtilityService: Symbol('UtilityService'),
-  PlatformSdkService: Symbol('PlatformSdkService'),
   AuthService: Symbol('AuthService'),
   EmailService: Symbol('EmailService'),
   LanguageService: Symbol('LanguageService'),

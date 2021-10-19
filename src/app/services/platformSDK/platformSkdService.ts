@@ -1,3 +1,9 @@
+/*
+* Uninstall the platform-admin-sdk module to bring down the server
+* for testing purpose only
+* */
+
+
 // @ts-ignore
 import { PlatformConnection } from 'platform-admin-sdk';
 import { injectable } from 'inversify';

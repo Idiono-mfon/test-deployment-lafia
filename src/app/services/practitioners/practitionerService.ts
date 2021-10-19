@@ -27,7 +27,6 @@ import { IUserLoginParams } from '../auth';
 import { S3Service } from '../aws';
 import { CodeSystemService } from '../codeSystems';
 import { FhirServerService } from '../fhirServer';
-import { PlatformSdkService } from '../platformSDK';
 import { UserService } from '../users';
 
 @injectable()
@@ -43,9 +42,6 @@ export class PractitionerService {
 
   @inject(TYPES.UtilityService)
   private readonly utilService: UtilityService;
-
-  @inject(TYPES.PlatformSdkService)
-  private readonly platformSdkService: PlatformSdkService;
 
   @inject(TYPES.UserService)
   private readonly userService: UserService;

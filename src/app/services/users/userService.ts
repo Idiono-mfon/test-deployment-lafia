@@ -18,7 +18,6 @@ import { Password } from '../../utils/password';
 import { ConsentService } from '../consents';
 import { EmailService, IComposeEmail } from '../email';
 import { FhirServerService } from '../fhirServer';
-import { PlatformSdkService } from '../platformSDK';
 import { IJwtPayload } from '../platformSDK/interfaces';
 import { TwilioService } from '../twilio';
 
@@ -28,9 +27,6 @@ const env = Env.all();
 export class UserService {
   @inject(TYPES.UserRepository)
   private userRepository: UserRepository;
-
-  @inject(TYPES.PlatformSdkService)
-  private readonly platformSdkService: PlatformSdkService;
 
   @inject(TYPES.EmailService)
   private readonly emailService: EmailService;

@@ -82,6 +82,7 @@
     "passport-oauth2": "^1.6.0",
     "passport-oauth2-refresh": "^2.1.0",
     "pg": "8.5.1",
+    "platform-admin-sdk": "^1.5.0",
     "pm2": "^4.5.5",
     "reflect-metadata": "^0.1.13",
     "short-uuid": "^4.1.0",

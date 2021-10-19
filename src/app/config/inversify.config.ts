@@ -45,7 +45,6 @@ import {
   CodeSystemService,
   FhirServerService,
   LafiaMediaService,
-  PlatformSdkService,
   TwilioRoomService,
   VideoRecordService,
   FhirResourceService,
@@ -137,10 +136,6 @@ container
 container
   .bind<UtilityService>(TYPES.UtilityService)
   .to(UtilityService)
-  .inSingletonScope();
-container
-  .bind<PlatformSdkService>(TYPES.PlatformSdkService)
-  .to(PlatformSdkService)
   .inSingletonScope();
 container
   .bind<AuthService>(TYPES.AuthService)

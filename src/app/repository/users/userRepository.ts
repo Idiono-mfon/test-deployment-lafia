@@ -1,14 +1,9 @@
-import { inject, injectable } from 'inversify';
-import TYPES from '../../config/types';
+import { injectable } from 'inversify';
 import { IFindUser, IUser, UserModel } from '../../models';
-import { PlatformSdkService } from '../../services';
 import { InternalServerError, logger } from '../../utils';
 
 @injectable()
 export class UserRepository {
-  @inject(TYPES.PlatformSdkService)
-  private readonly platformSdkService: PlatformSdkService;
-
   public async createUser(user: IUser): Promise<IUser> {
     logger.info('Running UserRepository.createUser');
     try {
