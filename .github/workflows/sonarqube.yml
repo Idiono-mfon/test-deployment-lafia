@@ -8,7 +8,7 @@ on:
   # a pull request. 
   push:
     branches:
-      - staging
+      - dev
   pull_request:
       types: [opened, synchronize, reopened]
 
@@ -33,7 +33,7 @@ jobs:
       with:
         scanMetadataReportFile: target/sonar/report-task.txt
       # Force to fail step after specific time
-      timeout-minutes: 10
+      timeout-minutes: 120
       env:
        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
