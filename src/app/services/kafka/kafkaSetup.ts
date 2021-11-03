@@ -4,23 +4,14 @@ import { Env } from '../../config/env';
 import { logger } from '../../utils';
 
 const env = Env.all();
-console.log('KafakConnection:', env.kafka_connection);
 
 @injectable()
 export class KafkaSetup {
   private readonly globalConfig = {
-    'security.protocol': 'SASL_SSL',
+    'security.protocol': 'plaintext',
     'client.id': 'lafia-service',
-    // 'ssl.endpoint.identification.algorithm': 'none',
     'bootstrap.servers': env.kafka_connection,
-
     'session.timeout.ms': 6000,
-
-    'sasl.mechanisms': 'SCRAM-SHA-256',
-
-    'sasl.username': 'ms48nmc7',
-
-    'sasl.password': 'rd9RwmTYPoYgSWR5ZCaS8xhmfSU5IJve',
   }
   private readonly kafkaProducerGlobalConfig = {
     ...this.globalConfig,
@@ -39,7 +30,9 @@ export class KafkaSetup {
     ...this.globalConfig,
     'group.id': 'kafka',
     'allow.auto.create.topics': true,
-    'consume.callback.max.messages': 10
+    'consume.callback.max.messages': 10,
+    'fetch.min.bytes': 1,
+    'fetch.wait.max.ms': 350
   };
 
   public instantiateKafkaProducer(): HighLevelProducer {
@@ -52,7 +45,7 @@ export class KafkaSetup {
     logger.info('Running KafkaSetup.instantiateKafkaConsumer');
 
     // @ts-ignore
-    return new KafkaConsumer(this.kafkaConsumerGlobalConfig, { 'auto.offset.reset': 'latest' });
+    return new KafkaConsumer(this.kafkaConsumerGlobalConfig, { 'auto.offset.reset': 'earliest' });
   }
 
   public structureSuccessData(
