@@ -8,7 +8,6 @@ import {
   request,
   response
 } from 'inversify-express-utils';
-import { Env } from '../../config/env';
 import TYPES from '../../config/types';
 import { uploadFile } from '../../middlewares';
 import {
@@ -17,23 +16,16 @@ import {
 } from '../../models';
 import {
   PractitionerService,
-  successResponseType,
-  KafkaService,
-  KafkaSetup
+  practitionerEventService,
+  practitionerEvent
 } from '../../services';
 import { HttpStatusCode, logger } from '../../utils';
 import { BaseController } from '../baseController';
-
-const env = Env.all();
 
 @controller('/practitioners')
 export class PractitionerController extends BaseController {
   @inject(TYPES.PractitionerService)
   private readonly practitionerService: PractitionerService;
-  @inject(TYPES.KafkaService)
-  private readonly kafkaService: KafkaService;
-  @inject(TYPES.KafkaSetup)
-  private readonly kafkaSetup: KafkaSetup;
 
   @httpPut('/:id')
   public async updatePractitioner(@request() req: Request, @response() res: Response) {
@@ -76,8 +68,8 @@ export class PractitionerController extends BaseController {
         resource_type: practitioner?.user?.resourceType as string
       };
 
-      const kafkaProducerMsg = this.kafkaSetup.structureSuccessData(successResponseType.default, responseData, 'Resource created successfully', practitioner?.user?.id);
-      await this.kafkaService.producer(env.kafka_erpnext_producer_topic, kafkaProducerMsg);
+      // Raise new practitioner event
+      practitionerEventService.emit(practitionerEvent.newPractitioner, practitioner?.user?.id, responseData);
 
       this.success(res, practitioner, 'Practitioner registration successful', HttpStatusCode.CREATED);
     } catch (e: any) {
