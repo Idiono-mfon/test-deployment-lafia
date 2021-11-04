@@ -9,6 +9,8 @@ on:
   push:
     branches:
       - dev
+      - main
+      - staging
   pull_request:
       types: [opened, synchronize, reopened]
 
@@ -22,7 +24,7 @@ jobs:
         # fetch-depth: 0
       # Triggering SonarQube analysis as results of it are required by Quality Gate check
     - name: SonarQube Scan
-      uses: sonarsource/sonarqube-scan-action@main
+      uses: sonarsource/sonarqube-scan-action@master
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
