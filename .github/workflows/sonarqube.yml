@@ -9,8 +9,6 @@ on:
   push:
     branches:
       - dev
-      - main
-      - staging
   pull_request:
       types: [opened, synchronize, reopened]
 
@@ -31,6 +29,6 @@ jobs:
     - name: SonarQube Quality Gate check
       uses: sonarsource/sonarqube-quality-gate-action@master
       # Force to fail step after specific time
-      timeout-minutes: 360
+      timeout-minutes: 5
       env:
        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
