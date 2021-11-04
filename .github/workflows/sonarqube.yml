@@ -16,16 +16,16 @@ jobs:
   sonarqube:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@master
       with:
         # Disabling shallow clone is recommended for improving relevancy of reporting
         fetch-depth: 0
       # Triggering SonarQube analysis as results of it are required by Quality Gate check
     - name: SonarQube Scan
-      uses: sonarsource/sonarqube-scan-action@master
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      uses: kitabisa/sonarqube-action@v1.1.0
+      with:
+        login: ${{ secrets.SONAR_TOKEN }}
+        host: ${{ secrets.SONAR_HOST_URL }}
     - name: SonarQube Quality Gate check
       uses: sonarsource/sonarqube-quality-gate-action@master
       # Force to fail step after specific time
