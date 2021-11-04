@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { inject } from 'inversify';
 import { controller, httpDelete, httpGet, httpPost, request, response } from 'inversify-express-utils';
-import { Env } from '../../config/env';
 import TYPES from '../../config/types';
 import { AuthMiddleware } from '../../middlewares';
 import {
@@ -9,14 +8,13 @@ import {
   FhirServerService,
   LafiaMediaService,
   TwilioService,
-  KafkaService,
-  KafkaSetup,
-  successResponseType
+  encounterEventService,
+  encounterEvent,
+  mediaEventService,
+  mediaEvent
 } from '../../services';
 import { GenericResponseError, HttpStatusCode, logger } from '../../utils';
 import { BaseController } from '../baseController';
-
-const env = Env.all();
 
 @controller('/media')
 export class LafiaMediaController extends BaseController {
@@ -30,10 +28,6 @@ export class LafiaMediaController extends BaseController {
   private readonly fhirServerService: FhirServerService;
   @inject(TYPES.TwilioRoomService)
   private readonly twilioRoomService: TwilioRoomService;
-  @inject(TYPES.KafkaService)
-  private readonly kafkaService: KafkaService;
-  @inject(TYPES.KafkaSetup)
-  private readonly kafkaSetup: KafkaSetup;
 
   @httpPost('/broadcast', TYPES.AuthMiddleware)
   public async createBroadcast(@request() req: Request, @response() res: Response) {
@@ -124,8 +118,8 @@ export class LafiaMediaController extends BaseController {
           const resource_type = 'encounter';
           const publishData = { data: encounter, resource_type };
 
-          const kafkaProducerMsg = this.kafkaSetup.structureSuccessData(successResponseType.fhir, publishData, 'New encounter published successfully', encounter?.id);
-          await this.kafkaService.producer(env.kafka_erpnext_producer_topic, kafkaProducerMsg);
+          // Raise new encounter event
+          encounterEventService.emit(encounterEvent.newEncounter, encounter?.id, publishData);
 
           // Create a media for the encounter
           const mediaResourceData = {
@@ -171,8 +165,8 @@ export class LafiaMediaController extends BaseController {
             const resource_type = 'media';
             const publishData = { data: media, resource_type };
 
-            const kafkaProducerMsg = this.kafkaSetup.structureSuccessData(successResponseType.fhir, publishData, 'New media published successfully', media?.id);
-            await this.kafkaService.producer(env.kafka_erpnext_producer_topic, kafkaProducerMsg);
+            // Raise new media event
+            mediaEventService.emit(mediaEvent.newMedia, media?.id, publishData);
           } catch (e: any) {
             logger.error(`Could not create telehealth encounter media:`, e);
             throw new GenericResponseError(e.message, e.code);

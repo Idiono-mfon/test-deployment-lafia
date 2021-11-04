@@ -8,7 +8,6 @@ import {
   response,
   request,
 } from 'inversify-express-utils';
-import { Env } from '../../config/env';
 import TYPES from '../../config/types';
 import { uploadFile } from '../../middlewares';
 import {
@@ -18,23 +17,16 @@ import {
 } from '../../models';
 import {
   PatientService,
-  successResponseType,
-  KafkaService,
-  KafkaSetup
+  patientEventService,
+  patientEvent
 } from '../../services';
 import { HttpStatusCode, logger } from '../../utils';
 import { BaseController } from '../baseController';
-
-const env = Env.all();
 
 @controller('/patients')
 export class PatientController extends BaseController {
   @inject(TYPES.PatientService)
   private readonly patientService: PatientService;
-  @inject(TYPES.KafkaService)
-  private readonly kafkaService: KafkaService;
-  @inject(TYPES.KafkaSetup)
-  private readonly kafkaSetup: KafkaSetup;
 
   @httpPut('/:id')
   public async updatePatient(@request() req: Request, @response() res: Response) {
@@ -75,13 +67,14 @@ export class PatientController extends BaseController {
       const ip: string = req.headers['x-forwarded-for']?.split(',').shift() || req.socket?.remoteAddress;
 
       const patient: IPatientWithToken = await this.patientService.createPatient(patientData, ip);
+
       const responseData = {
         data: patientData,
         resource_type: patient?.user?.resourceType as string
       };
 
-      const kafkaProducerMsg = this.kafkaSetup.structureSuccessData(successResponseType.default, responseData, 'Resource created successfully', patient?.user?.id);
-      await this.kafkaService.producer(env.kafka_erpnext_producer_topic, kafkaProducerMsg);
+      // Raise new patient event
+      patientEventService.emit(patientEvent.newPatient, patient?.user?.id, responseData);
 
       this.success(res, patient, 'Patient registration successful', HttpStatusCode.CREATED);
     } catch (e: any) {
