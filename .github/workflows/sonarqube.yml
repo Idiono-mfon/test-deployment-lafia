@@ -1,4 +1,4 @@
-name: Build
+name: Sonarqube Code Scanner
 on: 
   pull_request: 
     types: 
@@ -7,7 +7,7 @@ on:
       - reopened
   push: 
     branches: 
-      - main 
+      - dev 
 jobs: 
   build: 
     name: Build
@@ -25,5 +25,5 @@ jobs:
       - 
         env: 
           SONAR_TOKEN: "${{ secrets.SONAR_TOKEN }}"
-        timeout-minutes: 240
+        timeout-minutes: 5
         uses: sonarsource/sonarqube-quality-gate-action@master
