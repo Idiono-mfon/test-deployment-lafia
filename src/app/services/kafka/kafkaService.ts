@@ -6,6 +6,14 @@ import TYPES from '../../config/types';
 import { IPatient, IPractitioner } from '../../models';
 import { forWho, logger } from '../../utils';
 import { Password } from '../../utils/password';
+import {
+  encounterEvent,
+  encounterEventService, mediaEvent, mediaEventService,
+  patientEvent,
+  patientEventService,
+  practitionerEvent,
+  practitionerEventService
+} from '../eventEmitter';
 import { PatientService } from '../patients';
 import { PractitionerService } from '../practitioners';
 import { UserService } from '../users';
@@ -208,6 +216,52 @@ export class KafkaService {
         logger.error(`Error consuming data from kafka: `, error);
 
         return error;
+      })
+  }
+
+  public handleEvents() {
+    patientEventService
+      .on(patientEvent.newPatient, async (patientId, data) => {
+      const kafkaProducerMsg = this.kafkaSetup
+        .structureSuccessData(successResponseType.default, data, 'Resource created successfully', patientId);
+
+      await this.producer(env.kafka_erpnext_producer_topic, kafkaProducerMsg);
+    })
+      .on(patientEvent.error, () => {
+      logger.error('Error creating/publishing patient');
+    });
+
+    practitionerEventService
+      .on(practitionerEvent.newPractitioner, async (practitionerId, data) => {
+        const kafkaProducerMsg = this.kafkaSetup
+          .structureSuccessData(successResponseType.default, data, 'Resource created successfully', practitionerId);
+
+        await this.producer(env.kafka_erpnext_producer_topic, kafkaProducerMsg);
+      })
+      .on(practitionerEvent.error, () => {
+      logger.error('Error creating/publishing practitioner');
+    });
+
+    encounterEventService
+      .on(encounterEvent.newEncounter, async (encounterId, data) => {
+        const kafkaProducerMsg = this.kafkaSetup
+          .structureSuccessData(successResponseType.fhir, data, 'New encounter published successfully', encounterId);
+
+        await this.producer(env.kafka_erpnext_producer_topic, kafkaProducerMsg);
+      })
+      .on(encounterEvent.error, () => {
+        logger.error('Error creating/publishing encounter');
+      });
+
+    mediaEventService
+      .on(mediaEvent.newMedia, async (mediaId, data) => {
+        const kafkaProducerMsg = this.kafkaSetup
+          .structureSuccessData(successResponseType.fhir, data, 'New media published successfully', mediaId);
+
+        await this.producer(env.kafka_erpnext_producer_topic, kafkaProducerMsg);
+      })
+      .on(mediaEvent.error, () => {
+        logger.error('Error creating/publishing media');
       })
   }
 }

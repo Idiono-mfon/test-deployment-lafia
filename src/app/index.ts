@@ -55,6 +55,7 @@ server.setConfig((app) => {
   app.use(authMiddleware.parseThirdPartyConnection);
 
   passport.use(saFhirStrategy);
+
   refreshOauth2Token.use(saFhirStrategy, {
     // @ts-ignore
     setRefreshOAuth2({ strategyOAuth2, refreshOAuth2 }) {
@@ -73,6 +74,7 @@ server.setConfig((app) => {
 });
 
 kafkaService.consumer();
+kafkaService.handleEvents();
 
 const serverInstance = server.build();
 const PORT = Env.all().port;
@@ -80,8 +82,8 @@ const PORT = Env.all().port;
 const appServer = createServer(serverInstance);
 
 appServer.listen(PORT, () => {
-  logger.debug(`Listening on port: ${PORT}`);
-  logger.debug('');
+  logger.info(`Listening on port: ${PORT}`);
+  logger.info('');
 });
 
 const signallingServer = new SignallingServerService(
