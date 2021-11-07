@@ -11,7 +11,7 @@ import {
   encounterEventService,
   encounterEvent,
   mediaEventService,
-  mediaEvent
+  mediaEvent, FileService
 } from '../../services';
 import { GenericResponseError, HttpStatusCode, logger } from '../../utils';
 import { BaseController } from '../baseController';
@@ -28,6 +28,8 @@ export class LafiaMediaController extends BaseController {
   private readonly fhirServerService: FhirServerService;
   @inject(TYPES.TwilioRoomService)
   private readonly twilioRoomService: TwilioRoomService;
+  @inject(TYPES.FileService)
+  private readonly fileService: FileService;
 
   @httpPost('/broadcast', TYPES.AuthMiddleware)
   public async createBroadcast(@request() req: Request, @response() res: Response) {
@@ -65,7 +67,8 @@ export class LafiaMediaController extends BaseController {
 
       if (event?.StatusCallbackEvent === 'composition-available') {
         logger.info('Twilio video composition available');
-        const recordedFileUrl = await this.twilioService.getVideoRecordingFile(event?.CompositionSid);
+        const twilioFileUrl = await this.twilioService.getVideoRecordingFile(event?.CompositionSid);
+        const recordedFileUrl = await this.fileService.transferFileToLafiaS3Bucket(twilioFileUrl);
         const { practitioner, patients } = await this.twilioService.getParticipantsByRoomSid(event?.RoomSid);
 
         for (let patientId of patients) {
