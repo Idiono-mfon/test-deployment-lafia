@@ -1,4 +1,5 @@
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { ReadStream } from 'fs';
 import { injectable } from 'inversify';
 import { v4 as uuidV4 } from 'uuid';
 import { Env } from '../../config/env';
@@ -26,7 +27,7 @@ export class S3Service {
     });
   }
 
-  public async uploadFile(file: Express.Multer.File): Promise<string> {
+  public async uploadFile(file: Express.Multer.File | { buffer: Buffer | ReadStream, mimetype: string }): Promise<string> {
     logger.info('Running S3Service::uploadFile');
     try {
       if (!file) {

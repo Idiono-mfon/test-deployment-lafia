@@ -14,5 +14,6 @@ export * from './videoRecords';
 export * from './consents';
 export * from './resources';
 export * from './kafka';
+export * from './file';
 export * from './eventEmitter';
 export * from './signallingServers';
