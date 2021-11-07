@@ -51,6 +51,7 @@ import {
   PractitionerService,
   VideoBroadcastService,
   ImplementationGuideService,
+  FileService,
 } from '../services';
 import { TokenUtil, UtilityService } from '../utils';
 import TYPES from './types';
@@ -192,6 +193,10 @@ container
 container
   .bind<KafkaSetup>(TYPES.KafkaSetup)
   .to(KafkaSetup)
+  .inSingletonScope();
+container
+  .bind<FileService>(TYPES.FileService)
+  .to(FileService)
   .inSingletonScope();
 
 
