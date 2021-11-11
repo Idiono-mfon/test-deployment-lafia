@@ -17,3 +17,4 @@ export * from './kafka';
 export * from './file';
 export * from './eventEmitter';
 export * from './signallingServers';
+export * from './notifications';
