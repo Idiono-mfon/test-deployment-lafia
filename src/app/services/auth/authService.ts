@@ -79,7 +79,7 @@ export class AuthService {
       throwError('connection name is required', error.badRequest);
     }
 
-    const env = Env.all();
+    const env: any = Env.all();
     connectionName = connectionName.toLowerCase();
 
     return {

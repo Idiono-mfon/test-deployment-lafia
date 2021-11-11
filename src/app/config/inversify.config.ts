@@ -36,10 +36,10 @@ import {
   KafkaSetup,
   UserService,
   AuthService,
+  FileService,
   KafkaService,
   EmailService,
   TwilioService,
-  ConsentService,
   PatientService,
   LanguageService,
   CodeSystemService,
@@ -51,7 +51,6 @@ import {
   PractitionerService,
   VideoBroadcastService,
   ImplementationGuideService,
-  FileService,
 } from '../services';
 import { TokenUtil, UtilityService } from '../utils';
 import TYPES from './types';
@@ -165,10 +164,6 @@ container
 container
   .bind<LafiaMediaService>(TYPES.LafiaMediaService)
   .to(LafiaMediaService)
-  .inSingletonScope();
-container
-  .bind<ConsentService>(TYPES.ConsentService)
-  .to(ConsentService)
   .inSingletonScope();
 container
   .bind<VideoBroadcastService>(TYPES.VideoBroadcastService)
