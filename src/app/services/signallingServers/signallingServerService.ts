@@ -19,6 +19,7 @@ import {
 } from './interfaces';
 import { RedisStore } from './redisStore';
 import { IPractitionerVideoBroadcast, IVideoBroadcast } from '../../models';
+import { FirebaseService, NotificationPayload } from '../notifications';
 
 const env = Env.all();
 
@@ -34,6 +35,7 @@ export class SignallingServerService {
   private readonly kafkaService: KafkaService;
   @inject(TYPES.KafkaSetup)
   private readonly kafkaSetup: KafkaSetup;
+  private static firebaseService: FirebaseService;
   private readonly io: any;
   private static redisStore: RedisStore;
   private static onlinePractitionerRoom: string;
@@ -45,12 +47,14 @@ export class SignallingServerService {
     patientService: PatientService,
     practitionerService: PractitionerService,
     videoBroadcastService: VideoBroadcastService,
-    kafkaService: KafkaService
+    kafkaService: KafkaService,
+    FirebaseService: FirebaseService
   ) {
     SignallingServerService.redisStore = new RedisStore(pubClient, patientService, practitionerService);
     SignallingServerService.onlinePractitionerRoom = 'onlinePractitioners';
     SignallingServerService.twilioService = new TwilioService();
     SignallingServerService.videoBroadcastService = videoBroadcastService;
+    SignallingServerService.firebaseService = FirebaseService;
 
     this.io = new Server(appServer, {
       cors: {
@@ -83,13 +87,14 @@ export class SignallingServerService {
 
   private static async listenForConnectionEvent(socket: Socket) {
     logger.info('Running SignallingServerService.listenForConnectionEvent');
-    let { userId, resourceType } = socket.handshake.query;
+    let { userId, resourceType, deviceToken } = socket.handshake.query;
     resourceType = resourceType as unknown as string;
     resourceType = resourceType.toLowerCase();
     const user: IOnlineUser = {
       userId,
       resourceType,
-      socketId: socket?.id
+      socketId: socket?.id,
+      deviceToken,
     } as IOnlineUser;
 
     if (user.userId && user.userId !== 'undefined') {
@@ -290,6 +295,15 @@ export class SignallingServerService {
 
     logger.debug(`EmitCallEvent Data: ${JSON.stringify(res)}`);
 
+    // Todo: extract and add the user image later
+    //  when the image binary in the db
+    //  is changed to a url string
+    const payload: NotificationPayload = { user_image: '', user_name: reciever.username as string };
+
+    // Send firebase notification to user's device
+    await SignallingServerService.firebaseService.sendNotification(reciever.deviceToken, payload);
+
+    // Send call event and data to the reciever
     socket
       .to(reciever.socketId)
       .emit('call', res);

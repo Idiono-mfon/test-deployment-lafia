@@ -3,6 +3,8 @@ export interface IOnlineUser {
   resourceType: string;
   username?: string;
   socketId: string;
+  deviceToken: string;
+  userImage?: string;
 }
 
 export interface IBroadcastStatus {

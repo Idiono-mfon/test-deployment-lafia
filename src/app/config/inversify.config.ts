@@ -11,8 +11,8 @@ import {
   CodeSystemController,
   LafiaMediaController,
   PractitionerController,
-  ImplementationGuideController,
   FhirResourceController,
+  ImplementationGuideController,
 } from '../controllers';
 import { AuthMiddleware } from '../middlewares';
 import {
@@ -22,14 +22,14 @@ import {
   LanguageRepository,
   ComponentRepository,
   CodeSystemRepository,
-  VideoRecordRepository,
-  PractitionerRepository,
-  VideoBroadcastRepository,
-  PractitionerVideoBroadcastRepository,
   ConnectionRepository,
   TwilioRoomRepository,
+  VideoRecordRepository,
+  FhirResourceRepository,
+  PractitionerRepository,
+  VideoBroadcastRepository,
   ImplementationGuideRepository,
-  FhirResourceRepository
+  PractitionerVideoBroadcastRepository,
 } from '../repository';
 import {
   S3Service,
