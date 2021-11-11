@@ -11,8 +11,8 @@ import {
   CodeSystemController,
   LafiaMediaController,
   PractitionerController,
-  ImplementationGuideController,
   FhirResourceController,
+  ImplementationGuideController,
 } from '../controllers';
 import { AuthMiddleware } from '../middlewares';
 import {
@@ -22,14 +22,14 @@ import {
   LanguageRepository,
   ComponentRepository,
   CodeSystemRepository,
-  VideoRecordRepository,
-  PractitionerRepository,
-  VideoBroadcastRepository,
-  PractitionerVideoBroadcastRepository,
   ConnectionRepository,
   TwilioRoomRepository,
+  VideoRecordRepository,
+  FhirResourceRepository,
+  PractitionerRepository,
+  VideoBroadcastRepository,
   ImplementationGuideRepository,
-  FhirResourceRepository
+  PractitionerVideoBroadcastRepository,
 } from '../repository';
 import {
   S3Service,
@@ -51,6 +51,7 @@ import {
   PractitionerService,
   VideoBroadcastService,
   ImplementationGuideService,
+  FileService,
 } from '../services';
 import { TokenUtil, UtilityService } from '../utils';
 import TYPES from './types';
@@ -192,6 +193,10 @@ container
 container
   .bind<KafkaSetup>(TYPES.KafkaSetup)
   .to(KafkaSetup)
+  .inSingletonScope();
+container
+  .bind<FileService>(TYPES.FileService)
+  .to(FileService)
   .inSingletonScope();
 
 

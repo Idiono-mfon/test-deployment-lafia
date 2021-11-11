@@ -17,7 +17,7 @@ import {
   VideoBroadcastService,
   AuthService,
   KafkaService,
-  SignallingServerService
+  SignallingServerService, FileService
 } from './services';
 import * as swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './config/swagger.config';
@@ -39,6 +39,7 @@ const practitionerService = container.get<PractitionerService>(TYPES.Practitione
 const authMiddleware = container.get<AuthMiddleware>(TYPES.AuthMiddleware);
 const authService = container.get<AuthService>(TYPES.AuthService);
 const kafkaService = container.get<KafkaService>(TYPES.KafkaService);
+const fileService = container.get<FileService>(TYPES.FileService);
 
 const saFhirStrategy = authService.getStrategy('safhir');
 
@@ -72,6 +73,9 @@ server.setConfig((app) => {
 
   passport.deserializeUser((obj: any, done) => done(null, obj));
 });
+
+// Delete local encounter files that has been uploaded to S3
+fileService.onLocalFileDelete();
 
 kafkaService.consumer();
 kafkaService.handleEvents();

@@ -36,6 +36,7 @@ const TYPES = {
   FhirResourceService: Symbol('FhirResourceService'),
   KafkaService: Symbol('KafkaService'),
   KafkaSetup: Symbol('KafkaSetup'),
+  FileService: Symbol('FileService'),
 
   // repositories
   UserRepository: Symbol('UserRepository'),

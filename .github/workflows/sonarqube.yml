@@ -1,34 +1,29 @@
-# This is a basic workflow to help you get started with Actions
-
-name: SonarQube Service
-
-# Controls when the workflow will run
-on:
-  # Trigger analysis when pushing in master or pull requests, and when creating
-  # a pull request. 
-  push:
-    branches:
-      - dev
-  pull_request:
-      types: [opened, synchronize, reopened]
-
-jobs:
-  sonarqube:
+name: Sonarqube Code Scanner
+on: 
+  pull_request: 
+    types: 
+      - opened
+      - synchronize
+      - reopened
+  push: 
+    branches: 
+      - dev 
+jobs: 
+  build: 
+    name: Build
     runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-      # with:
-        # Disabling shallow clone is recommended for improving relevancy of reporting
-        # fetch-depth: 0
-      # Triggering SonarQube analysis as results of it are required by Quality Gate check
-    - name: SonarQube Scan
-      uses: sonarsource/sonarqube-scan-action@master
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-    - name: SonarQube Quality Gate check
-      uses: sonarsource/sonarqube-quality-gate-action@master
-      # Force to fail step after specific time
-      timeout-minutes: 5
-      env:
-       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    steps: 
+      - 
+        uses: actions/checkout@v2
+        with: 
+          fetch-depth: 0
+      - 
+        env: 
+          SONAR_HOST_URL: "${{ secrets.SONAR_HOST_URL }}"
+          SONAR_TOKEN: "${{ secrets.SONAR_TOKEN }}"
+        uses: sonarsource/sonarqube-scan-action@master
+      - 
+        env: 
+          SONAR_TOKEN: "${{ secrets.SONAR_TOKEN }}"
+        timeout-minutes: 550
+        uses: SonarSource/sonarqube-quality-gate-action@v1.0.0
