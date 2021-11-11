@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { v4 as uuid } from 'uuid';
 import { Env } from '../../config/env';
 import TYPES from '../../config/types';
-import { IFindUser, IUser } from '../../models';
+import { IFindUser, IJwtPayload, IUser } from '../../models';
 import { UserRepository } from '../../repository';
 import {
   error,
@@ -15,10 +15,8 @@ import {
   Validations
 } from '../../utils';
 import { Password } from '../../utils/password';
-import { ConsentService } from '../consents';
 import { EmailService, IComposeEmail } from '../email';
 import { FhirServerService } from '../fhirServer';
-import { IJwtPayload } from '../platformSDK/interfaces';
 import { TwilioService } from '../twilio';
 
 const env = Env.all();
@@ -36,9 +34,6 @@ export class UserService {
 
   @inject(TYPES.FhirServerService)
   private readonly fhirServerService: FhirServerService;
-
-  @inject(TYPES.ConsentService)
-  private readonly consentService: ConsentService;
 
   public async validateUser(data: IUser, ip?: string): Promise<boolean> {
     logger.info('Running UserService.validateUser');

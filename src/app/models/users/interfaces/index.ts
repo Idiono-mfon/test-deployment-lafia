@@ -48,6 +48,14 @@ export interface IFindUser extends IBase {
   has_verified_email?: boolean;
 }
 
+export interface IJwtPayload {
+  id: string | any;
+  email: string;
+  aud?: string;
+  iat?: string;
+  exp?: string;
+}
+
 export interface IUserPhoto extends IBase {
   photo?: string;
 }
