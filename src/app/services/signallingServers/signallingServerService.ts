@@ -47,14 +47,13 @@ export class SignallingServerService {
     patientService: PatientService,
     practitionerService: PractitionerService,
     videoBroadcastService: VideoBroadcastService,
-    kafkaService: KafkaService,
-    FirebaseService: FirebaseService
+    kafkaService: KafkaService
   ) {
     SignallingServerService.redisStore = new RedisStore(pubClient, patientService, practitionerService);
     SignallingServerService.onlinePractitionerRoom = 'onlinePractitioners';
     SignallingServerService.twilioService = new TwilioService();
     SignallingServerService.videoBroadcastService = videoBroadcastService;
-    SignallingServerService.firebaseService = FirebaseService;
+    SignallingServerService.firebaseService = new FirebaseService();
 
     this.io = new Server(appServer, {
       cors: {
