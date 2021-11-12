@@ -1,6 +1,7 @@
 import { initializeApp, cert } from 'firebase-admin/app';
 import { Messaging } from 'firebase-admin/messaging';
 import { Env } from '../../config/env';
+import { logger } from '../../utils';
 import { serviceAccount } from './firebaseServiceAccount';
 
 const env = Env.all();
@@ -18,6 +19,8 @@ export class FirebaseService {
   }
 
   public async sendNotification(firebaseToken: string, notificationPayload: NotificationPayload): Promise<void> {
+    logger.info('Running FirebaseService.sendNotification');
+
     const { title, body, user_image, user_name, type } = notificationPayload;
 
     const payload = {
