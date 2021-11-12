@@ -1,11 +1,10 @@
-import TYPES from '../app/config/types';
-import { container } from '../app/index';
-import { CodeSystemRepository } from '../app/repository';
-import { CodeSystemService } from '../app/services';
-import { TestCodeSystemRepository } from './fixtures/repository';
+import TYPES from '../../app/config/types';
+import { appServer, container } from '../../app/index';
+import { CodeSystemRepository } from '../../app/repository';
+import { TestCodeSystemRepository } from '../fixtures/repository';
 
 describe('Code System Test', () => {
-  let testCodeSystemService: CodeSystemService;
+  // let testCodeSystemService: CodeSystemService;
   let testCodeSystemRepository: CodeSystemRepository;
 
   beforeEach(() => {
@@ -26,8 +25,14 @@ describe('Code System Test', () => {
     // Restore to last snapshot so each unit test
     // takes a clean copy of the application container
     container.restore();
+    appServer.close();
 
   });
+
+  afterAll((done) => {
+    appServer.close();
+    done();
+  })
 
   it('should be defined', () => {
 

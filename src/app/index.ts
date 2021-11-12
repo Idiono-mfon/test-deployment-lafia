@@ -43,7 +43,6 @@ const authMiddleware = container.get<AuthMiddleware>(TYPES.AuthMiddleware);
 const authService = container.get<AuthService>(TYPES.AuthService);
 const kafkaService = container.get<KafkaService>(TYPES.KafkaService);
 const fileService = container.get<FileService>(TYPES.FileService);
-const codeSystemService = container.get<CodeSystemService>(TYPES.CodeSystemService);
 
 const saFhirStrategy = authService.getStrategy('safhir');
 
@@ -106,4 +105,4 @@ const signallingServer = new SignallingServerService(
 );
 signallingServer.initialize();
 
-export { app, passport, refreshOauth2Token, container, codeSystemService };
+export { appServer, passport, refreshOauth2Token, container };
