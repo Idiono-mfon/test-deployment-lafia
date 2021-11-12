@@ -20,6 +20,12 @@ jobs:
       
       - name: Install modules
         run: yarn install --ignore-engines
+        env:
+          TWILIO_ACCOUNT_SID: "${{ secrets.TWILIO_ACCOUNT_SID }}"
+          TWILIO_AUTH_TOKEN: "${{ secrets.TWILIO_AUTH_TOKEN }}"
+          TWILIO_API_KEY: "${{ secrets.TWILIO_API_KEY }}"
+          TWILIO_API_SECRET: "${{ secrets.TWILIO_API_SECRET }}"
+          TWILIO_VERIFY_SID: "${{ secrets.TWILIO_VERIFY_SID }}"
       - name: Run Test
         run: yarn test
       - 
