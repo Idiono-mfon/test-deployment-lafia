@@ -15,9 +15,9 @@ import {
   IPractitioner, IPractitionerWithToken
 } from '../../models';
 import {
+  eventName,
+  eventService,
   PractitionerService,
-  practitionerEventService,
-  practitionerEvent
 } from '../../services';
 import { HttpStatusCode, logger } from '../../utils';
 import { BaseController } from '../baseController';
@@ -69,7 +69,7 @@ export class PractitionerController extends BaseController {
       };
 
       // Raise new practitioner event
-      practitionerEventService.emit(practitionerEvent.newPractitioner, practitioner?.user?.id, responseData);
+      eventService.emit(eventName.newPractitioner, practitioner?.user?.id, responseData);
 
       this.success(res, practitioner, 'Practitioner registration successful', HttpStatusCode.CREATED);
     } catch (e: any) {

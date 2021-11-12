@@ -6,7 +6,7 @@ import { v4 as uuid } from 'uuid';
 import { Env } from '../../config/env';
 import TYPES from '../../config/types';
 import { forWho, logger } from '../../utils';
-import { firebaseEvent, firebaseEventService } from '../eventEmitter';
+import { eventName, eventService } from '../eventEmitter';
 import { KafkaService, KafkaSetup, successResponseType } from '../kafka';
 import { PatientService } from '../patients';
 import { PractitionerService } from '../practitioners';
@@ -301,8 +301,7 @@ export class SignallingServerService {
     const payload: NotificationPayload = { user_image: '', user_name: reciever.username as string };
 
     // Send firebase notification to user's device
-    firebaseEventService.emit(firebaseEvent.send_notification, reciever.deviceToken, payload);
-    // await SignallingServerService.firebaseService.sendNotification(reciever.deviceToken, payload);
+    eventService.emit(eventName.sendNotification, reciever.deviceToken, payload);
 
     logger.info('ALIVE AFTER FIREBASE NOTIFICATION');
 

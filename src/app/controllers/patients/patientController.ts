@@ -15,11 +15,7 @@ import {
   IPatient,
   IPatientWithToken
 } from '../../models';
-import {
-  PatientService,
-  patientEventService,
-  patientEvent
-} from '../../services';
+import { PatientService, eventService, eventName } from '../../services';
 import { HttpStatusCode, logger } from '../../utils';
 import { BaseController } from '../baseController';
 
@@ -74,7 +70,7 @@ export class PatientController extends BaseController {
       };
 
       // Raise new patient event
-      patientEventService.emit(patientEvent.newPatient, patient?.user?.id, responseData);
+      eventService.emit(eventName.newPatient, patient?.user?.id, responseData);
 
       this.success(res, patient, 'Patient registration successful', HttpStatusCode.CREATED);
     } catch (e: any) {

@@ -1,8 +1,7 @@
 import firebase, { messaging } from 'firebase-admin';
-import { Messaging } from 'firebase-admin/messaging';
 import { Env } from '../../config/env';
 import { logger } from '../../utils';
-import { firebaseEvent, firebaseEventService } from '../eventEmitter';
+import { eventName, eventService } from '../eventEmitter';
 import { serviceAccount } from './firebaseServiceAccount';
 import MessagingDevicesResponse = messaging.MessagingDevicesResponse;
 
@@ -40,15 +39,11 @@ export class FirebaseService {
 
     }
 
-    const notificationResponse = await firebase.messaging().sendToDevice(firebaseToken, payload, options);
-
-    console.log('NotificationResponse', notificationResponse);
-
-    return notificationResponse;
+    return firebase.messaging().sendToDevice(firebaseToken, payload, options);
   }
 
   public static triggerNotification() {
-    firebaseEventService.on(firebaseEvent.send_notification, async (deviceToken, payload) => {
+    eventService.on(eventName.sendNotification, async (deviceToken, payload) => {
       await FirebaseService.sendNotification(deviceToken, payload);
     });
   }

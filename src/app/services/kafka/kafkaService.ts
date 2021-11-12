@@ -1,19 +1,12 @@
 import { inject, injectable } from 'inversify';
 import _ from 'lodash';
-import { DeliveryReport, LibrdKafkaError, Message, Metadata, NumberNullUndefined } from 'node-rdkafka';
+import { DeliveryReport, LibrdKafkaError, Message, NumberNullUndefined } from 'node-rdkafka';
 import { Env } from '../../config/env';
 import TYPES from '../../config/types';
 import { IPatient, IPractitioner } from '../../models';
 import { forWho, logger } from '../../utils';
 import { Password } from '../../utils/password';
-import {
-  encounterEvent,
-  encounterEventService, mediaEvent, mediaEventService,
-  patientEvent,
-  patientEventService,
-  practitionerEvent,
-  practitionerEventService
-} from '../eventEmitter';
+import { eventName, eventService } from '../eventEmitter';
 import { PatientService } from '../patients';
 import { PractitionerService } from '../practitioners';
 import { UserService } from '../users';
@@ -39,7 +32,7 @@ export class KafkaService {
     const kafkaProducer = this.kafkaSetup.instantiateKafkaProducer();
 
     return new Promise((resolve, reject) => {
-      kafkaProducer.connect({ topic }, (error: LibrdKafkaError, data: Metadata) => {
+      kafkaProducer.connect({ topic }, (error: LibrdKafkaError) => {
         if (error) {
           return reject(error);
         }
@@ -101,7 +94,7 @@ export class KafkaService {
     const kafkaConsumer = this.kafkaSetup.instantiateKafkaConsumer();
 
     kafkaConsumer
-      .connect({}, (error: LibrdKafkaError, data: Metadata) => {
+      .connect({}, (error: LibrdKafkaError) => {
         if (error) {
           return error;
         }
@@ -220,48 +213,33 @@ export class KafkaService {
   }
 
   public handleEvents() {
-    patientEventService
-      .on(patientEvent.newPatient, async (patientId, data) => {
-      const kafkaProducerMsg = this.kafkaSetup
-        .structureSuccessData(successResponseType.default, data, 'Resource created successfully', patientId);
+    eventService
+      .on(eventName.newPatient, async (patientId, data) => {
+        const kafkaProducerMsg = this.kafkaSetup
+          .structureSuccessData(successResponseType.default, data, 'Resource created successfully', patientId);
 
-      await this.producer(env.kafka_erpnext_producer_topic, kafkaProducerMsg);
-    })
-      .on(patientEvent.error, () => {
-      logger.error('Error creating/publishing patient');
-    });
-
-    practitionerEventService
-      .on(practitionerEvent.newPractitioner, async (practitionerId, data) => {
+        await this.producer(env.kafka_erpnext_producer_topic, kafkaProducerMsg);
+      })
+      .on(eventName.newPractitioner, async (practitionerId, data) => {
         const kafkaProducerMsg = this.kafkaSetup
           .structureSuccessData(successResponseType.default, data, 'Resource created successfully', practitionerId);
 
         await this.producer(env.kafka_erpnext_producer_topic, kafkaProducerMsg);
       })
-      .on(practitionerEvent.error, () => {
-      logger.error('Error creating/publishing practitioner');
-    });
-
-    encounterEventService
-      .on(encounterEvent.newEncounter, async (encounterId, data) => {
+      .on(eventName.newEncounter, async (encounterId, data) => {
         const kafkaProducerMsg = this.kafkaSetup
           .structureSuccessData(successResponseType.fhir, data, 'New encounter published successfully', encounterId);
 
         await this.producer(env.kafka_erpnext_producer_topic, kafkaProducerMsg);
       })
-      .on(encounterEvent.error, () => {
-        logger.error('Error creating/publishing encounter');
-      });
-
-    mediaEventService
-      .on(mediaEvent.newMedia, async (mediaId, data) => {
+      .on(eventName.newMedia, async (mediaId, data) => {
         const kafkaProducerMsg = this.kafkaSetup
           .structureSuccessData(successResponseType.fhir, data, 'New media published successfully', mediaId);
 
         await this.producer(env.kafka_erpnext_producer_topic, kafkaProducerMsg);
       })
-      .on(mediaEvent.error, () => {
-        logger.error('Error creating/publishing media');
-      })
+      .on(eventName.error, () => {
+        logger.error('Error creating/publishing events');
+      });
   }
 }
