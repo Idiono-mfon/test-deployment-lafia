@@ -17,7 +17,10 @@ import {
   VideoBroadcastService,
   AuthService,
   KafkaService,
-  SignallingServerService, FileService, FirebaseService
+  SignallingServerService,
+  FileService,
+  FirebaseService,
+  CodeSystemService
 } from './services';
 import * as swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './config/swagger.config';
@@ -102,4 +105,4 @@ const signallingServer = new SignallingServerService(
 );
 signallingServer.initialize();
 
-export { app, passport, refreshOauth2Token };
+export { appServer, passport, refreshOauth2Token, container };
