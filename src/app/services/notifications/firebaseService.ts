@@ -28,7 +28,7 @@ export class FirebaseService {
       },
       data: {
         user_name,
-        user_image,
+        user_image: user_image || 'https://i.pravatar.cc/500',
         type: type || 'video',
       }
     };
