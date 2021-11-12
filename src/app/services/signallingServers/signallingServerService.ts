@@ -88,7 +88,7 @@ export class SignallingServerService {
     logger.info('Running SignallingServerService.listenForConnectionEvent');
     let { userId, resourceType, deviceToken } = socket.handshake.query;
     resourceType = resourceType as unknown as string;
-    resourceType = resourceType.toLowerCase();
+    resourceType = resourceType?.toLowerCase();
     const user: IOnlineUser = {
       userId,
       resourceType,
