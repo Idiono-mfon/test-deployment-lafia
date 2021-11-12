@@ -117,34 +117,35 @@ export class RedisStore {
       const existingUser = await this.getUserById(user.userId);
 
       if (existingUser) {
-        return;
-      }
+        user.deviceToken = existingUser.deviceToken;
+        user.socketId = existingUser.socketId;
+      } else {
+        let username: string = '';
 
-      let username: string = '';
-
-      if (user?.resourceType === forWho.patient) {
-        try {
-          const patient: IPatient = await this.patientService.findPatientById(user.userId);
-          // @ts-ignore
-          username = patient?.name[0]?.text;
-        } catch (e: any) {
-          console.log(e);
-        }
-      }
-
-      if (user?.resourceType === forWho.practitioner) {
-        try {
-          const practitioner: IPractitioner = await this.practitionerService.findPractitionerById(user.userId);
-          // @ts-ignore
-          username = practitioner?.name[0]?.text;
-        } catch (e: any) {
-          console.log(e);
+        if (user?.resourceType === forWho.patient) {
+          try {
+            const patient: IPatient = await this.patientService.findPatientById(user.userId);
+            // @ts-ignore
+            username = patient?.name[0]?.text;
+          } catch (e: any) {
+            console.log(e);
+          }
         }
 
-      }
+        if (user?.resourceType === forWho.practitioner) {
+          try {
+            const practitioner: IPractitioner = await this.practitionerService.findPractitionerById(user.userId);
+            // @ts-ignore
+            username = practitioner?.name[0]?.text;
+          } catch (e: any) {
+            console.log(e);
+          }
 
-      if (username) {
-        user.username = username;
+        }
+
+        if (username) {
+          user.username = username;
+        }
       }
 
       // Update with the new users

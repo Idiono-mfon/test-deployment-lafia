@@ -1,15 +1,13 @@
 import { Request, Response } from 'express';
 import { inject } from 'inversify';
-import { controller, httpGet, httpPost, httpPut, request, response } from 'inversify-express-utils';
+import { controller, httpGet, httpPost, request, response } from 'inversify-express-utils';
 import TYPES from '../../config/types';
-import { ConsentService, FhirServerService, UserService } from '../../services';
+import { FhirServerService, UserService } from '../../services';
 import { error, logger, throwError } from '../../utils';
 import { BaseController } from '../baseController';
 
 @controller('/consents')
 export class ConsentController extends BaseController {
-  @inject(TYPES.ConsentService)
-  private readonly consentService: ConsentService;
   @inject(TYPES.UserService)
   private readonly userService: UserService;
   @inject(TYPES.FhirServerService)
@@ -32,30 +30,6 @@ export class ConsentController extends BaseController {
       this.success(res, consentRecord?.data, 'Consent successfully accepted');
     } catch (e: any) {
       logger.error(`Unable to accept consent -`, e);
-      this.error(res, e);
-    }
-  }
-
-  @httpPut('/type')
-  public async addConsentCategory(@request() req: Request, @response() res: Response) {
-    logger.info('Running ConsentController::addConsentCategory');
-    try {
-      const { consent_type, patient_id } = req.body;
-
-      const patientDetails = await this.userService.getOneUser({
-        resource_type: 'patient',
-        resource_id: patient_id,
-      });
-
-      if (!patientDetails) {
-        throwError('Patient with the id not found', error.notFound);
-      }
-
-      await this.consentService.addConsentCategory(patientDetails?.email, consent_type);
-
-      this.success(res, {}, 'Consent category added successfully');
-    } catch (e: any) {
-      logger.error(`Unable to add consent category -`, e);
       this.error(res, e);
     }
   }

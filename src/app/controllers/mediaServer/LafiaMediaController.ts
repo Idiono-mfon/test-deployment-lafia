@@ -8,10 +8,9 @@ import {
   FhirServerService,
   LafiaMediaService,
   TwilioService,
-  encounterEventService,
-  encounterEvent,
-  mediaEventService,
-  mediaEvent, FileService
+  FileService,
+  eventService,
+  eventName
 } from '../../services';
 import { GenericResponseError, HttpStatusCode, logger } from '../../utils';
 import { BaseController } from '../baseController';
@@ -122,7 +121,7 @@ export class LafiaMediaController extends BaseController {
           const publishData = { data: encounter, resource_type };
 
           // Raise new encounter event
-          encounterEventService.emit(encounterEvent.newEncounter, encounter?.id, publishData);
+          eventService.emit(eventName.newEncounter, encounter?.id, publishData);
 
           // Create a media for the encounter
           const mediaResourceData = {
@@ -169,7 +168,7 @@ export class LafiaMediaController extends BaseController {
             const publishData = { data: media, resource_type };
 
             // Raise new media event
-            mediaEventService.emit(mediaEvent.newMedia, media?.id, publishData);
+            eventService.emit(eventName.newMedia, media?.id, publishData);
           } catch (e: any) {
             logger.error(`Could not create telehealth encounter media:`, e);
             throw new GenericResponseError(e.message, e.code);

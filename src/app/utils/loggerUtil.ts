@@ -30,7 +30,7 @@ const levels = {
 const level = () => {
   const currentEnv = env.environment || 'development'
   const isDevelopment = currentEnv === 'development'
-  return isDevelopment ? 'debug' : 'warn'
+  return isDevelopment ? 'debug' : 'info'
 }
 
 // Define different colors for each level.

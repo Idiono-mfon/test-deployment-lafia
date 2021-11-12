@@ -28,7 +28,6 @@ const TYPES = {
   TwilioService: Symbol('TwilioService'),
   VideoRecordService: Symbol('VideoRecordService'),
   LafiaMediaService: Symbol('LafiaMediaService'),
-  ConsentService: Symbol('ConsentService'),
   VideoBroadcastService: Symbol('VideoBroadcastService'),
   TwilioRoomService: Symbol('TwilioRoomService'),
   ConnectionService: Symbol('ConnectionService'),

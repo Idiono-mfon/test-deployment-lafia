@@ -6,6 +6,7 @@ import { v4 as uuid } from 'uuid';
 import { Env } from '../../config/env';
 import TYPES from '../../config/types';
 import { forWho, logger } from '../../utils';
+import { eventName, eventService } from '../eventEmitter';
 import { KafkaService, KafkaSetup, successResponseType } from '../kafka';
 import { PatientService } from '../patients';
 import { PractitionerService } from '../practitioners';
@@ -88,7 +89,7 @@ export class SignallingServerService {
     logger.info('Running SignallingServerService.listenForConnectionEvent');
     let { userId, resourceType, deviceToken } = socket.handshake.query;
     resourceType = resourceType as unknown as string;
-    resourceType = resourceType.toLowerCase();
+    resourceType = resourceType?.toLowerCase();
     const user: IOnlineUser = {
       userId,
       resourceType,
@@ -300,7 +301,9 @@ export class SignallingServerService {
     const payload: NotificationPayload = { user_image: '', user_name: reciever.username as string };
 
     // Send firebase notification to user's device
-    await SignallingServerService.firebaseService.sendNotification(reciever.deviceToken, payload);
+    eventService.emit(eventName.sendNotification, reciever.deviceToken, payload);
+
+    logger.info('ALIVE AFTER FIREBASE NOTIFICATION');
 
     // Send call event and data to the reciever
     socket

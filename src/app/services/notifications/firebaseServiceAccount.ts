@@ -13,19 +13,8 @@ const {
   firebase_client_id: client_id,
 } = Env.all();
 
-
-
-const firebaseServiceAccount = {
-  type ,
-  project_id,
-  private_key_id,
-  private_key,
-  client_email,
-  client_id,
-  auth_uri,
-  token_uri,
-  auth_provider_x509_cert_url,
-  client_x509_cert_url
+export const serviceAccount = {
+  projectId: project_id,
+  privateKey: private_key,
+  clientEmail: client_email,
 };
-
-export const serviceAccount = JSON.stringify(firebaseServiceAccount);

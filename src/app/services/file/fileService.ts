@@ -8,7 +8,7 @@ import { v4 as uuid } from 'uuid';
 import TYPES from '../../config/types';
 import { InternalServerError, logger } from '../../utils';
 import { S3Service } from '../aws';
-import { fileEvent, fileEventService } from '../eventEmitter/fileEventService';
+import { eventName, eventService } from '../eventEmitter';
 
 @injectable()
 export class FileService {
@@ -63,7 +63,7 @@ export class FileService {
     const s3FileUrl = await this.s3.uploadFile(options);
 
     // Raise event to delete local file
-    fileEventService.emit(fileEvent.removeLocalFile, path);
+    eventService.emit(eventName.removeLocalFile, path);
 
     return s3FileUrl;
 
@@ -81,6 +81,6 @@ export class FileService {
   }
 
   public onLocalFileDelete(): void {
-    fileEventService.on(fileEvent.removeLocalFile, (path) => this.deleteLocalFile(path));
+    eventService.on(eventName.removeLocalFile, (path) => this.deleteLocalFile(path));
   }
 }
