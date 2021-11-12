@@ -1,4 +1,4 @@
-name: Sonarqube Code Scanner
+name: Build Process
 on: 
   pull_request: 
     types: 
@@ -20,8 +20,8 @@ jobs:
       
       - name: Install modules
         run: yarn install --ignore-engines
-      - name: Run Jest
-        uses: stefanoeb/jest-action@1.0.3
+      - name: Run Test
+        run: yarn test
       - 
         env: 
           SONAR_HOST_URL: "${{ secrets.SONAR_HOST_URL }}"
