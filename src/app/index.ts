@@ -17,7 +17,10 @@ import {
   VideoBroadcastService,
   AuthService,
   KafkaService,
-  SignallingServerService, FileService, FirebaseService
+  SignallingServerService,
+  FileService,
+  FirebaseService,
+  CodeSystemService
 } from './services';
 import * as swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './config/swagger.config';
@@ -40,6 +43,7 @@ const authMiddleware = container.get<AuthMiddleware>(TYPES.AuthMiddleware);
 const authService = container.get<AuthService>(TYPES.AuthService);
 const kafkaService = container.get<KafkaService>(TYPES.KafkaService);
 const fileService = container.get<FileService>(TYPES.FileService);
+const codeSystemService = container.get<CodeSystemService>(TYPES.CodeSystemService);
 
 const saFhirStrategy = authService.getStrategy('safhir');
 
@@ -102,4 +106,4 @@ const signallingServer = new SignallingServerService(
 );
 signallingServer.initialize();
 
-export { app, passport, refreshOauth2Token };
+export { app, passport, refreshOauth2Token, container, codeSystemService };

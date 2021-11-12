@@ -10,17 +10,17 @@ export class CodeSystemService {
   private readonly codeSystemRepo: CodeSystemRepository;
 
   public async getCodeSystemByType(type: string): Promise<ICodeSystem[]> {
-    logger.info('Running CodeSystemService::getCodeSystemByType');
+    logger.info('Running CodeSystemService.getCodeSystemByType');
     return this.codeSystemRepo.getCodeSystemByType(type);
   }
 
   public async addCodeSystem(data: ICodeSystem): Promise<ICodeSystem> {
-    logger.info('Running CodeSystemService::addCodeSystem');
+    logger.info('Running CodeSystemService.addCodeSystem');
     return this.codeSystemRepo.addCodeSystem(data);
   }
 
   public async getCodeSystemByCode(code: string): Promise<ICodeSystem> {
-    logger.info('Running CodeSystemService::getCodeSystemByCode');
+    logger.info('Running CodeSystemService.getCodeSystemByCode');
     return this.codeSystemRepo.getCodeSystemByCode(code);
   }
 }
