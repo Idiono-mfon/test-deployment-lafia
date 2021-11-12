@@ -302,6 +302,8 @@ export class SignallingServerService {
     // Send firebase notification to user's device
     await SignallingServerService.firebaseService.sendNotification(reciever.deviceToken, payload);
 
+    logger.info('ALIVE AFTER FIREBASE NOTIFICATION');
+
     // Send call event and data to the reciever
     socket
       .to(reciever.socketId)
