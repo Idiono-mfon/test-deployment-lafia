@@ -17,7 +17,7 @@ import {
   VideoBroadcastService,
   AuthService,
   KafkaService,
-  SignallingServerService, FileService
+  SignallingServerService, FileService, FirebaseService
 } from './services';
 import * as swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './config/swagger.config';
@@ -76,6 +76,9 @@ server.setConfig((app) => {
 
 // Delete local encounter files that has been uploaded to S3
 fileService.onLocalFileDelete();
+
+// Send Firebase call notification to patient
+FirebaseService.triggerNotification();
 
 kafkaService.consumer();
 kafkaService.handleEvents();

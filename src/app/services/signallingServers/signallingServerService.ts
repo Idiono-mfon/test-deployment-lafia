@@ -6,6 +6,7 @@ import { v4 as uuid } from 'uuid';
 import { Env } from '../../config/env';
 import TYPES from '../../config/types';
 import { forWho, logger } from '../../utils';
+import { firebaseEvent, firebaseEventService } from '../eventEmitter';
 import { KafkaService, KafkaSetup, successResponseType } from '../kafka';
 import { PatientService } from '../patients';
 import { PractitionerService } from '../practitioners';
@@ -297,9 +298,10 @@ export class SignallingServerService {
     // Todo: extract and add the user image later
     //  when the image binary in the db
     //  is changed to a url string
-    // const payload: NotificationPayload = { user_image: '', user_name: reciever.username as string };
+    const payload: NotificationPayload = { user_image: '', user_name: reciever.username as string };
 
     // Send firebase notification to user's device
+    firebaseEventService.emit(firebaseEvent.send_notification, reciever.deviceToken, payload);
     // await SignallingServerService.firebaseService.sendNotification(reciever.deviceToken, payload);
 
     logger.info('ALIVE AFTER FIREBASE NOTIFICATION');

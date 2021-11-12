@@ -1,24 +1,21 @@
-import { initializeApp, cert } from 'firebase-admin/app';
+import firebase, { messaging } from 'firebase-admin';
 import { Messaging } from 'firebase-admin/messaging';
 import { Env } from '../../config/env';
 import { logger } from '../../utils';
+import { firebaseEvent, firebaseEventService } from '../eventEmitter';
 import { serviceAccount } from './firebaseServiceAccount';
+import MessagingDevicesResponse = messaging.MessagingDevicesResponse;
 
 const env = Env.all();
 
+firebase.initializeApp({
+  credential: firebase.credential.cert(serviceAccount),
+  databaseURL: env.firebase_database_url
+});
+
 export class FirebaseService {
-  private messaging: any;
 
-  public constructor() {
-    initializeApp({
-      credential: cert(serviceAccount),
-      databaseURL: env.firebase_database_url
-    });
-
-    this.messaging = Messaging;
-  }
-
-  public async sendNotification(firebaseToken: string, notificationPayload: NotificationPayload): Promise<void> {
+  public static async sendNotification(firebaseToken: string, notificationPayload: NotificationPayload): Promise<MessagingDevicesResponse> {
     logger.info('Running FirebaseService.sendNotification');
 
     const { title, body, user_image, user_name, type } = notificationPayload;
@@ -43,10 +40,18 @@ export class FirebaseService {
 
     }
 
-    return this.messaging.sendToDevice(firebaseToken, payload, options);
+    const notificationResponse = await firebase.messaging().sendToDevice(firebaseToken, payload, options);
+
+    console.log('NotificationResponse', notificationResponse);
+
+    return notificationResponse;
   }
 
-
+  public static triggerNotification() {
+    firebaseEventService.on(firebaseEvent.send_notification, async (deviceToken, payload) => {
+      await FirebaseService.sendNotification(deviceToken, payload);
+    });
+  }
 }
 
 export interface NotificationPayload {
