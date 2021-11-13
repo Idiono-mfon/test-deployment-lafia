@@ -1,4 +1,4 @@
-name: Sonarqube Code Scanner
+name: Build Process
 on: 
   pull_request: 
     types: 
@@ -17,6 +17,11 @@ jobs:
         uses: actions/checkout@v2
         with: 
           fetch-depth: 0
+      
+      - name: Install modules
+        run: yarn install --ignore-engines
+      - name: Run Test
+        run: yarn test
       - 
         env: 
           SONAR_HOST_URL: "${{ secrets.SONAR_HOST_URL }}"
