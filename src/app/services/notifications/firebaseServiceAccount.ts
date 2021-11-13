@@ -6,6 +6,8 @@ const {
   firebase_project_id: projectId,
 } = Env.all();
 
+console.log('EncodedKey:', encodedPrivateKey);
+
 // Parse the the private key
 const { privateKey } = JSON.parse(encodedPrivateKey);
 
