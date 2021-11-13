@@ -101,7 +101,8 @@ const config: IEnv = {
   kafka_connection: process.env.KAFKA_CONNECTION as string,
   firebase_client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL as string,
   firebase_auth_provider_x509_cert_url: process.env.FIREBASE_AUTH_PROVIDER_X509_CERT_URL as string,
-  firebase_private_key: process.env.FIREBASE_PRIVATE_KEY as string,
+  // @ts-ignore
+  firebase_private_key: process.env.FIREBASE_PRIVATE_KEY,
   firebase_private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID as string,
   firebase_type: process.env.FIREBASE_TYPE as string,
   firebase_client_email: process.env.FIREBASE_CLIENT_EMAIL as string,
