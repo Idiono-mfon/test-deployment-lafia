@@ -7,6 +7,7 @@ module.exports = {
   moduleFileExtensions: ['ts', 'js'],
   collectCoverage: true,
   clearMocks: true,
+  testResultsProcessor: "jest-sonar-reporter",
   coverageDirectory: 'coverage',
   // Indicates whether each individual test should be reported during the run.
   verbose: false,
