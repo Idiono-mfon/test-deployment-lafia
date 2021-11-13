@@ -12,6 +12,23 @@ jobs:
   build: 
     name: Build
     runs-on: ubuntu-latest
+    env:
+      TWILIO_ACCOUNT_SID: "${{ secrets.TWILIO_ACCOUNT_SID }}"
+      TWILIO_AUTH_TOKEN: "${{ secrets.TWILIO_AUTH_TOKEN }}"
+      TWILIO_API_KEY: "${{ secrets.TWILIO_API_KEY }}"
+      TWILIO_API_SECRET: "${{ secrets.TWILIO_API_SECRET }}"
+      TWILIO_VERIFY_SID: "${{ secrets.TWILIO_VERIFY_SID }}"
+      FIREBASE_DATABASE_URL: "${{ secrets.FIREBASE_DATABASE_URL }}"
+      FIREBASE_TYPE: "${{ secrets.FIREBASE_TYPE }}"
+      FIREBASE_PROJECT_ID: "${{ secrets.FIREBASE_PROJECT_ID }}"
+      FIREBASE_PRIVATE_KEY_ID: "${{ secrets.FIREBASE_PRIVATE_KEY_ID }}"
+      FIREBASE_PRIVATE_KEY: "${{ secrets.FIREBASE_PRIVATE_KEY }}"
+      FIREBASE_CLIENT_EMAIL: "${{ secrets.FIREBASE_CLIENT_EMAIL }}"
+      FIREBASE_CLIENT_ID: "${{ secrets.FIREBASE_CLIENT_ID }}"
+      FIREBASE_AUTH_URI: "${{ secrets.FIREBASE_AUTH_URI }}"
+      FIREBASE_TOKEN_URI: "${{ secrets.FIREBASE_TOKEN_URI }}"
+      FIREBASE_AUTH_PROVIDER_X509_CERT_URL: "${{ secrets.FIREBASE_AUTH_PROVIDER_X509_CERT_URL }}"
+      FIREBASE_CLIENT_X509_CERT_URL: "${{ secrets.FIREBASE_CLIENT_X509_CERT_URL }}"
     steps: 
       - 
         uses: actions/checkout@v2
