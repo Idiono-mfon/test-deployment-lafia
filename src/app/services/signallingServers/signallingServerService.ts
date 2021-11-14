@@ -293,7 +293,7 @@ export class SignallingServerService {
       socket: socket?.id,
     };
 
-    logger.debug(`EmitCallEvent Data: ${JSON.stringify(res)}`);
+    logger.info(`EmitCallEvent Data: ${JSON.stringify(res)}`);
 
     // Todo: extract and add the user image later
     //  when the image binary in the db
@@ -302,8 +302,6 @@ export class SignallingServerService {
 
     // Send firebase notification to user's device
     eventService.emit(eventName.sendNotification, reciever.deviceToken, payload);
-
-    logger.info('ALIVE AFTER FIREBASE NOTIFICATION');
 
     // Send call event and data to the reciever
     socket
