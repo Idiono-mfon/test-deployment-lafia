@@ -298,7 +298,7 @@ export class SignallingServerService {
     // Todo: extract and add the user image later
     //  when the image binary in the db
     //  is changed to a url string
-    const payload: NotificationPayload = { user_image: '', user_name: reciever.username as string };
+    const payload: NotificationPayload = { user_image: '', user_name: reciever.username as string, call_data: res };
 
     // Send firebase notification to user's device
     eventService.emit(eventName.sendNotification, reciever.deviceToken, payload);
