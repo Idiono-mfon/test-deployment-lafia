@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testExecutions version="1">
+  <file path="/Users/ps2020-01/Documents/GitHub/ParallelScore/lafia-service/src/tests/__tests__/codeSystem.spec.ts">
+    <testCase name="Code System Test should be defined" duration="3"/>
+    <testCase name="Code System Test should get code system by type" duration="1"/>
+    <testCase name="Code System Test should get code system by code system name" duration="3"/>
+    <testCase name="Code System Test should add new code system" duration="1"/>
+  </file>
+</testExecutions>

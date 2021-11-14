@@ -43,16 +43,9 @@ export interface IEnv {
   kafka_connection: string;
   kafka_erpnext_producer_topic: string;
   kafka_consumer_topics: string;
-  firebase_type: string;
   firebase_project_id: string;
-  firebase_private_key_id: string;
   firebase_private_key: string;
   firebase_client_email: string;
-  firebase_client_id: string;
-  firebase_auth_uri: string;
-  firebase_token_uri: string;
-  firebase_auth_provider_x509_cert_url: string;
-  firebase_client_x509_cert_url: string;
   firebase_database_url: string;
 }
 
@@ -99,15 +92,8 @@ const config: IEnv = {
   kafka_consumer_topics: process.env.KAFKA_CONSUMER_TOPICS as string,
   kafka_erpnext_producer_topic: process.env.KAFKA_ERPNEXT_PRODUCER_TOPIC as string,
   kafka_connection: process.env.KAFKA_CONNECTION as string,
-  firebase_client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL as string,
-  firebase_auth_provider_x509_cert_url: process.env.FIREBASE_AUTH_PROVIDER_X509_CERT_URL as string,
   firebase_private_key: process.env.FIREBASE_PRIVATE_KEY as string,
-  firebase_private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID as string,
-  firebase_type: process.env.FIREBASE_TYPE as string,
   firebase_client_email: process.env.FIREBASE_CLIENT_EMAIL as string,
-  firebase_client_id: process.env.FIREBASE_CLIENT_ID as string,
-  firebase_auth_uri: process.env.FIREBASE_AUTH_URI as string,
-  firebase_token_uri: process.env.FIREBASE_TOKEN_URI as string,
   firebase_project_id: process.env.FIREBASE_PROJECT_ID as string,
   firebase_database_url: process.env.FIREBASE_DATABASE_URL as string,
 };
