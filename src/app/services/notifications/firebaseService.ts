@@ -2,6 +2,7 @@ import firebase, { messaging } from 'firebase-admin';
 import { Env } from '../../config/env';
 import { logger } from '../../utils';
 import { eventName, eventService } from '../eventEmitter';
+import { IOnlineUser } from '../signallingServers';
 import { serviceAccount } from './firebaseServiceAccount';
 import MessagingDevicesResponse = messaging.MessagingDevicesResponse;
 
@@ -17,18 +18,19 @@ export class FirebaseService {
   public static async sendNotification(firebaseToken: string, notificationPayload: NotificationPayload): Promise<MessagingDevicesResponse> {
     logger.info('Running FirebaseService.sendNotification');
 
-    const { title, body, user_image, user_name, type } = notificationPayload;
+    const { title, body, user_image, user_name, type, call_data } = notificationPayload;
 
     const payload = {
       notification: {
-        title: title || 'Incoming Call',
-        body: body || 'TeleHealth Call',
+        title: title || 'Lafia TeleHealth Call',
+        body: body || 'is calling...',
         sound: 'default'
       },
       data: {
         user_name,
         user_image: user_image || 'https://i.pravatar.cc/500',
         type: type || 'video',
+        call_data: JSON.stringify(call_data),
       }
     };
 
@@ -55,4 +57,16 @@ export interface NotificationPayload {
   user_image: string;
   user_name: string;
   type?: string;
+  call_data?: CallData;
+}
+
+export interface CallData {
+  room: string;
+  token: string;
+  sender: string;
+  reciever: string;
+  senderDetails: IOnlineUser;
+  recieverDetails: IOnlineUser;
+  type: string;
+  socket: string;
 }
