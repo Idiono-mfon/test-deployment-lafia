@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
 import TYPES from '../../config/types';
-import { AttachmentModel, IAttachment, IFindUser, IPatient, IUser, PatientsAttachmentModel } from '../../models';
+import { IAttachment, IFindUser, IPatient, IUser } from '../../models';
 import { PatientRepository } from '../../repository';
 import {
   error,
@@ -192,17 +192,11 @@ export class PatientService {
         creation: new Date(),
       };
 
+      await this.userService.updateUser(patient.id!, {
+        photo: fileLink,
+      });
 
-      const attachment: IAttachment = await AttachmentModel.query()
-        .insertAndFetch(attachmentData);
-
-      await PatientsAttachmentModel.query()
-        .insert({
-          patientId: patient?.id,
-          attachmentId: attachment?.id
-        });
-
-      return attachment;
+      return attachmentData;
     } catch (e: any) {
       throw new InternalServerError(e.message);
     }

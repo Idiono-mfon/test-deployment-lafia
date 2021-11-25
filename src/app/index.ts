@@ -20,7 +20,6 @@ import {
   SignallingServerService,
   FileService,
   FirebaseService,
-  CodeSystemService
 } from './services';
 import * as swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './config/swagger.config';

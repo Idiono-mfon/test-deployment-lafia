@@ -45,7 +45,7 @@ export class S3Service {
     // Set S3 params
     const uploadParams = {
       Bucket: `${env.aws_bucket}`,
-      Key: `lafia-service/videos/${uuidV4()}.${ext}`,
+      Key: `videos/${uuidV4()}.${ext}`,
       Body: fileBuffer,
       ACL: 'public-read'
     };

@@ -6,7 +6,7 @@ import { Env } from '../config/env';
 import TYPES from '../config/types';
 import { IPatient, IPractitioner, IUser } from '../models';
 import { PatientService, PractitionerService, UserService } from '../services';
-import { logger } from '../utils';
+import { forWho, logger } from '../utils';
 
 interface CastJWTDecodedType {
   email: string;
@@ -104,14 +104,16 @@ export class AuthMiddleware extends BaseMiddleware {
 
   private async getUserPayload(payload: CastJWTDecodedType): Promise<IUser | IPatient | IPractitioner> {
     logger.info('Running AuthMiddleware::getUserPayload');
-    let user: IUser | IPatient | IPractitioner = await this.patientService.findPatientById(payload.aud);
-
-    if (!user) {
-      user = await this.practitionerService.findPractitionerById(payload.aud);
-    }
+    let user: IUser | IPatient | IPractitioner = await this.userService.getOneUser({ resource_id: payload.aud });
 
     if (!user) {
       throw new Error('User not found');
+    }
+
+    if (user?.resourceType?.toLowerCase() === forWho.practitioner) {
+      user = await this.practitionerService.findPractitionerById(payload.aud);
+    } else {
+      user = await this.patientService.findPatientById(payload.aud);
     }
 
     return user;

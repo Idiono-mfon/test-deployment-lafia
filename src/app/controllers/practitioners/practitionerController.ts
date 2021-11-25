@@ -78,7 +78,7 @@ export class PractitionerController extends BaseController {
     }
   }
 
-  @httpPost('/:id/attachments', uploadFile.single('file'))
+  @httpPost('/:id/attachments', TYPES.AuthMiddleware, uploadFile.single('file'))
   public async uploadAttachment(@request() req: Request, @response() res: Response) {
     logger.info('Running PractitionerController.uploadAttachment');
     try {
