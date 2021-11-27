@@ -19,7 +19,7 @@ interface Connection {
   password: string;
   database: string;
   port: number;
-  sslmode: string;
+  ssl?: any;
 }
 
 let connection: Connection = {
@@ -28,7 +28,9 @@ let connection: Connection = {
   password: pg_password,
   database: pg_dbname,
   port: pg_port,
-  sslmode: 'require'
+  ssl: {
+    rejectUnauthorized: false,
+  },
 };
 
 if (environment === 'test' || environment === 'testing') {
@@ -38,7 +40,9 @@ if (environment === 'test' || environment === 'testing') {
     password: pg_test_password,
     database: pg_test_dbname,
     port: pg_test_port,
-    sslmode: 'require'
+    ssl: {
+      rejectUnauthorized: false,
+    },
   };
 }
 
