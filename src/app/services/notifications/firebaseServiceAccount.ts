@@ -6,7 +6,7 @@ const {
   firebase_project_id: projectId,
 } = Env.all();
 
-// Parse the the private key
+// Parse the private key
 const { privateKey } = JSON.parse(encodedPrivateKey);
 
 export const serviceAccount = { projectId, privateKey, clientEmail };

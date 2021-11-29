@@ -2,6 +2,7 @@ import { injectable } from 'inversify';
 import { HighLevelProducer, KafkaConsumer, ProducerGlobalConfig } from 'node-rdkafka';
 import { Env } from '../../config/env';
 import { logger } from '../../utils';
+import { BroadcastData } from '../notifications';
 
 const env = Env.all();
 
@@ -50,14 +51,14 @@ export class KafkaSetup {
 
   public structureSuccessData(
     responseType: string,
-    receivedData: IKafkaReceivedMessage,
+    receivedData: IKafkaReceivedMessage | BroadcastData,
     message: string,
     id?: string
   ): IKafkaMessageResponse | any {
     logger.info('Running KafkaSetup.structureSuccessData');
 
     if (responseType === successResponseType.default) {
-      const { resource_type, data } = receivedData;
+      const { resource_type, data } = receivedData as IKafkaReceivedMessage;
       return {
         status: 'success',
         message,

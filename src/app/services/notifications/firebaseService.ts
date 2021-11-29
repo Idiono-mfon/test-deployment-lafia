@@ -1,8 +1,9 @@
 import firebase, { messaging } from 'firebase-admin';
+import { DataMessagePayload } from 'firebase-admin/lib/messaging/messaging-api';
 import { Env } from '../../config/env';
 import { logger } from '../../utils';
 import { eventName, eventService } from '../eventEmitter';
-import { IOnlineUser } from '../signallingServers';
+import { INewBroadcast, IOnlineUser } from '../signallingServers';
 import { serviceAccount } from './firebaseServiceAccount';
 import MessagingDevicesResponse = messaging.MessagingDevicesResponse;
 
@@ -15,23 +16,53 @@ firebase.initializeApp({
 
 export class FirebaseService {
 
-  public static async sendNotification(firebaseToken: string, notificationPayload: NotificationPayload): Promise<MessagingDevicesResponse> {
+  sendNotification(firebaseToken: string, notificationPayload: CallNotificationPayload): Promise<MessagingDevicesResponse>
+  sendNotification(firebaseToken: string, notificationPayload: BroadcastNotificationPayload): Promise<MessagingDevicesResponse>
+
+  public async sendNotification(firebaseToken: string, notificationPayload: any): Promise<MessagingDevicesResponse> {
     logger.info('Running FirebaseService.sendNotification');
 
-    const { title, body, user_image, user_name, type, call_data } = notificationPayload;
+    let { title, body, user_image, user_name, type, notificationType, call_data, broadcast_data } = notificationPayload;
+    let data: DataMessagePayload = { notificationType };
+
+    if (notificationType === 'broadcast') {
+      title = title || 'Broadcast Notification';
+      body = body || 'new broadcast message';
+      type = type || 'broadcast';
+
+      broadcast_data = JSON.stringify(broadcast_data);
+
+      data = {
+        ...data,
+        user_name,
+        type,
+        broadcast_data,
+      }
+    }
+
+    if (notificationType === 'call') {
+      title = title || 'Lafia TeleHealth Call';
+      body = body || 'is calling...';
+      type = type || 'video';
+
+      call_data = JSON.stringify(call_data);
+
+      data = {
+        ...data,
+        user_name,
+        type,
+        call_data,
+        user_image: user_image || 'https://i.pravatar.cc/500',
+      }
+    }
 
     const payload = {
       notification: {
-        title: title || 'Lafia TeleHealth Call',
-        body: body || 'is calling...',
+        title,
+        body,
         sound: 'default'
       },
-      data: {
-        user_name,
-        user_image: user_image || 'https://i.pravatar.cc/500',
-        type: type || 'video',
-        call_data: JSON.stringify(call_data),
-      }
+      data,
     };
 
     const options = {
@@ -44,21 +75,39 @@ export class FirebaseService {
     return firebase.messaging().sendToDevice(firebaseToken, payload, options);
   }
 
-  public static triggerNotification() {
+  public async triggerNotification() {
     eventService.on(eventName.sendNotification, async (deviceToken, payload) => {
-      await FirebaseService.sendNotification(deviceToken, payload);
+      await this.sendNotification(deviceToken, payload);
     });
   }
+}
+
+export interface NotificationPayloadData {
+  user_name: string;
+  user_image: string;
+  type: string;
+  call_data?: string;
+  broadcast_data?: string;
 }
 
 export interface NotificationPayload {
   title?: string;
   body?: string;
-  user_image: string;
   user_name: string;
   type?: string;
-  call_data?: CallData;
+  notificationType: string;
 }
+
+export interface CallNotificationPayload extends NotificationPayload {
+  call_data: CallData;
+  user_image: string;
+}
+
+export interface BroadcastNotificationPayload extends NotificationPayload {
+  broadcast_data: BroadcastData;
+}
+
+export type BroadcastData = INewBroadcast;
 
 export interface CallData {
   room: string;

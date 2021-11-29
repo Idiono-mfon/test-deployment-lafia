@@ -3,7 +3,6 @@ import cors from 'cors';
 import { config as dotConfig } from 'dotenv';
 import express from 'express';
 import { createServer } from 'http';
-import event from 'events';
 import passport from 'passport';
 import refreshOauth2Token from 'passport-oauth2-refresh';
 import container from './config/inversify.config';
@@ -24,10 +23,6 @@ import {
 import * as swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './config/swagger.config';
 import { logger } from './utils';
-
-const emitter = new event.EventEmitter();
-emitter.setMaxListeners(0);
-process.setMaxListeners(0);
 
 dotConfig();
 
@@ -80,7 +75,7 @@ server.setConfig((app) => {
 fileService.onLocalFileDelete();
 
 // Send Firebase call notification to patient
-FirebaseService.triggerNotification();
+new FirebaseService().triggerNotification().then(response => logger.info(response));
 
 kafkaService.consumer();
 kafkaService.handleEvents();

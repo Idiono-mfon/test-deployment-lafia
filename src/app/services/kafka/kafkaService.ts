@@ -7,6 +7,7 @@ import { IPatient, IPractitioner } from '../../models';
 import { forWho, logger } from '../../utils';
 import { Password } from '../../utils/password';
 import { eventName, eventService } from '../eventEmitter';
+import { BroadcastData } from '../notifications';
 import { PatientService } from '../patients';
 import { PractitionerService } from '../practitioners';
 import { UserService } from '../users';
@@ -235,6 +236,12 @@ export class KafkaService {
       .on(eventName.newMedia, async (mediaId, data) => {
         const kafkaProducerMsg = this.kafkaSetup
           .structureSuccessData(successResponseType.fhir, data, 'New media published successfully', mediaId);
+
+        await this.producer(env.kafka_erpnext_producer_topic, kafkaProducerMsg);
+      })
+      .on(eventName.newBroadcast, async (data: BroadcastData) => {
+        const kafkaProducerMsg = this.kafkaSetup
+          .structureSuccessData(successResponseType.broadcast, data, 'New broadcast published successfully');
 
         await this.producer(env.kafka_erpnext_producer_topic, kafkaProducerMsg);
       })

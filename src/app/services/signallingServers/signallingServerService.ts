@@ -7,7 +7,7 @@ import { Env } from '../../config/env';
 import TYPES from '../../config/types';
 import { forWho, logger } from '../../utils';
 import { eventName, eventService } from '../eventEmitter';
-import { KafkaService, KafkaSetup, successResponseType } from '../kafka';
+import { KafkaService, KafkaSetup } from '../kafka';
 import { PatientService } from '../patients';
 import { PractitionerService } from '../practitioners';
 import { VideoBroadcastService } from '../videoRecords';
@@ -20,7 +20,12 @@ import {
 } from './interfaces';
 import { RedisStore } from './redisStore';
 import { IPractitionerVideoBroadcast, IVideoBroadcast } from '../../models';
-import { FirebaseService, NotificationPayload } from '../notifications';
+import {
+  BroadcastData,
+  BroadcastNotificationPayload,
+  CallNotificationPayload,
+  FirebaseService,
+} from '../notifications';
 
 const env = Env.all();
 const { redis_username, redis_host, redis_port, redis_password } = env;
@@ -109,9 +114,11 @@ export class SignallingServerService {
     }
   }
 
-  private static async emitOnlinePractitionersEvent(socket: Socket) {
-    logger.info('Running SignallingServerService.emitOnlinePractitionersEvent');
-    const onlineUsers = await SignallingServerService.redisStore.getOnlineUsers();
+  private static async getOnlineUsers() {
+    return SignallingServerService.redisStore.getOnlineUsers();
+  }
+
+  private static async getOnlinePractitioners(onlineUsers: IOnlineUser[]) {
     let onlinePractitioners = [];
 
     for (let user of onlineUsers) {
@@ -123,6 +130,34 @@ export class SignallingServerService {
       }
     }
 
+    return onlinePractitioners;
+  }
+
+  private static async sendFirebaseNotificationToAllPractitioners(
+    eventName: string, data: BroadcastData
+  ) {
+    const onlineUsers = await SignallingServerService.getOnlineUsers();
+    const onlinePractitioners = await SignallingServerService.getOnlinePractitioners(onlineUsers);
+
+    for (let practitioner of onlinePractitioners) {
+
+      const payload: BroadcastNotificationPayload = {
+        notificationType: 'broadcast',
+        user_name: data.patientName,
+        broadcast_data: data
+      };
+
+      // Send firebase notification to user's device
+      eventService.emit(eventName, practitioner.deviceToken, payload);
+    }
+  }
+
+  private static async emitOnlinePractitionersEvent(socket: Socket) {
+    logger.info('Running SignallingServerService.emitOnlinePractitionersEvent');
+
+    const onlineUsers = await SignallingServerService.getOnlineUsers();
+    const onlinePractitioners = await SignallingServerService.getOnlinePractitioners(onlineUsers);
+
     logger.info(`OnlinePractitioners: ${JSON.stringify(onlinePractitioners)}`);
     logger.info(`OnlineUsers: ${JSON.stringify(onlineUsers)}`);
 
@@ -133,17 +168,17 @@ export class SignallingServerService {
     logger.info('Running SignallingServerService.listenForNewVideoBroadcastEvent');
     socket.on('newVideoBroadcast', async (newBroadcast: INewBroadcast) => {
       await SignallingServerService.redisStore.saveBroadcast(newBroadcast);
+
       const newCareBroadCast = await SignallingServerService.redisStore
         .getBroadcastByVideoUrl(newBroadcast.videoUrl);
 
       SignallingServerService.emitNewCareEvent(socket, newCareBroadCast);
 
-      const kafkaProducerMsg = this.kafkaSetup.structureSuccessData(
-        successResponseType.broadcast,
-        newCareBroadCast,
-        'New broadcast event emitted successfully'
-      );
-      await this.kafkaService.producer(env.kafka_erpnext_producer_topic, kafkaProducerMsg);
+      // Send kafka message to practitioner
+      eventService.emit(eventName.newBroadcast, newCareBroadCast);
+
+      // Send firebase notification to all practitioners
+      await SignallingServerService.sendFirebaseNotificationToAllPractitioners(eventName.sendNotification, newCareBroadCast);
 
       if (newCareBroadCast.videoUrl) {
         const patient: IOnlineUser = await SignallingServerService
@@ -295,10 +330,12 @@ export class SignallingServerService {
 
     logger.info(`EmitCallEvent Data: ${JSON.stringify(res)}`);
 
-    // Todo: extract and add the user image later
-    //  when the image binary in the db
-    //  is changed to a url string
-    const payload: NotificationPayload = { user_image: '', user_name: reciever.username as string, call_data: res };
+    const payload: CallNotificationPayload = {
+      user_image: reciever.userImage as string,
+      user_name: reciever.username as string,
+      notificationType: 'call',
+      call_data: res
+    };
 
     // Send firebase notification to user's device
     eventService.emit(eventName.sendNotification, reciever.deviceToken, payload);
