@@ -23,12 +23,12 @@ import { IPractitionerVideoBroadcast, IVideoBroadcast } from '../../models';
 import { FirebaseService, NotificationPayload } from '../notifications';
 
 const env = Env.all();
+const { redis_username, redis_host, redis_port, redis_password } = env;
 
-const pubClient = new Redis({
-  port: env.redis_port,
-  host: env.redis_host,
-  password: env.redis_password,
-});
+const pubClient = new Redis(
+  `rediss://${redis_username}:${redis_password}@${redis_host}:${redis_port}?allowUsernameInURI=true`
+);
+
 const subClient = pubClient.duplicate();
 
 export class SignallingServerService {

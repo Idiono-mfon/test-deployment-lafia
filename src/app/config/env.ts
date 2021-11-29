@@ -23,6 +23,7 @@ export interface IEnv {
   redis_port: number;
   redis_host: string;
   redis_password: string;
+  redis_username: string;
   twilio_account_sid: string;
   twilio_api_key: string;
   twilio_api_secret: string;
@@ -72,6 +73,7 @@ const config: IEnv = {
   redis_host: process.env.REDIS_HOST as string,
   redis_password: process.env.REDIS_PASSWORD as string,
   redis_port: Number(process.env.REDIS_PORT),
+  redis_username: process.env.REDIS_USERNAME as string,
   twilio_account_sid: process.env.TWILIO_ACCOUNT_SID as string,
   twilio_api_key: process.env.TWILIO_API_KEY as string,
   twilio_api_secret: process.env.TWILIO_API_SECRET as string,
