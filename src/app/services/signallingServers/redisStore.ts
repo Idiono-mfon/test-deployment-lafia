@@ -117,8 +117,16 @@ export class RedisStore {
       const existingUser = await this.getUserById(user.userId);
 
       if (existingUser) {
-        user.deviceToken = existingUser.deviceToken;
-        user.socketId = existingUser.socketId;
+        user = {
+          deviceToken: existingUser.deviceToken,
+          socketId: existingUser.socketId,
+          ...existingUser
+        }
+
+        // Remove the existing user
+        _.remove(onlineUsers, (onlineUser: IOnlineUser) => {
+          return onlineUser?.userId === existingUser.userId;
+        });
       } else {
         let username: string = '';
 
