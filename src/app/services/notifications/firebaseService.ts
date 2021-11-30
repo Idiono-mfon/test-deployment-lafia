@@ -65,6 +65,8 @@ export class FirebaseService {
       data,
     };
 
+    logger.info(`Firebase Payload: ${JSON.stringify(payload)}`);
+
     const options = {
       priority: 'high',
       timeToLive: 60 * 60 * 2, // 2 hours
