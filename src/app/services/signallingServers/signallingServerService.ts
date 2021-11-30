@@ -385,10 +385,12 @@ export class SignallingServerService {
       resourceType = resourceType.toLowerCase();
       const user: IOnlineUser = { userId, resourceType } as IOnlineUser;
       console.log(`DisconnectedUser: ${socket?.id}`);
+
       // Todo: correctly implement user's online presence by allowing them to turn on/off their online presence
       // that way, we can only send notification to the user's device when they are online
       // and as well persist the user's broadcast data to the database and then send it to users via API
-      await SignallingServerService.redisStore.removeUserBYId(user.userId);
+
+      // await SignallingServerService.redisStore.removeUserBYId(user.userId);
       await SignallingServerService.emitOnlinePractitionersEvent(io);
     });
   }
