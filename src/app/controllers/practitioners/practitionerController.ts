@@ -61,7 +61,7 @@ export class PractitionerController extends BaseController {
   public async createPractitioner(@request() req: Request, @response() res: Response) {
     logger.info('Running PractitionerController.createPractitioner');
     try {
-      const practitionerData: any = req.body;
+      const practitionerData: any = { ...req.body, provider: 'lafia' };
       const practitioner: IPractitionerWithToken = await this.practitionerService.createPractitioner(practitionerData);
       const responseData = {
         data: practitionerData,

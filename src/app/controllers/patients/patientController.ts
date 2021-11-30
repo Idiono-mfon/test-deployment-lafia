@@ -58,7 +58,7 @@ export class PatientController extends BaseController {
   public async createPatient(@request() req: Request, @response() res: Response) {
     logger.info('Running PatientController.createPatient');
     try {
-      const patientData: any = req.body;
+      const patientData: any = { ...req.body, provider: 'lafia' };
       // @ts-ignore
       const ip: string = req.headers['x-forwarded-for']?.split(',').shift() || req.socket?.remoteAddress;
 
