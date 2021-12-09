@@ -1,31 +1,26 @@
 import { inject } from 'inversify';
+import Redis from 'ioredis';
 import { Server, Socket } from 'socket.io';
 import { createAdapter } from 'socket.io-redis';
-import Redis from 'ioredis';
 import { v4 as uuid } from 'uuid';
 import { Env } from '../../config/env';
 import TYPES from '../../config/types';
+import { IPractitionerVideoBroadcast, IVideoBroadcast } from '../../models';
 import { forWho, logger } from '../../utils';
 import { eventName, eventService } from '../eventEmitter';
 import { KafkaService, KafkaSetup } from '../kafka';
-import { PatientService } from '../patients';
-import { PractitionerService } from '../practitioners';
-import { VideoBroadcastService } from '../videoRecords';
-import { TwilioService } from '../twilio';
-import {
-  IAcceptCare,
-  INewBroadcast,
-  INewCare,
-  IOnlineUser
-} from './interfaces';
-import { RedisStore } from './redisStore';
-import { IPractitionerVideoBroadcast, IVideoBroadcast } from '../../models';
 import {
   BroadcastData,
   BroadcastNotificationPayload,
   CallNotificationPayload,
   FirebaseService,
 } from '../notifications';
+import { PatientService } from '../patients';
+import { PractitionerService } from '../practitioners';
+import { TwilioService } from '../twilio';
+import { VideoBroadcastService } from '../videoRecords';
+import { IAcceptCare, INewBroadcast, INewCare, IOnlineUser } from './interfaces';
+import { RedisStore } from './redisStore';
 
 const env = Env.all();
 const { redis_username, redis_host, redis_port, redis_password } = env;
@@ -101,6 +96,8 @@ export class SignallingServerService {
       socketId: socket?.id,
       deviceToken,
     } as IOnlineUser;
+
+    logger.info(`Received: ${JSON.stringify(user)}`);
 
     if (user.userId && user.userId !== 'undefined') {
       await SignallingServerService.redisStore.saveOnlineUser(user);
@@ -182,8 +179,8 @@ export class SignallingServerService {
 
       if (newCareBroadCast.videoUrl) {
         const patient: IOnlineUser = await SignallingServerService
-        .redisStore
-        .getUserById(newCareBroadCast.patientId);
+          .redisStore
+          .getUserById(newCareBroadCast.patientId);
 
         const vidBroadcast: IVideoBroadcast = {
           patient_name: patient.username,
