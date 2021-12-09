@@ -98,8 +98,6 @@ export class SignallingServerService {
       deviceToken,
     } as IOnlineUser;
 
-    logger.info(`Received: ${JSON.stringify(user)}`);
-
     if (user.userId && user.userId !== 'undefined') {
       await SignallingServerService.redisStore.saveOnlineUser(user);
     }
@@ -407,7 +405,7 @@ export class SignallingServerService {
       resourceType = resourceType as unknown as string;
       resourceType = resourceType.toLowerCase();
       const user: IOnlineUser = { userId, resourceType } as IOnlineUser;
-      console.log(`DisconnectedUser: ${socket?.id}`);
+      logger.info(`DisconnectedUser: ${socket?.id}`);
 
       // Todo: correctly implement user's online presence by allowing them to turn on/off their online presence
       // that way, we can only send notification to the user's device when they are online
