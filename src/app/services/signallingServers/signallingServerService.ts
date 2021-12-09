@@ -75,6 +75,7 @@ export class SignallingServerService {
       await SignallingServerService.listenForConnectionEvent(socket);
       await SignallingServerService.emitOnlinePractitionersEvent(this.io);
       this.listenForNewVideoBroadcastEvent(socket);
+      this.listenForConnectionData(socket);
       SignallingServerService.listenForAcceptCareEvent(socket);
       SignallingServerService.listenForIceCandidateEvent(socket);
       SignallingServerService.listenForPatientOnlineStatusEvent(socket);
@@ -192,6 +193,25 @@ export class SignallingServerService {
 
         await SignallingServerService.videoBroadcastService.saveBroadcastVideo(vidBroadcast);
       }
+    });
+  }
+
+  private listenForConnectionData(socket: Socket) {
+    logger.info('Running SignallingServerService.listenForConnectionData');
+    socket.on('connectionData', async (connectionData: IOnlineUser) => {
+      logger.info(`ConnectionData: ${JSON.stringify(connectionData)}`);
+
+      await SignallingServerService.redisStore.removeUserBySocketId(socket.id);
+
+      const user: IOnlineUser = {
+        ...connectionData,
+        socketId: socket?.id,
+      } as IOnlineUser;
+
+      await SignallingServerService.redisStore
+        .saveOnlineUser(user);
+
+      await SignallingServerService.emitOnlinePractitionersEvent(socket);
     });
   }
 
@@ -387,7 +407,7 @@ export class SignallingServerService {
       // that way, we can only send notification to the user's device when they are online
       // and as well persist the user's broadcast data to the database and then send it to users via API
 
-      await SignallingServerService.redisStore.removeUserBYId(user.userId);
+      await SignallingServerService.redisStore.removeUserById(user.userId);
       await SignallingServerService.emitOnlinePractitionersEvent(io);
     });
   }

@@ -82,8 +82,32 @@ export class RedisStore {
     }
   }
 
-  public async removeUserBYId(userId: string): Promise<void> {
-    logger.info('Running RedisStore.removeUserBYId');
+  public async getUserBySocketId(socketId: string): Promise<IOnlineUser | any> {
+    logger.info('Running RedisStore.getUserBySocketId');
+    try {
+      // Get All Online Users
+      let onlineUsers: IOnlineUser[] | any = await this.getOnlineUsers();
+
+      if (!onlineUsers || _.isEmpty(onlineUsers)) {
+        return;
+      }
+
+      let onlineUser: IOnlineUser | any;
+      for (let user of onlineUsers) {
+        if (user?.socketId === socketId) {
+          onlineUser = user;
+          break;
+        }
+      }
+
+      return onlineUser;
+    } catch (e: any) {
+      throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  public async removeUserById(userId: string): Promise<void> {
+    logger.info('Running RedisStore.removeUserById');
     try {
       // Get All Online Users
       const onlineUsers: IOnlineUser[] | any = await this.getOnlineUsers();
@@ -94,6 +118,28 @@ export class RedisStore {
 
       _.remove(onlineUsers, (user: IOnlineUser | any) => {
         return user?.userId === userId;
+      });
+
+      const base64Str = RedisStore.encodeBase64(JSON.stringify(onlineUsers));
+
+      await this.redisClient.set(this.onlineUsersKey, base64Str);
+    } catch (e: any) {
+      throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  public async removeUserBySocketId(socketId: string): Promise<void> {
+    logger.info('Running RedisStore.removeUserBySocketId');
+    try {
+      // Get All Online Users
+      const onlineUsers: IOnlineUser[] | any = await this.getOnlineUsers();
+
+      if (!onlineUsers) {
+        return;
+      }
+
+      _.remove(onlineUsers, (user: IOnlineUser | any) => {
+        return user?.socketId === socketId;
       });
 
       const base64Str = RedisStore.encodeBase64(JSON.stringify(onlineUsers));
