@@ -104,6 +104,10 @@ export class SignallingServerService {
       await SignallingServerService.redisStore.saveOnlineUser(user);
     }
 
+    SignallingServerService.joinOnlinePractitionerRoom(socket, user);
+  }
+
+  private static joinOnlinePractitionerRoom(socket: Socket, user: IOnlineUser) {
     if (
       user.resourceType === forWho.practitioner &&
       (user.userId && user.userId !== 'undefined')
@@ -205,11 +209,13 @@ export class SignallingServerService {
 
       const user: IOnlineUser = {
         ...connectionData,
+        resourceType: connectionData?.resourceType?.toLowerCase(),
         socketId: socket?.id,
       } as IOnlineUser;
 
-      await SignallingServerService.redisStore
-        .saveOnlineUser(user);
+      await SignallingServerService.redisStore.saveOnlineUser(user);
+
+      SignallingServerService.joinOnlinePractitionerRoom(socket, user);
 
       await SignallingServerService.emitOnlinePractitionersEvent(socket);
     });
