@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import cors from 'cors';
 import { config as dotConfig } from 'dotenv';
 import express from 'express';
@@ -5,7 +6,6 @@ import { createServer } from 'http';
 import { InversifyExpressServer } from 'inversify-express-utils';
 import passport from 'passport';
 import refreshOauth2Token from 'passport-oauth2-refresh';
-import 'reflect-metadata';
 import * as swaggerUi from 'swagger-ui-express';
 import { Env } from './config/env';
 import container from './config/inversify.config';
