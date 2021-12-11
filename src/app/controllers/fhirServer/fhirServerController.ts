@@ -33,7 +33,7 @@ export class FhirServerController extends BaseController {
       throwError(`Unable to refresh access token: ${e.message}`, error.forbidden);
     }
 
-    return  null;
+    return null;
   }
 
   @httpGet('/Aggregate', TYPES.AuthMiddleware)
@@ -111,6 +111,8 @@ export class FhirServerController extends BaseController {
         data: req.body,
         ig
       };
+
+      console.log('FHIR_BODY:', req.body);
 
       const [, requestUrl] = req.url.split('fhir');
       const {

@@ -1,27 +1,27 @@
-import 'reflect-metadata';
 import cors from 'cors';
 import { config as dotConfig } from 'dotenv';
 import express from 'express';
 import { createServer } from 'http';
+import { InversifyExpressServer } from 'inversify-express-utils';
 import passport from 'passport';
 import refreshOauth2Token from 'passport-oauth2-refresh';
-import container from './config/inversify.config';
-import { InversifyExpressServer } from 'inversify-express-utils';
+import 'reflect-metadata';
+import * as swaggerUi from 'swagger-ui-express';
 import { Env } from './config/env';
+import container from './config/inversify.config';
+import swaggerDocument from './config/swagger.config';
 import TYPES from './config/types';
 import { AuthMiddleware, morganMiddleware } from './middlewares';
 import {
-  PatientService,
-  PractitionerService,
-  VideoBroadcastService,
   AuthService,
-  KafkaService,
-  SignallingServerService,
   FileService,
   FirebaseService,
+  KafkaService,
+  PatientService,
+  PractitionerService,
+  SignallingServerService,
+  VideoBroadcastService,
 } from './services';
-import * as swaggerUi from 'swagger-ui-express';
-import swaggerDocument from './config/swagger.config';
 import { logger } from './utils';
 
 dotConfig();
@@ -41,8 +41,8 @@ const fileService = container.get<FileService>(TYPES.FileService);
 const saFhirStrategy = authService.getStrategy('safhir');
 
 server.setConfig((app) => {
-  app.use(express.json({ limit: '50mb' }));
-  app.use(express.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 }));
+  app.use(express.json({ limit: '250mb' }));
+  app.use(express.urlencoded({ limit: '250mb', extended: true, parameterLimit: 50000 }));
   app.use(cors());
   app.use(morganMiddleware);
   app.use(passport.initialize());
