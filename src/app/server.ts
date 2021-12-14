@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { config as dotConfig } from 'dotenv';
 import { createServer } from 'http';
 import { InversifyExpressServer } from 'inversify-express-utils';

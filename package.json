@@ -2,10 +2,10 @@
   "name": "lafia-service",
   "version": "1.0.0",
   "description": "Server-Side implementation for lafia service.",
-  "main": "./dist/src/app/index.js",
+  "main": "./dist/src/app/server.js",
   "scripts": {
-    "start": "pm2 start dist/src/app/index.js",
-    "start:dev": "nodemon --trace-warnings dist/src/app/index.js",
+    "start": "node dist/src/app/server.js",
+    "start:dev": "nodemon --trace-warnings dist/src/app/server.js",
     "test": "NODE_ENV=test jest test --coverage --config jest.config.js --forceExit",
     "mg:latest": "knex migrate:latest",
     "mg:up": "knex migrate:up",
