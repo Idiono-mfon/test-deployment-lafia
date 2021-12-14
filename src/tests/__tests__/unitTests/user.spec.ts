@@ -324,7 +324,7 @@ describe('User Unit Test', () => {
     // @ts-ignore
     bcrypt.compare.mockResolvedValueOnce(true);
 
-    const id = '11';
+    const id = '11t ';
     const oldPassword = 'lslkMie@.alsK';
     const newPassword = 'NewWrongPass';
 
