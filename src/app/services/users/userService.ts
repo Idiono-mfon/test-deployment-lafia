@@ -67,7 +67,7 @@ export class UserService {
     }
   }
 
-  public async createUser(user: IUser): Promise< IUser> {
+  public async createUser(user: IUser): Promise<IUser> {
     logger.info('Running UserService.createUser');
 
     try {
@@ -131,7 +131,7 @@ export class UserService {
         throw new GenericResponseError('Patient already exists', {
           status: HttpStatusCode.CONFLICT,
           data: userFhirData.data,
-          headers : userFhirData.headers
+          headers: userFhirData.headers
         });
 
       }
@@ -161,7 +161,7 @@ export class UserService {
     logger.info('Running UserService.userLogin');
     try {
       // Login with email and phone?
-      let user = await this.userRepository.getUserByEmailOrPhone( data );
+      let user = await this.userRepository.getUserByEmailOrPhone(data);
 
       if (!user) {
         throwError('Invalid credentials. User not found!', error.unauthorized);

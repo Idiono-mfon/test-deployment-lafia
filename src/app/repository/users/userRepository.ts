@@ -24,7 +24,7 @@ export class UserRepository {
     }
   }
 
-  public async getOneBy(field: string, value:string): Promise<IUser> {
+  public async getOneBy(field: string, value: string): Promise<IUser> {
     logger.info('Running UserRepository.getOneBy');
     try {
       return await UserModel.query().where(field, value).first();
@@ -33,10 +33,10 @@ export class UserRepository {
     }
   }
 
-  public async getUserByEmailOrPhone(value:string): Promise<IUser> {
+  public async getUserByEmailOrPhone(value: string): Promise<IUser> {
     logger.info('Running UserRepository.getUserByEmailOrPhone');
     try {
-      return await UserModel.query().where("email", value).orWhere("phone", value).first();
+      return await UserModel.query().where('email', value).orWhere('phone', value).first();
     } catch (e: any) {
       throw new InternalServerError(e.message);
     }
@@ -49,7 +49,7 @@ export class UserRepository {
         .patch(data)
         // .where({ id })
         .where({ resource_id: id })
-        .returning("*")
+        .returning('*')
         .first()
         ;
     } catch (e: any) {

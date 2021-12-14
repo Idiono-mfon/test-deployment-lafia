@@ -1,0 +1,31 @@
+import { ContainerModule } from 'inversify';
+import TYPES from '../config/types';
+import { AuthController } from './auth';
+import { CodeSystemController } from './codeSystems';
+import { ConsentController } from './consents';
+import { FhirServerController } from './fhirServer';
+import { HealthController } from './health';
+import { ComponentController, LabelController, LanguageController } from './lang';
+import { LafiaMediaController, LafiaVideoController } from './mediaServer';
+import { PatientController } from './patients';
+import { PractitionerController } from './practitioners';
+import { FhirResourceController, ImplementationGuideController } from './resources';
+import { UserController } from './users';
+
+export const controllerModule = new ContainerModule((bind) => {
+  bind<AuthController>(TYPES.AuthController).to(AuthController);
+  bind<CodeSystemController>(TYPES.CodeSystemController).to(CodeSystemController);
+  bind<ConsentController>(TYPES.ConsentController).to(ConsentController);
+  bind<FhirServerController>(TYPES.FhirServerController).to(FhirServerController);
+  bind<ComponentController>(TYPES.ComponentController).to(ComponentController);
+  bind<LabelController>(TYPES.LabelController).to(LabelController);
+  bind<LanguageController>(TYPES.LanguageController).to(LanguageController);
+  bind<LafiaMediaController>(TYPES.LafiaMediaController).to(LafiaMediaController);
+  bind<LafiaVideoController>(TYPES.LafiaVideoController).to(LafiaVideoController);
+  bind<PatientController>(TYPES.PatientController).to(PatientController);
+  bind<PractitionerController>(TYPES.PractitionerController).to(PractitionerController);
+  bind<FhirResourceController>(TYPES.FhirResourceController).to(FhirResourceController);
+  bind<ImplementationGuideController>(TYPES.ImplementationGuideController).to(ImplementationGuideController);
+  bind<UserController>(TYPES.UserController).to(UserController);
+  bind<HealthController>(TYPES.HealthController).to(HealthController);
+});

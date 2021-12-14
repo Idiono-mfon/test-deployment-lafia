@@ -101,22 +101,22 @@ const logger = winston.createLogger({
 });
 
 // If we're not in production then log to the `console`
-// if (env.environment !== 'production') logger.add(new winston.transports.Console({
-logger.add(new winston.transports.Console({
-  format: winston.format.combine(
-    // Align the logs
-    winston.format.align(),
-    // Use simple format for the logs
-    winston.format.simple(),
-    // Log error stack track
-    winston.format.errors({ stack: true }),
-    // Add the message timestamp with the preferred format
-    winston.format.timestamp({ format: 'DD-MMM-YYYY HH:mm:ss:ms' }),
-    // Define the format of the message showing the timestamp, the level and the message
-    winston.format.colorize({ all: true }),
-    customPrint,
-  )
-}));
+if (env.environment !== 'test') //logger.add(new winston.transports.Console({
+  logger.add(new winston.transports.Console({
+    format: winston.format.combine(
+      // Align the logs
+      winston.format.align(),
+      // Use simple format for the logs
+      winston.format.simple(),
+      // Log error stack track
+      winston.format.errors({ stack: true }),
+      // Add the message timestamp with the preferred format
+      winston.format.timestamp({ format: 'DD-MMM-YYYY HH:mm:ss:ms' }),
+      // Define the format of the message showing the timestamp, the level and the message
+      winston.format.colorize({ all: true }),
+      customPrint,
+    )
+  }));
 
 // Handle node warning, unhandledRejection and uncaughtException
 process.on('unhandledRejection', (reason: any, promise: Promise<any>) => logger.debug(reason));

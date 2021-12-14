@@ -101,7 +101,7 @@ export class TwilioService {
       const room = await twilioClient.video.rooms(roomSid)
         .fetch();
 
-      const [,participants] = room?.uniqueName?.split(':');
+      const [, participants] = room?.uniqueName?.split(':');
       const [practitioner, ...patients] = participants?.split('-');
 
       return { practitioner, patients, };

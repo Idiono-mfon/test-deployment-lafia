@@ -5,7 +5,7 @@ import { InternalServerError, logger } from '../../utils';
 @injectable()
 export class TwilioRoomRepository {
 
-  public async fetchRoomByID(roomId: string) {
+  public async fetchRoomByID(roomId: string): Promise<ITwilioRoom> {
     logger.info('Running TwilioRoomRepository::fetchRoomByID');
     return TwilioRoomModel.query().findById(roomId);
   }

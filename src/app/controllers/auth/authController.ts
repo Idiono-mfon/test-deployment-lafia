@@ -8,11 +8,11 @@ import {
   response
 } from 'inversify-express-utils';
 import { Request, Response } from 'express';
+import { passport } from '../../app';
 import TYPES from '../../config/types';
 import { AuthService } from '../../services';
 import { error, logger, throwError } from '../../utils';
 import { BaseController } from '../baseController';
-import { passport } from '../..';
 
 @controller('')
 export class AuthController extends BaseController {

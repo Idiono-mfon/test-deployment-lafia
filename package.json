@@ -16,13 +16,6 @@
     "seed:make": "knex seed:make",
     "tsc": "tsc"
   },
-  "jest": {
-    "testEnvironment": "node",
-    "coveragePathIgnorePatterns": [
-      "/node_modules/",
-      "/dist/"
-    ]
-  },
   "keywords": [
     "patient",
     "doctor",
@@ -119,6 +112,7 @@
     "@types/uuid": "^3.4.6",
     "@typescript-eslint/eslint-plugin": "^4.17.0",
     "@typescript-eslint/parser": "^4.17.0",
+    "axios-mock-adapter": "^1.20.0",
     "eslint": "^7.21.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-config-prettier": "^6.10.0",

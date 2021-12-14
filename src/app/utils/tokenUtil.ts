@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
+import { refreshOauth2Token } from '../app';
 import TYPES from '../config/types';
-import { refreshOauth2Token } from '../index';
 import { AuthService } from '../services';
 import { logger } from './loggerUtil';
 

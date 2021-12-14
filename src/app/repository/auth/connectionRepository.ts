@@ -12,7 +12,7 @@ export class ConnectionRepository {
 
       if (connectionType) {
         connections = connections
-          .where( connectionType )
+          .where(connectionType)
           .skipUndefined();
       }
 
@@ -35,8 +35,7 @@ export class ConnectionRepository {
     logger.info('Running ConnectionRepository.addConnection');
     try {
       return await ConnectionModel.query().insertAndFetch(data);
-    }
-    catch (e: any) {
+    } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
