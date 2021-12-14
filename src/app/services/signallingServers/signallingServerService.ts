@@ -1,14 +1,11 @@
-import { inject } from 'inversify';
 import Redis from 'ioredis';
 import { Server, Socket } from 'socket.io';
 import { createAdapter } from 'socket.io-redis';
 import { v4 as uuid } from 'uuid';
 import { Env } from '../../config/env';
-import TYPES from '../../config/types';
 import { IPractitionerVideoBroadcast, IVideoBroadcast } from '../../models';
 import { forWho, logger } from '../../utils';
 import { eventName, eventService } from '../eventEmitter';
-import { KafkaService, KafkaSetup } from '../kafka';
 import {
   BroadcastData,
   BroadcastNotificationPayload,
@@ -32,10 +29,6 @@ const pubClient = new Redis(
 const subClient = pubClient.duplicate();
 
 export class SignallingServerService {
-  @inject(TYPES.KafkaService)
-  private readonly kafkaService: KafkaService;
-  @inject(TYPES.KafkaSetup)
-  private readonly kafkaSetup: KafkaSetup;
   private static firebaseService: FirebaseService;
   private readonly io: any;
   private static redisStore: RedisStore;
@@ -47,8 +40,7 @@ export class SignallingServerService {
     appServer: any,
     patientService: PatientService,
     practitionerService: PractitionerService,
-    videoBroadcastService: VideoBroadcastService,
-    kafkaService: KafkaService
+    videoBroadcastService: VideoBroadcastService
   ) {
     SignallingServerService.redisStore = new RedisStore(pubClient, patientService, practitionerService);
     SignallingServerService.onlinePractitionerRoom = 'onlinePractitioners';
@@ -66,7 +58,6 @@ export class SignallingServerService {
     });
 
     this.io.adapter(createAdapter({ pubClient, subClient }));
-    this.kafkaService = kafkaService;
   }
 
   public initialize(): void {

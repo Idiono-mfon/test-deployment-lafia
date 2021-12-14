@@ -38,6 +38,8 @@ const TYPES = {
   FhirResourceService: Symbol('FhirResourceService'),
   KafkaService: Symbol('KafkaService'),
   KafkaSetup: Symbol('KafkaSetup'),
+  RabbitMqService: Symbol('RabbitMqService'),
+  RabbitMqSetup: Symbol('RabbitMqSetup'),
   FileService: Symbol('FileService'),
 
   // repositories

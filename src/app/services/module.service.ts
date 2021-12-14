@@ -6,9 +6,9 @@ import { CodeSystemService } from './codeSystems';
 import { EmailService } from './email';
 import { FhirServerService } from './fhirServer';
 import { FileService } from './file';
-import { KafkaService, KafkaSetup } from './kafka';
 import { LanguageService } from './lang';
 import { LafiaMediaService } from './mediaServer';
+import { RabbitMqService, RabbitMqSetup } from './messageBroker';
 import { PatientService } from './patients';
 import { PractitionerService } from './practitioners';
 import { FhirResourceService, ImplementationGuideService } from './resources';
@@ -23,8 +23,8 @@ export const serviceModule = new ContainerModule((bind) => {
   bind<EmailService>(TYPES.EmailService).to(EmailService);
   bind<FhirServerService>(TYPES.FhirServerService).to(FhirServerService);
   bind<FileService>(TYPES.FileService).to(FileService);
-  bind<KafkaSetup>(TYPES.KafkaSetup).to(KafkaSetup);
-  bind<KafkaService>(TYPES.KafkaService).to(KafkaService);
+  // bind<KafkaSetup>(TYPES.KafkaSetup).to(KafkaSetup);
+  // bind<KafkaService>(TYPES.KafkaService).to(KafkaService);
   bind<LanguageService>(TYPES.LanguageService).to(LanguageService);
   bind<LafiaMediaService>(TYPES.LafiaMediaService).to(LafiaMediaService);
   bind<PatientService>(TYPES.PatientService).to(PatientService);
@@ -36,4 +36,6 @@ export const serviceModule = new ContainerModule((bind) => {
   bind<UserService>(TYPES.UserService).to(UserService);
   bind<VideoBroadcastService>(TYPES.VideoBroadcastService).to(VideoBroadcastService);
   bind<VideoRecordService>(TYPES.VideoRecordService).to(VideoRecordService);
+  bind<RabbitMqService>(TYPES.RabbitMqService).to(RabbitMqService);
+  bind<RabbitMqSetup>(TYPES.RabbitMqSetup).to(RabbitMqSetup);
 });

@@ -11,9 +11,8 @@ import TYPES from './config/types';
 import {
   FileService,
   FirebaseService,
-  KafkaService,
   PatientService,
-  PractitionerService,
+  PractitionerService, RabbitMqService,
   SignallingServerService,
   VideoBroadcastService,
 } from './services';
@@ -29,8 +28,9 @@ const server = new InversifyExpressServer(container, null, null, getExpressApp()
 const patientService = container.get<PatientService>(TYPES.PatientService);
 const videoBroadcastService = container.get<VideoBroadcastService>(TYPES.VideoBroadcastService);
 const practitionerService = container.get<PractitionerService>(TYPES.PractitionerService);
-const kafkaService = container.get<KafkaService>(TYPES.KafkaService);
+// const kafkaService = container.get<KafkaService>(TYPES.KafkaService);
 const fileService = container.get<FileService>(TYPES.FileService);
+const rabbitMqService = container.get<RabbitMqService>(TYPES.RabbitMqService);
 
 // const saFhirStrategy = authService.getStrategy('safhir');
 
@@ -46,8 +46,10 @@ fileService.onLocalFileDelete();
 // Send Firebase call notification to patient
 new FirebaseService().triggerNotification().then(response => logger.info(response));
 
-kafkaService.consumer();
-kafkaService.handleEvents();
+// kafkaService.consumer();
+// kafkaService.handleEvents();
+rabbitMqService.rmqSubscribe().then();
+rabbitMqService.handleEvents();
 
 const serverInstance = server.build();
 const PORT = Env.all().port;
@@ -63,8 +65,7 @@ const signallingServer = new SignallingServerService(
   appServer,
   patientService,
   practitionerService,
-  videoBroadcastService,
-  kafkaService
+  videoBroadcastService
 );
 signallingServer.initialize();
 
