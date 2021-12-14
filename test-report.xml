@@ -2,38 +2,38 @@
 <testExecutions version="1">
     <file path="/Users/ps2020-01/Documents/GitHub/ParallelScore/lafia-service/src/tests/__tests__/unitTests/codeSystem.spec.ts">
         <testCase name="Code System Unit Test should be defined" duration="5"/>
-        <testCase name="Code System Unit Test should get code system by type" duration="4"/>
-        <testCase name="Code System Unit Test should get code system by code system name" duration="1"/>
+        <testCase name="Code System Unit Test should get code system by type" duration="5"/>
+        <testCase name="Code System Unit Test should get code system by code system name" duration="2"/>
         <testCase name="Code System Unit Test should add new code system" duration="1"/>
     </file>
     <file path="/Users/ps2020-01/Documents/GitHub/ParallelScore/lafia-service/src/tests/__tests__/unitTests/user.spec.ts">
-        <testCase name="User Unit Test should be defined" duration="6"/>
-        <testCase name="User Unit Test should create a new user" duration="14"/>
-        <testCase name="User Unit Test should not create a new user if email is invalid" duration="2"/>
+        <testCase name="User Unit Test should be defined" duration="7"/>
+        <testCase name="User Unit Test should create a new user" duration="15"/>
+        <testCase name="User Unit Test should not create a new user if email is invalid" duration="10"/>
         <testCase name="User Unit Test should not create a user if password is less than 6 characters" duration="3"/>
-        <testCase name="User Unit Test should get a user by field" duration="1"/>
-        <testCase name="User Unit Test should get one user by" duration="2"/>
-        <testCase name="User Unit Test should get one user" duration="1"/>
+        <testCase name="User Unit Test should get a user by field" duration="2"/>
+        <testCase name="User Unit Test should get one user by" duration="1"/>
+        <testCase name="User Unit Test should get one user" duration="2"/>
         <testCase name="User Unit Test should login a user with email" duration="2"/>
-        <testCase name="User Unit Test should login a user with phone" duration="1"/>
+        <testCase name="User Unit Test should login a user with phone" duration="2"/>
         <testCase name="User Unit Test should not login with invalid email" duration="1"/>
-        <testCase name="User Unit Test should not login with invalid password" duration="1"/>
-        <testCase name="User Unit Test should log a user out" duration="2"/>
-        <testCase name="User Unit Test should generate JWT token" duration="6"/>
+        <testCase name="User Unit Test should not login with invalid password" duration="2"/>
+        <testCase name="User Unit Test should log a user out" duration="1"/>
+        <testCase name="User Unit Test should generate JWT token" duration="4"/>
         <testCase name="User Unit Test should throw error generating JWT token" duration="1"/>
-        <testCase name="User Unit Test should decode JWT token" duration="3"/>
-        <testCase name="User Unit Test should throw error while decoding JWT token" duration="1"/>
+        <testCase name="User Unit Test should decode JWT token" duration="6"/>
+        <testCase name="User Unit Test should throw error while decoding JWT token" duration="2"/>
         <testCase name="User Unit Test should update user password" duration="2"/>
-        <testCase name="User Unit Test should not update user password if old password is incorrect" duration="2"/>
-        <testCase name="User Unit Test should not update user password if password validation fails" duration="2"/>
+        <testCase name="User Unit Test should not update user password if old password is incorrect" duration="3"/>
+        <testCase name="User Unit Test should not update user password if password validation fails" duration="1"/>
         <testCase name="User Unit Test should not update user password if the user does not exist" duration="1"/>
-        <testCase name="User Unit Test should not reset user password if an email is not provided" duration="1"/>
+        <testCase name="User Unit Test should not reset user password if an email is not provided" duration="5"/>
         <testCase name="User Unit Test should not reset user password if a user with the email does not exist"
-                  duration="1"/>
+                  duration="8"/>
         <testCase
                 name="User Unit Test should reset user password if an email is provided and a user with the email exist"
-                duration="4413"/>
+                duration="2"/>
         <testCase name="User Unit Test should update user" duration="2"/>
-        <testCase name="User Unit Test should check for existing user" duration="893"/>
+        <testCase name="User Unit Test should check for existing user" duration="826"/>
     </file>
 </testExecutions>
