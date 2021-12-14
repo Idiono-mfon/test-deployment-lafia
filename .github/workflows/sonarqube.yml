@@ -1,15 +1,15 @@
 name: Build Process
-on: 
-  pull_request: 
-    types: 
+on:
+  pull_request:
+    types:
       - opened
       - synchronize
       - reopened
-  push: 
-    branches: 
-      - dev 
-jobs: 
-  build: 
+  push:
+    branches:
+      - dev
+jobs:
+  build:
     name: Build
     runs-on: ubuntu-latest
     env:
@@ -50,25 +50,23 @@ jobs:
       KAFKA_CONSUMER_TOPICS: "${{ secrets.KAFKA_CONSUMER_TOPICS }}"
       PORT: "${{ secrets.PORT }}"
       NODE_ENV: "${{ secrets.NODE_ENV }}"
-    steps: 
-      - 
-        uses: actions/checkout@v2
-        with: 
+      JWT_SECRETE_KEY: "${{ secrets.JWT_SECRETE_KEY }}"
+    steps:
+      - uses: actions/checkout@v2
+        with:
           fetch-depth: 0
       - uses: actions/setup-node@v2
         with:
-         node-version: '14'
+          node-version: '14'
       - name: Install modules
         run: yarn install --ignore-engines
       - name: Run Test
         run: yarn test
-      - 
-        env: 
+      - env:
           SONAR_HOST_URL: "${{ secrets.SONAR_HOST_URL }}"
           SONAR_TOKEN: "${{ secrets.SONAR_TOKEN }}"
         uses: sonarsource/sonarqube-scan-action@master
-      - 
-        env: 
+      - env:
           SONAR_TOKEN: "${{ secrets.SONAR_TOKEN }}"
         timeout-minutes: 550
         uses: SonarSource/sonarqube-quality-gate-action@master
