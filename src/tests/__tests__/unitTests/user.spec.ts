@@ -290,7 +290,7 @@ describe('User Unit Test', () => {
     // @ts-ignore
     bcrypt.compare.mockResolvedValueOnce(true);
 
-    const id = 'e59d4aee-3f4e-461a-9057-ba4677d9b057';
+    const id = '11';
     const oldPassword = '13Jmsl*2#';
     const newPassword = 'newPass12$';
 
@@ -306,7 +306,7 @@ describe('User Unit Test', () => {
     // @ts-ignore
     bcrypt.compare.mockResolvedValueOnce(false);
 
-    const id = 'e59d4aee-3f4e-461a-9057-ba4677d9b057';
+    const id = '11';
     const oldPassword = 'lslkMie@.alsK';
     const newPassword = 'anotherNewPass3$';
 
@@ -324,7 +324,7 @@ describe('User Unit Test', () => {
     // @ts-ignore
     bcrypt.compare.mockResolvedValueOnce(true);
 
-    const id = 'e59d4aee-3f4e-461a-9057-ba4677d9b057';
+    const id = '11';
     const oldPassword = 'lslkMie@.alsK';
     const newPassword = 'NewWrongPass';
 

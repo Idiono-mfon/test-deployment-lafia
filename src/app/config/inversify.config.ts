@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { Container } from 'inversify';
 import { controllerModule } from '../controllers';
 import { middlewareModule } from '../middlewares';

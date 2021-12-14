@@ -58,7 +58,7 @@ export class TestUserRepository {
   public async getOneUser(data: IFindUser | any): Promise<IUser> {
     const user = this.userData.filter(user => {
       let isMatch = false;
-      // eslint-disable-next-line @typescript-eslint/no-for-in-array
+
       for (const key of Object.keys(data)) {
         // @ts-ignore
         isMatch = user[key] === data[key];
