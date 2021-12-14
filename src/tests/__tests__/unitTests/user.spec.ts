@@ -29,7 +29,7 @@ describe('User Unit Test', () => {
     container.snapshot();
 
     container.rebind<TwilioRoomRepository>(TYPES.TwilioRoomRepository).to(TestTwilioRoomRepository);
-    container.rebind<EmailService>(TYPES.UserRepository).to(TestEmailService);
+    container.rebind<EmailService>(TYPES.EmailService).to(TestEmailService);
     container.rebind<UserRepository>(TYPES.UserRepository).to(TestUserRepository);
 
     testUserService = container.get<UserService>(TYPES.UserService);
