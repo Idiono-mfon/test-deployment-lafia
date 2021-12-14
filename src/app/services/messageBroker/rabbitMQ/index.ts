@@ -1,2 +1,2 @@
-export * from './rmqSetup';
-export * from './rmqService';
+export * from './rabbitMqSetup';
+export * from './rabbitMqService';

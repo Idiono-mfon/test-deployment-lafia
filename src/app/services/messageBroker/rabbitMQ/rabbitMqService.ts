@@ -11,7 +11,7 @@ import { PatientService } from '../../patients';
 import { PractitionerService } from '../../practitioners';
 import { UserService } from '../../users';
 // import { successResponseType } from '../kafka';
-import { RabbitMqSetup, successResponseType } from './rmqSetup';
+import { RabbitMqSetup, successResponseType } from './rabbitMqSetup';
 
 const env = Env.all();
 
@@ -94,7 +94,8 @@ export class RabbitMqService {
         logger.info(`[x] Received Data: ${msgString})`);
         logger.info(`[x] Received Date: ${new Date().toString()}`);
 
-        const { data, resource_type, resource_id, email } = msgJson;
+        let { data, resource_type, resource_id, email } = msgJson;
+        resource_type = resource_type?.toLowerCase();
 
         if (resource_id && data) {
           try {
