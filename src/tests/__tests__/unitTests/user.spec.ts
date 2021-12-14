@@ -6,16 +6,16 @@ import container from '../../../app/config/inversify.config';
 import TYPES from '../../../app/config/types';
 import { IJwtPayload, IUser } from '../../../app/models';
 import { TwilioRoomRepository, UserRepository } from '../../../app/repository';
-import { UserService } from '../../../app/services';
+import { EmailService, UserService } from '../../../app/services';
 import { TestTwilioRoomRepository, TestUserRepository } from '../../fixtures/repositories';
-import { EmailService } from '../../fixtures/services';
+import { TestEmailService } from '../../fixtures/services';
 
 jest.mock('bcryptjs');
 
 describe('User Unit Test', () => {
   let testUserService: UserService;
   let testUserRepository: UserRepository;
-  let emailService: EmailService;
+  let emailService: TestEmailService;
   let axiosMock: any;
 
   beforeAll(() => {
@@ -29,7 +29,7 @@ describe('User Unit Test', () => {
     container.snapshot();
 
     container.rebind<TwilioRoomRepository>(TYPES.TwilioRoomRepository).to(TestTwilioRoomRepository);
-    container.rebind<EmailService>(TYPES.UserRepository).to(EmailService);
+    container.rebind<EmailService>(TYPES.UserRepository).to(TestEmailService);
     container.rebind<UserRepository>(TYPES.UserRepository).to(TestUserRepository);
 
     testUserService = container.get<UserService>(TYPES.UserService);
