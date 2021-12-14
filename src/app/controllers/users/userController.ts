@@ -19,7 +19,7 @@ export class UserController extends BaseController {
 
   @httpPost('/register')
   public async createUser(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController::createUser');
+    logger.info('Running UserController.createUser');
     const user: IUser = req.body
     try {
       const newUser = await this.userService.createUser(user);
@@ -33,7 +33,7 @@ export class UserController extends BaseController {
 
   @httpPost('/validate')
   public async validateUser(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController::validateUser');
+    logger.info('Running UserController.validateUser');
     try {
       // @ts-ignore
       const ip: string = req.headers['x-forwarded-for']?.split(',').shift() || req.socket?.remoteAddress;
@@ -49,9 +49,9 @@ export class UserController extends BaseController {
 
   @httpGet('/photo', TYPES.AuthMiddleware)
   public async getUserPhoto(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController::getUserPhoto');
+    logger.info('Running UserController.getUserPhoto');
     try {
-      const user = await this.userService.getOneUser({resource_id: req.body.user.id});
+      const user = await this.userService.getOneUser({ resource_id: req.body.user.id });
 
       this.success(res, user.photo, 'Photo fetched', HttpStatusCode.OK);
     } catch (e: any) {
@@ -62,14 +62,14 @@ export class UserController extends BaseController {
 
   @httpPost('/photo', TYPES.AuthMiddleware)
   public async updatePhoto(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController::updatePhoto');
+    logger.info('Running UserController.updatePhoto');
     try {
-      const {id} = req.body.user;
-      if ( req.body.user ) {
+      const { id } = req.body.user;
+      if (req.body.user) {
         delete req.body.user;
       }
       const photo: IUserPhoto = req.body
-      const user = await this.userService.updateUser( id, photo );
+      const user = await this.userService.updateUser(id, photo);
 
       this.success(res, user, 'Photo updated', HttpStatusCode.CREATED);
     } catch (e: any) {
@@ -80,7 +80,7 @@ export class UserController extends BaseController {
 
   @httpPost('/update', TYPES.AuthMiddleware)
   public async updateUser(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController::updateUser');
+    logger.info('Running UserController.updateUser');
     try {
       const user = await this.userService.updateUser(req.body.user.id, req.body);
 
@@ -93,7 +93,7 @@ export class UserController extends BaseController {
 
   @httpPut('/:id/change-password')
   public async updatePassword(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController::updatePassword');
+    logger.info('Running UserController.updatePassword');
     try {
       const { id } = req.params;
       const { old_password, new_password } = req.body;
@@ -109,7 +109,7 @@ export class UserController extends BaseController {
 
   @httpPost('/reset-password')
   public async resetPassword(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController::resetPassword');
+    logger.info('Running UserController.resetPassword');
     try {
       const { email } = req.body;
 
@@ -124,7 +124,7 @@ export class UserController extends BaseController {
 
   @httpPost('/check')
   public async check(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController::check');
+    logger.info('Running UserController.check');
     try {
       const { field, value } = req.body;
 
@@ -141,7 +141,7 @@ export class UserController extends BaseController {
 
   @httpPost('/otp/send')
   public async sendOtp(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController::sendOtp');
+    logger.info('Running UserController.sendOtp');
     try {
       const { phone } = req.body;
       const otp = await this.twilioService.sendOTP(phone);
@@ -154,7 +154,7 @@ export class UserController extends BaseController {
 
   @httpPost('/otp/verify')
   public async verifyOtp(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController::verifyOtp');
+    logger.info('Running UserController.verifyOtp');
     try {
       const { phone, code } = req.body;
       const verify = await this.twilioService.verifyOTP(phone, code);
@@ -167,7 +167,7 @@ export class UserController extends BaseController {
 
   @httpPost('/existing')
   public async checkExistingUser(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController::checkExistingUser');
+    logger.info('Running UserController.checkExistingUser');
     try {
       await this.userService.checkExistingUser(req.body);
 
@@ -180,7 +180,7 @@ export class UserController extends BaseController {
 
   @httpPost('/access/generate')
   public async generateTwilioAccessToken(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController::generateTwilioAccessToken');
+    logger.info('Running UserController.generateTwilioAccessToken');
     try {
       const { identity, room } = req.body;
       const verify = await this.twilioService.generateAccessToken(identity, room, true);

@@ -214,15 +214,12 @@ export class UserService {
 
   public async changePassword(id: string, oldPassword: string, newPassword: string): Promise<IUser> {
     logger.info('Running UserService.changePassword');
+
     try {
-      let user = await this.userRepository.getOneUser({ id });
+      const user = await this.userRepository.getOneUser({ resource_id: id });
 
       if (!user) {
-        user = await this.userRepository.getOneUser({ resource_id: id });
-
-        if (!user) {
-          throwError('Unable to update password: user does not exist', error.badRequest);
-        }
+        throwError('Unable to update password: user does not exist', error.badRequest);
       }
 
       const isNewPasswordValid = Password.validatePassword(newPassword);
@@ -243,7 +240,7 @@ export class UserService {
 
       const newPasswordHash = await Password.hash(newPassword);
 
-      const updatedUser = await this.userRepository.updateUser(user.id!, { password: newPasswordHash });
+      const updatedUser = await this.userRepository.updateUser(id, { password: newPasswordHash });
 
       delete updatedUser.password;
 
@@ -273,14 +270,14 @@ export class UserService {
       const hashPassword = await Password.hash(newPassword);
 
       // Update the user's password
-      await this.userRepository.updateUser(user.id!, { password: hashPassword });
+      await this.userRepository.updateUser(user.resourceId!, { password: hashPassword });
 
       // Send the new password details to the user
       const emailMessage = `
         <p>Hello <strong>${user.firstName} ${user.lastName}</strong>,</p>
         <p>You receive this email because you requested for a password reset on 
-        your lafia account. You password has now been reset and a new password 
-        has been assigned to you. Please login with the new password and then 
+        your lafia account. Your password has now been reset and a new password 
+        has been assigned to you. Please log in with the new password and then 
         update it from your account.</p>
         <div>
           <strong>Email:</strong>    <strong style="color: saddlebrown">${email}</strong>

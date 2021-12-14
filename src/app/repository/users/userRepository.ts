@@ -47,11 +47,8 @@ export class UserRepository {
     try {
       return await UserModel.query()
         .patch(data)
-        // .where({ id })
         .where({ resource_id: id })
-        .returning('*')
-        .first()
-        ;
+        .returning('*');
     } catch (e: any) {
       throw new InternalServerError(e.message);
     }
