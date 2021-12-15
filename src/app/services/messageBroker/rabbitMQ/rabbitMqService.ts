@@ -9,8 +9,7 @@ import { eventName, eventService } from '../../eventEmitter';
 import { BroadcastData } from '../../notifications';
 import { PatientService } from '../../patients';
 import { PractitionerService } from '../../practitioners';
-import { UserService } from '../../users';
-// import { successResponseType } from '../kafka';
+import { IUserService } from '../../users';
 import { RabbitMqSetup, successResponseType } from './rabbitMqSetup';
 
 const env = Env.all();
@@ -22,7 +21,7 @@ export class RabbitMqService {
   @inject(TYPES.PractitionerService)
   private readonly practitionerService: PractitionerService;
   @inject(TYPES.UserService)
-  private readonly userService: UserService;
+  private readonly userService: IUserService;
   @inject(TYPES.RabbitMqSetup)
   private readonly rabbitMqSetup: RabbitMqSetup;
 
@@ -99,7 +98,7 @@ export class RabbitMqService {
 
         if (resource_id && data) {
           try {
-            await this.userService.createUser({
+            await this.userService.create({
               resource_id,
               resource_type,
               ...data,
@@ -123,10 +122,10 @@ export class RabbitMqService {
           if (first_name) dataToUpdate.first_name = first_name;
           if (password) dataToUpdate.password = Password.hash(password);
 
-          const existingUser = await this.userService.getOneUser({ email });
+          const existingUser = await this.userService.findOne({ email });
 
           if (existingUser) {
-            await this.userService.updateUser(existingUser?.resourceId!, dataToUpdate);
+            await this.userService.update(existingUser?.resourceId!, dataToUpdate);
           }
         }
 

@@ -23,9 +23,9 @@ import {
 } from '../../utils';
 import { IUserLoginParams } from '../auth';
 import { S3Service } from '../aws';
-import { CodeSystemService } from '../codeSystems';
+import { ICodeSystemService } from '../codeSystems';
 import { FhirServerService } from '../fhirServer';
-import { UserService } from '../users';
+import { IUserService } from '../users';
 
 @injectable()
 export class PractitionerService {
@@ -33,7 +33,7 @@ export class PractitionerService {
   private readonly practitionerRepo: PractitionerRepository;
 
   @inject(TYPES.CodeSystemService)
-  private readonly codeSystemService: CodeSystemService;
+  private readonly codeSystemService: ICodeSystemService;
 
   @inject(TYPES.S3Service)
   private readonly s3Service: S3Service;
@@ -42,7 +42,7 @@ export class PractitionerService {
   private readonly utilService: UtilityService;
 
   @inject(TYPES.UserService)
-  private readonly userService: UserService;
+  private readonly userService: IUserService;
 
   @inject(TYPES.FhirServerService)
   private readonly fhirServerService: FhirServerService;
@@ -90,7 +90,7 @@ export class PractitionerService {
       birth_date: birthDate,
     } = data;
 
-    const existingUser: IUser = await this.userService.getOneUser({ email });
+    const existingUser: IUser = await this.userService.findOne({ email });
 
     if (existingUser) {
       throwError('User already exists!', error.badRequest);
@@ -138,7 +138,7 @@ export class PractitionerService {
       resource_type: forWho.practitioner,
     }
 
-    await this.userService.createUser({
+    await this.userService.create({
       ...data,
       ...userData
     });
@@ -160,7 +160,7 @@ export class PractitionerService {
         delete user.photo;
       }
 
-      await this.userService.updateUser(user.id!, {...user, token});
+      await this.userService.update(user.id!, { ...user, token });
 
       const { data: practitionerData } = await this.fhirServerService.executeQuery(
         `/Practitioner/${user.resourceId}`,
@@ -198,7 +198,7 @@ export class PractitionerService {
         creation: new Date(),
       };
 
-      await this.userService.updateUser(practitioner.id!, {
+      await this.userService.update(practitioner.id!, {
         photo: fileLink,
       });
 
@@ -212,12 +212,12 @@ export class PractitionerService {
     logger.info('Running PractitionerService.attachBroadCastVideo');
 
     const videoBroadcasts: VideoBroadcastModel = await this.videoBroadcastRepository.fetchBroadcastByID(videoBroadcastId);
-    if ( !videoBroadcasts ) {
-      throw new NotFoundError("video broadcasts not found");
+    if (!videoBroadcasts) {
+      throw new NotFoundError('video broadcasts not found');
     }
     const practitioner: IPractitioner = await this.practitionerRepo.findPractitionerById(practitionerId);
-    if ( !practitioner ) {
-      throw new NotFoundError("practitioner not found");
+    if (!practitioner) {
+      throw new NotFoundError('practitioner not found');
     }
     return this.practitionerRepo.attachBroadcastVideos(practitionerId, videoBroadcastId);
   }
@@ -225,8 +225,8 @@ export class PractitionerService {
   public async findAssignedPractitionerVideoBroadcast(practitionerId: string) {
     logger.info('Running PractitionerService.findAssignedPractitionerVideoBroadcast');
     const practitioner = this.findPractitionerById(practitionerId)
-    if ( !practitioner ) {
-      throw new NotFoundError("unknown practitioner");
+    if (!practitioner) {
+      throw new NotFoundError('unknown practitioner');
     }
     return this.practitionervideoBroadcastRepository.fetchPractitionerBroadcastByID(practitionerId);
   }

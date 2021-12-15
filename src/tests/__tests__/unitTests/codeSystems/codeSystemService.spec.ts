@@ -1,13 +1,13 @@
-import container from '../../../app/config/inversify.config';
-import TYPES from '../../../app/config/types';
-import { CodeSystemRepository } from '../../../app/repository';
-import { CodeSystemService } from '../../../app/services';
-import { TestCodeSystemRepository } from '../../fixtures/repositories';
+import container from '../../../../app/config/inversify.config';
+import TYPES from '../../../../app/config/types';
+import { ICodeSystem } from '../../../../app/models';
+import { DbAccess } from '../../../../app/repository';
+import { ICodeSystemService } from '../../../../app/services';
+import { TestCodeSystemRepository, TestBaseRepository } from '../../../fixtures/repositories';
 
 
-describe('Code System Unit Test', () => {
-  let testCodeSystemService: CodeSystemService;
-  let testCodeSystemRepository: CodeSystemRepository;
+describe('Code System Service Unit Test', () => {
+  let testCodeSystemService: ICodeSystemService;
 
   beforeEach(() => {
 
@@ -15,11 +15,12 @@ describe('Code System Unit Test', () => {
     // it without breaking other unit tests
     container.snapshot();
 
-    // container.unbind(TYPES.CodeSystemRepository);
-    container.rebind<CodeSystemRepository>(TYPES.CodeSystemRepository).to(TestCodeSystemRepository);
+    // @ts-ignore
+    container.rebind<DbAccess>(TYPES.BaseRepository).to(TestBaseRepository);
+    // @ts-ignore
+    container.rebind<DbAccess>(TYPES.CodeSystemRepository).to(TestCodeSystemRepository);
 
-    testCodeSystemService = container.get<CodeSystemService>(TYPES.CodeSystemService);
-    testCodeSystemRepository = container.get<CodeSystemRepository>(TYPES.CodeSystemRepository);
+    testCodeSystemService = container.get<ICodeSystemService>(TYPES.CodeSystemService);
   });
 
   afterEach(() => {
@@ -37,7 +38,6 @@ describe('Code System Unit Test', () => {
   it('should be defined', () => {
 
     expect(testCodeSystemService).toBeDefined();
-    expect(testCodeSystemRepository).toBeDefined();
   });
 
   it('should get code system by type', async () => {
@@ -45,6 +45,7 @@ describe('Code System Unit Test', () => {
 
     expect(codeSystem).not.toBeFalsy();
     expect(codeSystem[0].type).toBe('language');
+    expect(codeSystem[0].system).toBe('https://example.org/codesystems/3');
   });
 
   it('should get code system by code system name', async () => {
@@ -63,7 +64,7 @@ describe('Code System Unit Test', () => {
 
     };
 
-    const newCodeSystem = await testCodeSystemService.addCodeSystem(data);
+    const newCodeSystem = await testCodeSystemService.create<ICodeSystem>(data);
 
     expect(newCodeSystem).not.toBeFalsy();
     expect(newCodeSystem.code).toBe('12');

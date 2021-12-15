@@ -78,7 +78,7 @@ export class CodeSystemController extends BaseController {
     logger.info('Running CodeSystemController::addCodeSystem');
     try {
       const data: ICodeSystem = req.body;
-      const codeSystem: ICodeSystem = await this.codeSystemService.addCodeSystem(data);
+      const codeSystem: ICodeSystem = await this.codeSystemService.create<ICodeSystem>(data);
 
       this.success(res, codeSystem, 'Code system successfully added', HttpStatusCode.CREATED);
     } catch (e: any) {

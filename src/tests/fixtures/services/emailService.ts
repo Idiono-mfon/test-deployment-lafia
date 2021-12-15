@@ -1,8 +1,8 @@
 import { injectable } from 'inversify';
-import { IComposeEmail } from '../../../app/services';
+import { IComposeEmail, IEmailService } from '../../../app/services';
 
 @injectable()
-export class TestEmailService {
+export class TestEmailService implements IEmailService {
   public async sendEmail(data: IComposeEmail) {
     // Sending email...
   }

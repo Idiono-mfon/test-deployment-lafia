@@ -9,7 +9,7 @@ import { ConnectionRepository } from '../../repository';
 import { error, forWho, GenericResponseError, getE164Format, logger, throwError } from '../../utils';
 import { PatientService } from '../patients';
 import { PractitionerService } from '../practitioners';
-import { UserService } from '../users';
+import { IUserService } from '../users';
 
 const httpsAgent = new https.Agent({
   rejectUnauthorized: false,
@@ -22,7 +22,7 @@ export class AuthService {
   @inject(TYPES.PractitionerService)
   private readonly practitionerService: PractitionerService;
   @inject(TYPES.UserService)
-  private userService: UserService;
+  private userService: IUserService;
   @inject(TYPES.ConnectionRepository)
   private connectionRepository: ConnectionRepository;
 
@@ -34,7 +34,7 @@ export class AuthService {
         email = getE164Format(email, ip);
       }
 
-      const loggedInUser: IUser = await this.userService.userLogin(email, password);
+      const loggedInUser: IUser = await this.userService.login(email, password);
 
       const token = this.userService.generateJwtToken({ email, id: loggedInUser.resourceId });
       let loggedInUserData: any;

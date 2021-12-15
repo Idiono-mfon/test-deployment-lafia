@@ -2,14 +2,14 @@ import { Request, Response } from 'express';
 import { inject } from 'inversify';
 import { controller, httpGet, httpPost, request, response } from 'inversify-express-utils';
 import TYPES from '../../config/types';
-import { FhirServerService, UserService } from '../../services';
+import { FhirServerService, IUserService } from '../../services';
 import { error, logger, throwError } from '../../utils';
 import { BaseController } from '../baseController';
 
 @controller('/consents')
 export class ConsentController extends BaseController {
   @inject(TYPES.UserService)
-  private readonly userService: UserService;
+  private readonly userService: IUserService;
   @inject(TYPES.FhirServerService)
   private readonly fhirServerService: FhirServerService;
 
@@ -45,7 +45,7 @@ export class ConsentController extends BaseController {
         throwError('resource_type field is required', error.badRequest);
       }
 
-      const userDetails = await this.userService.getOneUser({ resource_id: user_id });
+      const userDetails = await this.userService.findOne({ resource_id: user_id });
 
       if (!userDetails) {
         throwError('User with the id not found', error.notFound);

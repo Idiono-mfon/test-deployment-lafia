@@ -19,10 +19,10 @@ export class UserController extends BaseController {
 
   @httpPost('/register')
   public async createUser(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController.createUser');
+    logger.info('Running UserController.create');
     const user: IUser = req.body
     try {
-      const newUser = await this.userService.createUser(user);
+      const newUser = await this.userService.create(user);
 
       this.success(res, newUser, 'User created', HttpStatusCode.CREATED);
     } catch (e: any) {
@@ -33,12 +33,12 @@ export class UserController extends BaseController {
 
   @httpPost('/validate')
   public async validateUser(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController.validateUser');
+    logger.info('Running UserController.validate');
     try {
       // @ts-ignore
       const ip: string = req.headers['x-forwarded-for']?.split(',').shift() || req.socket?.remoteAddress;
 
-      const newUser = await this.userService.validateUser(req.body, ip);
+      const newUser = await this.userService.validate(req.body, ip);
 
       this.success(res, newUser, 'User created', HttpStatusCode.CREATED);
     } catch (e: any) {
@@ -51,7 +51,7 @@ export class UserController extends BaseController {
   public async getUserPhoto(@request() req: Request, @response() res: Response) {
     logger.info('Running UserController.getUserPhoto');
     try {
-      const user = await this.userService.getOneUser({ resource_id: req.body.user.id });
+      const user = await this.userService.findOne({ resource_id: req.body.user.id });
 
       this.success(res, user.photo, 'Photo fetched', HttpStatusCode.OK);
     } catch (e: any) {
@@ -69,7 +69,7 @@ export class UserController extends BaseController {
         delete req.body.user;
       }
       const photo: IUserPhoto = req.body
-      const user = await this.userService.updateUser(id, photo);
+      const user = await this.userService.update(id, photo);
 
       this.success(res, user, 'Photo updated', HttpStatusCode.CREATED);
     } catch (e: any) {
@@ -80,9 +80,9 @@ export class UserController extends BaseController {
 
   @httpPost('/update', TYPES.AuthMiddleware)
   public async updateUser(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController.updateUser');
+    logger.info('Running UserController.update');
     try {
-      const user = await this.userService.updateUser(req.body.user.id, req.body);
+      const user = await this.userService.update(req.body.user.id, req.body);
 
       this.success(res, user, 'User updated', HttpStatusCode.CREATED);
     } catch (e: any) {
@@ -128,7 +128,7 @@ export class UserController extends BaseController {
     try {
       const { field, value } = req.body;
 
-      const user = await this.userService.getUserByField(field, value);
+      const user = await this.userService.findOne({ [field]: value });
 
       const exist = !!user;
 

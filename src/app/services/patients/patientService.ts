@@ -14,9 +14,9 @@ import {
 } from '../../utils';
 import { IUserLoginParams } from '../auth';
 import { S3Service } from '../aws';
-import { CodeSystemService } from '../codeSystems';
+import { ICodeSystemService } from '../codeSystems';
 import { FhirServerService } from '../fhirServer';
-import { UserService } from '../users';
+import { IUserService } from '../users';
 import { VideoBroadcastService } from '../videoRecords';
 
 @injectable()
@@ -25,7 +25,7 @@ export class PatientService {
   private readonly patientRepo: PatientRepository;
 
   @inject(TYPES.CodeSystemService)
-  private readonly codeSystemService: CodeSystemService;
+  private readonly codeSystemService: ICodeSystemService;
 
   @inject(TYPES.VideoBroadcastService)
   private readonly videoBroadcastService: VideoBroadcastService;
@@ -37,7 +37,7 @@ export class PatientService {
   private readonly utilService: UtilityService;
 
   @inject(TYPES.UserService)
-  private readonly userService: UserService;
+  private readonly userService: IUserService;
 
   @inject(TYPES.FhirServerService)
   private readonly fhirServerService: FhirServerService;
@@ -86,7 +86,7 @@ export class PatientService {
         phone = getE164Format(phone!, ip);
       }
 
-      const existingUser: IUser = await this.userService.getOneUser({ email });
+      const existingUser: IUser = await this.userService.findOne({ email });
 
       if (existingUser) {
         throwError('User already exists!', error.badRequest);
@@ -130,7 +130,7 @@ export class PatientService {
 
       data.hasVerifiedPhone = true;
 
-      await this.userService.createUser({
+      await this.userService.create({
         ...data,
         ...userData,
       });
@@ -154,7 +154,7 @@ export class PatientService {
         delete user.photo;
       }
 
-      await this.userService.updateUser(user.id!, {...user, token});
+      await this.userService.update(user.id!, { ...user, token });
 
       const { data: patientData } = await this.fhirServerService.executeQuery(
         `/Patient/${user.resourceId}`,
@@ -192,7 +192,7 @@ export class PatientService {
         creation: new Date(),
       };
 
-      await this.userService.updateUser(patient.id!, {
+      await this.userService.update(patient.id!, {
         photo: fileLink,
       });
 
@@ -205,8 +205,8 @@ export class PatientService {
   public async findPatientVideoBroadcast(patientId: string) {
     logger.info('Running PatientService.findPatientVideoBroadcast');
     const patient = this.findPatientById(patientId)
-    if ( !patient ) {
-      throw new NotFoundError("unknown patient");
+    if (!patient) {
+      throw new NotFoundError('unknown patient');
     }
     return this.videoBroadcastService.getAllVideoRecords(patientId);
   }

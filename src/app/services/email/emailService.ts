@@ -2,6 +2,7 @@ import { injectable } from 'inversify';
 import nodemailer, { Transporter } from 'nodemailer';
 import { GenericResponseError, HttpStatusCode, logger } from '../../utils';
 import { Env } from '../../config/env';
+import { IEmailService } from './interfaces';
 
 const env = Env.all();
 
@@ -17,7 +18,7 @@ const transporter: Transporter = nodemailer.createTransport({
 });
 
 @injectable()
-export class EmailService {
+export class EmailService implements IEmailService {
   public async sendEmail(data: IComposeEmail) {
     logger.info('Running EmailService::sendEmail')
     try {

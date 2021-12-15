@@ -57,6 +57,10 @@ const TYPES = {
   ConnectionRepository: Symbol('ConnectionRepository'),
   ImplementationGuideRepository: Symbol('ImplementationGuideRepository'),
   FhirResourceRepository: Symbol('FhirResourceRepository'),
+  BaseRepository: Symbol('BaseRepository'),
+
+  // models
+  ModelClass: Symbol('ModelClass'),
 
   // middlewares
   AuthMiddleware: Symbol('AuthMiddleware'),

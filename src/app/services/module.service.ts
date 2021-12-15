@@ -2,8 +2,8 @@ import { ContainerModule } from 'inversify';
 import TYPES from '../config/types';
 import { AuthService } from './auth';
 import { S3Service } from './aws';
-import { CodeSystemService } from './codeSystems';
-import { EmailService } from './email';
+import { CodeSystemService, ICodeSystemService } from './codeSystems';
+import { EmailService, IEmailService } from './email';
 import { FhirServerService } from './fhirServer';
 import { FileService } from './file';
 import { LanguageService } from './lang';
@@ -13,14 +13,14 @@ import { PatientService } from './patients';
 import { PractitionerService } from './practitioners';
 import { FhirResourceService, ImplementationGuideService } from './resources';
 import { TwilioService } from './twilio';
-import { UserService } from './users';
+import { IUserService, UserService } from './users';
 import { TwilioRoomService, VideoBroadcastService, VideoRecordService } from './videoRecords';
 
 export const serviceModule = new ContainerModule((bind) => {
   bind<AuthService>(TYPES.AuthService).to(AuthService);
   bind<S3Service>(TYPES.S3Service).to(S3Service);
-  bind<CodeSystemService>(TYPES.CodeSystemService).to(CodeSystemService);
-  bind<EmailService>(TYPES.EmailService).to(EmailService);
+  bind<ICodeSystemService>(TYPES.CodeSystemService).to(CodeSystemService);
+  bind<IEmailService>(TYPES.EmailService).to(EmailService);
   bind<FhirServerService>(TYPES.FhirServerService).to(FhirServerService);
   bind<FileService>(TYPES.FileService).to(FileService);
   // bind<KafkaSetup>(TYPES.KafkaSetup).to(KafkaSetup);
@@ -33,7 +33,7 @@ export const serviceModule = new ContainerModule((bind) => {
   bind<ImplementationGuideService>(TYPES.ImplementationGuideService).to(ImplementationGuideService);
   bind<TwilioService>(TYPES.TwilioService).to(TwilioService);
   bind<TwilioRoomService>(TYPES.TwilioRoomService).to(TwilioRoomService);
-  bind<UserService>(TYPES.UserService).to(UserService);
+  bind<IUserService>(TYPES.UserService).to(UserService);
   bind<VideoBroadcastService>(TYPES.VideoBroadcastService).to(VideoBroadcastService);
   bind<VideoRecordService>(TYPES.VideoRecordService).to(VideoRecordService);
   bind<RabbitMqService>(TYPES.RabbitMqService).to(RabbitMqService);

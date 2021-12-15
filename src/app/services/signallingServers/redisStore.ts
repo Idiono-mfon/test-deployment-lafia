@@ -325,7 +325,7 @@ export class RedisStore {
   }
 
   public async getAllRooms(): Promise<IRooms> {
-    logger.info('Running RedisStore.getAllRooms');
+    logger.info('Running RedisStore.findAll');
     try {
       const encodedRoom = await this.redisClient.get(this.roomKey);
 

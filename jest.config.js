@@ -15,17 +15,17 @@ module.exports = {
   // If the test path matches any of the patterns, it will be skipped.
   testPathIgnorePatterns: [
     '<rootDir>/node_modules/',
-    '<rootDir>/src/app/models/',
-    '<rootDir>/src/app/repository/',
-    '<rootDir>/src/database/',
-    '<rootDir>/src/tests/fixtures/',
+    // '<rootDir>/src/app/models/',
+    // '<rootDir>/src/app/repository/',
+    // '<rootDir>/src/database/',
+    // '<rootDir>/src/tests/fixtures/',
   ],
   // If the file path matches any of the patterns, coverage information will be skipped.
   coveragePathIgnorePatterns: [
     '<rootDir>/node_modules/',
-    '<rootDir>/src/app/models/',
-    '<rootDir>/src/app/repository/',
-    '<rootDir>/src/database/',
-    '<rootDir>/src/tests/fixtures/',
+    // '<rootDir>/src/app/models/',
+    // '<rootDir>/src/app/repository/',
+    // '<rootDir>/src/database/',
+    // '<rootDir>/src/tests/fixtures/',
   ],
 };

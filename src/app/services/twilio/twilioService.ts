@@ -3,7 +3,7 @@ import twilio, { jwt } from 'twilio';
 import { Env } from '../../config/env';
 import TYPES from '../../config/types';
 import { ITwilioRoom } from '../../models';
-import { UserRepository } from '../../repository';
+import { IUserRepository } from '../../repository';
 import { GenericResponseError, HttpStatusCode, logger } from '../../utils';
 import { TwilioRoomService } from '../videoRecords';
 
@@ -19,7 +19,7 @@ const twilioClient = twilio(
 export class TwilioService {
 
   @inject(TYPES.UserRepository)
-  private userRepository: UserRepository;
+  private userRepository: IUserRepository;
   @inject(TYPES.TwilioRoomService)
   private readonly twilioRoomService: TwilioRoomService;
 
@@ -195,7 +195,7 @@ export class TwilioService {
     logger.info('Running TwilioService.triggerMediaComposition');
     if (!twilioRoom?.room_sid) {
       try {
-        await this.twilioRoomService.saveRoom({
+        await this.twilioRoomService.create({
           room_sid: event?.RoomSid,
           recording_sid: event?.RecordingSid
         });

@@ -138,7 +138,7 @@
 //
 //           if (resource_id && data) {
 //             try {
-//               await this.userService.createUser({
+//               await this.userService.create({
 //                 resource_id,
 //                 resource_type,
 //                 ...data,
@@ -165,7 +165,7 @@
 //             const existingUser = await this.userService.getOneUser({ email });
 //
 //             if (existingUser) {
-//               await this.userService.updateUser(existingUser?.resourceId!, dataToUpdate);
+//               await this.userService.update(existingUser?.resourceId!, dataToUpdate);
 //             }
 //           }
 //

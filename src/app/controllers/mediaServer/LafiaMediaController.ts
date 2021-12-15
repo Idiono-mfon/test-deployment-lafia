@@ -59,7 +59,7 @@ export class LafiaMediaController extends BaseController {
 
       if (event?.StatusCallbackEvent === 'recording-completed') {
         logger.info('Twilio Recording completed');
-        const twilioRoom = await this.twilioRoomService.getOneRoom({ room_sid: event?.RoomSid });
+        const twilioRoom = await this.twilioRoomService.findOne({ room_sid: event?.RoomSid });
 
         await this.twilioService.triggerMediaComposition(twilioRoom, event);
       }

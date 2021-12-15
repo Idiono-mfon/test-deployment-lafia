@@ -1,37 +1,17 @@
 import { injectable } from 'inversify';
 import { ITwilioRoom, TwilioRoomModel, } from '../../models';
 import { InternalServerError, logger } from '../../utils';
+import { BaseRepository } from '../base';
 
 @injectable()
-export class TwilioRoomRepository {
+export class TwilioRoomRepository extends BaseRepository {
 
-  public async fetchRoomByID(roomId: string): Promise<ITwilioRoom> {
-    logger.info('Running TwilioRoomRepository::fetchRoomByID');
-    return TwilioRoomModel.query().findById(roomId);
+  constructor() {
+    super(TwilioRoomModel);
   }
 
-  public async saveRoom(data: ITwilioRoom): Promise<ITwilioRoom> {
-    logger.info('Running TwilioRoomRepository::saveRoom');
-    try {
-      return await TwilioRoomModel.query()
-        .insert(data)
-        .returning('*');
-    } catch (e: any) {
-      throw new InternalServerError(e.message);
-    }
-  }
-
-  public async getOneRoom(data: ITwilioRoom | any): Promise<ITwilioRoom> {
-    logger.info('Running TwilioRoomRepository::getOneRoom');
-    try {
-      return await TwilioRoomModel.query().findOne(data);
-    } catch (e: any) {
-      throw new InternalServerError(e.message);
-    }
-  }
-
-  public async getAllRooms(user_id: string): Promise<ITwilioRoom[]> {
-    logger.info('Running TwilioRoomRepository::getAllRooms');
+  public async findAll<T = string>(user_id: T): Promise<ITwilioRoom[]> {
+    logger.info('Running TwilioRoomRepository.findAll');
     try {
       return await TwilioRoomModel.query().where({ patient_id: user_id });
     } catch (e: any) {

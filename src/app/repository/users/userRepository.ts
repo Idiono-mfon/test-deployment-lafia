@@ -1,36 +1,14 @@
 import { injectable } from 'inversify';
 import { IFindUser, IUser, UserModel } from '../../models';
 import { InternalServerError, logger } from '../../utils';
+import { BaseRepository } from '../base';
+import { IUserRepository } from './interfaces';
 
 @injectable()
-export class UserRepository {
-  public async createUser(user: IUser): Promise<IUser> {
-    logger.info('Running UserRepository.createUser');
-    try {
-      return await UserModel.query()
-        .insert(user)
-        .returning('*');
-    } catch (e: any) {
-      throw new InternalServerError(e.message);
-    }
-  }
+export class UserRepository extends BaseRepository implements IUserRepository {
 
-  public async getOneUser(data: IFindUser | any): Promise<IUser> {
-    logger.info('Running UserRepository.getOneUser');
-    try {
-      return await UserModel.query().findOne(data);
-    } catch (e: any) {
-      throw new InternalServerError(e.message);
-    }
-  }
-
-  public async getOneBy(field: string, value: string): Promise<IUser> {
-    logger.info('Running UserRepository.getOneBy');
-    try {
-      return await UserModel.query().where(field, value).first();
-    } catch (e: any) {
-      throw new InternalServerError(e.message);
-    }
+  constructor() {
+    super(UserModel);
   }
 
   public async getUserByEmailOrPhone(value: string): Promise<IUser> {
@@ -42,20 +20,26 @@ export class UserRepository {
     }
   }
 
-  public async updateUser(id: string, data: IFindUser): Promise<any> {
-    logger.info('Running UserRepository.updateUser');
+  public async update<T = IFindUser>(id: string, data: T): Promise<IUser> {
+    logger.info('Running UserRepository.update');
     try {
-      return await UserModel.query()
+      const result = await UserModel.query()
         .patch(data)
         .where({ resource_id: id })
         .returning('*');
+
+      const user = result as unknown as IFindUser;
+
+      delete user.password;
+
+      return user as IUser;
     } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
 
-  public async userLogout(id: string): Promise<IUser> {
-    logger.info('Running UserRepository.userLogout');
+  public async logout(id: string): Promise<IUser> {
+    logger.info('Running UserRepository.logout');
     try {
       return await UserModel.query()
         .where({ id })
