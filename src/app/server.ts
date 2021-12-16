@@ -56,10 +56,12 @@ const PORT = Env.all().port;
 
 const appServer = createServer(serverInstance);
 
-appServer.listen(PORT, () => {
-  logger.info(`Listening on port: ${PORT}`);
-  logger.info('');
-});
+if (!module.parent) {
+  appServer.listen(PORT, () => {
+    logger.info(`Listening on port: ${PORT}`);
+    logger.info('');
+  });
+}
 
 const signallingServer = new SignallingServerService(
   appServer,

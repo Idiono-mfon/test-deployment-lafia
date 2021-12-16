@@ -12,12 +12,9 @@ export class TestBaseRepository implements DbAccess {
   }
 
   public async create<T extends IBase>(data: T): Promise<T> {
-    data.created_at = new Date();
-    data.updated_at = new Date();
-
-    if (!data.id) {
-      data.id = Math.random().toString().slice(2, 6);
-    }
+    if (!data.created_at) data.created_at = new Date();
+    if (!data.updated_at) data.updated_at = new Date();
+    if (!data.id) data.id = Math.random().toString().slice(2, 6);
 
     this.model.push(data);
 

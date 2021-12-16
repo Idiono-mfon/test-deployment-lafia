@@ -22,11 +22,11 @@ import { RedisStore } from './redisStore';
 const env = Env.all();
 const { redis_username, redis_host, redis_port, redis_password } = env;
 
-const pubClient = new Redis(
+export const pubClient = new Redis(
   `rediss://${redis_username}:${redis_password}@${redis_host}:${redis_port}?allowUsernameInURI=true`
 );
 
-const subClient = pubClient.duplicate();
+export const subClient = pubClient.duplicate();
 
 export class SignallingServerService {
   private static firebaseService: FirebaseService;

@@ -8,7 +8,7 @@ const env = Env.all();
 
 @injectable()
 export class RabbitMqSetup {
-  public async initRMQ(): Promise<amqp.Channel> {
+  public async initRMQ(): Promise<{ connection: amqp.Connection, channel: amqp.Channel }> {
     logger.info('Running RabbitMqSetup.initRMQ');
 
     const connectionURL = env.rmq_connection;
@@ -47,7 +47,7 @@ export class RabbitMqSetup {
             }
 
             // Return the connection and channel
-            return resolve(channel);
+            return resolve({ connection, channel });
           });
         } catch (e: any) {
           return reject({

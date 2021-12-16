@@ -1,5 +1,3 @@
-import MockAdapter from 'axios-mock-adapter';
-import axios from 'axios';
 import bcrypt from 'bcryptjs';
 import container from '../../../../app/config/inversify.config';
 import TYPES from '../../../../app/config/types';
@@ -19,9 +17,6 @@ import { TestTwilioRoomRepository, TestUserRepository, TestBaseRepository } from
 import { TestEmailService, TestFhirServerService, TestTwilioService } from '../../../fixtures/services';
 import { getE164FormatMockImpl } from '../../../fixtures/utils';
 
-// Increase jest timeout to 1 minutes
-jest.setTimeout(10000)
-
 jest.mock('bcryptjs');
 jest.mock('../../../../app/utils/phone.util');
 
@@ -29,14 +24,8 @@ describe('User Service Unit Test', () => {
   const getE164FormatMock = getE164Format as jest.Mocked<any>;
   let testUserService: IUserService;
   let emailService: TestEmailService;
-  let axiosMock: any;
-
-  beforeAll(() => {
-    axiosMock = new MockAdapter(axios);
-  })
 
   beforeEach(() => {
-
     // create a snapshot so each unit test can modify
     // it without breaking other unit tests
     container.snapshot();
@@ -69,11 +58,8 @@ describe('User Service Unit Test', () => {
     // @ts-ignore
     getE164Format.mockClear();
 
-    axiosMock.reset();
-
     // Clear all mocks after each test
     jest.clearAllMocks();
-
   });
 
   afterAll((done) => {

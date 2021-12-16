@@ -36,7 +36,7 @@ export class RabbitMqService {
   public async rmqPublish(msg: any) {
     logger.info('Running RabbitMqService.rmqPublish');
     try {
-      const rmqChannel = await this.rabbitMqSetup.initRMQ();
+      const { channel: rmqChannel } = await this.rabbitMqSetup.initRMQ();
 
       rmqChannel.assertQueue(this.pubQueue, { durable: false });
       rmqChannel.sendToQueue(this.pubQueue, Buffer.from(msg));
@@ -55,7 +55,8 @@ export class RabbitMqService {
     let rmqChannel: any;
 
     try {
-      rmqChannel = await this.rabbitMqSetup.initRMQ();
+      const { channel } = await this.rabbitMqSetup.initRMQ();
+      rmqChannel = channel;
     } catch (e: any) {
       const rmqPubMsg = this.rabbitMqSetup.structureErrorData(e.message);
       await this.rmqPublish(JSON.stringify(rmqPubMsg));

@@ -5,12 +5,10 @@ import { DbAccess } from '../../../../app/repository';
 import { ICodeSystemService } from '../../../../app/services';
 import { TestCodeSystemRepository, TestBaseRepository } from '../../../fixtures/repositories';
 
-
 describe('Code System Service Unit Test', () => {
   let testCodeSystemService: ICodeSystemService;
 
   beforeEach(() => {
-
     // create a snapshot so each unit test can modify
     // it without breaking other unit tests
     container.snapshot();
@@ -28,7 +26,6 @@ describe('Code System Service Unit Test', () => {
     // Restore to last snapshot so each unit test
     // takes a clean copy of the application container
     container.restore();
-
   });
 
   afterAll((done) => {

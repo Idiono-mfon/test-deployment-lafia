@@ -3,6 +3,7 @@ import { CodeSystemModel } from '../../../../app/models';
 import { BaseModel } from '../../../../app/models/base';
 
 describe('User Model Unit Test', () => {
+
   it('should be defined', () => {
     expect(CodeSystemModel).toBeDefined();
   });

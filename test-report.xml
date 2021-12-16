@@ -1,66 +1,84 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testExecutions version="1">
-    <file path="/Users/ps2020-01/Documents/GitHub/ParallelScore/lafia-service/src/tests/__tests__/unitTests/users/userModel.spec.ts">
-        <testCase name="User Model Unit Test should be defined" duration="9"/>
-        <testCase name="User Model Unit Test should be a BaseModel" duration="0"/>
-        <testCase name="User Model Unit Test should be a Model" duration="1"/>
-        <testCase name="User Model Unit Test should have a tableName" duration="0"/>
-        <testCase name="User Model Unit Test should have a jsonSchema" duration="2"/>
-    </file>
-    <file path="/Users/ps2020-01/Documents/GitHub/ParallelScore/lafia-service/src/tests/__tests__/unitTests/codeSystems/codeSystemModel.spec.ts">
-        <testCase name="User Model Unit Test should be defined" duration="2"/>
-        <testCase name="User Model Unit Test should be a BaseModel" duration="0"/>
-        <testCase name="User Model Unit Test should be a Model" duration="1"/>
-        <testCase name="User Model Unit Test should have a tableName" duration="0"/>
-        <testCase name="User Model Unit Test should return hidden fields" duration="1"/>
-        <testCase name="User Model Unit Test should have a jsonSchema" duration="1"/>
-    </file>
-    <file path="/Users/ps2020-01/Documents/GitHub/ParallelScore/lafia-service/src/tests/__tests__/unitTests/codeSystems/codeSystemService.spec.ts">
-        <testCase name="Code System Service Unit Test should be defined" duration="5"/>
-        <testCase name="Code System Service Unit Test should get code system by type" duration="4"/>
-        <testCase name="Code System Service Unit Test should get code system by code system name" duration="2"/>
-        <testCase name="Code System Service Unit Test should add new code system" duration="2"/>
-    </file>
     <file path="/Users/ps2020-01/Documents/GitHub/ParallelScore/lafia-service/src/tests/__tests__/unitTests/users/userService.spec.ts">
-        <testCase name="User Service Unit Test should be defined" duration="16"/>
+        <testCase name="User Service Unit Test should be defined" duration="5"/>
         <testCase name="User Service Unit Test should create a new user" duration="6"/>
         <testCase name="User Service Unit Test should not create a new user if email is invalid" duration="2"/>
         <testCase name="User Service Unit Test should not create a user if password is less than 6 characters"
                   duration="3"/>
-        <testCase name="User Service Unit Test should validate a user " duration="2"/>
+        <testCase name="User Service Unit Test should validate a user " duration="1"/>
         <testCase name="User Service Unit Test should fail validation if user email already exists " duration="1"/>
-        <testCase name="User Service Unit Test should fail validation if user phone already exists " duration="1"/>
-        <testCase name="User Service Unit Test should get one user" duration="3"/>
-        <testCase name="User Service Unit Test should login a user with email" duration="2"/>
-        <testCase name="User Service Unit Test should login a user with phone" duration="5"/>
-        <testCase name="User Service Unit Test should not login with invalid email" duration="6"/>
+        <testCase name="User Service Unit Test should fail validation if user phone already exists " duration="2"/>
+        <testCase name="User Service Unit Test should get one user" duration="1"/>
+        <testCase name="User Service Unit Test should login a user with email" duration="7"/>
+        <testCase name="User Service Unit Test should login a user with phone" duration="1"/>
+        <testCase name="User Service Unit Test should not login with invalid email" duration="1"/>
         <testCase name="User Service Unit Test should not login with invalid phone" duration="1"/>
         <testCase name="User Service Unit Test should not login with invalid password" duration="1"/>
         <testCase name="User Service Unit Test should log a user out" duration="2"/>
         <testCase name="User Service Unit Test should generate JWT token" duration="3"/>
         <testCase name="User Service Unit Test should throw error generating JWT token if id is not provided"
                   duration="1"/>
-        <testCase name="User Service Unit Test should decode JWT token" duration="6"/>
+        <testCase name="User Service Unit Test should decode JWT token" duration="3"/>
         <testCase name="User Service Unit Test should throw error while decoding JWT token" duration="1"/>
-        <testCase name="User Service Unit Test should update user password" duration="8"/>
+        <testCase name="User Service Unit Test should update user password" duration="2"/>
         <testCase name="User Service Unit Test should not update user password if old password is incorrect"
                   duration="2"/>
         <testCase name="User Service Unit Test should not update user password if password validation fails"
-                  duration="3"/>
+                  duration="1"/>
         <testCase name="User Service Unit Test should not update user password if the user does not exist"
-                  duration="2"/>
+                  duration="1"/>
         <testCase name="User Service Unit Test should not reset user password if an email is not provided"
                   duration="2"/>
         <testCase name="User Service Unit Test should not reset user password if a user with the email does not exist"
-                  duration="2"/>
+                  duration="3"/>
         <testCase
                 name="User Service Unit Test should reset user password if an email is provided and a user with the email exist"
-                duration="1"/>
+                duration="3"/>
         <testCase name="User Service Unit Test should update user" duration="2"/>
         <testCase name="User Service Unit Test should check for existing user and throw error if the user already exist"
                   duration="2"/>
         <testCase
                 name="User Service Unit Test should check for existing user and not throw error if the user does not exist already"
                 duration="1"/>
+    </file>
+    <file path="/Users/ps2020-01/Documents/GitHub/ParallelScore/lafia-service/src/tests/__tests__/unitTests/codeSystems/codeSystemService.spec.ts">
+        <testCase name="Code System Service Unit Test should be defined" duration="2"/>
+        <testCase name="Code System Service Unit Test should get code system by type" duration="8"/>
+        <testCase name="Code System Service Unit Test should get code system by code system name" duration="1"/>
+        <testCase name="Code System Service Unit Test should add new code system" duration="1"/>
+    </file>
+    <file path="/Users/ps2020-01/Documents/GitHub/ParallelScore/lafia-service/src/tests/__tests__/unitTests/users/userModel.spec.ts">
+        <testCase name="User Model Unit Test should be defined" duration="1"/>
+        <testCase name="User Model Unit Test should be a BaseModel" duration="1"/>
+        <testCase name="User Model Unit Test should be a Model" duration="0"/>
+        <testCase name="User Model Unit Test should have a tableName" duration="1"/>
+        <testCase name="User Model Unit Test should have a jsonSchema" duration="1"/>
+    </file>
+    <file path="/Users/ps2020-01/Documents/GitHub/ParallelScore/lafia-service/src/tests/__tests__/unitTests/codeSystems/codeSystemModel.spec.ts">
+        <testCase name="User Model Unit Test should be defined" duration="0"/>
+        <testCase name="User Model Unit Test should be a BaseModel" duration="0"/>
+        <testCase name="User Model Unit Test should be a Model" duration="1"/>
+        <testCase name="User Model Unit Test should have a tableName" duration="0"/>
+        <testCase name="User Model Unit Test should return hidden fields" duration="1"/>
+        <testCase name="User Model Unit Test should have a jsonSchema" duration="0"/>
+    </file>
+    <file path="/Users/ps2020-01/Documents/GitHub/ParallelScore/lafia-service/src/tests/__tests__/integrationTests/codeSystemController.spec.ts">
+        <testCase
+                name="CodeSystem [Controller] Integration Test POST /systems when passed in correct data should create a new code system"
+                duration="47"/>
+        <testCase
+                name="CodeSystem [Controller] Integration Test POST /systems when the passed in data is incorrect should throw an error"
+                duration="14"/>
+        <testCase
+                name="CodeSystem [Controller] Integration Test GET /systems/marital_status when there is data with type of marital_status should return code systems with type marital_status"
+                duration="7"/>
+        <testCase
+                name="CodeSystem [Controller] Integration Test GET /systems/marital_status when there is no data with the type of marital_status should throw an error"
+                duration="4"/>
+        <testCase name="CodeSystem [Controller] Integration Test GET /systems/languages" duration="7"/>
+        <testCase name="CodeSystem [Controller] Integration Test GET /systems/relationships" duration="5"/>
+        <testCase name="CodeSystem [Controller] Integration Test GET /systems/qualifications" duration="5"/>
+        <testCase name="CodeSystem [Controller] Integration Test GET /systems/durations" duration="9"/>
     </file>
 </testExecutions>
