@@ -1,7 +1,5 @@
 import { injectable } from 'inversify';
-import { ComponentModel } from '../../models/lang/componentModel';
-import { ILabel } from '../../models/lang/interfaces';
-import { LabelModel } from '../../models/lang/labelModel';
+import { ComponentModel, ILabel, LabelModel } from '../../models';
 import { InternalServerError, logger } from '../../utils';
 
 @injectable()

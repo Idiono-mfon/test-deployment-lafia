@@ -1,6 +1,5 @@
 import { injectable } from 'inversify';
-import { ComponentModel } from '../../models/lang/componentModel';
-import { IComponent } from '../../models/lang/interfaces';
+import { ComponentModel, } from '../../models';
 import { InternalServerError, logger } from '../../utils';
 
 @injectable()
@@ -16,12 +15,12 @@ export class ComponentRepository {
     return ComponentModel.query().findById(id);
   }
 
-  public async addComponent(data: IComponent): Promise<IComponent> {
+  public async addComponent(data: any): Promise<any> {
     logger.info('Running ComponentRepository::addComponent');
     return ComponentModel.query().insertAndFetch(data);
   }
 
-  public async updateComponent(id: string, data: IComponent): Promise<IComponent> {
+  public async updateComponent(id: string, data: any): Promise<any> {
     logger.info('Running ComponentRepository::updateComponent');
     try {
       return await ComponentModel.query().patchAndFetchById(id, data);

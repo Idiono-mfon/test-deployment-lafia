@@ -1,7 +1,5 @@
 import { injectable } from 'inversify';
-import { ComponentModel } from '../../models/lang/componentModel';
-import { ILangauge } from '../../models/lang/interfaces';
-import { LanguageModel } from '../../models/lang/languageModel';
+import { ComponentModel, LanguageModel } from '../../models';
 import { InternalServerError, logger } from '../../utils';
 
 @injectable()
@@ -40,7 +38,7 @@ export class LanguageRepository {
       .where('code', language.code).first();
   }
 
-  public async addLanguage(data: ILangauge): Promise<ILangauge> {
+  public async addLanguage(data: any): Promise<any> {
     logger.info('Running LanguageRepository::addLanguage');
     return LanguageModel.query().insertAndFetch(data);
   }
@@ -68,7 +66,7 @@ export class LanguageRepository {
       .unrelate().where('id', componentId);
   }
 
-  public async updateLanguage(id: string, data: ILangauge): Promise<ILangauge> {
+  public async updateLanguage(id: string, data: any): Promise<any> {
     logger.info('Running LanguageRepository::updateLanguage');
     try {
       return await LanguageModel.query().patchAndFetchById(id, data);
