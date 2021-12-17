@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node dist/src/app/server.js",
     "start:dev": "nodemon --trace-warnings dist/src/app/server.js",
-    "test": "NODE_ENV=test jest test --coverage --config jest.config.js --verbose --silent --runInBand --forceExit",
+    "test": "NODE_ENV=test jest test --config jest.config.js --verbose --silent --runInBand --forceExit",
     "mg:latest": "knex migrate:latest",
     "mg:up": "knex migrate:up",
     "mg:rollback": "knex migrate:rollback --all",
@@ -96,6 +96,7 @@
     "@types/chai": "^4.2.7",
     "@types/cors": "^2.8.6",
     "@types/express": "^4.17.2",
+    "@types/faker": "^5.5.9",
     "@types/geoip-lite": "^1.4.1",
     "@types/google-libphonenumber": "^7.4.21",
     "@types/hapi__joi": "^16.0.11",

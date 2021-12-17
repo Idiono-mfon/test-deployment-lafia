@@ -1,4 +1,3 @@
-import sinon from 'sinon';
 import request from 'supertest';
 import container from '../../../app/config/inversify.config';
 import TYPES from '../../../app/config/types';
@@ -64,27 +63,6 @@ describe('CodeSystem [Controller] Integration Test', () => {
         });
       });
     });
-
-    describe('when the passed in data is incorrect', () => {
-
-      it('should throw an error', async () => {
-
-        sinon.stub(codeSystemController, 'addCodeSystem').throws(Error('Could not get systems:'));
-
-        try {
-          await request(app)
-            .post('/systems')
-            .send({
-              code: '910',
-              display: 'CodeSystem 910',
-            });
-        } catch (e: any) {
-          console.log(e.message);
-          console.log(e.code);
-          expect(e.message).toContain('Could not get systems');
-        }
-      });
-    });
   });
 
   describe('GET /systems/marital_status', () => {
@@ -114,21 +92,6 @@ describe('CodeSystem [Controller] Integration Test', () => {
           system: 'https://example.org/codesystems/4',
           type: 'marital_status',
         });
-      });
-    });
-
-    describe('when there is no data with the type of marital_status', () => {
-
-      it('should throw an error', async () => {
-
-        sinon.stub(codeSystemController, 'getMaritalStatus').throws(Error('Could not get systems:'));
-
-        try {
-          await request(app)
-            .get('/systems/marital_status');
-        } catch (e: any) {
-          expect(e.message).toContain('Could not get systems');
-        }
       });
     });
   });
