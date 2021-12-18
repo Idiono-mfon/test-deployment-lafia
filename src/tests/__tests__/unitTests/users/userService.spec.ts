@@ -1,13 +1,12 @@
 import bcrypt from 'bcryptjs';
 import container from '../../../../app/config/inversify.config';
 import TYPES from '../../../../app/config/types';
-import { IJwtPayload, IUser } from '../../../../app/models';
+import { IFhirServer, IJwtPayload, IUser } from '../../../../app/models';
 import {
   DbAccess,
   IUserRepository,
 } from '../../../../app/repository';
 import {
-  FhirServerService,
   IEmailService,
   IUserService,
   TwilioService,
@@ -22,6 +21,7 @@ jest.mock('../../../../app/utils/phone.util');
 
 describe('User Service Unit Test', () => {
   const getE164FormatMock = getE164Format as jest.Mocked<any>;
+  const bcryptMock = bcrypt as jest.Mocked<any>;
   let testUserService: IUserService;
   let emailService: TestEmailService;
 
@@ -37,7 +37,7 @@ describe('User Service Unit Test', () => {
     container.rebind<IEmailService>(TYPES.EmailService).to(TestEmailService);
     container.rebind<DbAccess>(TYPES.BaseRepository).to(TestBaseRepository);
     // @ts-ignore
-    container.rebind<FhirServerService>(TYPES.FhirServerService).to(TestFhirServerService);
+    container.rebind<IFhirServer>(TYPES.FhirServerService).to(TestFhirServerService);
     container.rebind<IUserRepository>(TYPES.UserRepository).to(TestUserRepository);
 
     testUserService = container.get<IUserService>(TYPES.UserService);
@@ -51,10 +51,8 @@ describe('User Service Unit Test', () => {
     container.restore();
 
     // Clear all mocks after each test
-    // @ts-ignore
-    bcrypt.hash.mockClear();
-    // @ts-ignore
-    bcrypt.compare.mockClear();
+    bcryptMock.hash.mockClear();
+    bcryptMock.compare.mockClear();
     // @ts-ignore
     getE164Format.mockClear();
 
@@ -72,8 +70,7 @@ describe('User Service Unit Test', () => {
   });
 
   it('should create a new user', async () => {
-    // @ts-ignore
-    bcrypt.hash.mockResolvedValueOnce('1S896xPD#$')
+    bcryptMock.hash.mockResolvedValueOnce('1S896xPD#$')
 
     const userData: IUser = {
       email: 'test@example.com',
@@ -95,8 +92,7 @@ describe('User Service Unit Test', () => {
   });
 
   it('should not create a new user if email is invalid', async () => {
-    // @ts-ignore
-    bcrypt.hash.mockResolvedValueOnce('1S896xPD#$')
+    bcryptMock.hash.mockResolvedValueOnce('1S896xPD#$')
 
     const userData: IUser = {
       email: 'test@example',
@@ -121,8 +117,7 @@ describe('User Service Unit Test', () => {
   });
 
   it('should not create a user if password is less than 6 characters', async () => {
-    // @ts-ignore
-    bcrypt.hash.mockResolvedValueOnce('1S896xPD#$')
+    bcryptMock.hash.mockResolvedValueOnce('1S896xPD#$')
 
     const userData: IUser = {
       email: 'test@example.com',
@@ -237,8 +232,7 @@ describe('User Service Unit Test', () => {
   });
 
   it('should login a user with email', async () => {
-    // @ts-ignore
-    bcrypt.compare.mockResolvedValueOnce(true);
+    bcryptMock.compare.mockResolvedValueOnce(true);
 
     const user = await testUserService.login('david@test.com', '13Jmsl*2#');
 
@@ -249,8 +243,7 @@ describe('User Service Unit Test', () => {
   });
 
   it('should login a user with phone', async () => {
-    // @ts-ignore
-    bcrypt.compare.mockResolvedValueOnce(true);
+    bcryptMock.compare.mockResolvedValueOnce(true);
 
     const user = await testUserService.login('09082315532', '13Jmsl*2#');
 
@@ -260,8 +253,7 @@ describe('User Service Unit Test', () => {
   });
 
   it('should not login with invalid email', async () => {
-    // @ts-ignore
-    bcrypt.compare.mockResolvedValueOnce(true);
+    bcryptMock.compare.mockResolvedValueOnce(true);
 
     try {
       await testUserService.login('error@test.com', '13Jmsl*2#');
@@ -272,8 +264,7 @@ describe('User Service Unit Test', () => {
   });
 
   it('should not login with invalid phone', async () => {
-    // @ts-ignore
-    bcrypt.compare.mockResolvedValueOnce(true);
+    bcryptMock.compare.mockResolvedValueOnce(true);
 
     try {
       await testUserService.login('08099324359', '13Jmsl*2#');
@@ -284,8 +275,7 @@ describe('User Service Unit Test', () => {
   });
 
   it('should not login with invalid password', async () => {
-    // @ts-ignore
-    bcrypt.compare.mockResolvedValueOnce(false);
+    bcryptMock.compare.mockResolvedValueOnce(false);
 
     try {
       await testUserService.login('joy@test.com', 'wrongPass');
@@ -306,7 +296,7 @@ describe('User Service Unit Test', () => {
 
   it('should generate JWT token', async () => {
     const userData: IJwtPayload = {
-      id: 'e456432b-8335-4a07-a1a5-34f860e2f33f',
+      id: '22',
       email: 'joy@test.com',
     }
     const token = testUserService.generateJwtToken(userData);
@@ -328,12 +318,12 @@ describe('User Service Unit Test', () => {
   });
 
   it('should decode JWT token', async () => {
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpveUB0ZXN0LmNvbSIsImlhdCI6MTYzOTQzMTkxOSwiYXVkIjoiZTQ1NjQzMmItODMzNS00YTA3LWExYTUtMzRmODYwZTJmMzNmIn0.RODj4OzgVPibzheJS2XdD6G3T6XXgEvwtaUfQhh5tYY';
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpveUB0ZXN0LmNvbSIsImlhdCI6MTYzOTcxMjQwNiwiYXVkIjoiMjIifQ.4jZ7c8smeGOUFgS-Sc2Kh6P9_AXAooi7a_vtPrge8KQ';
     const decodedToken: IJwtPayload | any = testUserService.decodeJwtToken(token);
 
     expect(decodedToken).toBeDefined();
     expect(decodedToken.email).toBe('joy@test.com');
-    expect(decodedToken.aud).toBe('e456432b-8335-4a07-a1a5-34f860e2f33f');
+    expect(decodedToken.aud).toBe('22');
   });
 
   it('should throw error while decoding JWT token', async () => {
@@ -349,10 +339,8 @@ describe('User Service Unit Test', () => {
   });
 
   it('should update user password', async () => {
-    // @ts-ignore
-    bcrypt.hash.mockResolvedValueOnce('Laksm*@!mlawaw$%.@!makso');
-    // @ts-ignore
-    bcrypt.compare.mockResolvedValueOnce(true);
+    bcryptMock.hash.mockResolvedValueOnce('Laksm*@!mlawaw$%.@!makso');
+    bcryptMock.compare.mockResolvedValueOnce(true);
 
     const id = '11';
     const oldPassword = '13Jmsl*2#';
@@ -365,10 +353,8 @@ describe('User Service Unit Test', () => {
   });
 
   it('should not update user password if old password is incorrect', async () => {
-    // @ts-ignore
-    bcrypt.hash.mockResolvedValueOnce('@!maksoMKa.soged');
-    // @ts-ignore
-    bcrypt.compare.mockResolvedValueOnce(false);
+    bcryptMock.hash.mockResolvedValueOnce('@!maksoMKa.soged');
+    bcryptMock.compare.mockResolvedValueOnce(false);
 
     const id = '11';
     const oldPassword = 'lslkMie@.alsK';
@@ -383,10 +369,8 @@ describe('User Service Unit Test', () => {
   });
 
   it('should not update user password if password validation fails', async () => {
-    // @ts-ignore
-    bcrypt.hash.mockResolvedValueOnce('@!maksoMKa.soged');
-    // @ts-ignore
-    bcrypt.compare.mockResolvedValueOnce(true);
+    bcryptMock.hash.mockResolvedValueOnce('@!maksoMKa.soged');
+    bcryptMock.compare.mockResolvedValueOnce(true);
 
     const id = '11';
     const oldPassword = 'lslkMie@.alsK';
@@ -405,10 +389,8 @@ describe('User Service Unit Test', () => {
   });
 
   it('should not update user password if the user does not exist', async () => {
-    // @ts-ignore
-    bcrypt.hash.mockResolvedValueOnce('@!maksoMKa.soged');
-    // @ts-ignore
-    bcrypt.compare.mockResolvedValueOnce(true);
+    bcryptMock.hash.mockResolvedValueOnce('@!maksoMKa.soged');
+    bcryptMock.compare.mockResolvedValueOnce(true);
 
     const id = '091';
     const oldPassword = 'lslkMie@.alsK';
@@ -460,7 +442,7 @@ describe('User Service Unit Test', () => {
 
   it('should check for existing user and throw error if the user already exist', async () => {
     try {
-      await testUserService.checkExistingUser({ email: 'joy@test.com' });
+      await testUserService.checkExistingUser({ email: 'david@test.com' });
     } catch (e: any) {
       const errorMessage = 'Patient already exists';
 
