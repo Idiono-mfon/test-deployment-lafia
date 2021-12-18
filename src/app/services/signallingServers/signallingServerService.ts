@@ -402,7 +402,12 @@ export class SignallingServerService {
       // that way, we can only send notification to the user's device when they are online
       // and as well persist the user's broadcast data to the database and then send it to users via API
 
-      await SignallingServerService.redisStore.removeUserById(user.userId);
+
+      // Don't know remove practitioner from the room if the user is disconnected
+      if (resourceType !== forWho.practitioner) {
+        await SignallingServerService.redisStore.removeUserById(user.userId);
+      }
+
       await SignallingServerService.emitOnlinePractitionersEvent(io);
     });
   }
