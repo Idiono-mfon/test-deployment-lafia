@@ -1,11 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
 import { BaseMiddleware } from 'inversify-express-utils';
-import jwt from 'jsonwebtoken';
-import { Env } from '../config/env';
 import TYPES from '../config/types';
 import { IPatient, IPractitioner, IUser } from '../models';
-import { IUserService, PatientService, PractitionerService } from '../services';
+import { IPatientService, IPractitionerService, IUserService } from '../services';
 import { forWho, logger } from '../utils';
 
 interface CastJWTDecodedType {
@@ -14,23 +12,21 @@ interface CastJWTDecodedType {
   aud: string
 }
 
-const env = Env.all();
-
 @injectable()
 export class AuthMiddleware extends BaseMiddleware {
 
   @inject(TYPES.UserService)
   private readonly userService: IUserService;
   @inject(TYPES.PatientService)
-  private readonly patientService: PatientService;
+  private readonly patientService: IPatientService;
   @inject(TYPES.PractitionerService)
-  private readonly practitionerService: PractitionerService;
+  private readonly practitionerService: IPractitionerService;
 
   public async handler(req: Request, res: Response, next: NextFunction) {
     logger.info('Running AuthMiddleware.handler');
     try {
 
-      const jwtPayload: CastJWTDecodedType = AuthMiddleware.decodeJwtToken(req);
+      const jwtPayload: CastJWTDecodedType = this.decodeJwtToken(req);
       const user = await this.getUserPayload(jwtPayload);
 
       // res.locals.token = jwtPayload.token as string;
@@ -51,7 +47,7 @@ export class AuthMiddleware extends BaseMiddleware {
   public authenticate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     logger.info('Running AuthMiddleware.authenticate');
     try {
-      const jwtPayload: CastJWTDecodedType = AuthMiddleware.decodeJwtToken(req);
+      const jwtPayload: CastJWTDecodedType = this.decodeJwtToken(req);
 
       res.locals.user = await this.getUserPayload(jwtPayload);
 
@@ -66,9 +62,11 @@ export class AuthMiddleware extends BaseMiddleware {
     }
   }
 
-  private static decodeJwtToken(req: Request): CastJWTDecodedType {
+  private decodeJwtToken(req: Request): CastJWTDecodedType {
     logger.info('Running AuthMiddleware.decodeJwtToken');
+
     const requestHeaderAuthorization: string = req.headers.authorization as string;
+
 
     if (!requestHeaderAuthorization) {
       throw new Error('Unable to authenticate.');
@@ -80,7 +78,7 @@ export class AuthMiddleware extends BaseMiddleware {
       throw new Error('Unable to authenticate.');
     }
 
-    const decoded = jwt.verify(token, env.jwt_secrete_key);
+    const decoded = this.userService.decodeJwtToken(token);
 
     return decoded as CastJWTDecodedType;
   }
@@ -111,9 +109,9 @@ export class AuthMiddleware extends BaseMiddleware {
     }
 
     if (user?.resourceType?.toLowerCase() === forWho.practitioner) {
-      user = await this.practitionerService.findPractitionerById(payload.aud);
+      user = await this.practitionerService.findById(payload.aud);
     } else {
-      user = await this.patientService.findPatientById(payload.aud);
+      user = await this.patientService.findById(payload.aud);
     }
 
     return user;

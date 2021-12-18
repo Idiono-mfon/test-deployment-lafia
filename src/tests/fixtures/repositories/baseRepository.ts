@@ -32,10 +32,13 @@ export class TestBaseRepository implements DbAccess {
   }
 
   public async findMany<T = any>(data: T): Promise<T[]> {
+    // eslint-disable-next-line array-callback-return
     const result = this.model.filter((obj: T) => {
       let isMatch = false;
 
-      for (const key of Object.keys(data)) {
+      const fields = Object.keys(data);
+
+      for (const key of fields) {
         // @ts-ignore
         isMatch = obj[key] === data[key];
       }
@@ -43,8 +46,6 @@ export class TestBaseRepository implements DbAccess {
       if (isMatch) {
         return obj;
       }
-
-      return null;
     });
 
     return Promise.resolve(result);

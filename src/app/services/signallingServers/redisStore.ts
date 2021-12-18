@@ -1,25 +1,33 @@
+import { inject, injectable } from 'inversify';
 import _ from 'lodash';
+import TYPES from '../../config/types';
 import { IPatient, IPractitioner } from '../../models';
 import { forWho, GenericResponseError, HttpStatusCode, logger } from '../../utils';
-import { PatientService } from '../patients';
-import { PractitionerService } from '../practitioners';
+import { IPatientService } from '../patients';
+import { IPractitionerService } from '../practitioners';
 import { IBroadcastStatus, IOnlineUser, IRoom, IRooms } from './interfaces';
 
+@injectable()
 export class RedisStore {
-  private readonly redisClient: any;
+  private readonly roomKey: string;
   private readonly onlineUsersKey: string;
   private readonly broadcastStatusKey: string;
-  private readonly roomKey: string;
-  private readonly patientService: PatientService;
-  private readonly practitionerService: PractitionerService;
 
-  constructor(redisClient: any, patientService: PatientService, practitionerService: PractitionerService) {
+  private redisClient: any;
+
+  @inject(TYPES.PatientService)
+  private readonly patientService: IPatientService;
+  @inject(TYPES.PractitionerService)
+  private readonly practitionerService: IPractitionerService;
+
+  constructor() {
     this.roomKey = 'rooms';
     this.onlineUsersKey = 'onlineUsers';
     this.broadcastStatusKey = 'broadcastStatus';
+  }
+
+  public configure(redisClient: any) {
     this.redisClient = redisClient;
-    this.patientService = patientService;
-    this.practitionerService = practitionerService;
   }
 
   private static encodeBase64(data: any): string {
@@ -178,7 +186,7 @@ export class RedisStore {
 
         if (user?.resourceType === forWho.patient) {
           try {
-            const patient: IPatient = await this.patientService.findPatientById(user.userId);
+            const patient: IPatient = await this.patientService.findById(user.userId);
             // @ts-ignore
             username = patient?.name[0]?.text;
           } catch (e: any) {
@@ -188,7 +196,7 @@ export class RedisStore {
 
         if (user?.resourceType === forWho.practitioner) {
           try {
-            const practitioner: IPractitioner = await this.practitionerService.findPractitionerById(user.userId);
+            const practitioner: IPractitioner = await this.practitionerService.findById(user.userId);
             // @ts-ignore
             username = practitioner?.name[0]?.text;
           } catch (e: any) {
@@ -275,7 +283,7 @@ export class RedisStore {
         });
       }
 
-      const patient: IPatient = await this.patientService.findPatientById(broadcast.patientId);
+      const patient: IPatient = await this.patientService.findById(broadcast.patientId);
 
       // @ts-ignore
       const patientName = patient?.name[0]?.text;

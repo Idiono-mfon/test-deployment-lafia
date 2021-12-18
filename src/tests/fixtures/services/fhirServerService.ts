@@ -11,7 +11,7 @@ export class TestFhirServerService implements IFhirServer {
   private readonly fhirResourceData = [
     {
       'resourceType': 'Patient',
-      'id': '22',
+      'id': '11',
       'meta': {
         'versionId': '2',
         'lastUpdated': '2021-10-11T19:52:02.842+00:00',
@@ -20,6 +20,41 @@ export class TestFhirServerService implements IFhirServer {
       'text': {
         'status': 'generated',
         'div': '<div xmlns="http://www.w3.org/1999/xhtml"><div class="hapiHeaderText">Joy <b>Test </b></div><table class="hapiPropertyTable"><tbody/></table></div>'
+      },
+      'active': true,
+      'name': [
+        {
+          'use': 'official',
+          'text': 'David Test',
+          'family': 'Test',
+          'given': [
+            'David'
+          ]
+        }
+      ],
+      'telecom': [
+        {
+          'system': 'email',
+          'value': 'david@test.com',
+          'use': 'home',
+          'rank': 0
+        },
+        {
+          'system': 'phone',
+          'value': '09082315532',
+          'use': 'mobile',
+          'rank': 0
+        }
+      ],
+      'gender': 'male'
+    },
+    {
+      'resourceType': 'Practitioner',
+      'id': '22',
+      'meta': {
+        'versionId': '1',
+        'lastUpdated': '2021-11-28T20:12:22.064+00:00',
+        'source': '#plxaVxoPzCLTtGvJ'
       },
       'active': true,
       'name': [
@@ -201,9 +236,13 @@ export class TestFhirServerService implements IFhirServer {
       }
     }
 
-    if (httpMethod?.toLowerCase() === 'get' && resourceQuery?.toLowerCase().startsWith('/patient/22')) {
+    if (httpMethod?.toLowerCase() === 'get' && resourceQuery.startsWith('/Patient/11')) {
       const patient = this.fhirResourceData.find((patient: any) => {
-        return patient.resourceType === 'Patient' && patient.id === '22';
+        if (patient.resourceType === 'Patient' && patient.id === '11') {
+          return patient;
+        }
+
+        return null;
       });
 
       return {
@@ -212,11 +251,30 @@ export class TestFhirServerService implements IFhirServer {
       }
     }
 
-    if (httpMethod?.toLowerCase() === 'get' && resourceQuery?.toLowerCase().startsWith('/practitioner/33')) {
-      const practitioner = this.fhirResourceData.filter((practitioner: any) => {
-        return practitioner.resourceType === 'Practitioner' && practitioner.id === '33';
+    if (httpMethod?.toLowerCase() === 'get' && resourceQuery.startsWith('/Practitioner/22')) {
+
+      const practitioner = this.fhirResourceData.find((practitioner: any) => {
+        if (practitioner.resourceType === 'Practitioner' && practitioner.id === '22') {
+          return practitioner;
+        }
+
+        return null;
       });
 
+      return {
+        data: practitioner,
+        status: 200
+      }
+    }
+
+    if (httpMethod?.toLowerCase() === 'get' && resourceQuery.startsWith('/practitioner/33')) {
+      const practitioner = this.fhirResourceData.filter((practitioner: any) => {
+        if (practitioner.resourceType === 'Practitioner' && practitioner.id === '33') {
+          return practitioner;
+        }
+
+        return null;
+      });
 
       return {
         data: practitioner,

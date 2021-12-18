@@ -9,11 +9,12 @@ import {
   HttpStatusCode, logger,
   throwError
 } from '../../utils';
+import { IS3Service } from './interfaces';
 
 const env = Env.all();
 
 @injectable()
-export class S3Service {
+export class S3Service implements IS3Service {
   private s3: any;
 
   constructor() {

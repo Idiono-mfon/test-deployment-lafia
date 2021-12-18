@@ -174,7 +174,7 @@
 //
 //             if (resource_type?.toLowerCase() === forWho.patient) {
 //               try {
-//                 resource = await this.patientService.createPatient(data);
+//                 resource = await this.patientService.create(data);
 //               } catch (e: any) {
 //                 logger.error('Error creating patient:', e);
 //                 const producerMsg = this.kafkaSetup.structureErrorData(e.message, resource_type);
@@ -186,7 +186,7 @@
 //
 //             if (resource_type?.toLowerCase() === forWho.practitioner) {
 //               try {
-//                 resource = await this.practitionerService.createPractitioner(data);
+//                 resource = await this.practitionerService.create(data);
 //               } catch (e: any) {
 //                 logger.error('Error creating practitioner:', e);
 //                 const producerMsg = this.kafkaSetup.structureErrorData(e.message, resource_type);

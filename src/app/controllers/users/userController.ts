@@ -4,15 +4,15 @@ import {
   controller, httpGet, httpPost, httpPut, request, response
 } from 'inversify-express-utils';
 import TYPES from '../../config/types';
-import { IUser, IUserPhoto } from '../../models';
-import { TwilioService, UserService } from '../../services';
+import { IUser } from '../../models';
+import { IUserService, TwilioService } from '../../services';
 import { HttpStatusCode, logger } from '../../utils';
 import { BaseController } from '../baseController';
 
 @controller('/users')
 export class UserController extends BaseController {
   @inject(TYPES.UserService)
-  private userService: UserService;
+  private userService: IUserService;
 
   @inject(TYPES.TwilioService)
   private twilioService: TwilioService;
@@ -51,7 +51,7 @@ export class UserController extends BaseController {
   public async getUserPhoto(@request() req: Request, @response() res: Response) {
     logger.info('Running UserController.getUserPhoto');
     try {
-      const user = await this.userService.findOne({ resource_id: req.body.user.id });
+      const user = await this.userService.findOne({ resource_id: res.locals.user.id });
 
       this.success(res, user.photo, 'Photo fetched', HttpStatusCode.OK);
     } catch (e: any) {
@@ -60,29 +60,11 @@ export class UserController extends BaseController {
     }
   }
 
-  @httpPost('/photo', TYPES.AuthMiddleware)
-  public async updatePhoto(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController.updatePhoto');
-    try {
-      const { id } = req.body.user;
-      if (req.body.user) {
-        delete req.body.user;
-      }
-      const photo: IUserPhoto = req.body
-      const user = await this.userService.update(id, photo);
-
-      this.success(res, user, 'Photo updated', HttpStatusCode.CREATED);
-    } catch (e: any) {
-      logger.error(`Unable to update user photo -`, e);
-      this.error(res, e);
-    }
-  }
-
   @httpPost('/update', TYPES.AuthMiddleware)
   public async updateUser(@request() req: Request, @response() res: Response) {
     logger.info('Running UserController.update');
     try {
-      const user = await this.userService.update(req.body.user.id, req.body);
+      const user = await this.userService.update(res.locals.user.id, req.body);
 
       this.success(res, user, 'User updated', HttpStatusCode.CREATED);
     } catch (e: any) {
@@ -170,6 +152,7 @@ export class UserController extends BaseController {
     logger.info('Running UserController.checkExistingUser');
     try {
       await this.userService.checkExistingUser(req.body);
+
 
       this.success(res, {}, 'User does not exist');
     } catch (e: any) {

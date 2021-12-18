@@ -10,7 +10,7 @@ import {
 @injectable()
 export class PatientRepository {
   public async updatePatient(data: IPatient): Promise<IPatient> {
-    logger.info('Running PatientRepository::updatePatient');
+    logger.info('Running PatientRepository.update');
     try {
       return await transaction(PatientModel, async (PatientModel) => {
         return PatientModel.query().upsertGraphAndFetch(data, { relate: true, unrelate: true });
@@ -21,13 +21,13 @@ export class PatientRepository {
   }
 
   public async findPatientById(id: string): Promise<IPatient> {
-    logger.info('Running PatientRepository::findPatientById');
+    logger.info('Running PatientRepository.findById');
     try {
-      return await transaction(PatientModel, async(PatientModel) => {
-          return PatientModel.query()
-            .where({ id })
-            .withGraphFetched(
-              `[
+      return await transaction(PatientModel, async (PatientModel) => {
+        return PatientModel.query()
+          .where({ id })
+          .withGraphFetched(
+            `[
                 text, 
                 maritalStatus.[
                   coding
@@ -56,24 +56,24 @@ export class PatientRepository {
                 generalPractitioner,
                 link,
               ]`
-            )
-            .skipUndefined()
-            .first();
-        });
+          )
+          .skipUndefined()
+          .first();
+      });
     } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
 
   public async getIds(id: string): Promise<any> {
-    logger.info('Running PatientRepository::getIds');
+    logger.info('Running PatientRepository.getIds');
     try {
-      return await transaction(PatientModel, async(PatientModel) => {
-          return PatientModel.query()
-            .modify('selectId')
-            .where({ id })
-            .withGraphFetched(
-              `[
+      return await transaction(PatientModel, async (PatientModel) => {
+        return PatientModel.query()
+          .modify('selectId')
+          .where({ id })
+          .withGraphFetched(
+            `[
                 text(selectId), 
                 maritalStatus(selectId).[
                   coding(selectId)
@@ -102,17 +102,17 @@ export class PatientRepository {
                 generalPractitioner(selectId),
                 link(selectId),
               ]`
-            )
-            .skipUndefined()
-            .first();
-        });
+          )
+          .skipUndefined()
+          .first();
+      });
     } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
 
   public async createPatient(data: any): Promise<IPatient> {
-    logger.info('Running PatientRepository::getIds');
+    logger.info('Running PatientRepository.getIds');
     try {
       return await transaction(PatientModel, async (PatientModel) => {
         return PatientModel.query().insertGraphAndFetch(data);

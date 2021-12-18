@@ -10,8 +10,8 @@ export class TestTwilioService {
     code: '1234',
     to: '+1234567890',
     channel: 'sms',
-    status: 'fail',
-    valid: false,
+    status: 'success',
+    valid: true,
   }];
 
   @inject(TYPES.UserRepository)

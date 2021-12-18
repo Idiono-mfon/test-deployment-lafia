@@ -1,17 +1,7 @@
 import { inject, injectable } from 'inversify';
 import TYPES from '../../config/types';
-import {
-  IAttachment,
-  IFindUser,
-  IPractitioner,
-  IUser,
-  VideoBroadcastModel,
-} from '../../models';
-import {
-  PractitionerRepository,
-  VideoBroadcastRepository,
-  PractitionerVideoBroadcastRepository
-} from '../../repository';
+import { IAttachment, IFhirServer, IFindUser, IPractitioner, IUser } from '../../models';
+import { VideoBroadcastRepository, PractitionerVideoBroadcastRepository } from '../../repository';
 import {
   error,
   forWho,
@@ -24,14 +14,11 @@ import {
 import { IUserLoginParams } from '../auth';
 import { S3Service } from '../aws';
 import { ICodeSystemService } from '../codeSystems';
-import { FhirServerService } from '../fhirServer';
 import { IUserService } from '../users';
+import { IPractitionerService } from './interfaces';
 
 @injectable()
-export class PractitionerService {
-  @inject(TYPES.PractitionerRepository)
-  private readonly practitionerRepo: PractitionerRepository;
-
+export class PractitionerService implements IPractitionerService {
   @inject(TYPES.CodeSystemService)
   private readonly codeSystemService: ICodeSystemService;
 
@@ -45,16 +32,16 @@ export class PractitionerService {
   private readonly userService: IUserService;
 
   @inject(TYPES.FhirServerService)
-  private readonly fhirServerService: FhirServerService;
+  private readonly fhirServerService: IFhirServer;
 
   @inject(TYPES.VideoBroadcastRepository)
   private readonly videoBroadcastRepository: VideoBroadcastRepository;
 
   @inject(TYPES.PractitionerVideoBroadcastRepository)
-  private readonly practitionervideoBroadcastRepository: PractitionerVideoBroadcastRepository;
+  private readonly practitionerVideoBroadcastRepository: PractitionerVideoBroadcastRepository;
 
-  public async updatePractitioner(id: string, data: any): Promise<IPractitioner> {
-    logger.info('Running PractitionerService.updatePractitioner');
+  public async update(id: string, data: any): Promise<IPractitioner> {
+    logger.info('Running PractitionerService.update');
     try {
       const { data: practitionerData } = await this.fhirServerService.executeQuery(
         `/Practitioner/${id}`,
@@ -70,15 +57,15 @@ export class PractitionerService {
     }
   }
 
-  public async findPractitionerById(id: string): Promise<IPractitioner> {
-    logger.info('Running PractitionerService.findPractitionerById');
+  public async findById(id: string): Promise<IPractitioner> {
+    logger.info('Running PractitionerService.findById');
     const practitioner = await this.fhirServerService.executeQuery(`/Practitioner/${id}`, 'GET');
 
     return practitioner.data;
   }
 
-  public async createPractitioner(data: any): Promise<any> {
-    logger.info('Running PractitionerService.createPractitioner');
+  public async create(data: any): Promise<any> {
+    logger.info('Running PractitionerService.create');
     this.utilService.checkForRequiredFields(data);
 
     const {
@@ -151,8 +138,8 @@ export class PractitionerService {
     }
   }
 
-  public async practitionerLogin(data: IUserLoginParams): Promise<any> {
-    logger.info('Running PractitionerService.practitionerLogin');
+  public async login(data: IUserLoginParams): Promise<any> {
+    logger.info('Running PractitionerService.login');
     try {
       const { user, token } = data;
 
@@ -176,7 +163,7 @@ export class PractitionerService {
   public async uploadAttachment(practitionerId: string, file: Express.Multer.File): Promise<IAttachment> {
     logger.info('Running PractitionerService.uploadAttachment');
     try {
-      const practitioner: any = await this.findPractitionerById(practitionerId);
+      const practitioner: any = await this.findById(practitionerId);
 
       if (!practitioner) {
         throwError('No User Record. Confirm the user id', error.notFound);
@@ -208,26 +195,12 @@ export class PractitionerService {
     }
   }
 
-  public async attachBroadCastVideo(practitionerId: string, videoBroadcastId: string): Promise<any> {
-    logger.info('Running PractitionerService.attachBroadCastVideo');
-
-    const videoBroadcasts: VideoBroadcastModel = await this.videoBroadcastRepository.fetchBroadcastByID(videoBroadcastId);
-    if (!videoBroadcasts) {
-      throw new NotFoundError('video broadcasts not found');
-    }
-    const practitioner: IPractitioner = await this.practitionerRepo.findPractitionerById(practitionerId);
-    if (!practitioner) {
-      throw new NotFoundError('practitioner not found');
-    }
-    return this.practitionerRepo.attachBroadcastVideos(practitionerId, videoBroadcastId);
-  }
-
   public async findAssignedPractitionerVideoBroadcast(practitionerId: string) {
     logger.info('Running PractitionerService.findAssignedPractitionerVideoBroadcast');
-    const practitioner = this.findPractitionerById(practitionerId)
+    const practitioner = this.findById(practitionerId)
     if (!practitioner) {
       throw new NotFoundError('unknown practitioner');
     }
-    return this.practitionervideoBroadcastRepository.fetchPractitionerBroadcastByID(practitionerId);
+    return this.practitionerVideoBroadcastRepository.fetchPractitionerBroadcastByID(practitionerId);
   }
 }

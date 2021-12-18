@@ -1,8 +1,10 @@
+import { inject, injectable } from 'inversify';
 import Redis from 'ioredis';
 import { Server, Socket } from 'socket.io';
 import { createAdapter } from 'socket.io-redis';
 import { v4 as uuid } from 'uuid';
-import { Env } from '../../config/env';
+import { Env, IEnv } from '../../config/env';
+import TYPES from '../../config/types';
 import { IPractitionerVideoBroadcast, IVideoBroadcast } from '../../models';
 import { forWho, logger } from '../../utils';
 import { eventName, eventService } from '../eventEmitter';
@@ -10,7 +12,6 @@ import {
   BroadcastData,
   BroadcastNotificationPayload,
   CallNotificationPayload,
-  FirebaseService,
 } from '../notifications';
 import { PatientService } from '../patients';
 import { PractitionerService } from '../practitioners';
@@ -19,34 +20,58 @@ import { VideoBroadcastService } from '../videoRecords';
 import { IAcceptCare, INewBroadcast, INewCare, IOnlineUser } from './interfaces';
 import { RedisStore } from './redisStore';
 
-const env = Env.all();
-const { redis_username, redis_host, redis_port, redis_password } = env;
-
-export const pubClient = new Redis(
-  `rediss://${redis_username}:${redis_password}@${redis_host}:${redis_port}?allowUsernameInURI=true`
-);
-
-export const subClient = pubClient.duplicate();
-
+@injectable()
 export class SignallingServerService {
-  private static firebaseService: FirebaseService;
-  private readonly io: any;
-  private static redisStore: RedisStore;
+  private io: any;
+  private readonly env: IEnv;
+  private readonly pubClient: any;
+  private readonly subClient: any;
   private static onlinePractitionerRoom: string;
-  private static twilioService: any;
-  private static videoBroadcastService: VideoBroadcastService;
 
-  constructor(
-    appServer: any,
-    patientService: PatientService,
-    practitionerService: PractitionerService,
-    videoBroadcastService: VideoBroadcastService
-  ) {
-    SignallingServerService.redisStore = new RedisStore(pubClient, patientService, practitionerService);
+  @inject(TYPES.RedisStore)
+  private readonly redisStore: RedisStore;
+  @inject(TYPES.TwilioService)
+  private readonly twilioService: TwilioService;
+  @inject(TYPES.VideoBroadcastService)
+  private readonly videoBroadcastService: VideoBroadcastService;
+  @inject(TYPES.PatientService)
+  private readonly patientService: PatientService;
+  @inject(TYPES.PractitionerService)
+  private readonly practitionerService: PractitionerService;
+
+  constructor() {
     SignallingServerService.onlinePractitionerRoom = 'onlinePractitioners';
-    SignallingServerService.twilioService = new TwilioService();
-    SignallingServerService.videoBroadcastService = videoBroadcastService;
-    SignallingServerService.firebaseService = new FirebaseService();
+
+    this.env = Env.all();
+    this.pubClient = new Redis(
+      `rediss://${this.env.redis_username}:${this.env.redis_password}@${this.env.redis_host}:${this.env.redis_port}?allowUsernameInURI=true`
+    );
+    this.subClient = this.pubClient.duplicate();
+  }
+
+  public initialize(appServer: any): void {
+    logger.info('Running SignallingServerService.initialize');
+
+    this.configureSocket(appServer);
+    this.io.on('connection', async (socket: Socket) => {
+      await this.listenForConnectionEvent(socket);
+      await this.emitOnlinePractitionersEvent(this.io);
+      this.listenForNewVideoBroadcastEvent(socket);
+      this.listenForConnectionData(socket);
+      this.listenForAcceptCareEvent(socket);
+      SignallingServerService.listenForIceCandidateEvent(socket);
+      this.listenForPatientOnlineStatusEvent(socket);
+      this.listenForCallUserEvent(socket);
+      this.listenForCallEvent(socket);
+      this.listenForMakeAnswerEvent(socket);
+      this.listenForDisconnectEvent(this.io, socket);
+    });
+
+    this.redisStore.configure(this.pubClient);
+  }
+
+  private configureSocket(appServer: any) {
+    logger.info('Running SignallingServerService.configureSocket');
 
     this.io = new Server(appServer, {
       cors: {
@@ -56,28 +81,10 @@ export class SignallingServerService {
       },
       allowEIO3: true
     });
-
-    this.io.adapter(createAdapter({ pubClient, subClient }));
+    this.io.adapter(createAdapter({ pubClient: this.pubClient, subClient: this.subClient }));
   }
 
-  public initialize(): void {
-    logger.info('Running SignallingServerService.initialize');
-    this.io.on('connection', async (socket: Socket) => {
-      await SignallingServerService.listenForConnectionEvent(socket);
-      await SignallingServerService.emitOnlinePractitionersEvent(this.io);
-      this.listenForNewVideoBroadcastEvent(socket);
-      this.listenForConnectionData(socket);
-      SignallingServerService.listenForAcceptCareEvent(socket);
-      SignallingServerService.listenForIceCandidateEvent(socket);
-      SignallingServerService.listenForPatientOnlineStatusEvent(socket);
-      SignallingServerService.listenForCallUserEvent(socket);
-      SignallingServerService.listenForCallEvent(socket);
-      SignallingServerService.listenForMakeAnswerEvent(socket);
-      SignallingServerService.listenForDisconnectEvent(this.io, socket);
-    });
-  }
-
-  private static async listenForConnectionEvent(socket: Socket) {
+  private async listenForConnectionEvent(socket: Socket) {
     logger.info('Running SignallingServerService.listenForConnectionEvent');
     let { userId, resourceType, deviceToken } = socket.handshake.query;
     resourceType = resourceType as unknown as string;
@@ -90,7 +97,7 @@ export class SignallingServerService {
     } as IOnlineUser;
 
     if (user.userId && user.userId !== 'undefined') {
-      await SignallingServerService.redisStore.saveOnlineUser(user);
+      await this.redisStore.saveOnlineUser(user);
     }
 
     SignallingServerService.joinOnlinePractitionerRoom(socket, user);
@@ -105,8 +112,8 @@ export class SignallingServerService {
     }
   }
 
-  private static async getOnlineUsers() {
-    return SignallingServerService.redisStore.getOnlineUsers();
+  private async getOnlineUsers() {
+    return this.redisStore.getOnlineUsers();
   }
 
   private static async getOnlinePractitioners(onlineUsers: IOnlineUser[]) {
@@ -124,10 +131,10 @@ export class SignallingServerService {
     return onlinePractitioners;
   }
 
-  private static async sendFirebaseNotificationToAllPractitioners(
+  private async sendFirebaseNotificationToAllPractitioners(
     eventName: string, data: BroadcastData
   ) {
-    const onlineUsers = await SignallingServerService.getOnlineUsers();
+    const onlineUsers = await this.getOnlineUsers();
     const onlinePractitioners = await SignallingServerService.getOnlinePractitioners(onlineUsers);
 
     for (let practitioner of onlinePractitioners) {
@@ -143,10 +150,10 @@ export class SignallingServerService {
     }
   }
 
-  private static async emitOnlinePractitionersEvent(socket: Socket) {
+  private async emitOnlinePractitionersEvent(socket: Socket) {
     logger.info('Running SignallingServerService.emitOnlinePractitionersEvent');
 
-    const onlineUsers = await SignallingServerService.getOnlineUsers();
+    const onlineUsers = await this.getOnlineUsers();
     const onlinePractitioners = await SignallingServerService.getOnlinePractitioners(onlineUsers);
 
     logger.info(`OnlinePractitioners: ${JSON.stringify(onlinePractitioners)}`);
@@ -158,9 +165,9 @@ export class SignallingServerService {
   private listenForNewVideoBroadcastEvent(socket: Socket) {
     logger.info('Running SignallingServerService.listenForNewVideoBroadcastEvent');
     socket.on('newVideoBroadcast', async (newBroadcast: INewBroadcast) => {
-      await SignallingServerService.redisStore.saveBroadcast(newBroadcast);
+      await this.redisStore.saveBroadcast(newBroadcast);
 
-      const newCareBroadCast = await SignallingServerService.redisStore
+      const newCareBroadCast = await this.redisStore
         .getBroadcastByVideoUrl(newBroadcast.videoUrl);
 
       SignallingServerService.emitNewCareEvent(socket, newCareBroadCast);
@@ -169,12 +176,10 @@ export class SignallingServerService {
       eventService.emit(eventName.newBroadcast, newCareBroadCast);
 
       // Send firebase notification to all practitioners
-      await SignallingServerService.sendFirebaseNotificationToAllPractitioners(eventName.sendNotification, newCareBroadCast);
+      await this.sendFirebaseNotificationToAllPractitioners(eventName.sendNotification, newCareBroadCast);
 
       if (newCareBroadCast.videoUrl) {
-        const patient: IOnlineUser = await SignallingServerService
-          .redisStore
-          .getUserById(newCareBroadCast.patientId);
+        const patient: IOnlineUser = await this.redisStore.getUserById(newCareBroadCast.patientId);
 
         const vidBroadcast: IVideoBroadcast = {
           patient_name: patient.username,
@@ -184,7 +189,7 @@ export class SignallingServerService {
           video_url: newCareBroadCast.videoUrl
         }
 
-        await SignallingServerService.videoBroadcastService.saveBroadcastVideo(vidBroadcast);
+        await this.videoBroadcastService.saveBroadcastVideo(vidBroadcast);
       }
     });
   }
@@ -194,7 +199,7 @@ export class SignallingServerService {
     socket.on('connectionData', async (connectionData: IOnlineUser) => {
       logger.info(`ConnectionData: ${JSON.stringify(connectionData)}`);
 
-      await SignallingServerService.redisStore.removeUserBySocketId(socket.id);
+      await this.redisStore.removeUserBySocketId(socket.id);
 
       const user: IOnlineUser = {
         ...connectionData,
@@ -202,11 +207,11 @@ export class SignallingServerService {
         socketId: socket?.id,
       } as IOnlineUser;
 
-      await SignallingServerService.redisStore.saveOnlineUser(user);
+      await this.redisStore.saveOnlineUser(user);
 
       SignallingServerService.joinOnlinePractitionerRoom(socket, user);
 
-      await SignallingServerService.emitOnlinePractitionersEvent(socket);
+      await this.emitOnlinePractitionersEvent(socket);
     });
   }
 
@@ -216,10 +221,10 @@ export class SignallingServerService {
       .emit('newCare', newCareBroadcast);
   }
 
-  private static listenForAcceptCareEvent(socket: Socket) {
+  private listenForAcceptCareEvent(socket: Socket) {
     logger.info('Running SignallingServerService.listenForAcceptCareEvent');
     socket.on('acceptCare', async (acceptCare: IAcceptCare, cb) => {
-      const existingCare = await SignallingServerService.redisStore.getBroadcastByVideoUrl(acceptCare.videoUrl);
+      const existingCare = await this.redisStore.getBroadcastByVideoUrl(acceptCare.videoUrl);
 
       if (existingCare?.initiateCare) {
         if (existingCare?.practitionerId !== acceptCare?.practitionerId) {
@@ -230,9 +235,9 @@ export class SignallingServerService {
         }
       }
 
-      await SignallingServerService.redisStore.updateBroadcast(acceptCare);
+      await this.redisStore.updateBroadcast(acceptCare);
 
-      const videoBroadcast = await SignallingServerService.videoBroadcastService.getOneVideoRecord({
+      const videoBroadcast = await this.videoBroadcastService.getOneVideoRecord({
         patient_id: existingCare.patientId,
         video_url: existingCare.videoUrl
       });
@@ -244,12 +249,12 @@ export class SignallingServerService {
           video_broadcast_id: vidId
         }
 
-        await SignallingServerService.videoBroadcastService.assignBroadcastVideoToPractitioner(data);
+        await this.videoBroadcastService.assignBroadcastVideoToPractitioner(data);
       }
 
 
       const defaultRoomName = uuid();
-      const { token, roomId } = await SignallingServerService.twilioService
+      const { token, roomId } = await this.twilioService
         .generateAccessToken(acceptCare?.practitionerId as string, defaultRoomName);
       return cb({
         roomId,
@@ -260,12 +265,10 @@ export class SignallingServerService {
     });
   }
 
-  private static listenForPatientOnlineStatusEvent(socket: Socket) {
+  private listenForPatientOnlineStatusEvent(socket: Socket) {
     logger.info('Running SignallingServerService.listenForPatientOnlineStatusEvent');
     socket.on('patientOnlineStatus', async (data, cb) => {
-      const userData: IOnlineUser = await SignallingServerService
-        .redisStore
-        .getUserById(data.patientId);
+      const userData: IOnlineUser = await this.redisStore.getUserById(data.patientId);
 
       if (!userData?.socketId) {
         return cb({
@@ -273,7 +276,7 @@ export class SignallingServerService {
           patientSocketId: null,
         });
       }
-      await SignallingServerService.emitOnlinePractitionersEvent(socket);
+      await this.emitOnlinePractitionersEvent(socket);
 
       return cb({
         status: 'online',
@@ -282,21 +285,16 @@ export class SignallingServerService {
     });
   }
 
-  private static listenForCallUserEvent(socket: Socket) {
+  private listenForCallUserEvent(socket: Socket) {
     logger.info('Running SignallingServerService.listenForCallUserEvent');
     socket.on('callUser', async (data) => {
-      await SignallingServerService.emitCallMadeEvent(socket, data);
+      await this.emitCallMadeEvent(socket, data);
     });
   }
 
-  private static async emitCallMadeEvent(socket: Socket, data: any) {
+  private async emitCallMadeEvent(socket: Socket, data: any) {
     logger.info('Running SignallingServerService.emitCallMadeEvent');
-    const { token } = await SignallingServerService
-      .twilioService
-      .generateAccessToken(
-        data.patientId,
-        data.roomId
-      );
+    const { token } = await this.twilioService.generateAccessToken(data.patientId, data.roomId);
 
     socket.to(data.to).emit('callMade', {
       roomId: data.roomId,
@@ -306,28 +304,19 @@ export class SignallingServerService {
     });
   }
 
-  private static listenForCallEvent(socket: Socket) {
+  private listenForCallEvent(socket: Socket) {
     logger.info('Running SignallingServerService.listenForCallEvent');
     socket.on('call', async (data) => {
-      await SignallingServerService.emitCallEvent(socket, data);
+      await this.emitCallEvent(socket, data);
     });
   }
 
-  private static async emitCallEvent(socket: Socket, data: any) {
+  private async emitCallEvent(socket: Socket, data: any) {
     logger.info('Running SignallingServerService.emitCallEvent');
-    const reciever: IOnlineUser = await SignallingServerService
-      .redisStore
-      .getUserById(data.reciever);
-    const sender: IOnlineUser = await SignallingServerService
-      .redisStore
-      .getUserById(data.sender);
+    const reciever: IOnlineUser = await this.redisStore.getUserById(data.reciever);
+    const sender: IOnlineUser = await this.redisStore.getUserById(data.sender);
 
-    const access = data.type === 'connect' ? await SignallingServerService
-      .twilioService
-      .generateAccessToken(
-        data.reciever,
-        data.room
-      ) : null;
+    const access = data.type === 'connect' ? await this.twilioService.generateAccessToken(data.reciever, data.room) : null;
 
     const res = {
       room: data.room,
@@ -358,10 +347,10 @@ export class SignallingServerService {
       .emit('call', res);
   }
 
-  private static listenForMakeAnswerEvent(socket: Socket) {
+  private listenForMakeAnswerEvent(socket: Socket) {
     logger.info('Running SignallingServerService.listenForMakeAnswerEvent');
     socket.on('makeAnswer', async data => {
-      await SignallingServerService.emitOnlinePractitionersEvent(socket);
+      await this.emitOnlinePractitionersEvent(socket);
       SignallingServerService.emitAnswerMadeEvent(socket, data);
     });
   }
@@ -389,7 +378,7 @@ export class SignallingServerService {
     });
   }
 
-  private static listenForDisconnectEvent(io: Socket, socket: Socket) {
+  private listenForDisconnectEvent(io: Socket, socket: Socket) {
     logger.info('Running SignallingServerService.listenForDisconnectEvent');
     socket.on('disconnect', async () => {
       let { userId, resourceType } = socket.handshake.query;
@@ -402,8 +391,8 @@ export class SignallingServerService {
       // that way, we can only send notification to the user's device when they are online
       // and as well persist the user's broadcast data to the database and then send it to users via API
 
-      await SignallingServerService.redisStore.removeUserById(user.userId);
-      await SignallingServerService.emitOnlinePractitionersEvent(io);
+      await this.redisStore.removeUserById(user.userId);
+      await this.emitOnlinePractitionersEvent(io);
     });
   }
 }

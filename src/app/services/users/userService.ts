@@ -117,12 +117,12 @@ export class UserService implements IUserService {
     logger.info('Running UserService.checkExistingUser');
 
     // Get User By Phone
-    let existingUser: IUser = await this.userRepository.findOne<IFindUser>({ phone: data.phone });
+    let existingUser: IUser = await this.findOne(data);
 
-    if (!existingUser) {
-      // Get User By Email
-      existingUser = await this.userRepository.findOne<IFindUser>({ email: data.email });
-    }
+    // if (!existingUser) {
+    //   // Get User By Email
+    //   existingUser = await this.findOne({ email: data?.email });
+    // }
 
     try {
 
@@ -198,6 +198,7 @@ export class UserService implements IUserService {
 
   public decodeJwtToken(token: string): object | string | IJwtPayload {
     logger.info('Running UserService.decodeJwtToken');
+
     try {
       return jwt.verify(token, this.env.jwt_secrete_key);
     } catch (e: any) {

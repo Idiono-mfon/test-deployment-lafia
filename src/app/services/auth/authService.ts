@@ -48,11 +48,11 @@ export class AuthService {
       }
 
       if (loggedInUser.resourceType === forWho.patient) {
-        loggedInUserData = await this.patientService.patientLogin({ user: loggedInUser, token });
+        loggedInUserData = await this.patientService.login({ user: loggedInUser, token });
       }
 
       if (loggedInUser.resourceType === forWho.practitioner) {
-        loggedInUserData = await this.practitionerService.practitionerLogin({ user: loggedInUser, token });
+        loggedInUserData = await this.practitionerService.login({ user: loggedInUser, token });
       }
 
       return {

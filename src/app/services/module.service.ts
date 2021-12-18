@@ -1,7 +1,7 @@
 import { ContainerModule } from 'inversify';
 import TYPES from '../config/types';
 import { AuthService } from './auth';
-import { S3Service } from './aws';
+import { IS3Service, S3Service } from './aws';
 import { CodeSystemService, ICodeSystemService } from './codeSystems';
 import { EmailService, IEmailService } from './email';
 import { FhirServerService } from './fhirServer';
@@ -9,16 +9,18 @@ import { FileService } from './file';
 import { LanguageService } from './lang';
 import { LafiaMediaService } from './mediaServer';
 import { RabbitMqService, RabbitMqSetup } from './messageBroker';
-import { PatientService } from './patients';
-import { PractitionerService } from './practitioners';
+import { FirebaseService, IFirebaseService } from './notifications';
+import { IPatientService, PatientService } from './patients';
+import { IPractitionerService, PractitionerService } from './practitioners';
 import { FhirResourceService, ImplementationGuideService } from './resources';
+import { RedisStore, SignallingServerService } from './signallingServers';
 import { TwilioService } from './twilio';
 import { IUserService, UserService } from './users';
 import { TwilioRoomService, VideoBroadcastService, VideoRecordService } from './videoRecords';
 
 export const serviceModule = new ContainerModule((bind) => {
   bind<AuthService>(TYPES.AuthService).to(AuthService);
-  bind<S3Service>(TYPES.S3Service).to(S3Service);
+  bind<IS3Service>(TYPES.S3Service).to(S3Service);
   bind<ICodeSystemService>(TYPES.CodeSystemService).to(CodeSystemService);
   bind<IEmailService>(TYPES.EmailService).to(EmailService);
   bind<FhirServerService>(TYPES.FhirServerService).to(FhirServerService);
@@ -27,8 +29,8 @@ export const serviceModule = new ContainerModule((bind) => {
   // bind<KafkaService>(TYPES.KafkaService).to(KafkaService);
   bind<LanguageService>(TYPES.LanguageService).to(LanguageService);
   bind<LafiaMediaService>(TYPES.LafiaMediaService).to(LafiaMediaService);
-  bind<PatientService>(TYPES.PatientService).to(PatientService);
-  bind<PractitionerService>(TYPES.PractitionerService).to(PractitionerService);
+  bind<IPatientService>(TYPES.PatientService).to(PatientService);
+  bind<IPractitionerService>(TYPES.PractitionerService).to(PractitionerService);
   bind<FhirResourceService>(TYPES.FhirResourceService).to(FhirResourceService);
   bind<ImplementationGuideService>(TYPES.ImplementationGuideService).to(ImplementationGuideService);
   bind<TwilioService>(TYPES.TwilioService).to(TwilioService);
@@ -38,4 +40,7 @@ export const serviceModule = new ContainerModule((bind) => {
   bind<VideoRecordService>(TYPES.VideoRecordService).to(VideoRecordService);
   bind<RabbitMqService>(TYPES.RabbitMqService).to(RabbitMqService);
   bind<RabbitMqSetup>(TYPES.RabbitMqSetup).to(RabbitMqSetup);
+  bind<IFirebaseService>(TYPES.FirebaseService).to(FirebaseService);
+  bind<SignallingServerService>(TYPES.SignallingServerService).to(SignallingServerService);
+  bind<RedisStore>(TYPES.RedisStore).to(RedisStore);
 });

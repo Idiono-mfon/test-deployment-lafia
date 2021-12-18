@@ -10,7 +10,7 @@ import {
 @injectable()
 export class PractitionerRepository {
   public async updatePractitioner(data: IPractitioner): Promise<IPractitioner> {
-    logger.info('Running PractitionerRepository::updatePractitioner');
+    logger.info('Running PractitionerRepository.update');
     try {
       return await transaction(PractitionerModel, async (PractitionerModel) => {
         return PractitionerModel.query().upsertGraphAndFetch(data);
@@ -21,9 +21,9 @@ export class PractitionerRepository {
   }
 
   public async findPractitionerById(id: string): Promise<IPractitioner> {
-    logger.info('Running PractitionerRepository::findPractitionerById');
+    logger.info('Running PractitionerRepository.findById');
     try {
-      return await transaction(PractitionerModel, async(PractitionerModel) => {
+      return await transaction(PractitionerModel, async (PractitionerModel) => {
         return PractitionerModel.query()
           .where({ id })
           .withGraphFetched(
@@ -66,9 +66,9 @@ export class PractitionerRepository {
   }
 
   public async getIds(id: string): Promise<any> {
-    logger.info('Running PractitionerRepository::getIds');
+    logger.info('Running PractitionerRepository.getIds');
     try {
-      return await transaction(PractitionerModel, async(PractitionerModel) => {
+      return await transaction(PractitionerModel, async (PractitionerModel) => {
         return PractitionerModel.query()
           .modify('selectId')
           .where({ id })
@@ -118,7 +118,7 @@ export class PractitionerRepository {
   }
 
   public async createPractitioner(data: any): Promise<IPractitioner> {
-    logger.info('Running PractitionerRepository::createPractitioner');
+    logger.info('Running PractitionerRepository.create');
     try {
       return await transaction(PractitionerModel, async (PractitionerModel) => {
         return PractitionerModel.query().upsertGraphAndFetch(data)
@@ -130,7 +130,7 @@ export class PractitionerRepository {
   }
 
   public async attachBroadcastVideos(practitionerID: string, broadcastVideoId: string): Promise<any> {
-    logger.info('Running PractitionerRepository::attachBroadcastVideos');
+    logger.info('Running PractitionerRepository.attachBroadcastVideos');
     return PractitionerModel.relatedQuery('broadcastVideos').for(practitionerID).relate(broadcastVideoId);
   }
 }

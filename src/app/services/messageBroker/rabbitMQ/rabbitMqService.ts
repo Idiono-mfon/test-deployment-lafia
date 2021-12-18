@@ -135,7 +135,7 @@ export class RabbitMqService {
 
           if (resource_type?.toLowerCase() === forWho.patient) {
             try {
-              resource = await this.patientService.createPatient(data);
+              resource = await this.patientService.create(data);
             } catch (e: any) {
               const rmqPubMsg = this.rabbitMqSetup.structureErrorData(e.message, resource_type);
               await this.rmqPublish(JSON.stringify(rmqPubMsg));
@@ -146,7 +146,7 @@ export class RabbitMqService {
 
           if (resource_type?.toLowerCase() === forWho.practitioner) {
             try {
-              resource = await this.practitionerService.createPractitioner(data);
+              resource = await this.practitionerService.create(data);
             } catch (e: any) {
               const rmqPubMsg = this.rabbitMqSetup.structureErrorData(e.message, resource_type);
               await this.rmqPublish(JSON.stringify(rmqPubMsg));

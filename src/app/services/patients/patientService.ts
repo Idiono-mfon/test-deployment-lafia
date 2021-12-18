@@ -1,7 +1,6 @@
 import { inject, injectable } from 'inversify';
 import TYPES from '../../config/types';
-import { IAttachment, IFindUser, IPatient, IUser } from '../../models';
-import { PatientRepository } from '../../repository';
+import { IAttachment, IFhirServer, IFindUser, IPatient, IUser } from '../../models';
 import {
   error,
   forWho,
@@ -15,15 +14,12 @@ import {
 import { IUserLoginParams } from '../auth';
 import { S3Service } from '../aws';
 import { ICodeSystemService } from '../codeSystems';
-import { FhirServerService } from '../fhirServer';
 import { IUserService } from '../users';
 import { VideoBroadcastService } from '../videoRecords';
+import { IPatientService } from './interfaces';
 
 @injectable()
-export class PatientService {
-  @inject(TYPES.PatientRepository)
-  private readonly patientRepo: PatientRepository;
-
+export class PatientService implements IPatientService {
   @inject(TYPES.CodeSystemService)
   private readonly codeSystemService: ICodeSystemService;
 
@@ -40,10 +36,10 @@ export class PatientService {
   private readonly userService: IUserService;
 
   @inject(TYPES.FhirServerService)
-  private readonly fhirServerService: FhirServerService;
+  private readonly fhirServerService: IFhirServer;
 
-  public async updatePatient(id: string, data: any): Promise<IPatient> {
-    logger.info('Running PatientService.updatePatient');
+  public async update(id: string, data: any): Promise<IPatient> {
+    logger.info('Running PatientService.update');
     try {
 
       const { data: patientUpdatedData } = await this.fhirServerService.executeQuery(
@@ -60,15 +56,15 @@ export class PatientService {
     }
   }
 
-  public async findPatientById(id: string): Promise<IPatient> {
-    logger.info('Running PatientService.findPatientById');
+  public async findById(id: string): Promise<IPatient> {
+    logger.info('Running PatientService.findById');
     const patient = await this.fhirServerService.executeQuery(`/Patient/${id}`, 'GET');
 
     return patient.data;
   }
 
-  public async createPatient(data: IUser, ip?: string): Promise<any> {
-    logger.info('Running PatientService.createPatient');
+  public async create(data: IUser, ip?: string): Promise<any> {
+    logger.info('Running PatientService.create');
     try {
 
       this.utilService.checkForRequiredFields(data);
@@ -146,8 +142,8 @@ export class PatientService {
     }
   }
 
-  public async patientLogin(data: IUserLoginParams): Promise<any> {
-    logger.info('Running PatientService.patientLogin');
+  public async login(data: IUserLoginParams): Promise<any> {
+    logger.info('Running PatientService.login');
     try {
       const { user, token } = data;
       if (user.photo === null) {
@@ -170,7 +166,7 @@ export class PatientService {
   public async uploadAttachment(patientId: string, file: Express.Multer.File): Promise<IAttachment> {
     logger.info('Running PatientService.uploadAttachment');
     try {
-      const patient: any = await this.findPatientById(patientId);
+      const patient: any = await this.findById(patientId);
 
       if (!patient) {
         throwError('No User Record. Confirm the user id', error.notFound);
@@ -204,7 +200,7 @@ export class PatientService {
 
   public async findPatientVideoBroadcast(patientId: string) {
     logger.info('Running PatientService.findPatientVideoBroadcast');
-    const patient = this.findPatientById(patientId)
+    const patient = this.findById(patientId)
     if (!patient) {
       throw new NotFoundError('unknown patient');
     }
