@@ -4,25 +4,25 @@ import {
   controller, httpGet, httpPost, httpPut, request, response
 } from 'inversify-express-utils';
 import TYPES from '../../config/types';
-import { IUser, IUserPhoto } from '../../models';
-import { TwilioService, UserService } from '../../services';
+import { IUser } from '../../models';
 import { HttpStatusCode, logger } from '../../utils';
 import { BaseController } from '../baseController';
+import { ITwilioService, IUserService } from '../../services';
 
 @controller('/users')
 export class UserController extends BaseController {
   @inject(TYPES.UserService)
-  private userService: UserService;
+  private userService: IUserService;
 
   @inject(TYPES.TwilioService)
-  private twilioService: TwilioService;
+  private twilioService: ITwilioService;
 
   @httpPost('/register')
   public async createUser(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController::createUser');
+    logger.info('Running UserController.create');
     const user: IUser = req.body
     try {
-      const newUser = await this.userService.createUser(user);
+      const newUser = await this.userService.create(user);
 
       this.success(res, newUser, 'User created', HttpStatusCode.CREATED);
     } catch (e: any) {
@@ -33,12 +33,12 @@ export class UserController extends BaseController {
 
   @httpPost('/validate')
   public async validateUser(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController::validateUser');
+    logger.info('Running UserController.validate');
     try {
       // @ts-ignore
       const ip: string = req.headers['x-forwarded-for']?.split(',').shift() || req.socket?.remoteAddress;
 
-      const newUser = await this.userService.validateUser(req.body, ip);
+      const newUser = await this.userService.validate(req.body, ip);
 
       this.success(res, newUser, 'User created', HttpStatusCode.CREATED);
     } catch (e: any) {
@@ -49,9 +49,9 @@ export class UserController extends BaseController {
 
   @httpGet('/photo', TYPES.AuthMiddleware)
   public async getUserPhoto(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController::getUserPhoto');
+    logger.info('Running UserController.getUserPhoto');
     try {
-      const user = await this.userService.getOneUser({resource_id: req.body.user.id});
+      const user = await this.userService.findOne({ resource_id: res.locals.user.id });
 
       this.success(res, user.photo, 'Photo fetched', HttpStatusCode.OK);
     } catch (e: any) {
@@ -60,29 +60,11 @@ export class UserController extends BaseController {
     }
   }
 
-  @httpPost('/photo', TYPES.AuthMiddleware)
-  public async updatePhoto(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController::updatePhoto');
-    try {
-      const {id} = req.body.user;
-      if ( req.body.user ) {
-        delete req.body.user;
-      }
-      const photo: IUserPhoto = req.body
-      const user = await this.userService.updateUser( id, photo );
-
-      this.success(res, user, 'Photo updated', HttpStatusCode.CREATED);
-    } catch (e: any) {
-      logger.error(`Unable to update user photo -`, e);
-      this.error(res, e);
-    }
-  }
-
   @httpPost('/update', TYPES.AuthMiddleware)
   public async updateUser(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController::updateUser');
+    logger.info('Running UserController.update');
     try {
-      const user = await this.userService.updateUser(req.body.user.id, req.body);
+      const user = await this.userService.update(res.locals.user.id, req.body);
 
       this.success(res, user, 'User updated', HttpStatusCode.CREATED);
     } catch (e: any) {
@@ -93,7 +75,7 @@ export class UserController extends BaseController {
 
   @httpPut('/:id/change-password')
   public async updatePassword(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController::updatePassword');
+    logger.info('Running UserController.updatePassword');
     try {
       const { id } = req.params;
       const { old_password, new_password } = req.body;
@@ -109,7 +91,7 @@ export class UserController extends BaseController {
 
   @httpPost('/reset-password')
   public async resetPassword(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController::resetPassword');
+    logger.info('Running UserController.resetPassword');
     try {
       const { email } = req.body;
 
@@ -124,11 +106,11 @@ export class UserController extends BaseController {
 
   @httpPost('/check')
   public async check(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController::check');
+    logger.info('Running UserController.check');
     try {
       const { field, value } = req.body;
 
-      const user = await this.userService.getUserByField(field, value);
+      const user = await this.userService.findOne({ [field]: value });
 
       const exist = !!user;
 
@@ -141,7 +123,7 @@ export class UserController extends BaseController {
 
   @httpPost('/otp/send')
   public async sendOtp(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController::sendOtp');
+    logger.info('Running UserController.sendOtp');
     try {
       const { phone } = req.body;
       const otp = await this.twilioService.sendOTP(phone);
@@ -154,7 +136,7 @@ export class UserController extends BaseController {
 
   @httpPost('/otp/verify')
   public async verifyOtp(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController::verifyOtp');
+    logger.info('Running UserController.verifyOtp');
     try {
       const { phone, code } = req.body;
       const verify = await this.twilioService.verifyOTP(phone, code);
@@ -167,9 +149,10 @@ export class UserController extends BaseController {
 
   @httpPost('/existing')
   public async checkExistingUser(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController::checkExistingUser');
+    logger.info('Running UserController.checkExistingUser');
     try {
       await this.userService.checkExistingUser(req.body);
+
 
       this.success(res, {}, 'User does not exist');
     } catch (e: any) {
@@ -180,7 +163,7 @@ export class UserController extends BaseController {
 
   @httpPost('/access/generate')
   public async generateTwilioAccessToken(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController::generateTwilioAccessToken');
+    logger.info('Running UserController.generateTwilioAccessToken');
     try {
       const { identity, room } = req.body;
       const verify = await this.twilioService.generateAccessToken(identity, room, true);

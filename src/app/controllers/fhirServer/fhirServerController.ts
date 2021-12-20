@@ -12,19 +12,19 @@ import {
   response
 } from 'inversify-express-utils';
 import TYPES from '../../config/types';
-import { FhirProperties, FhirServerService } from '../../services';
-import { error, logger, throwError, TokenUtil } from '../../utils';
 import { BaseController } from '../baseController';
+import { FhirProperties, IFhirServer } from '../../models';
+import { error, ITokenUtil, logger, throwError } from '../../utils';
 
 @controller('/fhir')
 export class FhirServerController extends BaseController {
   @inject(TYPES.FhirServerService)
-  private readonly fhirServerService: FhirServerService;
+  private readonly fhirServerService: IFhirServer;
   @inject(TYPES.TokenUtil)
-  private readonly tokenUtil: TokenUtil;
+  private readonly tokenUtil: ITokenUtil;
 
   private async refreshAccessToken(token: string): Promise<any> {
-    logger.info('Running FhirServerController::refreshAccessToken');
+    logger.info('Running FhirServerController.refreshAccessToken');
     try {
       const { access_token, is_refresh_token_expired } = await this.tokenUtil.refreshAccessToken(token);
 
@@ -38,7 +38,7 @@ export class FhirServerController extends BaseController {
 
   @httpGet('/Aggregate', TYPES.AuthMiddleware)
   public async getFhirResourceAggregatedData(@request() req: Request, @response() res: Response) {
-    logger.info('Running FhirServerController::getFhirResourceAggregatedData');
+    logger.info('Running FhirServerController.getFhirResourceAggregatedData');
     try {
       const { user } = res.locals;
       let {
@@ -82,7 +82,7 @@ export class FhirServerController extends BaseController {
 
   @httpGet('*')
   public async fhirResourceGetMethod(@request() req: Request, @response() res: Response) {
-    logger.info('Running FhirServerController::fhirResourceGetMethod');
+    logger.info('Running FhirServerController.fhirResourceGetMethod');
     try {
       let {
         'x-oauth': token,
@@ -130,7 +130,7 @@ export class FhirServerController extends BaseController {
 
   @httpPost('*')
   public async fhirResourcePostMethode(@request() req: Request, @response() res: Response) {
-    logger.info('Running FhirServerController::fhirResourcePostMethode');
+    logger.info('Running FhirServerController.fhirResourcePostMethode');
     try {
       let { 'x-oauth': token, 'x-connection-name': connectionName, ig } = res.locals?.connection;
 
@@ -165,7 +165,7 @@ export class FhirServerController extends BaseController {
 
   @httpPut('*')
   public async fhirResourcePutMethode(@request() req: Request, @response() res: Response) {
-    logger.info('Running FhirServerController::fhirResourcePutMethode');
+    logger.info('Running FhirServerController.fhirResourcePutMethode');
     try {
       let {
         'x-oauth': token,
@@ -203,7 +203,7 @@ export class FhirServerController extends BaseController {
 
   @httpPatch('*')
   public async fhirResourcePatchMethode(@request() req: Request, @response() res: Response) {
-    logger.info('Running FhirServerController::fhirResourcePatchMethode');
+    logger.info('Running FhirServerController.fhirResourcePatchMethode');
     try {
       let { 'x-oauth': token, 'x-connection-name': connectionName, ig } = res.locals?.connection;
 
@@ -238,7 +238,7 @@ export class FhirServerController extends BaseController {
 
   @httpDelete('*')
   public async fhirResourceDeleteMethode(@request() req: Request, @response() res: Response) {
-    logger.info('Running FhirServerController::fhirResourceDeleteMethode');
+    logger.info('Running FhirServerController.fhirResourceDeleteMethode');
     try {
       let { 'x-oauth': token, 'x-connection-name': connectionName, ig } = res.locals?.connection;
 

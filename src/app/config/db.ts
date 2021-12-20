@@ -1,13 +1,24 @@
 import knex from 'knex';
 import { Env } from './env';
 
-const env = Env.all().environment;
-const config = require('../../../knexfile')[env];
-
-const db = knex(config);
-
 export class PostgresConnection {
-  static getDb() {
-    return db;
+  private static db: any;
+
+  private static setDb() {
+    const env = Env.all();
+    const config = require('../../../knexfile')[env.environment];
+
+    this.db = knex(config);
+  }
+
+  public static getDb() {
+
+    if (!this.db) {
+      this.setDb();
+    }
+
+    return this.db;
   }
 }
+
+

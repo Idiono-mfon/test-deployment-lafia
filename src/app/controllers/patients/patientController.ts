@@ -15,23 +15,23 @@ import {
   IPatient,
   IPatientWithToken
 } from '../../models';
-import { PatientService, eventService, eventName } from '../../services';
+import { eventService, eventName, IPatientService } from '../../services';
 import { HttpStatusCode, logger } from '../../utils';
 import { BaseController } from '../baseController';
 
 @controller('/patients')
 export class PatientController extends BaseController {
   @inject(TYPES.PatientService)
-  private readonly patientService: PatientService;
+  private readonly patientService: IPatientService;
 
   @httpPut('/:id')
   public async updatePatient(@request() req: Request, @response() res: Response) {
-    logger.info('Running PatientController.updatePatient');
+    logger.info('Running PatientController.update');
     try {
       const { id: patientId } = req.params;
       const patientData: IPatient = req.body;
 
-      const patient = await this.patientService.updatePatient(patientId, { id: patientId, ...patientData });
+      const patient = await this.patientService.update(patientId, { id: patientId, ...patientData });
 
       this.success(res, patient, 'Patient profile successfully updated');
     } catch (e: any) {
@@ -42,10 +42,10 @@ export class PatientController extends BaseController {
 
   @httpGet('/:id')
   public async findPatientById(@request() req: Request, @response() res: Response) {
-    logger.info('Running PatientController.findPatientById');
+    logger.info('Running PatientController.findById');
     try {
       const { id } = req.params;
-      const patient: IPatient = await this.patientService.findPatientById(id);
+      const patient: IPatient = await this.patientService.findById(id);
 
       this.success(res, patient, 'Request completed');
     } catch (e: any) {
@@ -56,13 +56,13 @@ export class PatientController extends BaseController {
 
   @httpPost('/')
   public async createPatient(@request() req: Request, @response() res: Response) {
-    logger.info('Running PatientController.createPatient');
+    logger.info('Running PatientController.create');
     try {
       const patientData: any = { ...req.body, provider: 'lafia' };
       // @ts-ignore
       const ip: string = req.headers['x-forwarded-for']?.split(',').shift() || req.socket?.remoteAddress;
 
-      const patient: IPatientWithToken = await this.patientService.createPatient(patientData, ip);
+      const patient: IPatientWithToken = await this.patientService.create(patientData, ip);
 
       const responseData = {
         data: patientData,

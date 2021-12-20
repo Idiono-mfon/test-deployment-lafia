@@ -1,12 +1,19 @@
 # About
+
 Lafia Service
 
+## Last Modified Date: 12/15/2021
+
 ## Installation
+
 To clone the project:
+
 ```bash
 https://github.com/parallelscore/lafia-service.git
 ```
+
 `cd` into the `lafia-service` directory
+
 ```bash
 cd lafia-service
 ```

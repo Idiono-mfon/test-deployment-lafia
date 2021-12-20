@@ -1,3 +1,4 @@
+export * from './baseRepository';
 export * from './userRepository';
 export * from './codeSystemRepository';
 export * from './twilioRoomRepository';

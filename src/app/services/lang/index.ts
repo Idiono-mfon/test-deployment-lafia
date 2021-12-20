@@ -1,1 +1,2 @@
-export * from "./languageService";
+export * from './interfaces';
+export * from './languageService';

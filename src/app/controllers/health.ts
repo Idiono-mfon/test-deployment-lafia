@@ -1,13 +1,14 @@
 import { Request, Response } from 'express';
 import { controller, httpGet } from 'inversify-express-utils';
+import { BaseController } from './baseController';
 
 @controller('/health')
-export class HealthController {
+export class HealthController extends BaseController {
+
   @httpGet('/')
   public basicCheck(_: Request, res: Response) {
-    return res.status(200).json({
-      status: 'success',
-      message: 'Basic Health Check Route Working.',
-    });
+
+    this.success(res, null, 'Basic Health Check Route Working.');
+
   }
 }

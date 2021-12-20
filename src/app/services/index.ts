@@ -11,7 +11,7 @@ export * from './fhirServer';
 export * from './mediaServer';
 export * from './videoRecords';
 export * from './resources';
-export * from './kafka';
+export * from './messageBroker';
 export * from './file';
 export * from './eventEmitter';
 export * from './signallingServers';

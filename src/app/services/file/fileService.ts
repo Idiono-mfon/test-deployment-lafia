@@ -1,19 +1,20 @@
-import Axios, { AxiosResponse } from 'axios';
 import fs from 'fs';
-import { inject, injectable } from 'inversify';
 import * as Path from 'path';
 import * as stream from 'stream';
 import { promisify } from 'util';
 import { v4 as uuid } from 'uuid';
+import Axios, { AxiosResponse } from 'axios';
+import { inject, injectable } from 'inversify';
+import { IS3Service } from '../aws';
 import TYPES from '../../config/types';
-import { InternalServerError, logger } from '../../utils';
-import { S3Service } from '../aws';
+import { IFileService } from './interfaces';
 import { eventName, eventService } from '../eventEmitter';
+import { InternalServerError, logger } from '../../utils';
 
 @injectable()
-export class FileService {
+export class FileService implements IFileService {
   @inject(TYPES.S3Service)
-  private readonly s3: S3Service;
+  private readonly s3: IS3Service;
 
   private finished = promisify(stream.finished);
 

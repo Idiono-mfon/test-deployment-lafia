@@ -1,32 +1,29 @@
 import cors from 'cors';
 import express, { Application } from 'express';
-import passport from 'passport';
+import { ContainerModule, inject, injectable } from 'inversify';
 import OAuth2Strategy from 'passport-oauth2';
 import refreshOauth2Token from 'passport-oauth2-refresh';
 import * as swaggerUi from 'swagger-ui-express';
-import container from './config/inversify.config';
 import swaggerDocument from './config/swagger.config';
 import TYPES from './config/types';
-import { AuthMiddleware, morganMiddleware } from './middlewares';
+import { AuthMiddleware, morganMiddleware, passport } from './middlewares';
 import { AuthService } from './services';
+import { logger } from './utils';
 
-export class App {
+@injectable()
+export class App implements IApp {
+
   private app: Application;
+  private saFhirStrategy: OAuth2Strategy;
+
+  @inject(TYPES.AuthService)
   private readonly authService: AuthService;
+  @inject(TYPES.AuthMiddleware)
   private readonly authMiddleware: AuthMiddleware;
-  private readonly saFhirStrategy: OAuth2Strategy;
-
-  constructor() {
-    this.authService = container.get<AuthService>(TYPES.AuthService);
-    this.authMiddleware = container.get<AuthMiddleware>(TYPES.AuthMiddleware);
-    this.saFhirStrategy = this.authService.getStrategy('safhir');
-
-    // Bind "this" to the methods
-    this.getExpressApp = this.getExpressApp.bind(this);
-    this.mountMiddlewares = this.mountMiddlewares.bind(this);
-  }
 
   public getExpressApp(): Application {
+    logger.info('Running App.getExpressApp');
+
     if (!this.app) {
       this.app = express();
     }
@@ -35,6 +32,9 @@ export class App {
   }
 
   public mountMiddlewares(app: Application): void {
+    logger.info('Running App.mountMiddlewares');
+
+    this.saFhirStrategy = this.authService.getStrategy('safhir');
 
     app.use(express.json({ limit: '250mb' }));
     app.use(express.urlencoded({ limit: '250mb', extended: true, parameterLimit: 50000 }));
@@ -45,6 +45,7 @@ export class App {
       customfavIcon: 'https://lafia.io/wp-content/uploads/2021/02/lafia_logo_small.png',
       customSiteTitle: 'lafia.io api docs'
     }));
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     app.use(this.authMiddleware.parseThirdPartyConnection);
 
     passport.use(this.saFhirStrategy);
@@ -70,4 +71,14 @@ export class App {
 
 }
 
-export { passport, refreshOauth2Token };
+export const appModule = new ContainerModule((bind) => {
+  bind<IApp>(TYPES.App).to(App);
+});
+
+export interface IApp {
+  getExpressApp(): Application;
+
+  mountMiddlewares(app: Application): void;
+}
+
+export { refreshOauth2Token };

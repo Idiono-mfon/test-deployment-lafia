@@ -1,67 +1,51 @@
-import { injectable } from 'inversify';
-import { ComponentModel } from '../../models/lang/componentModel';
-import { ILabel } from '../../models/lang/interfaces';
-import { LabelModel } from '../../models/lang/labelModel';
-import { InternalServerError, logger } from '../../utils';
+import { inject, injectable } from 'inversify';
+import TYPES from '../../config/types';
+import { logger } from '../../utils';
+import { BaseRepository, DbAccess } from '../base';
+import { LabelModel } from '../../models';
+import { ILabelRepository } from './interfaces';
 
 @injectable()
-export class LabelRepository {
+export class LabelRepository extends BaseRepository implements ILabelRepository {
 
-  public async fetchLabelByID(id: string) {
-    logger.info('Running LabelRepository::fetchLabelByID');
-    return LabelModel.query().findById(id);
+  @inject(TYPES.ComponentRepository)
+  private readonly componentRepository: DbAccess;
+
+  constructor() {
+    super(LabelModel);
   }
 
-  public async fetchLabelByName(name: string) {
-    logger.info('Running LabelRepository::fetchLabelByName');
-    return LabelModel.query().where('name', name).first();
-  }
+  public async fetchLabelByName(name: string): Promise<any> {
+    logger.info('Running LabelRepository.fetchLabelByName');
 
-  public async fetchLabels() {
-    logger.info('Running LabelRepository::fetchLabels');
-    return LabelModel.query();
-  }
-
-  public async addLabel(data: ILabel): Promise<ILabel> {
-    logger.info('Running LabelRepository::addLabel');
-    try {
-      return await LabelModel.query().insertAndFetch(data);
-    } catch (e: any) {
-      throw new InternalServerError(e.message);
-    }
+    return this.findOne({ name });
   }
 
   public async addComponent(id: string, data: object): Promise<any> {
-    logger.info('Running LabelRepository::addComponent');
+    logger.info('Running LabelRepository.createComponent');
+
     return LabelModel.relatedQuery('components')
       .for(id)
       .insert(data);
   }
 
   public async attachComponent(labelId: string, componentId: string): Promise<any> {
-    logger.info('Running LabelRepository::attachComponent');
-    return (await LabelModel.query().findById(labelId)).$relatedQuery('components')
-      .relate(await ComponentModel.query().findById(componentId));
+    logger.info('Running LabelRepository.attachComponent');
+
+    const label = await this.findById(labelId);
+    const component = await this.componentRepository.findById(componentId);
+
+    return label.$relatedQuery('components')
+      .relate(component);
   }
 
   public async detachComponent(labelId: string, componentId: string): Promise<any> {
-    logger.info('Running LabelRepository::detachComponent');
-    return (await LabelModel.query().findById(labelId)).$relatedQuery('components')
+    logger.info('Running LabelRepository.detachComponent');
+
+    const label = await this.findById(labelId);
+
+    return label.$relatedQuery('components')
       .unrelate().where('id', componentId);
-  }
-
-  public async updateLabel(id: string, data: ILabel): Promise<ILabel> {
-    logger.info('Running LabelRepository::updateLabel');
-    try {
-      return await LabelModel.query().patchAndFetchById(id, data);
-    } catch (e: any) {
-      throw new InternalServerError(e.message);
-    }
-  }
-
-  public async deleteLabel(id: string) {
-    logger.info('Running LabelRepository::deleteLabel');
-    return LabelModel.query().deleteById(id);
   }
 
 }

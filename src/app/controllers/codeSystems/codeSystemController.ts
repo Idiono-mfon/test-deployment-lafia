@@ -8,18 +8,18 @@ import {
 } from 'inversify-express-utils';
 import TYPES from '../../config/types';
 import { CODE_SYSTEM_TYPE, ICodeSystem } from '../../models';
-import { CodeSystemService } from '../../services';
+import { ICodeSystemService } from '../../services';
 import { HttpStatusCode, logger } from '../../utils';
 import { BaseController } from '../baseController';
 
 @controller('/systems')
 export class CodeSystemController extends BaseController {
   @inject(TYPES.CodeSystemService)
-  private readonly codeSystemService: CodeSystemService;
+  private readonly codeSystemService: ICodeSystemService;
 
   @httpGet('/marital_status')
   public async getMaritalStatus(@request() req: Request, @response() res: Response): Promise<void> {
-    logger.info('Running CodeSystemController::getMaritalStatus');
+    logger.info('Running CodeSystemController.getMaritalStatus');
     try {
       const maritalStatus: ICodeSystem[] = await this.codeSystemService
         .getCodeSystemByType(CODE_SYSTEM_TYPE.MARITAL_STATUS);
@@ -33,7 +33,7 @@ export class CodeSystemController extends BaseController {
 
   @httpGet('/languages')
   public async getLanguages(@request() req: Request, @response() res: Response): Promise<void> {
-    logger.info('Running CodeSystemController::getLanguages');
+    logger.info('Running CodeSystemController.getLanguages');
     try {
       const languages: ICodeSystem[] = await this.codeSystemService
         .getCodeSystemByType(CODE_SYSTEM_TYPE.LANGUAGE);
@@ -47,7 +47,7 @@ export class CodeSystemController extends BaseController {
 
   @httpGet('/relationships')
   public async getRelationships(@request() req: Request, @response() res: Response): Promise<void> {
-    logger.info('Running CodeSystemController::getRelationships');
+    logger.info('Running CodeSystemController.getRelationships');
     try {
       const relationships: ICodeSystem[] = await this.codeSystemService
         .getCodeSystemByType(CODE_SYSTEM_TYPE.RELATIONSHIP);
@@ -61,7 +61,7 @@ export class CodeSystemController extends BaseController {
 
   @httpGet('/qualifications')
   public async getQualifications(@request() req: Request, @response() res: Response): Promise<void> {
-    logger.info('Running CodeSystemController::getQualifications');
+    logger.info('Running CodeSystemController.getQualifications');
     try {
       const qualifications: ICodeSystem[] = await this.codeSystemService
         .getCodeSystemByType(CODE_SYSTEM_TYPE.QUALIFICATION);
@@ -75,10 +75,10 @@ export class CodeSystemController extends BaseController {
 
   @httpPost('/')
   public async addCodeSystem(@request() req: Request, @response() res: Response): Promise<void> {
-    logger.info('Running CodeSystemController::addCodeSystem');
+    logger.info('Running CodeSystemController.addCodeSystem');
     try {
       const data: ICodeSystem = req.body;
-      const codeSystem: ICodeSystem = await this.codeSystemService.addCodeSystem(data);
+      const codeSystem: ICodeSystem = await this.codeSystemService.create<ICodeSystem>(data);
 
       this.success(res, codeSystem, 'Code system successfully added', HttpStatusCode.CREATED);
     } catch (e: any) {
@@ -89,7 +89,7 @@ export class CodeSystemController extends BaseController {
 
   @httpGet('/durations')
   public async getDurations(@request() req: Request, @response() res: Response): Promise<void> {
-    logger.info('Running CodeSystemController::getDurations');
+    logger.info('Running CodeSystemController.getDurations');
     try {
       const durations: ICodeSystem[] = await this.codeSystemService
         .getCodeSystemByType(CODE_SYSTEM_TYPE.DURATION);

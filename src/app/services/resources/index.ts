@@ -1,2 +1,3 @@
-export * from "./implementationGuideService";
-export * from "./fhirResourceService";
+export * from './interfaces';
+export * from './fhirResourceService';
+export * from './implementationGuideService';

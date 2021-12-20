@@ -12,12 +12,13 @@ import TYPES from '../../config/types';
 import { uploadFile } from '../../middlewares';
 import {
   IAttachment,
-  IPractitioner, IPractitionerWithToken
+  IPractitioner,
+  IPractitionerWithToken
 } from '../../models';
 import {
   eventName,
   eventService,
-  PractitionerService,
+  IPractitionerService,
 } from '../../services';
 import { HttpStatusCode, logger } from '../../utils';
 import { BaseController } from '../baseController';
@@ -25,16 +26,16 @@ import { BaseController } from '../baseController';
 @controller('/practitioners')
 export class PractitionerController extends BaseController {
   @inject(TYPES.PractitionerService)
-  private readonly practitionerService: PractitionerService;
+  private readonly practitionerService: IPractitionerService;
 
   @httpPut('/:id')
   public async updatePractitioner(@request() req: Request, @response() res: Response) {
-    logger.info('Running PractitionerController.updatePractitioner');
+    logger.info('Running PractitionerController.update');
     try {
       const { id: practitionerId } = req.params;
       const practitionerData: IPractitioner = req.body;
 
-      const practitioner = await this.practitionerService.updatePractitioner(practitionerId, { id: practitionerId, ...practitionerData });
+      const practitioner = await this.practitionerService.update(practitionerId, { id: practitionerId, ...practitionerData });
 
       this.success(res, practitioner, 'Practitioner profile successfully updated');
     } catch (e: any) {
@@ -45,10 +46,10 @@ export class PractitionerController extends BaseController {
 
   @httpGet('/:id')
   public async findPractitionerById(@request() req: Request, @response() res: Response) {
-    logger.info('Running PractitionerController.findPractitionerById');
+    logger.info('Running PractitionerController.findById');
     try {
       const { id } = req.params;
-      const practitioner: IPractitioner = await this.practitionerService.findPractitionerById(id);
+      const practitioner: IPractitioner = await this.practitionerService.findById(id);
 
       this.success(res, practitioner, 'Request completed');
     } catch (e: any) {
@@ -59,10 +60,10 @@ export class PractitionerController extends BaseController {
 
   @httpPost('')
   public async createPractitioner(@request() req: Request, @response() res: Response) {
-    logger.info('Running PractitionerController.createPractitioner');
+    logger.info('Running PractitionerController.create');
     try {
       const practitionerData: any = { ...req.body, provider: 'lafia' };
-      const practitioner: IPractitionerWithToken = await this.practitionerService.createPractitioner(practitionerData);
+      const practitioner: IPractitionerWithToken = await this.practitionerService.create(practitionerData);
       const responseData = {
         data: practitionerData,
         resource_type: practitioner?.user?.resourceType as string

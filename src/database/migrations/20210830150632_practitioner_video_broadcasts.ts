@@ -1,10 +1,10 @@
-import * as Knex from "knex";
-import { Table } from "..";
-import { Schema } from "../schema";
+import { Knex } from 'knex';
+import { Table } from '..';
+import { Schema } from '../schema';
 
 
 export async function up(knex: Knex): Promise<void> {
-    return knex
+  return knex
     .transaction(async (trx: Knex.Transaction) => trx.schema
       .createSchemaIfNotExists(Schema.lafiaService)
       .then(() => trx.schema.hasTable(Table.practitioner_video_broadcasts)
@@ -18,7 +18,7 @@ export async function up(knex: Knex): Promise<void> {
                   .unique()
                   .notNullable()
                   .defaultTo(knex.raw('gen_random_uuid()'))
-                  .primary(`${Table.practitioner_video_broadcasts}_id`);
+                  .primary({ constraintName: `${Table.practitioner_video_broadcasts}_id` });
                 tableBuilder
                   .string('practitioner_id')
                   .notNullable();
@@ -34,6 +34,6 @@ export async function up(knex: Knex): Promise<void> {
 
 
 export async function down(knex: Knex): Promise<void> {
-    return knex.schema.withSchema(Schema.lafiaService).dropTableIfExists(Table.practitioner_video_broadcasts);
+  return knex.schema.withSchema(Schema.lafiaService).dropTableIfExists(Table.practitioner_video_broadcasts);
 }
 

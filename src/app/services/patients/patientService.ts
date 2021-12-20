@@ -1,49 +1,44 @@
 import { inject, injectable } from 'inversify';
 import TYPES from '../../config/types';
-import { IAttachment, IFindUser, IPatient, IUser } from '../../models';
-import { PatientRepository } from '../../repository';
+import { IAttachment, IFhirServer, IFindUser, IPatient, IPatientWithToken, IUser } from '../../models';
 import {
   error,
   forWho,
   GenericResponseError,
   getE164Format,
-  InternalServerError, logger,
+  InternalServerError, IUtilityService, logger,
   NotFoundError,
   throwError,
-  UtilityService
 } from '../../utils';
 import { IUserLoginParams } from '../auth';
-import { S3Service } from '../aws';
-import { CodeSystemService } from '../codeSystems';
-import { FhirServerService } from '../fhirServer';
-import { UserService } from '../users';
-import { VideoBroadcastService } from '../videoRecords';
+import { IS3Service } from '../aws';
+import { ICodeSystemService } from '../codeSystems';
+import { IUserService } from '../users';
+import { IVideoBroadcastService } from '../videoRecords';
+import { IPatientService } from './interfaces';
 
 @injectable()
-export class PatientService {
-  @inject(TYPES.PatientRepository)
-  private readonly patientRepo: PatientRepository;
-
+export class PatientService implements IPatientService {
   @inject(TYPES.CodeSystemService)
-  private readonly codeSystemService: CodeSystemService;
+  private readonly codeSystemService: ICodeSystemService;
 
   @inject(TYPES.VideoBroadcastService)
-  private readonly videoBroadcastService: VideoBroadcastService;
+  private readonly videoBroadcastService: IVideoBroadcastService;
 
   @inject(TYPES.S3Service)
-  private readonly s3Service: S3Service;
+  private readonly s3Service: IS3Service;
 
   @inject(TYPES.UtilityService)
-  private readonly utilService: UtilityService;
+  private readonly utilService: IUtilityService;
 
   @inject(TYPES.UserService)
-  private readonly userService: UserService;
+  private readonly userService: IUserService;
 
   @inject(TYPES.FhirServerService)
-  private readonly fhirServerService: FhirServerService;
+  private readonly fhirServerService: IFhirServer;
 
-  public async updatePatient(id: string, data: any): Promise<IPatient> {
-    logger.info('Running PatientService.updatePatient');
+  public async update(id: string, data: any): Promise<IPatient> {
+    logger.info('Running PatientService.update');
     try {
 
       const { data: patientUpdatedData } = await this.fhirServerService.executeQuery(
@@ -60,16 +55,17 @@ export class PatientService {
     }
   }
 
-  public async findPatientById(id: string): Promise<IPatient> {
-    logger.info('Running PatientService.findPatientById');
+  public async findById(id: string): Promise<IPatient> {
+    logger.info('Running PatientService.findById');
     const patient = await this.fhirServerService.executeQuery(`/Patient/${id}`, 'GET');
 
     return patient.data;
   }
 
-  public async createPatient(data: IUser, ip?: string): Promise<any> {
-    logger.info('Running PatientService.createPatient');
+  public async create(data: IUser, ip?: string): Promise<IPatientWithToken> {
+    logger.info('Running PatientService.create');
     try {
+      console.log('God is here');
 
       this.utilService.checkForRequiredFields(data);
 
@@ -86,7 +82,7 @@ export class PatientService {
         phone = getE164Format(phone!, ip);
       }
 
-      const existingUser: IUser = await this.userService.getOneUser({ email });
+      const existingUser: IUser = await this.userService.findOne({ email });
 
       if (existingUser) {
         throwError('User already exists!', error.badRequest);
@@ -130,7 +126,7 @@ export class PatientService {
 
       data.hasVerifiedPhone = true;
 
-      await this.userService.createUser({
+      await this.userService.create({
         ...data,
         ...userData,
       });
@@ -146,15 +142,15 @@ export class PatientService {
     }
   }
 
-  public async patientLogin(data: IUserLoginParams): Promise<any> {
-    logger.info('Running PatientService.patientLogin');
+  public async login(data: IUserLoginParams): Promise<any> {
+    logger.info('Running PatientService.login');
     try {
       const { user, token } = data;
       if (user.photo === null) {
         delete user.photo;
       }
 
-      await this.userService.updateUser(user.id!, {...user, token});
+      await this.userService.update(user.id!, { ...user, token });
 
       const { data: patientData } = await this.fhirServerService.executeQuery(
         `/Patient/${user.resourceId}`,
@@ -170,7 +166,7 @@ export class PatientService {
   public async uploadAttachment(patientId: string, file: Express.Multer.File): Promise<IAttachment> {
     logger.info('Running PatientService.uploadAttachment');
     try {
-      const patient: any = await this.findPatientById(patientId);
+      const patient: any = await this.findById(patientId);
 
       if (!patient) {
         throwError('No User Record. Confirm the user id', error.notFound);
@@ -192,7 +188,7 @@ export class PatientService {
         creation: new Date(),
       };
 
-      await this.userService.updateUser(patient.id!, {
+      await this.userService.update(patient.id!, {
         photo: fileLink,
       });
 
@@ -204,11 +200,11 @@ export class PatientService {
 
   public async findPatientVideoBroadcast(patientId: string) {
     logger.info('Running PatientService.findPatientVideoBroadcast');
-    const patient = this.findPatientById(patientId)
-    if ( !patient ) {
-      throw new NotFoundError("unknown patient");
+    const patient = this.findById(patientId)
+    if (!patient) {
+      throw new NotFoundError('unknown patient');
     }
-    return this.videoBroadcastService.getAllVideoRecords(patientId);
+    return this.videoBroadcastService.findAll(patientId);
   }
 
 }

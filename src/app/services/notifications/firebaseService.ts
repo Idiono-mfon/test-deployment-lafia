@@ -1,20 +1,23 @@
 import firebase, { messaging } from 'firebase-admin';
 import { DataMessagePayload } from 'firebase-admin/lib/messaging/messaging-api';
+import { injectable } from 'inversify';
 import { Env } from '../../config/env';
 import { logger } from '../../utils';
 import { eventName, eventService } from '../eventEmitter';
 import { INewBroadcast, IOnlineUser } from '../signallingServers';
 import { serviceAccount } from './firebaseServiceAccount';
+import { IFirebaseService } from './interfaces';
 import MessagingDevicesResponse = messaging.MessagingDevicesResponse;
 
-const env = Env.all();
+@injectable()
+export class FirebaseService implements IFirebaseService {
 
-firebase.initializeApp({
-  credential: firebase.credential.cert(serviceAccount),
-  databaseURL: env.firebase_database_url
-});
-
-export class FirebaseService {
+  constructor() {
+    firebase.initializeApp({
+      credential: firebase.credential.cert(serviceAccount),
+      databaseURL: Env.all().firebase_database_url
+    });
+  }
 
   sendNotification(firebaseToken: string, notificationPayload: CallNotificationPayload): Promise<MessagingDevicesResponse>
   sendNotification(firebaseToken: string, notificationPayload: BroadcastNotificationPayload): Promise<MessagingDevicesResponse>
@@ -77,19 +80,13 @@ export class FirebaseService {
     return firebase.messaging().sendToDevice(firebaseToken, payload, options);
   }
 
-  public async triggerNotification() {
+  public async triggerNotification(): Promise<void> {
+    logger.info('Running FirebaseService.triggerNotification');
+
     eventService.on(eventName.sendNotification, async (deviceToken, payload) => {
       await this.sendNotification(deviceToken, payload);
     });
   }
-}
-
-export interface NotificationPayloadData {
-  user_name: string;
-  user_image: string;
-  type: string;
-  call_data?: string;
-  broadcast_data?: string;
 }
 
 export interface NotificationPayload {
@@ -113,7 +110,7 @@ export type BroadcastData = INewBroadcast;
 
 export interface CallData {
   room: string;
-  token: string;
+  token?: string;
   sender: string;
   reciever: string;
   senderDetails: IOnlineUser;

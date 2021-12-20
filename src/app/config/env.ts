@@ -1,4 +1,6 @@
-require('dotenv').config();
+import { config as dotConfig } from 'dotenv';
+
+dotConfig();
 
 export interface IEnv {
   port: number;
@@ -29,6 +31,7 @@ export interface IEnv {
   twilio_api_secret: string;
   twilio_auth_token: string;
   twilio_verify_sid: string;
+  twilio_composition_callback: string;
   email_address: string;
   email_password: string;
   fhir_server_base_url: string;
@@ -44,6 +47,9 @@ export interface IEnv {
   kafka_connection: string;
   kafka_erpnext_producer_topic: string;
   kafka_consumer_topics: string;
+  rmq_connection: string;
+  rmq_pub_queue: string;
+  rmq_sub_queue: string;
   firebase_project_id: string;
   firebase_private_key: string;
   firebase_client_email: string;
@@ -79,6 +85,7 @@ const config: IEnv = {
   twilio_api_secret: process.env.TWILIO_API_SECRET as string,
   twilio_auth_token: process.env.TWILIO_AUTH_TOKEN as string,
   twilio_verify_sid: process.env.TWILIO_VERIFY_SID as string,
+  twilio_composition_callback: process.env.TWILIO_COMPOSITION_CALLBACK as string,
   email_address: process.env.EMAIL_ADDRESS as string,
   email_password: process.env.EMAIL_PASSWORD as string,
   fhir_server_base_url: process.env.FHIR_SERVER_BASE_URL as string,
@@ -94,6 +101,9 @@ const config: IEnv = {
   kafka_consumer_topics: process.env.KAFKA_CONSUMER_TOPICS as string,
   kafka_erpnext_producer_topic: process.env.KAFKA_ERPNEXT_PRODUCER_TOPIC as string,
   kafka_connection: process.env.KAFKA_CONNECTION as string,
+  rmq_connection: process.env.RABBITMQ_CONNECTION as string,
+  rmq_pub_queue: process.env.RABBITMQ_PUB_QUEUE as string,
+  rmq_sub_queue: process.env.RABBITMQ_SUB_QUEUE as string,
   firebase_private_key: process.env.FIREBASE_PRIVATE_KEY as string,
   firebase_client_email: process.env.FIREBASE_CLIENT_EMAIL as string,
   firebase_project_id: process.env.FIREBASE_PROJECT_ID as string,

@@ -1,32 +1,38 @@
-import axios, { Method } from 'axios';
+import axios, { AxiosInstance, Method } from 'axios';
+import { Agent } from 'https';
 import * as https from 'https';
 import { inject, injectable } from 'inversify';
 import { isEmpty } from 'lodash';
-import { Env } from '../../config/env';
 import TYPES from '../../config/types';
-import { IFhirServer } from '../../models';
-import { GenericResponseError, logger } from '../../utils';
+import { Env, IEnv } from '../../config/env';
 import { FhirResourceService } from '../resources';
-
-const env = Env.all();
-
-const httpsAgent = new https.Agent({
-  rejectUnauthorized: false,
-});
-
-
-const axiosInstance = axios.create({
-  httpsAgent,
-});
-
-axiosInstance.interceptors.request.use((config: any) => {
-  config.params = config.params || {};
-  config.params._format = 'json';
-  return config;
-});
+import { GenericResponseError, logger } from '../../utils';
+import { AggregatedData, FetchProps, FhirProperties, IFhirServer, IndexAccessor } from '../../models';
 
 @injectable()
 export class FhirServerService implements IFhirServer {
+
+  private readonly env: IEnv;
+  private readonly httpsAgent: Agent;
+  private readonly axiosInstance: AxiosInstance;
+
+  constructor() {
+    this.env = Env.all();
+
+    this.httpsAgent = new https.Agent({
+      rejectUnauthorized: false,
+    });
+
+    this.axiosInstance = axios.create({
+      httpsAgent: this.httpsAgent,
+    });
+
+    this.axiosInstance.interceptors.request.use((config: any) => {
+      config.params = config.params || {};
+      config.params._format = 'json';
+      return config;
+    });
+  }
 
   @inject(TYPES.FhirResourceService)
   private readonly fhirResourceService: FhirResourceService;
@@ -75,6 +81,7 @@ export class FhirServerService implements IFhirServer {
 
   private static groupResource(resourceData: any, data: AggregatedData, resourceDateField: string, resourceName: string) {
     logger.info('Running FhirServerService.groupResource');
+
     for (let entry of resourceData?.entry) {
 
       const date = entry.resource ? entry.resource[resourceDateField] : entry[resourceDateField];
@@ -98,6 +105,7 @@ export class FhirServerService implements IFhirServer {
 
   private static organizeResourceByDate(data: AggregatedData) {
     logger.info('Running FhirServerService.organizeResourceByDate');
+
     const resourceByDates: IndexAccessor | any = {};
 
     for (let year in data.groupedEntries) {
@@ -151,9 +159,9 @@ export class FhirServerService implements IFhirServer {
     logger.info('Running FhirServerService.lafiaFhir');
     try {
       const { data } = props!;
-      const { status, data: responseData, headers } = await axiosInstance({
+      const { status, data: responseData, headers } = await this.axiosInstance({
         url: resourceQuery,
-        baseURL: `${env.fhir_server_base_url}/`,
+        baseURL: `${this.env.fhir_server_base_url}/`,
         method: httpMethod,
         data,
       });
@@ -181,10 +189,10 @@ export class FhirServerService implements IFhirServer {
 
       if (!ig) ig = 'pdex';
 
-      const { status, data: responseData } = await axiosInstance({
+      const { status, data: responseData } = await this.axiosInstance({
         url: resourceQuery,
         method: httpMethod,
-        baseURL: `${env.safhir_base_url}/${ig}/`,
+        baseURL: `${this.env.safhir_base_url}/${ig}/`,
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -206,7 +214,7 @@ export class FhirServerService implements IFhirServer {
   public async fetchSampleResources(resourceName: string): Promise<any> {
     logger.info('Running FhirServerService.fetchSampleResources');
     try {
-      const fhirSampleResources = await this.fhirResourceService.getOneFhirResource({ slug: resourceName.toLocaleLowerCase() });
+      const fhirSampleResources = await this.fhirResourceService.findOne({ slug: resourceName.toLocaleLowerCase() });
 
       return fhirSampleResources?.examples;
     } catch (e: any) {
@@ -300,32 +308,4 @@ export class FhirServerService implements IFhirServer {
       groupedYear = {}
     }
   }
-}
-
-interface FetchProps {
-  resourceQuery: string;
-  selectMethod: any;
-  data: AggregatedData;
-  fetchSampleResource?: boolean
-  token?: string;
-}
-
-export interface FhirProperties {
-  data?: any,
-  token?: string,
-  connectionName?: string,
-  ig?: string,
-  patient_id?: string,
-}
-
-interface IndexAccessor {
-  [key: string]: string[] | any;
-}
-
-interface AggregatedData {
-  grouped: IndexAccessor[],
-  ungrouped: IndexAccessor[],
-  groupedEntries: IndexAccessor,
-  failed: IndexAccessor[],
-  ungroupedEntries: any[],
 }

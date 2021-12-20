@@ -1,70 +1,46 @@
-import { config as dotConfig } from 'dotenv';
 import { createServer } from 'http';
 import { InversifyExpressServer } from 'inversify-express-utils';
-import passport from 'passport';
-import refreshOauth2Token from 'passport-oauth2-refresh';
-import { App } from './app';
-import { Env } from './config/env';
-import container from './config/inversify.config';
+import { IApp } from './app';
+import { container } from './config';
 import TYPES from './config/types';
-import {
-  FileService,
-  FirebaseService,
-  KafkaService,
-  PatientService,
-  PractitionerService,
-  SignallingServerService,
-  VideoBroadcastService,
-} from './services';
 import { logger } from './utils';
 
-dotConfig();
+class ServerSetup {
+  private readonly app: IApp;
+  private serverInstance: any;
+  private readonly server: InversifyExpressServer;
 
-// eslint-disable-next-line @typescript-eslint/unbound-method
-const { getExpressApp, mountMiddlewares } = new App();
+  constructor() {
+    this.app = container.get<IApp>(TYPES.App);
+    this.server = new InversifyExpressServer(container, null, null, this.app.getExpressApp());
+  }
 
-// @ts-ignore
-const server = new InversifyExpressServer(container, null, null, getExpressApp());
-const patientService = container.get<PatientService>(TYPES.PatientService);
-const videoBroadcastService = container.get<VideoBroadcastService>(TYPES.VideoBroadcastService);
-const practitionerService = container.get<PractitionerService>(TYPES.PractitionerService);
-const kafkaService = container.get<KafkaService>(TYPES.KafkaService);
-const fileService = container.get<FileService>(TYPES.FileService);
+  public getServer(): any {
+    logger.info('Running ServerSetup.getServer');
 
-// const saFhirStrategy = authService.getStrategy('safhir');
+    if (!this.serverInstance) {
+      this.serverInstance = createServer(this.setServer());
+    }
 
-server.setConfig((app) => {
+    return this.serverInstance;
+  }
 
-  mountMiddlewares(app);
+  private setServer() {
+    logger.info('Running ServerSetup.setServer');
 
-});
+    const server = new InversifyExpressServer(container, null, null, this.app.getExpressApp());
 
-// Delete local encounter files that has been uploaded to S3
-fileService.onLocalFileDelete();
+    server.setConfig((app) => {
 
-// Send Firebase call notification to patient
-new FirebaseService().triggerNotification().then(response => logger.info(response));
+      this.app.mountMiddlewares(app);
 
-kafkaService.consumer();
-kafkaService.handleEvents();
+    });
 
-const serverInstance = server.build();
-const PORT = Env.all().port;
+    return server.build();
+  }
+}
 
-const appServer = createServer(serverInstance);
 
-appServer.listen(PORT, () => {
-  logger.info(`Listening on port: ${PORT}`);
-  logger.info('');
-});
+const appServer = new ServerSetup().getServer();
 
-const signallingServer = new SignallingServerService(
-  appServer,
-  patientService,
-  practitionerService,
-  videoBroadcastService,
-  kafkaService
-);
-signallingServer.initialize();
-
-export { appServer, passport, refreshOauth2Token, container };
+export { appServer };

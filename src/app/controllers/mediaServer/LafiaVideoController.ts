@@ -8,24 +8,24 @@ import {
   response
 } from 'inversify-express-utils';
 import TYPES from '../../config/types';
-import { AuthMiddleware } from '../../middlewares';
-import { VideoBroadcastService } from '../../services';
+import { IAuthMiddleware } from '../../middlewares';
+import { IVideoBroadcastService } from '../../services';
 import { HttpStatusCode, logger } from '../../utils';
 import { BaseController } from '../baseController';
 
 @controller('/video')
 export class LafiaVideoController extends BaseController {
   @inject(TYPES.VideoBroadcastService)
-  private readonly videoBroadcastService: VideoBroadcastService;
+  private readonly videoBroadcastService: IVideoBroadcastService;
   @inject(TYPES.AuthMiddleware)
-  private readonly auth: AuthMiddleware;
+  private readonly auth: IAuthMiddleware;
 
   @httpGet('/broadcast', TYPES.AuthMiddleware)
   public async createBroadcast(@request() req: Request, @response() res: Response) {
-    logger.info('Running LafiaVideoController::createBroadcast');
+    logger.info('Running LafiaVideoController.createBroadcast');
     try {
       const { user } = res.locals;
-      const broadcast = await this.videoBroadcastService.getAllVideoRecords(user?.id);
+      const broadcast = await this.videoBroadcastService.findAll(user?.id);
 
       this.success(res, broadcast, 'Broadcast fetched successfully', HttpStatusCode.OK);
     } catch (e: any) {
@@ -36,10 +36,10 @@ export class LafiaVideoController extends BaseController {
 
   @httpDelete('/broadcast/:id')
   public async deleteBroadcast(@request() req: Request, @response() res: Response) {
-    logger.info('Running LafiaVideoController::deleteBroadcast');
+    logger.info('Running LafiaVideoController.deleteBroadcast');
     try {
       const { id } = req.params;
-      const broadcast = await this.videoBroadcastService.deleteVideoBroadcastRecords(id);
+      const broadcast = await this.videoBroadcastService.delete(id);
 
       this.success(res, broadcast, 'Broadcast delete successfully', HttpStatusCode.OK);
     } catch (e: any) {
@@ -50,12 +50,12 @@ export class LafiaVideoController extends BaseController {
 
   @httpGet('/broadcast/patient/:patient_id')
   public async fetchPatientVideo(@request() req: Request, @response() res: Response): Promise<void> {
-    logger.info('Running LafiaVideoController::fetchPatientVideo');
+    logger.info('Running LafiaVideoController.fetchPatientVideo');
     try {
       // Retrieve the request's body
       const { patient_id } = req.params;
 
-      const videoUrl = await this.videoBroadcastService.getAllVideoRecords(patient_id);
+      const videoUrl = await this.videoBroadcastService.findAll(patient_id);
 
       this.success(res, videoUrl, 'broadcast retrieved successfully');
 
@@ -66,12 +66,12 @@ export class LafiaVideoController extends BaseController {
 
   @httpGet('/broadcast/practitioner/:practitioner_id')
   public async fetchPractitionerVideo(@request() req: Request, @response() res: Response): Promise<void> {
-    logger.info('Running LafiaVideoController::fetchPractitionerVideo');
+    logger.info('Running LafiaVideoController.fetchPractitionerVideo');
     try {
       // Retrieve the request's body
       const { practitioner_id } = req.params;
 
-      const videoUrl = await this.videoBroadcastService.getAllPractitionerBroadcastVideos(practitioner_id);
+      const videoUrl = await this.videoBroadcastService.findAllPractitionerBroadcastVideos(practitioner_id);
 
       this.success(res, videoUrl, 'broadcast retrieved successfully');
 
@@ -82,7 +82,7 @@ export class LafiaVideoController extends BaseController {
 
   @httpDelete('/broadcast/practitioner/:id')
   public async deletePractitionerBroadcast(@request() req: Request, @response() res: Response) {
-    logger.info('Running LafiaVideoController::deletePractitionerBroadcast');
+    logger.info('Running LafiaVideoController.deletePractitionerBroadcast');
     try {
       const { id } = req.params;
       const broadcast = await this.videoBroadcastService.deletePractitionerBroadcastVideo(id);

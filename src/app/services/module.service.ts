@@ -1,39 +1,62 @@
 import { ContainerModule } from 'inversify';
 import TYPES from '../config/types';
-import { AuthService } from './auth';
-import { S3Service } from './aws';
-import { CodeSystemService } from './codeSystems';
-import { EmailService } from './email';
+import { IFhirServer } from '../models';
+import { IS3Service, S3Service } from './aws';
 import { FhirServerService } from './fhirServer';
-import { FileService } from './file';
-import { KafkaService, KafkaSetup } from './kafka';
-import { LanguageService } from './lang';
-import { LafiaMediaService } from './mediaServer';
-import { PatientService } from './patients';
-import { PractitionerService } from './practitioners';
-import { FhirResourceService, ImplementationGuideService } from './resources';
-import { TwilioService } from './twilio';
-import { UserService } from './users';
-import { TwilioRoomService, VideoBroadcastService, VideoRecordService } from './videoRecords';
+import { AuthService, IAuthService } from './auth';
+import { FileService, IFileService } from './file';
+import { IUserService, UserService } from './users';
+import { EmailService, IEmailService } from './email';
+import { ITwilioService, TwilioService } from './twilio';
+import { ILanguageService, LanguageService } from './lang';
+import { IPatientService, PatientService } from './patients';
+import { FirebaseService, IFirebaseService } from './notifications';
+import { ILafiaMediaService, LafiaMediaService } from './mediaServer';
+import { CodeSystemService, ICodeSystemService } from './codeSystems';
+import { IPractitionerService, PractitionerService } from './practitioners';
+import {
+  IRedisStore,
+  ISignallingServerService,
+  RedisStore,
+  SignallingServerService
+} from './signallingServers';
+import {
+  FhirResourceService,
+  ImplementationGuideService,
+  IFhirResourceService,
+  IImplementationGuideService
+} from './resources';
+import {
+  ITwilioRoomService,
+  IVideoBroadcastService,
+  IVideoRecordService,
+  TwilioRoomService,
+  VideoBroadcastService,
+  VideoRecordService
+} from './videoRecords';
+import { IRabbitMqService, IRabbitMqSetup, RabbitMqService, RabbitMqSetup } from './messageBroker';
 
 export const serviceModule = new ContainerModule((bind) => {
-  bind<AuthService>(TYPES.AuthService).to(AuthService);
-  bind<S3Service>(TYPES.S3Service).to(S3Service);
-  bind<CodeSystemService>(TYPES.CodeSystemService).to(CodeSystemService);
-  bind<EmailService>(TYPES.EmailService).to(EmailService);
-  bind<FhirServerService>(TYPES.FhirServerService).to(FhirServerService);
-  bind<FileService>(TYPES.FileService).to(FileService);
-  bind<KafkaSetup>(TYPES.KafkaSetup).to(KafkaSetup);
-  bind<KafkaService>(TYPES.KafkaService).to(KafkaService);
-  bind<LanguageService>(TYPES.LanguageService).to(LanguageService);
-  bind<LafiaMediaService>(TYPES.LafiaMediaService).to(LafiaMediaService);
-  bind<PatientService>(TYPES.PatientService).to(PatientService);
-  bind<PractitionerService>(TYPES.PractitionerService).to(PractitionerService);
-  bind<FhirResourceService>(TYPES.FhirResourceService).to(FhirResourceService);
-  bind<ImplementationGuideService>(TYPES.ImplementationGuideService).to(ImplementationGuideService);
-  bind<TwilioService>(TYPES.TwilioService).to(TwilioService);
-  bind<TwilioRoomService>(TYPES.TwilioRoomService).to(TwilioRoomService);
-  bind<UserService>(TYPES.UserService).to(UserService);
-  bind<VideoBroadcastService>(TYPES.VideoBroadcastService).to(VideoBroadcastService);
-  bind<VideoRecordService>(TYPES.VideoRecordService).to(VideoRecordService);
+  bind<IS3Service>(TYPES.S3Service).to(S3Service);
+  bind<IRedisStore>(TYPES.RedisStore).to(RedisStore);
+  bind<IAuthService>(TYPES.AuthService).to(AuthService);
+  bind<IFileService>(TYPES.FileService).to(FileService);
+  bind<IUserService>(TYPES.UserService).to(UserService);
+  bind<IEmailService>(TYPES.EmailService).to(EmailService);
+  bind<IRabbitMqSetup>(TYPES.RabbitMqSetup).to(RabbitMqSetup);
+  bind<ITwilioService>(TYPES.TwilioService).to(TwilioService);
+  bind<IPatientService>(TYPES.PatientService).to(PatientService);
+  bind<IFhirServer>(TYPES.FhirServerService).to(FhirServerService);
+  bind<IRabbitMqService>(TYPES.RabbitMqService).to(RabbitMqService);
+  bind<IFirebaseService>(TYPES.FirebaseService).to(FirebaseService);
+  bind<ILanguageService>(TYPES.LanguageService).to(LanguageService);
+  bind<ICodeSystemService>(TYPES.CodeSystemService).to(CodeSystemService);
+  bind<ITwilioRoomService>(TYPES.TwilioRoomService).to(TwilioRoomService);
+  bind<ILafiaMediaService>(TYPES.LafiaMediaService).to(LafiaMediaService);
+  bind<IVideoRecordService>(TYPES.VideoRecordService).to(VideoRecordService);
+  bind<IFhirResourceService>(TYPES.FhirResourceService).to(FhirResourceService);
+  bind<IPractitionerService>(TYPES.PractitionerService).to(PractitionerService);
+  bind<IVideoBroadcastService>(TYPES.VideoBroadcastService).to(VideoBroadcastService);
+  bind<ISignallingServerService>(TYPES.SignallingServerService).to(SignallingServerService);
+  bind<IImplementationGuideService>(TYPES.ImplementationGuideService).to(ImplementationGuideService);
 });

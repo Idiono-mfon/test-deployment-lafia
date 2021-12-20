@@ -1,34 +1,35 @@
-import { injectable } from 'inversify';
-import { ComponentModel } from '../../models/lang/componentModel';
-import { ILangauge } from '../../models/lang/interfaces';
-import { LanguageModel } from '../../models/lang/languageModel';
-import { InternalServerError, logger } from '../../utils';
+import { inject, injectable } from 'inversify';
+import TYPES from '../../config/types';
+import { BaseRepository, DbAccess } from '../base';
+import { logger } from '../../utils';
+import { LanguageModel } from '../../models';
+import { ILanguageRepository } from './interfaces';
 
 @injectable()
-export class LanguageRepository {
+export class LanguageRepository extends BaseRepository implements ILanguageRepository {
 
-  public async fetchLanguages() {
-    logger.info('Running LanguageRepository::fetchLanguages');
-    return LanguageModel.query();
+  @inject(TYPES.ComponentRepository)
+  private readonly componentRepository: DbAccess;
+
+  constructor() {
+    super(LanguageModel);
   }
 
-  public async fetchLanguageByID(id: string) {
-    logger.info('Running LanguageRepository::fetchLanguageByID');
-    return LanguageModel.query().findById(id);
+  public async fetchByCode(code: string): Promise<any> {
+    logger.info('Running LanguageRepository.fetchByCode');
+
+    return this.findOne({ code });
   }
 
-  public async fetchLanguageByCode(code: string) {
-    logger.info('Running LanguageRepository::fetchLanguageByCode');
-    return LanguageModel.query().where('code', code).first();
+  public async fetchByNameAndCode(code: string, name: string): Promise<any> {
+    logger.info('Running LanguageRepository.fetchByNameAndCode');
+
+    return this.findOne({ code, name });
   }
 
-  public async fetchLanguageByNameAndCode(code: string, name: string) {
-    logger.info('Running LanguageRepository::fetchLanguageByNameAndCode');
-    return LanguageModel.query().where({ 'code': code, 'name': name }).first();
-  }
+  public async fetchContent(language: LanguageModel): Promise<any> {
+    logger.info('Running LanguageRepository.fetchContent');
 
-  public async fetchLanguageContent(language: LanguageModel) {
-    logger.info('Running LanguageRepository::fetchLanguageContent');
     const languageId: string | any = language.id;
     return LanguageModel.query()
       .withGraphFetched('labels.components(forLanguage)')
@@ -40,45 +41,37 @@ export class LanguageRepository {
       .where('code', language.code).first();
   }
 
-  public async addLanguage(data: ILangauge): Promise<ILangauge> {
-    logger.info('Running LanguageRepository::addLanguage');
-    return LanguageModel.query().insertAndFetch(data);
-  }
-
   public async attachLabel(languageId: string, labelId: string): Promise<any> {
-    logger.info('Running LanguageRepository::attachLabel');
+    logger.info('Running LanguageRepository.attachLabel');
+
     return LanguageModel.relatedQuery('labels').for(languageId).relate(labelId);
   }
 
   public async detachLabel(languageId: string, labelId: string): Promise<any> {
-    logger.info('Running LanguageRepository::detachLabel');
-    return (await LanguageModel.query().findById(languageId)).$relatedQuery('labels')
+    logger.info('Running LanguageRepository.detachLabel');
+
+    const language = await this.findById(languageId);
+
+    return language.$relatedQuery('labels')
       .unrelate().where('id', labelId);
   }
 
   public async attachComponent(languageId: string, componentId: string): Promise<any> {
-    logger.info('Running LanguageRepository::attachComponent');
-    return (await LanguageModel.query().findById(languageId)).$relatedQuery('components')
-      .relate(await ComponentModel.query().findById(componentId));
+    logger.info('Running LanguageRepository.attachComponent');
+
+    const language = await this.findById(languageId);
+    const component = await this.componentRepository.findById(componentId);
+
+    return language.$relatedQuery('components')
+      .relate(component);
   }
 
   public async detachComponent(languageId: string, componentId: string): Promise<any> {
-    logger.info('Running LanguageRepository::detachComponent');
-    return (await LanguageModel.query().findById(languageId)).$relatedQuery('components')
+    logger.info('Running LanguageRepository.detachComponent');
+
+    const language = await this.findById(languageId);
+
+    return language.$relatedQuery('components')
       .unrelate().where('id', componentId);
-  }
-
-  public async updateLanguage(id: string, data: ILangauge): Promise<ILangauge> {
-    logger.info('Running LanguageRepository::updateLanguage');
-    try {
-      return await LanguageModel.query().patchAndFetchById(id, data);
-    } catch (e: any) {
-      throw new InternalServerError(e.message);
-    }
-  }
-
-  public async deleteLanguage(id: string) {
-    logger.info('Running LanguageRepository::deleteLanguage');
-    return LanguageModel.query().deleteById(id);
   }
 }

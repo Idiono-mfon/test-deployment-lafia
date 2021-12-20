@@ -2,7 +2,7 @@ import { inject } from 'inversify';
 import { Request, Response } from 'express';
 import { controller, httpDelete, httpGet, httpPost, httpPut, request, response } from 'inversify-express-utils';
 import TYPES from '../../config/types';
-import { ImplementationGuideService } from '../../services';
+import { IImplementationGuideService } from '../../services';
 import { logger } from '../../utils';
 
 import { BaseController } from '../baseController';
@@ -11,19 +11,19 @@ import { IFhirResourceImplementationGuide, IFindImplementationGuide, IImplementa
 @controller('/implementation-guide')
 export class ImplementationGuideController extends BaseController {
   @inject(TYPES.ImplementationGuideService)
-  private readonly implementationGuideService: ImplementationGuideService;
+  private readonly implementationGuideService: IImplementationGuideService;
 
   @httpGet('')
   public async fetchImplementationGuides(@request() req: Request, @response() res: Response) {
-    logger.info('Running ImplementationGuideController::fetchImplementationGuides');
+    logger.info('Running ImplementationGuideController.fetchImplementationGuides');
     try {
       const { slug } = req.query;
-      let implementationGuide: IFindImplementationGuide | IFindImplementationGuide[];
+      let implementationGuide: IFindImplementationGuide | IFindImplementationGuide[] | undefined;
 
       if (slug) {
-        implementationGuide = await this.implementationGuideService.getOneImplementationGuide({ slug: slug as string });
+        implementationGuide = await this.implementationGuideService.findOne({ slug: slug as string });
       } else {
-        implementationGuide = await this.implementationGuideService.fetchImplementationGuide();
+        implementationGuide = await this.implementationGuideService.findAll();
       }
 
       return this.success(res, implementationGuide, 'implementation guides successfully fetched');
@@ -35,11 +35,11 @@ export class ImplementationGuideController extends BaseController {
 
   @httpGet('/:id')
   public async fetchImplementationGuide(@request() req: Request, @response() res: Response) {
-    logger.info('Running ImplementationGuideController::fetchImplementationGuide');
+    logger.info('Running ImplementationGuideController.findAll');
     try {
       const { id: implementationGuide } = req.params;
       const find: IFindImplementationGuide = { id: implementationGuide };
-      const resp = await this.implementationGuideService.getOneImplementationGuide(find);
+      const resp = await this.implementationGuideService.findOne(find);
       this.success(res, resp, 'implementation guide successfully fetched');
     } catch (e: any) {
       logger.error(`Unable to fetch implementation guide with id - ${req?.params?.id} -`, e);
@@ -49,10 +49,10 @@ export class ImplementationGuideController extends BaseController {
 
   @httpPost('')
   public async createImplementationGuide(@request() req: Request, @response() res: Response) {
-    logger.info('Running ImplementationGuideController::createImplementationGuide');
+    logger.info('Running ImplementationGuideController.create');
     try {
       const implementationGuide: IImplementationGuide = req.body;
-      const resp = await this.implementationGuideService.saveImplementationGuide(implementationGuide);
+      const resp = await this.implementationGuideService.create(implementationGuide);
       this.success(res, resp, 'implementation guide successfully added');
     } catch (e: any) {
       logger.error(`Unable to create implementation guide -`, e);
@@ -62,7 +62,7 @@ export class ImplementationGuideController extends BaseController {
 
   @httpPost('/fhir-resource')
   public async attachFhirResource(@request() req: Request, @response() res: Response) {
-    logger.info('Running ImplementationGuideController::attachFhirResource');
+    logger.info('Running ImplementationGuideController.attachFhirResource');
     try {
       const fhirResourceImplementationGuide: IFhirResourceImplementationGuide = req.body;
       const resp = await this.implementationGuideService.attachFhirResource(fhirResourceImplementationGuide.fr_id, fhirResourceImplementationGuide.ig_id);
@@ -75,11 +75,11 @@ export class ImplementationGuideController extends BaseController {
 
   @httpPut('/:id')
   public async updateFhirResource(@request() req: Request, @response() res: Response) {
-    logger.info('Running ImplementationGuideController::updateFhirResource');
+    logger.info('Running ImplementationGuideController.update');
     try {
       const { id } = req.params;
       const implementationGuide: IImplementationGuide = req.body;
-      const resp = await this.implementationGuideService.updateImplementationGuide(id, implementationGuide);
+      const resp = await this.implementationGuideService.update(id, implementationGuide);
       this.success(res, resp, 'implementation guide successfully updated');
     } catch (e: any) {
       logger.error(`Unable to update fhir resource -`, e);
@@ -89,7 +89,7 @@ export class ImplementationGuideController extends BaseController {
 
   @httpDelete('/fhir-resource')
   public async detachIG(@request() req: Request, @response() res: Response) {
-    logger.info('Running ImplementationGuideController::detachIG');
+    logger.info('Running ImplementationGuideController.detachIG');
     try {
       const fhirResourceImplementationGuide: IFhirResourceImplementationGuide = req.body;
       const resp = await this.implementationGuideService.detachFRFromIG(fhirResourceImplementationGuide.fr_id, fhirResourceImplementationGuide.ig_id);
@@ -102,10 +102,10 @@ export class ImplementationGuideController extends BaseController {
 
   @httpDelete('/:id')
   public async deleteIG(@request() req: Request, @response() res: Response) {
-    logger.info('Running ImplementationGuideController::deleteIG');
+    logger.info('Running ImplementationGuideController.deleteIG');
     try {
       const { id } = req.params;
-      const resp = await this.implementationGuideService.deleteImplementationGuide(id);
+      const resp = await this.implementationGuideService.delete(id);
       this.success(res, resp, 'implementation guide successfully updated');
     } catch (e: any) {
       logger.error(`Unable to delete implementation guide -`, e);

@@ -2,21 +2,21 @@ import { inject } from 'inversify';
 import { Request, Response } from 'express';
 import { controller, httpDelete, httpGet, httpPost, httpPut, request, response } from 'inversify-express-utils';
 import TYPES from '../../config/types';
-import { ILangauge, ILangaugeLabel, ILanguageComponent } from '../../models/lang/interfaces';
-import { LanguageService } from '../../services';
+import { ILanguage, ILanguageLabel, ILanguageComponent } from '../../models';
+import { ILanguageService } from '../../services';
 import { logger } from '../../utils';
 import { BaseController } from '../baseController';
 
 @controller('/language')
 export class LanguageController extends BaseController {
   @inject(TYPES.LanguageService)
-  private readonly languageService: LanguageService;
+  private readonly languageService: ILanguageService;
 
   @httpGet('')
   public async fetchLanguages(@request() req: Request, @response() res: Response) {
-    logger.info('Running LanguageController::fetchLanguages');
+    logger.info('Running LanguageController.findAll');
     try {
-      const languages = await this.languageService.fetchLanguage();
+      const languages = await this.languageService.findAll();
       this.success(res, languages, 'Languages successfully fetched');
     } catch (e: any) {
       logger.error(`Unable to fetch languages -`, e);
@@ -26,16 +26,20 @@ export class LanguageController extends BaseController {
 
   @httpGet('/:code/contents')
   public async fetchLanguagesWithContent(@request() req: Request, @response() res: Response) {
-    logger.info('Running LanguageController::fetchLanguagesWithContent');
+    logger.info('Running LanguageController.findLanguagesWithContent');
     try {
       const { code } = req.params;
-      const languages: ILangauge = await this.languageService.fetchLanguagesWithContent(code);
+      const languages: ILanguage = await this.languageService.findLanguagesWithContent(code);
 
       const labels: object | any = {};
+
+      // TODO: normally label should have many component, but the front end is restricting me to to this format.
       languages.labels?.forEach((label: any) => {
-        labels[label.name] = label.components[0]?.fields // TODO: normmally label should have many component, but the front end is restricting me to to this format.
+        labels[label.name] = label.components[0]?.fields
       });
+
       languages.labels! = labels;
+
       this.success(res, languages, 'Language successfully fetched');
     } catch (e: any) {
       logger.error(`Unable to fetch languages with content -`, e);
@@ -45,10 +49,10 @@ export class LanguageController extends BaseController {
 
   @httpPost('')
   public async createLanguage(@request() req: Request, @response() res: Response) {
-    logger.info('Running LanguageController::createLanguage');
+    logger.info('Running LanguageController.createLanguage');
     try {
-      const languageData: ILangauge = req.body;
-      const language = await this.languageService.addLanguage(languageData);
+      const languageData: ILanguage = req.body;
+      const language = await this.languageService.create(languageData);
       this.success(res, language, 'Language successfully added');
     } catch (e: any) {
       logger.error(`Unable to create language -`, e);
@@ -58,9 +62,9 @@ export class LanguageController extends BaseController {
 
   @httpPost('/label')
   public async attachLabel(@request() req: Request, @response() res: Response) {
-    logger.info('Running LanguageController::attachLabel');
+    logger.info('Running LanguageController.attachLabel');
     try {
-      const languageData: ILangaugeLabel = req.body;
+      const languageData: ILanguageLabel = req.body;
       const label = await this.languageService.attachLabelToLanguage(languageData.languageId, languageData.labelId);
       this.success(res, label, 'Label successfully added to language');
     } catch (e: any) {
@@ -72,7 +76,7 @@ export class LanguageController extends BaseController {
 
   @httpPost('/component')
   public async attachComponent(@request() req: Request, @response() res: Response) {
-    logger.info('Running LanguageController::attachComponent');
+    logger.info('Running LanguageController.attachComponent');
     try {
       const LanguageComponentData: ILanguageComponent = req.body;
       const label = await this.languageService.attachComponentToLanguage(LanguageComponentData.languageId, LanguageComponentData.componentId);
@@ -85,12 +89,12 @@ export class LanguageController extends BaseController {
 
   @httpPut('/:id')
   public async updateLanguage(@request() req: Request, @response() res: Response) {
-    logger.info('Running LanguageController::updateLanguage');
+    logger.info('Running LanguageController.update');
     try {
       const { id } = req.params;
-      const languageData: ILangauge = req.body;
+      const languageData: ILanguage = req.body;
 
-      const language = await this.languageService.updateLanguage(id, languageData);
+      const language = await this.languageService.update(id, languageData);
 
       this.success(res, language, 'Language successfully updated');
     } catch (e: any) {
@@ -101,11 +105,11 @@ export class LanguageController extends BaseController {
 
   @httpDelete('/:id')
   public async deleteLanguage(@request() req: Request, @response() res: Response) {
-    logger.info('Running LanguageController::deleteLanguage');
+    logger.info('Running LanguageController.delete');
     try {
       const { id } = req.params;
 
-      const language = await this.languageService.deleteLanguage(id);
+      const language = await this.languageService.delete(id);
 
       this.success(res, language, 'Language successfully updated');
     } catch (e: any) {
@@ -116,7 +120,7 @@ export class LanguageController extends BaseController {
 
   @httpDelete('/component')
   public async detachComponent(@request() req: Request, @response() res: Response) {
-    logger.info('Running LanguageController::detachComponent');
+    logger.info('Running LanguageController.detachComponent');
     try {
       const LanguageComponentData: ILanguageComponent = req.body;
       const language = await this.languageService.detachComponentFromLanguage(LanguageComponentData.languageId, LanguageComponentData.componentId);
@@ -129,9 +133,9 @@ export class LanguageController extends BaseController {
 
   @httpDelete('/label')
   public async detachLabel(@request() req: Request, @response() res: Response) {
-    logger.info('Running LanguageController::detachLabel');
+    logger.info('Running LanguageController.detachLabel');
     try {
-      const languageData: ILangaugeLabel = req.body;
+      const languageData: ILanguageLabel = req.body;
       const label = await this.languageService.attachComponentToLabel(languageData.languageId, languageData.labelId);
       this.success(res, label, 'Label successfully removed from language');
     } catch (e: any) {

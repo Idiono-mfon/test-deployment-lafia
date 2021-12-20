@@ -15,7 +15,6 @@ export class Validations {
   public static isNumeric(str: any) {
     logger.info('Running Validations.isNumeric');
 
-    // if (typeof str != "string") return false // we only process strings!
     return !Number.isNaN(str) && !Number.isNaN(parseFloat(str))
   }
 }
