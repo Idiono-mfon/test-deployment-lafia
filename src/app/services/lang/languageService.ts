@@ -34,6 +34,7 @@ export class LanguageService implements ILanguageService {
 
   public async findLanguagesWithContent(code: string): Promise<ILanguage> {
     logger.info('Running LanguageService.findLanguagesWithContent');
+
     const language: LanguageModel = await this.languageRepository.fetchByCode(code);
 
     if (!language) {
@@ -46,7 +47,7 @@ export class LanguageService implements ILanguageService {
   public async create(data: ILanguage): Promise<ILanguage> {
     logger.info('Running LanguageService.create');
     if (!data.name || !data.code) {
-      throw new BadRequestError('language name and code are required feilds');
+      throw new BadRequestError('language name and code are required fields');
     }
     const language: LanguageModel = await this.languageRepository.fetchByNameAndCode(data.code, data.name);
     if (language) {

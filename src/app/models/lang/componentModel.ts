@@ -2,7 +2,6 @@ import { JSONSchema } from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
 import { IComponent } from './interfaces';
-// import { LabelModel } from './labelModel';
 import { ComponentValidation } from './validation';
 
 export class ComponentModel extends BaseModel implements IComponent {
@@ -27,7 +26,7 @@ export class ComponentModel extends BaseModel implements IComponent {
     return {
       label: {
         relation: BaseModel.BelongsToOneRelation,
-        modelClass: './labelModel',
+        modelClass: '../lang/labelModel',
         join: {
           from: `${Schema.lafiaService}.${Table.components}.label_id`,
           to: `${Schema.lafiaService}.${Table.labels}.id`

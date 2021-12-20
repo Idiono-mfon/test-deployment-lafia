@@ -24,7 +24,7 @@ export class LanguageModel extends BaseModel implements ILanguage {
     return {
       components: {
         relation: BaseModel.HasManyRelation,
-        modelClass: './componentModel',
+        modelClass: '../lang/componentModel',
         join: {
           from: `${Schema.lafiaService}.${Table.languages}.id`,
           to: `${Schema.lafiaService}.${Table.components}.language_id`
@@ -32,7 +32,7 @@ export class LanguageModel extends BaseModel implements ILanguage {
       },
       labels: {
         relation: BaseModel.ManyToManyRelation,
-        modelClass: './labelModel',
+        modelClass: '../lang/labelModel',
         join: {
           from: `${Schema.lafiaService}.${Table.languages}.id`,
           through: {
