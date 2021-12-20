@@ -1,7 +1,7 @@
 import { createServer } from 'http';
 import { InversifyExpressServer } from 'inversify-express-utils';
 import { IApp } from './app';
-import container from './config/inversify.config';
+import { container } from './config';
 import TYPES from './config/types';
 import { logger } from './utils';
 

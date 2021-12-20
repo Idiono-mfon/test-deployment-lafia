@@ -1,10 +1,10 @@
 import { injectable } from 'inversify';
 import { ITwilioRoom, TwilioRoomModel, } from '../../models';
 import { InternalServerError, logger } from '../../utils';
-import { BaseRepository } from '../base';
+import { BaseRepository, DbAccess } from '../base';
 
 @injectable()
-export class TwilioRoomRepository extends BaseRepository {
+export class TwilioRoomRepository extends BaseRepository implements DbAccess {
 
   constructor() {
     super(TwilioRoomModel);

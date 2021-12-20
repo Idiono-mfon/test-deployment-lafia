@@ -6,61 +6,59 @@ import {
   VideoBroadcastModel,
   IPractitionerVideoBroadcast,
 } from '../../models';
-import {
-  VideoBroadcastRepository,
-  PractitionerVideoBroadcastRepository
-} from '../../repository';
+import { DbAccess } from '../../repository';
 import { InternalServerError, logger, NotFoundError } from '../../utils';
+import { IVideoBroadcastService } from './interfaces';
 
 @injectable()
-export class VideoBroadcastService {
+export class VideoBroadcastService implements IVideoBroadcastService {
   @inject(TYPES.VideoBroadcastRepository)
-  private readonly videoBroadcastRepository: VideoBroadcastRepository;
+  private readonly videoBroadcastRepository: DbAccess;
 
   @inject(TYPES.PractitionerVideoBroadcastRepository)
-  private readonly practitionerVideoBroadcastRepository: PractitionerVideoBroadcastRepository;
+  private readonly practitionerVideoBroadcastRepository: DbAccess;
 
 
-  public async saveBroadcastVideo(data: IVideoBroadcast): Promise<IVideoBroadcast> {
-    logger.info('Running VideoBroadcastService.saveBroadcastVideo');
+  public async create(data: IVideoBroadcast): Promise<IVideoBroadcast> {
+    logger.info('Running VideoBroadcastService.create');
     try {
-      return await this.videoBroadcastRepository.saveBroadcastVideo(data);
+      return await this.videoBroadcastRepository.create(data);
     } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
 
-  public async getOneVideoRecord(data: IFindVideoBroadcast | any): Promise<IVideoBroadcast> {
-    logger.info('Running VideoBroadcastService.getOneVideoRecord');
+  public async findOne(data: IFindVideoBroadcast | any): Promise<IVideoBroadcast> {
+    logger.info('Running VideoBroadcastService.findOne');
     try {
-      return await this.videoBroadcastRepository.getOneBroadcastVideo(data);
+      return await this.videoBroadcastRepository.findOne(data);
     } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
 
-  public async getAllVideoRecords(user_id: string): Promise<IVideoBroadcast[]> {
-    logger.info('Running VideoBroadcastService.getAllVideoRecords');
+  public async findAll(user_id: string): Promise<IVideoBroadcast[]> {
+    logger.info('Running VideoBroadcastService.findAll');
     try {
-      return await this.videoBroadcastRepository.getAllBroadcastVideos(user_id);
+      return await this.videoBroadcastRepository.findAll(user_id);
     } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
 
-  public async deleteVideoBroadcastRecords(id: string): Promise<any> {
-    logger.info('Running VideoBroadcastService.deleteVideoBroadcastRecords');
+  public async delete(id: string): Promise<any> {
+    logger.info('Running VideoBroadcastService.delete');
     try {
-      return await this.videoBroadcastRepository.deleteBroadcastVideos(id);
+      return await this.videoBroadcastRepository.delete(id);
     } catch (e: any) {
       throw new InternalServerError(e.message);
     }
   }
 
-  public async getAllPractitionerBroadcastVideos(user_id: string): Promise<any> {
-    logger.info('Running VideoBroadcastService.getAllPractitionerBroadcastVideos');
+  public async findAllPractitionerBroadcastVideos(user_id: string): Promise<any> {
+    logger.info('Running VideoBroadcastService.findAllPractitionerBroadcastVideos');
     try {
-      return await this.practitionerVideoBroadcastRepository.getAllPractitionerBroadcastVideos(user_id);
+      return await this.practitionerVideoBroadcastRepository.findAll(user_id);
     } catch (e: any) {
       throw new InternalServerError(e.message);
     }
@@ -68,13 +66,13 @@ export class VideoBroadcastService {
 
   public async assignBroadcastVideoToPractitioner(data: IPractitionerVideoBroadcast): Promise<IPractitionerVideoBroadcast> {
     logger.info('Running VideoBroadcastService.assignBroadcastVideoToPractitioner');
-    const videoBroadcasts: VideoBroadcastModel = await this.videoBroadcastRepository.fetchBroadcastByID(data.video_broadcast_id);
+    const videoBroadcasts: VideoBroadcastModel = await this.videoBroadcastRepository.findById(data.video_broadcast_id);
     if (!videoBroadcasts) {
       throw new NotFoundError('video broadcasts not found');
     }
 
     try {
-      return await this.practitionerVideoBroadcastRepository.savePractitionerBroadcastVideo(data);
+      return await this.practitionerVideoBroadcastRepository.create(data);
     } catch (e: any) {
       throw new InternalServerError(e.message);
     }
@@ -82,13 +80,15 @@ export class VideoBroadcastService {
 
   public async deletePractitionerBroadcastVideo(id: string): Promise<IPractitionerVideoBroadcast> {
     logger.info('Running VideoBroadcastService.deletePractitionerBroadcastVideo');
-    const videoBroadcasts: VideoBroadcastModel = await this.videoBroadcastRepository.fetchBroadcastByID(id);
+
+    const videoBroadcasts: VideoBroadcastModel = await this.videoBroadcastRepository.findById(id);
+
     if (!videoBroadcasts) {
       throw new NotFoundError('video broadcasts not found');
     }
 
     try {
-      return await this.practitionerVideoBroadcastRepository.deletePractitionerBroadcastVideos(id);
+      return await this.practitionerVideoBroadcastRepository.delete(id);
     } catch (e: any) {
       throw new InternalServerError(e.message);
     }

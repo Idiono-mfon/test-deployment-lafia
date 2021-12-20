@@ -45,6 +45,7 @@ export class App implements IApp {
       customfavIcon: 'https://lafia.io/wp-content/uploads/2021/02/lafia_logo_small.png',
       customSiteTitle: 'lafia.io api docs'
     }));
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     app.use(this.authMiddleware.parseThirdPartyConnection);
 
     passport.use(this.saFhirStrategy);

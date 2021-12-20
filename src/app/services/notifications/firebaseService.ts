@@ -9,15 +9,15 @@ import { serviceAccount } from './firebaseServiceAccount';
 import { IFirebaseService } from './interfaces';
 import MessagingDevicesResponse = messaging.MessagingDevicesResponse;
 
-const env = Env.all();
-
-firebase.initializeApp({
-  credential: firebase.credential.cert(serviceAccount),
-  databaseURL: env.firebase_database_url
-});
-
 @injectable()
 export class FirebaseService implements IFirebaseService {
+
+  constructor() {
+    firebase.initializeApp({
+      credential: firebase.credential.cert(serviceAccount),
+      databaseURL: Env.all().firebase_database_url
+    });
+  }
 
   sendNotification(firebaseToken: string, notificationPayload: CallNotificationPayload): Promise<MessagingDevicesResponse>
   sendNotification(firebaseToken: string, notificationPayload: BroadcastNotificationPayload): Promise<MessagingDevicesResponse>

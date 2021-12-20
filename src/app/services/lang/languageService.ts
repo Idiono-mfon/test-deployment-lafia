@@ -1,211 +1,196 @@
 import { inject, injectable } from 'inversify';
 import TYPES from '../../config/types';
-import { ComponentModel } from '../../models/lang/componentModel';
-import { IComponent, ILabel, ILangauge } from '../../models/lang/interfaces';
-import { LabelModel } from '../../models/lang/labelModel';
-import { LanguageModel } from '../../models/lang/languageModel';
-import {
-  ComponentRepository,
-  LabelRepository,
-  LanguageRepository
-} from '../../repository';
+import { DbAccess, ILabelRepository, ILanguageRepository } from '../../repository';
+import { ComponentModel, IComponent, ILabel, ILanguage, LanguageModel, LabelModel } from '../../models';
 import { BadGatewayError, BadRequestError, ConflictError, logger, NotFoundError } from '../../utils';
+import { ILanguageService } from './interfaces';
 
 @injectable()
-export class LanguageService {
+export class LanguageService implements ILanguageService {
 
   @inject(TYPES.LanguageRepository)
-  private readonly languageRepository: LanguageRepository;
+  private readonly languageRepository: ILanguageRepository;
 
   @inject(TYPES.LabelRepository)
-  private readonly labelRepository: LabelRepository;
+  private readonly labelRepository: ILabelRepository;
 
   @inject(TYPES.ComponentRepository)
-  private readonly componentRepository: ComponentRepository;
+  private readonly componentRepository: DbAccess;
 
-  // create
-
-  public async fetchLanguage(): Promise<ILangauge[]> {
-    logger.info('Running LanguageService.fetchLanguage');
-    return this.languageRepository.fetchLanguages();
+  public async findAll(): Promise<ILanguage[]> {
+    logger.info('Running LanguageService.findAll');
+    return this.languageRepository.findAll();
   }
 
-  public async fetchLabel(): Promise<ILabel[]> {
-    logger.info('Running LanguageService.fetchLabel');
-    return this.labelRepository.fetchLabels();
+  public async findAllLabels(): Promise<ILabel[]> {
+    logger.info('Running LanguageService.findAllLabels');
+    return this.labelRepository.findAll();
   }
 
-  public async fetchComponent(): Promise<IComponent[]> {
-    logger.info('Running LanguageService.fetchComponent');
-    return this.componentRepository.fetchComponents();
+  public async findAllComponents(): Promise<IComponent[]> {
+    logger.info('Running LanguageService.findAllComponents');
+    return this.componentRepository.findAll();
   }
 
-  public async fetchLanguagesWithContent(code: string): Promise<ILangauge> {
-    logger.info('Running LanguageService.fetchLanguagesWithContent');
-    const language: LanguageModel = await this.languageRepository.fetchLanguageByCode(code);
-    if ( !language ) {
-      throw new NotFoundError("language not found");
+  public async findLanguagesWithContent(code: string): Promise<ILanguage> {
+    logger.info('Running LanguageService.findLanguagesWithContent');
+    const language: LanguageModel = await this.languageRepository.fetchByCode(code);
+
+    if (!language) {
+      throw new NotFoundError('language not found');
     }
 
-    return this.languageRepository.fetchLanguageContent(language);
+    return this.languageRepository.fetchContent(language);
   }
 
-  // create
-
-  public async addLanguage(data: ILangauge): Promise<ILangauge> {
-    logger.info('Running LanguageService.addLanguage');
-    if ( !data.name || !data.code ) {
-      throw new BadRequestError("language name and code are required feilds");
+  public async create(data: ILanguage): Promise<ILanguage> {
+    logger.info('Running LanguageService.create');
+    if (!data.name || !data.code) {
+      throw new BadRequestError('language name and code are required feilds');
     }
-    const language: LanguageModel = await this.languageRepository.fetchLanguageByNameAndCode(data.code, data.name);
+    const language: LanguageModel = await this.languageRepository.fetchByNameAndCode(data.code, data.name);
     if (language) {
-      throw new ConflictError("duplicate language resource");
+      throw new ConflictError('duplicate language resource');
     }
-    return this.languageRepository.addLanguage(data);
+    return this.languageRepository.create(data);
   }
 
-  public async addLabel(data: ILabel): Promise<ILabel | any> {
-    logger.info('Running LanguageService.addLabel');
-    if ( !data.name ) {
-      throw new BadRequestError("label name is required");
+  public async createLabel(data: ILabel): Promise<ILabel | any> {
+    logger.info('Running LanguageService.createLabel');
+    if (!data.name) {
+      throw new BadRequestError('label name is required');
     }
     try {
       const label: ILabel = await this.labelRepository.fetchLabelByName(data.name);
-      if (label ) {
-        throw new ConflictError("duplicate label resource");
+      if (label) {
+        throw new ConflictError('duplicate label resource');
       }
-      return this.labelRepository.addLabel(data);
+      return this.labelRepository.create(data);
     } catch (e: any) {
       throw new BadGatewayError(e.message);
     }
   }
 
-  public async addComponent(data: IComponent): Promise<IComponent> {
-    logger.info('Running LanguageService.addComponent');
+  public async createComponent(data: IComponent): Promise<IComponent> {
+    logger.info('Running LanguageService.createComponent');
     data.feilds = JSON.stringify(data.feilds);
-    return this.componentRepository.addComponent(data);
+    return this.componentRepository.create(data);
   }
 
   public async addComponentToLabel(labelId: string, data: IComponent): Promise<any> {
     logger.info('Running LanguageService.addComponentToLabel');
-    const label: LabelModel = await this.labelRepository.fetchLabelByID(labelId);
-    if ( !label ) {
-      throw new NotFoundError("label not found");
+    const label: LabelModel = await this.labelRepository.findById(labelId);
+    if (!label) {
+      throw new NotFoundError('label not found');
     }
     return this.labelRepository.addComponent(labelId, data);
   }
 
   public async attachComponentToLanguage(languageId: string, componentId: string): Promise<any> {
     logger.info('Running LanguageService.attachComponentToLanguage');
-    const language: LanguageModel = await this.languageRepository.fetchLanguageByID(languageId);
-    if ( !language ) {
-      throw new NotFoundError("language not found");
+    const language: LanguageModel = await this.languageRepository.findById(languageId);
+    if (!language) {
+      throw new NotFoundError('language not found');
     }
-    const component: ComponentModel = await this.componentRepository.fetchComponentByID(componentId);
-    if ( !component ) {
-      throw new NotFoundError("component not found");
+    const component: ComponentModel = await this.componentRepository.findById(componentId);
+    if (!component) {
+      throw new NotFoundError('component not found');
     }
     return this.languageRepository.attachComponent(languageId, componentId);
   }
 
   public async detachComponentFromLanguage(languageId: string, componentId: string): Promise<any> {
     logger.info('Running LanguageService.detachComponentFromLanguage');
-    const language: LanguageModel = await this.languageRepository.fetchLanguageByID(languageId);
-    if ( !language ) {
-      throw new NotFoundError("language not found");
+    const language: LanguageModel = await this.languageRepository.findById(languageId);
+    if (!language) {
+      throw new NotFoundError('language not found');
     }
-    const component: ComponentModel = await this.componentRepository.fetchComponentByID(componentId);
-    if ( !component ) {
-      throw new NotFoundError("component not found");
+    const component: ComponentModel = await this.componentRepository.findById(componentId);
+    if (!component) {
+      throw new NotFoundError('component not found');
     }
     return this.languageRepository.detachComponent(languageId, componentId);
   }
 
-
   public async attachComponentToLabel(labelId: string, componentId: string): Promise<any> {
     logger.info('Running LanguageService.attachComponentToLabel');
-    const label: LabelModel = await this.labelRepository.fetchLabelByID(labelId);
-    if ( !label ) {
-      throw new NotFoundError("label not found");
+    const label: LabelModel = await this.labelRepository.findById(labelId);
+    if (!label) {
+      throw new NotFoundError('label not found');
     }
-    const component: ComponentModel = await this.componentRepository.fetchComponentByID(componentId);
-    if ( !component ) {
-      throw new NotFoundError("component not found");
+    const component: ComponentModel = await this.componentRepository.findById(componentId);
+    if (!component) {
+      throw new NotFoundError('component not found');
     }
     return this.labelRepository.attachComponent(labelId, componentId);
   }
 
   public async detachComponentFromLabel(labelId: string, componentId: string): Promise<any> {
     logger.info('Running LanguageService.detachComponentFromLabel');
-    const label: LabelModel = await this.labelRepository.fetchLabelByID(labelId);
-    if ( !label ) {
-      throw new NotFoundError("label not found");
+    const label: LabelModel = await this.labelRepository.findById(labelId);
+    if (!label) {
+      throw new NotFoundError('label not found');
     }
-    const component: ComponentModel = await this.componentRepository.fetchComponentByID(componentId);
-    if ( !component ) {
-      throw new NotFoundError("component not found");
+    const component: ComponentModel = await this.componentRepository.findById(componentId);
+    if (!component) {
+      throw new NotFoundError('component not found');
     }
     return this.labelRepository.detachComponent(labelId, componentId);
   }
 
-
   public async attachLabelToLanguage(languageId: string, labelId: string): Promise<any> {
     logger.info('Running LanguageService.attachLabelToLanguage');
-    const label: LabelModel = await this.labelRepository.fetchLabelByID(labelId);
-    if ( !label ) {
-      throw new NotFoundError("label not found");
+    const label: LabelModel = await this.labelRepository.findById(labelId);
+    if (!label) {
+      throw new NotFoundError('label not found');
     }
-    const language: LanguageModel = await this.languageRepository.fetchLanguageByID(languageId);
-    if ( !language ) {
-      throw new NotFoundError("language not found");
+    const language: LanguageModel = await this.languageRepository.findById(languageId);
+    if (!language) {
+      throw new NotFoundError('language not found');
     }
     return this.languageRepository.attachLabel(languageId, labelId);
   }
 
   public async detachLabelFromLanguage(languageId: string, labelId: string): Promise<any> {
     logger.info('Running LanguageService.detachLabelFromLanguage');
-    const label: LabelModel = await this.labelRepository.fetchLabelByID(labelId);
-    if ( !label ) {
-      throw new NotFoundError("label not found");
+    const label: LabelModel = await this.labelRepository.findById(labelId);
+    if (!label) {
+      throw new NotFoundError('label not found');
     }
-    const language: LanguageModel = await this.languageRepository.fetchLanguageByID(labelId);
-    if ( !language ) {
-      throw new NotFoundError("language not found");
+    const language: LanguageModel = await this.languageRepository.findById(labelId);
+    if (!language) {
+      throw new NotFoundError('language not found');
     }
     return this.languageRepository.detachLabel(languageId, labelId);
   }
 
-  // update
-
-  public async updateLanguage(id: string, data: ILangauge): Promise<ILangauge> {
-    logger.info('Running LanguageService.updateLanguage');
-    return this.languageRepository.updateLanguage(id, data);
+  public async update(id: string, data: ILanguage): Promise<ILanguage> {
+    logger.info('Running LanguageService.update');
+    return this.languageRepository.update(id, data);
   }
 
   public async updateLabel(id: string, data: ILabel): Promise<ILabel> {
     logger.info('Running LanguageService.updateLabel');
-    return this.labelRepository.updateLabel(id, data);
+    return this.labelRepository.update(id, data);
   }
 
   public async updateComponent(id: string, data: IComponent): Promise<IComponent> {
     logger.info('Running LanguageService.updateComponent');
-    return this.componentRepository.updateComponent(id, data);
+    return this.componentRepository.update(id, data);
   }
 
-  // delete
-
-  public async deleteLanguage(id: string): Promise<number> {
-    logger.info('Running LanguageService.deleteLanguage');
-    return this.languageRepository.deleteLanguage(id);
+  public async delete(id: string): Promise<number> {
+    logger.info('Running LanguageService.delete');
+    return this.languageRepository.delete(id);
   }
 
   public async deleteLabel(id: string): Promise<number> {
     logger.info('Running LanguageService.deleteLabel');
-    return this.labelRepository.deleteLabel(id);
+    return this.labelRepository.delete(id);
   }
 
   public async deleteComponent(id: string): Promise<number> {
     logger.info('Running LanguageService.deleteComponent');
-    return this.componentRepository.deleteComponent(id);
+    return this.componentRepository.delete(id);
   }
 }

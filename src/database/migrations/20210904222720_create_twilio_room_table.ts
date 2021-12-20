@@ -1,9 +1,9 @@
-import * as Knex from "knex";
-import { Schema, Table } from "..";
+import { Knex } from 'knex';
+import { Schema, Table } from '..';
 
 
 export async function up(knex: Knex): Promise<void> {
-    return knex
+  return knex
     .transaction(async (trx: Knex.Transaction) => trx.schema
       .createSchemaIfNotExists(Schema.lafiaService)
       .then(() => trx.schema.hasTable(Table.twilio_rooms)
@@ -17,7 +17,7 @@ export async function up(knex: Knex): Promise<void> {
                   .unique()
                   .notNullable()
                   .defaultTo(knex.raw('gen_random_uuid()'))
-                  .primary(`${Table.twilio_rooms}_id`);
+                  .primary({ constraintName: `${Table.twilio_rooms}_id` });
                 tableBuilder
                   .string('room_sid')
                   .unique()
@@ -34,6 +34,6 @@ export async function up(knex: Knex): Promise<void> {
 
 
 export async function down(knex: Knex): Promise<void> {
-    return knex.schema.withSchema(Schema.lafiaService).dropTableIfExists(Table.twilio_rooms);
+  return knex.schema.withSchema(Schema.lafiaService).dropTableIfExists(Table.twilio_rooms);
 }
 

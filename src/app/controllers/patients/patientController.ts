@@ -15,14 +15,14 @@ import {
   IPatient,
   IPatientWithToken
 } from '../../models';
-import { PatientService, eventService, eventName } from '../../services';
+import { eventService, eventName, IPatientService } from '../../services';
 import { HttpStatusCode, logger } from '../../utils';
 import { BaseController } from '../baseController';
 
 @controller('/patients')
 export class PatientController extends BaseController {
   @inject(TYPES.PatientService)
-  private readonly patientService: PatientService;
+  private readonly patientService: IPatientService;
 
   @httpPut('/:id')
   public async updatePatient(@request() req: Request, @response() res: Response) {

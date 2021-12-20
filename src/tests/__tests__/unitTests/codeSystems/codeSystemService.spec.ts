@@ -1,4 +1,4 @@
-import container from '../../../../app/config/inversify.config';
+import { container } from '../../../../app/config';
 import TYPES from '../../../../app/config/types';
 import { ICodeSystem } from '../../../../app/models';
 import { DbAccess } from '../../../../app/repository';

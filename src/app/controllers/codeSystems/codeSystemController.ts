@@ -8,14 +8,14 @@ import {
 } from 'inversify-express-utils';
 import TYPES from '../../config/types';
 import { CODE_SYSTEM_TYPE, ICodeSystem } from '../../models';
-import { CodeSystemService } from '../../services';
+import { ICodeSystemService } from '../../services';
 import { HttpStatusCode, logger } from '../../utils';
 import { BaseController } from '../baseController';
 
 @controller('/systems')
 export class CodeSystemController extends BaseController {
   @inject(TYPES.CodeSystemService)
-  private readonly codeSystemService: CodeSystemService;
+  private readonly codeSystemService: ICodeSystemService;
 
   @httpGet('/marital_status')
   public async getMaritalStatus(@request() req: Request, @response() res: Response): Promise<void> {

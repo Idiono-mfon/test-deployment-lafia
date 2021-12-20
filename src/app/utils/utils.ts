@@ -9,7 +9,7 @@ import {
   ICoding, IContactPoint,
   IQualification, IReference,
 } from '../models';
-import { CodeSystemService } from '../services';
+import { ICodeSystemService } from '../services';
 import {
   error,
   throwError,
@@ -42,7 +42,7 @@ const codeType: ICodeType = {
 @injectable()
 class UtilityService {
   @inject(TYPES.CodeSystemService)
-  private readonly codeSystemService: CodeSystemService;
+  private readonly codeSystemService: ICodeSystemService;
 
   public extractDateOfBirth(data: any, forWho: string): string {
     logger.info('Running UtilityService.extractDateOfBirth');
@@ -204,7 +204,7 @@ class UtilityService {
     }
   }
 
-  public checkForRequiredFields(data: any) {
+  public checkForRequiredFields(data: any): void {
     logger.info('Running UtilityService.checkForRequiredFields');
 
     try {

@@ -1,4 +1,4 @@
-import * as Knex from 'knex';
+import { Knex } from 'knex';
 import { Schema, Table } from '..';
 
 
@@ -17,7 +17,7 @@ export async function up(knex: Knex): Promise<void> {
                   .unique()
                   .notNullable()
                   .defaultTo(knex.raw('gen_random_uuid()'))
-                  .primary(`${Table.implementation_guides}_id`);
+                  .primary({ constraintName: `${Table.implementation_guides}_id` });
                 tableBuilder
                   .string('name')
                   .notNullable();

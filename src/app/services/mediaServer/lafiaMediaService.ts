@@ -6,9 +6,10 @@ import { IFindVideoRecord, IVideoRecord } from '../../models';
 import { GenericResponseError, logger } from '../../utils';
 import TYPES from '../../config/types';
 import { VideoRecordService } from '../videoRecords';
+import { ILafiaMediaService, IStream } from './interfaces';
 
 @injectable()
-export class LafiaMediaService {
+export class LafiaMediaService implements ILafiaMediaService {
 
   @inject(TYPES.VideoRecordService)
   private readonly videoRecordService: VideoRecordService;
@@ -19,7 +20,7 @@ export class LafiaMediaService {
     this.env = Env.all();
   }
 
-  public async createBroadcast(patient_id: string) {
+  public async createBroadcast(patient_id: string): Promise<IStream> {
     logger.info('Running LafiaMediaService.createBroadcast');
     try {
       const axiosResponse: AxiosResponse = await axios.post(
@@ -29,7 +30,7 @@ export class LafiaMediaService {
 
       const streamKey = axiosResponse?.data?.streamId;
 
-      await this.videoRecordService.saveRecordedStream( { streamId: streamKey, patient_id });
+      await this.videoRecordService.create({ streamId: streamKey, patient_id });
 
       return {
         rtmp_url: `rtmp://media.lafia.io/WebRTCAppEE`,
@@ -40,8 +41,9 @@ export class LafiaMediaService {
     }
   }
 
-  public async getRecordedStream(id: string) {
+  public async getRecordedStream(id: string): Promise<string> {
     logger.info('Running LafiaMediaService.getRecordedStream');
+
     try {
       const axiosResponse: AxiosResponse = await axios.get(
         `${this.env.lafia_media_url}/rest/v2/vods/${id}`
@@ -52,13 +54,14 @@ export class LafiaMediaService {
     }
   }
 
-  public async addStreamUrlToPatientBroadcast(streamUrl: string, event: any) {
+  public async addStreamUrlToPatientBroadcast(streamUrl: string, event: any): Promise<void> {
     logger.info('Running LafiaMediaService.addStreamUrlToPatientBroadcast');
+
     if (streamUrl) {
-      const videoRecord = await this.getOneVideoRecord({ streamId: event?.id });
+      const videoRecord = await this.findOne({ streamId: event?.id });
 
       if (videoRecord) {
-        await this.updateVideoRecord(videoRecord?.id!, {
+        await this.update(videoRecord?.id!, {
           vodId: event?.vodId,
           stream_url: streamUrl
         });
@@ -66,23 +69,23 @@ export class LafiaMediaService {
     }
   }
 
-  public async getOneVideoRecord(data: IFindVideoRecord | any): Promise<IVideoRecord> {
-    logger.info('Running LafiaMediaService.getOneVideoRecord');
-    return this.videoRecordService.getOneVideoRecord(data);
+  public async findOne(data: IFindVideoRecord | any): Promise<IVideoRecord> {
+    logger.info('Running LafiaMediaService.findOne');
+    return this.videoRecordService.findOne(data);
   }
 
-  public async getAllVideoRecords(user_id: string): Promise<IVideoRecord[]> {
-    logger.info('Running LafiaMediaService.getAllVideoRecords');
-    return this.videoRecordService.getAllVideoRecords(user_id);
+  public async findAll(user_id: string): Promise<IVideoRecord[]> {
+    logger.info('Running LafiaMediaService.findAll');
+    return this.videoRecordService.findAll(user_id);
   }
 
-  public async deleteVideoRecord(id: string): Promise<any> {
-    logger.info('Running LafiaMediaService.deleteVideoRecord');
-    return this.videoRecordService.deleteVideoRecord(id);
+  public async delete(id: string): Promise<any> {
+    logger.info('Running LafiaMediaService.delete');
+    return this.videoRecordService.delete(id);
   }
 
-  public async updateVideoRecord(id: string, data: IFindVideoRecord): Promise<any> {
-    logger.info('Running LafiaMediaService.updateVideoRecord');
-    return this.videoRecordService.updateVideoRecord(id, data);
+  public async update(id: string, data: IFindVideoRecord): Promise<any> {
+    logger.info('Running LafiaMediaService.update');
+    return this.videoRecordService.update(id, data);
   }
 }

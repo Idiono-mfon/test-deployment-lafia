@@ -2,10 +2,11 @@ import { inject, injectable } from 'inversify';
 import { refreshOauth2Token } from '../app';
 import TYPES from '../config/types';
 import { AuthService } from '../services';
+import { ITokenUtil, RefreshToken } from './interfaces';
 import { logger } from './loggerUtil';
 
 @injectable()
-export class TokenUtil {
+export class TokenUtil implements ITokenUtil {
   @inject(TYPES.AuthService)
   private readonly authService: AuthService;
 
@@ -19,7 +20,7 @@ export class TokenUtil {
     return (Date.now() >= JSON.parse(Buffer.from(token?.split('.')[1], 'base64').toString()).exp * 1000);
   }
 
-  public async refreshAccessToken(token: string, provider: string = 'oauth2') {
+  public async refreshAccessToken(token: string, provider: string = 'oauth2'): Promise<RefreshToken> {
     logger.info('Running TokenUtil.refreshAccessToken');
 
     const isTokenExpired = this.isTokenExpired(token);
@@ -28,9 +29,9 @@ export class TokenUtil {
       return { access_token: null, is_refresh_token_expired: false };
     }
 
-    const existingConnection = await this.authService.getConnectionByFields({ access_token: token });
+    const existingConnection = await this.authService.findOneConnection({ access_token: token });
 
-    return new Promise<{ access_token: string | null, is_refresh_token_expired: boolean }>((resolve, reject) => {
+    return new Promise<RefreshToken>((resolve, reject) => {
       if (!existingConnection) {
         return reject({
           message: 'There is no existing connection with the provided access token',
@@ -63,7 +64,7 @@ export class TokenUtil {
           // You probably don't need it anyway, as according to the OAuth 2.0 spec,
           // it should be the same as the initial refreshAccessToken token.
           const { access_token, refresh_token } = result;
-          await this.authService.updateConnection({
+          await this.authService.updateConnection(existingConnection.id!, {
             ...existingConnection,
             access_token,
             refresh_token

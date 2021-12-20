@@ -1,5 +1,6 @@
 import { IAttachment, IPractitioner } from '../../../models';
 import { IUserLoginParams } from '../../auth';
+import { File } from '../../aws';
 
 export interface IPractitionerService {
   update(id: string, data: any): Promise<IPractitioner>;
@@ -10,5 +11,7 @@ export interface IPractitionerService {
 
   login(data: IUserLoginParams): Promise<any>;
 
-  uploadAttachment(practitionerId: string, file: Express.Multer.File): Promise<IAttachment>;
+  uploadAttachment(practitionerId: string, file: File): Promise<IAttachment>;
+
+  findAssignedPractitionerVideoBroadcast(practitionerId: string): Promise<any>
 }

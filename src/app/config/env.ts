@@ -1,4 +1,6 @@
-require('dotenv').config();
+import { config as dotConfig } from 'dotenv';
+
+dotConfig();
 
 export interface IEnv {
   port: number;
@@ -29,6 +31,7 @@ export interface IEnv {
   twilio_api_secret: string;
   twilio_auth_token: string;
   twilio_verify_sid: string;
+  twilio_composition_callback: string;
   email_address: string;
   email_password: string;
   fhir_server_base_url: string;
@@ -82,6 +85,7 @@ const config: IEnv = {
   twilio_api_secret: process.env.TWILIO_API_SECRET as string,
   twilio_auth_token: process.env.TWILIO_AUTH_TOKEN as string,
   twilio_verify_sid: process.env.TWILIO_VERIFY_SID as string,
+  twilio_composition_callback: process.env.TWILIO_COMPOSITION_CALLBACK as string,
   email_address: process.env.EMAIL_ADDRESS as string,
   email_password: process.env.EMAIL_PASSWORD as string,
   fhir_server_base_url: process.env.FHIR_SERVER_BASE_URL as string,

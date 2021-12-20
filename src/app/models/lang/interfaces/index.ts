@@ -1,3 +1,3 @@
-export * from "./iLangauge";
-export * from "./ILabel";
-export * from "./IComponent";
+export * from './ILanguage';
+export * from './ILabel';
+export * from './IComponent';

@@ -1,5 +1,5 @@
 import request from 'supertest';
-import container from '../../../app/config/inversify.config';
+import { container } from '../../../app/config';
 import TYPES from '../../../app/config/types';
 import { CodeSystemController } from '../../../app/controllers';
 import { DbAccess } from '../../../app/repository';

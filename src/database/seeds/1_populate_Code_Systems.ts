@@ -1,4 +1,4 @@
-import * as Knex from "knex";
+import { Knex } from 'knex';
 import { Schema } from '../schema';
 import { Table } from '../table';
 import {

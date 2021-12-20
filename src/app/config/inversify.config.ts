@@ -9,6 +9,10 @@ import { utilityModule } from '../utils';
 
 const container = new Container();
 
-container.load(controllerModule, serviceModule, repositoryModule, middlewareModule, utilityModule, appModule);
+container.load(
+  utilityModule, appModule,
+  controllerModule, serviceModule,
+  repositoryModule, middlewareModule,
+);
 
-export default container;
+export { container };

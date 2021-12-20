@@ -3,15 +3,20 @@ import { injectable } from 'inversify';
 import { Env } from '../../../config/env';
 import { HttpStatusCode, logger } from '../../../utils';
 import { BroadcastData } from '../../notifications';
-
-const env = Env.all();
+import {
+  InitRabbitMqConnection,
+  IRabbitMqSetup,
+  IRmqMessageResponse,
+  IRmqReceivedMessage,
+  successResponseType
+} from '../interfaces';
 
 @injectable()
-export class RabbitMqSetup {
-  public async initRMQ(): Promise<{ connection: amqp.Connection, channel: amqp.Channel }> {
+export class RabbitMqSetup implements IRabbitMqSetup {
+  public async initRMQ(): Promise<InitRabbitMqConnection> {
     logger.info('Running RabbitMqSetup.initRMQ');
 
-    const connectionURL = env.rmq_connection;
+    const connectionURL = Env.all().rmq_connection;
 
     return new Promise((resolve, reject) => {
       amqp.connect(connectionURL, (err: any, connection: Connection) => {
@@ -107,32 +112,5 @@ export class RabbitMqSetup {
       resource_type,
     };
   }
-}
-
-export interface IRmqReceivedMessage {
-  resource_type: string;
-  data: IRmqMessageData;
-}
-
-export interface IRmqMessageData {
-  first_name?: string;
-  last_name?: string;
-  email?: string;
-  password?: string;
-  gender?: string;
-}
-
-export interface IRmqMessageResponse extends IRmqMessageData {
-  status: string;
-  message: string;
-  resource_type?: string;
-  id?: string | null;
-
-}
-
-export const successResponseType = {
-  fhir: 'fhir',
-  broadcast: 'broadcast',
-  default: 'default',
 }
 

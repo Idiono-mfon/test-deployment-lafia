@@ -5,15 +5,10 @@ import TYPES from '../config/types';
 import { IPatient, IPractitioner, IUser } from '../models';
 import { IPatientService, IPractitionerService, IUserService } from '../services';
 import { forWho, logger } from '../utils';
-
-interface CastJWTDecodedType {
-  email: string;
-  iat?: number;
-  aud: string
-}
+import { CastJWTDecodedType, IAuthMiddleware } from './interfaces';
 
 @injectable()
-export class AuthMiddleware extends BaseMiddleware {
+export class AuthMiddleware extends BaseMiddleware implements IAuthMiddleware {
 
   @inject(TYPES.UserService)
   private readonly userService: IUserService;
@@ -22,7 +17,7 @@ export class AuthMiddleware extends BaseMiddleware {
   @inject(TYPES.PractitionerService)
   private readonly practitionerService: IPractitionerService;
 
-  public async handler(req: Request, res: Response, next: NextFunction) {
+  public async handler(req: Request, res: Response, next: NextFunction): Promise<void> {
     logger.info('Running AuthMiddleware.handler');
     try {
 
@@ -44,7 +39,7 @@ export class AuthMiddleware extends BaseMiddleware {
     }
   }
 
-  public authenticate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  public async authenticate(req: Request, res: Response, next: NextFunction): Promise<void> {
     logger.info('Running AuthMiddleware.authenticate');
     try {
       const jwtPayload: CastJWTDecodedType = this.decodeJwtToken(req);
@@ -83,8 +78,9 @@ export class AuthMiddleware extends BaseMiddleware {
     return decoded as CastJWTDecodedType;
   }
 
-  public parseThirdPartyConnection = (req: Request, res: Response, next: NextFunction): void => {
+  public parseThirdPartyConnection(req: Request, res: Response, next: NextFunction): void {
     logger.info('Running AuthMiddleware.parseThirdPartyConnection');
+
     const oauth: string = req.headers['x-oauth'] as string;
     const connectionName: string = req.headers['x-connection-name'] as string;
     const ig: string = req.headers['x-ig'] as string;
@@ -102,6 +98,7 @@ export class AuthMiddleware extends BaseMiddleware {
 
   private async getUserPayload(payload: CastJWTDecodedType): Promise<IUser | IPatient | IPractitioner> {
     logger.info('Running AuthMiddleware.getUserPayload');
+
     let user: IUser | IPatient | IPractitioner = await this.userService.findOne({ resource_id: payload.aud });
 
     if (!user) {

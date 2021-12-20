@@ -1,30 +1,28 @@
+import { Agent } from 'https';
 import * as https from 'https';
-import { inject, injectable } from 'inversify';
 import * as _ from 'lodash';
 import OAuth2Strategy from 'passport-oauth2';
+import { inject, injectable } from 'inversify';
 import { Env } from '../../config/env';
 import TYPES from '../../config/types';
-import { IConnection, IFindConnection, IUser } from '../../models';
-import { ConnectionRepository } from '../../repository';
-import { error, forWho, GenericResponseError, getE164Format, logger, throwError } from '../../utils';
-import { PatientService } from '../patients';
-import { PractitionerService } from '../practitioners';
 import { IUserService } from '../users';
-
-const httpsAgent = new https.Agent({
-  rejectUnauthorized: false,
-});
+import { DbAccess } from '../../repository';
+import { IPatientService } from '../patients';
+import { IPractitionerService } from '../practitioners';
+import { IConnection, IFindConnection, IUser } from '../../models';
+import { IAuthService, IConnectionCredentials } from './interfaces';
+import { error, forWho, GenericResponseError, getE164Format, logger, throwError } from '../../utils';
 
 @injectable()
-export class AuthService {
+export class AuthService implements IAuthService {
   @inject(TYPES.PatientService)
-  private readonly patientService: PatientService;
+  private readonly patientService: IPatientService;
   @inject(TYPES.PractitionerService)
-  private readonly practitionerService: PractitionerService;
+  private readonly practitionerService: IPractitionerService;
   @inject(TYPES.UserService)
   private userService: IUserService;
   @inject(TYPES.ConnectionRepository)
-  private connectionRepository: ConnectionRepository;
+  private connectionRepository: DbAccess;
 
   public async login(email: string, password: string, ip?: string): Promise<any> {
     logger.info('Running AuthService.login');
@@ -64,14 +62,14 @@ export class AuthService {
     }
   }
 
-  public getHttpsAgent() {
+  public getHttpsAgent(): Agent {
     logger.info('Running AuthService.getHttpsAgent');
     return new https.Agent({
       rejectUnauthorized: false,
     });
   }
 
-  public getConnectionCredentials(connectionName: string) {
+  public getConnectionCredentials(connectionName: string): IConnectionCredentials {
     logger.info('Running AuthService.getConnectionCredentials');
 
     if (!connectionName) {
@@ -92,7 +90,7 @@ export class AuthService {
     }
   }
 
-  public getStrategy(connectionName: string) {
+  public getStrategy(connectionName: string): OAuth2Strategy {
     logger.info('Running AuthService.getStrategy');
     const credentials = this.getConnectionCredentials(connectionName);
     const strategy = new OAuth2Strategy(credentials,
@@ -110,38 +108,38 @@ export class AuthService {
     );
 
     // @ts-ignore
-    strategy._oauth2.setAgent(httpsAgent);
+    strategy._oauth2.setAgent(this.getHttpsAgent());
 
     return strategy;
   }
 
-  public async getConnectionByType(connectionType: object): Promise<IConnection[]> {
-    logger.info('Running AuthService.getConnectionByType');
-    return this.connectionRepository.getConnectionByType(connectionType);
+  public async findManyConnection(connectionType: object): Promise<IConnection[]> {
+    logger.info('Running AuthService.findManyConnection');
+    return this.connectionRepository.findMany(connectionType);
   }
 
-  public async getConnectionByFields(fields: IFindConnection): Promise<IConnection> {
-    logger.info('Running AuthService.getConnectionByFields');
-    return this.connectionRepository.getConnectionByFields(fields);
+  public async findOneConnection(fields: IFindConnection): Promise<IConnection> {
+    logger.info('Running AuthService.findOneConnection');
+    return this.connectionRepository.findOne(fields);
   }
 
   public async addConnection(data: IConnection): Promise<IConnection> {
     logger.info('Running AuthService.addConnection');
-    return this.connectionRepository.addConnection(data);
+    return this.connectionRepository.create(data);
   }
 
   public async getConnectionByPatientId(patient_id: string): Promise<IConnection[]> {
     logger.info('Running AuthService.getConnectionByPatientId');
-    return this.connectionRepository.getConnectionByPatientId(patient_id);
+    return this.connectionRepository.findMany(patient_id);
   }
 
-  public async updateConnection(data: IFindConnection): Promise<IConnection> {
+  public async updateConnection(id: string, data: IFindConnection): Promise<IConnection> {
     logger.info('Running AuthService.updateConnection');
-    return this.connectionRepository.updateConnection(data);
+    return this.connectionRepository.update(id, data);
   }
 
-  public async deleteConnection(id: string) {
+  public async deleteConnection(id: string): Promise<IConnection> {
     logger.info('Running AuthService.deleteConnection');
-    return this.connectionRepository.deleteConnection(id);
+    return this.connectionRepository.delete(id);
   }
 }

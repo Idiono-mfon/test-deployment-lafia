@@ -1,4 +1,4 @@
-import * as Knex from 'knex';
+import { Knex } from 'knex';
 import { Schema } from '../schema';
 import { Table } from '../table';
 
@@ -17,7 +17,7 @@ export async function up(knex: Knex): Promise<void> {
                   .unique()
                   .notNullable()
                   .defaultTo(knex.raw('gen_random_uuid()'))
-                  .primary(`${Table.video_records}_id`);
+                  .primary({ constraintName: `${Table.video_records}_id` });
                 tableBuilder
                   .string('streamId')
                   .notNullable();

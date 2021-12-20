@@ -1,21 +1,20 @@
 import { inject, injectable } from 'inversify';
 import TYPES from '../../config/types';
-import { IAttachment, IFhirServer, IFindUser, IPatient, IUser } from '../../models';
+import { IAttachment, IFhirServer, IFindUser, IPatient, IPatientWithToken, IUser } from '../../models';
 import {
   error,
   forWho,
   GenericResponseError,
   getE164Format,
-  InternalServerError, logger,
+  InternalServerError, IUtilityService, logger,
   NotFoundError,
   throwError,
-  UtilityService
 } from '../../utils';
 import { IUserLoginParams } from '../auth';
-import { S3Service } from '../aws';
+import { IS3Service } from '../aws';
 import { ICodeSystemService } from '../codeSystems';
 import { IUserService } from '../users';
-import { VideoBroadcastService } from '../videoRecords';
+import { IVideoBroadcastService } from '../videoRecords';
 import { IPatientService } from './interfaces';
 
 @injectable()
@@ -24,13 +23,13 @@ export class PatientService implements IPatientService {
   private readonly codeSystemService: ICodeSystemService;
 
   @inject(TYPES.VideoBroadcastService)
-  private readonly videoBroadcastService: VideoBroadcastService;
+  private readonly videoBroadcastService: IVideoBroadcastService;
 
   @inject(TYPES.S3Service)
-  private readonly s3Service: S3Service;
+  private readonly s3Service: IS3Service;
 
   @inject(TYPES.UtilityService)
-  private readonly utilService: UtilityService;
+  private readonly utilService: IUtilityService;
 
   @inject(TYPES.UserService)
   private readonly userService: IUserService;
@@ -63,9 +62,10 @@ export class PatientService implements IPatientService {
     return patient.data;
   }
 
-  public async create(data: IUser, ip?: string): Promise<any> {
+  public async create(data: IUser, ip?: string): Promise<IPatientWithToken> {
     logger.info('Running PatientService.create');
     try {
+      console.log('God is here');
 
       this.utilService.checkForRequiredFields(data);
 
@@ -204,7 +204,7 @@ export class PatientService implements IPatientService {
     if (!patient) {
       throw new NotFoundError('unknown patient');
     }
-    return this.videoBroadcastService.getAllVideoRecords(patientId);
+    return this.videoBroadcastService.findAll(patientId);
   }
 
 }

@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify';
 import TYPES from '../../config/types';
 import { IAttachment, IFhirServer, IFindUser, IPractitioner, IUser } from '../../models';
-import { VideoBroadcastRepository, PractitionerVideoBroadcastRepository } from '../../repository';
+import { DbAccess } from '../../repository';
 import {
   error,
   forWho,
@@ -9,10 +9,10 @@ import {
   InternalServerError, logger,
   NotFoundError,
   throwError,
-  UtilityService
+  IUtilityService
 } from '../../utils';
 import { IUserLoginParams } from '../auth';
-import { S3Service } from '../aws';
+import { IS3Service } from '../aws';
 import { ICodeSystemService } from '../codeSystems';
 import { IUserService } from '../users';
 import { IPractitionerService } from './interfaces';
@@ -23,10 +23,10 @@ export class PractitionerService implements IPractitionerService {
   private readonly codeSystemService: ICodeSystemService;
 
   @inject(TYPES.S3Service)
-  private readonly s3Service: S3Service;
+  private readonly s3Service: IS3Service;
 
   @inject(TYPES.UtilityService)
-  private readonly utilService: UtilityService;
+  private readonly utilService: IUtilityService;
 
   @inject(TYPES.UserService)
   private readonly userService: IUserService;
@@ -35,10 +35,10 @@ export class PractitionerService implements IPractitionerService {
   private readonly fhirServerService: IFhirServer;
 
   @inject(TYPES.VideoBroadcastRepository)
-  private readonly videoBroadcastRepository: VideoBroadcastRepository;
+  private readonly videoBroadcastRepository: DbAccess;
 
   @inject(TYPES.PractitionerVideoBroadcastRepository)
-  private readonly practitionerVideoBroadcastRepository: PractitionerVideoBroadcastRepository;
+  private readonly practitionerVideoBroadcastRepository: DbAccess;
 
   public async update(id: string, data: any): Promise<IPractitioner> {
     logger.info('Running PractitionerService.update');
@@ -195,12 +195,12 @@ export class PractitionerService implements IPractitionerService {
     }
   }
 
-  public async findAssignedPractitionerVideoBroadcast(practitionerId: string) {
+  public async findAssignedPractitionerVideoBroadcast(practitionerId: string): Promise<any> {
     logger.info('Running PractitionerService.findAssignedPractitionerVideoBroadcast');
     const practitioner = this.findById(practitionerId)
     if (!practitioner) {
       throw new NotFoundError('unknown practitioner');
     }
-    return this.practitionerVideoBroadcastRepository.fetchPractitionerBroadcastByID(practitionerId);
+    return this.practitionerVideoBroadcastRepository.findById(practitionerId);
   }
 }

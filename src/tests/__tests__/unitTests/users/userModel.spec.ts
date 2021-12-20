@@ -27,7 +27,7 @@ describe('User Model Unit Test', () => {
       required: ['email'],
       title: 'User Schema Validation',
       properties: {
-        email: { type: 'string', format: 'email' },
+        email: { type: 'string' },
         phone: { type: 'string', minLength: 11 },
         photo: { type: 'string' },
         provider: { type: 'string' },

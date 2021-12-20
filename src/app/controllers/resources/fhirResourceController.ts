@@ -2,7 +2,7 @@ import { inject } from 'inversify';
 import { Request, Response } from 'express';
 import { controller, httpDelete, httpGet, httpPost, httpPut, request, response } from 'inversify-express-utils';
 import TYPES from '../../config/types';
-import { FhirResourceService } from '../../services';
+import { IFhirResourceService } from '../../services';
 import { logger } from '../../utils';
 import { BaseController } from '../baseController';
 import { IFhirResource, IFhirResourceImplementationGuide, IFindFhirResource } from '../../models';
@@ -10,13 +10,13 @@ import { IFhirResource, IFhirResourceImplementationGuide, IFindFhirResource } fr
 @controller('/fhir-resource')
 export class FhirResourceController extends BaseController {
   @inject(TYPES.FhirResourceService)
-  private readonly fhirResourceService: FhirResourceService;
+  private readonly fhirResourceService: IFhirResourceService;
 
   @httpGet('')
   public async fetchFhirResources(@request() req: Request, @response() res: Response) {
-    logger.info('Running FhirResourceController::fetchFhirResources');
+    logger.info('Running FhirResourceController.findAll');
     try {
-      const fhirResources = await this.fhirResourceService.fetchFhirResources();
+      const fhirResources = await this.fhirResourceService.findAll();
       this.success(res, fhirResources, 'fhir resources successfully fetched');
     } catch (e: any) {
       logger.error(`Unable to fetch fhir resources -`, e);
@@ -26,11 +26,11 @@ export class FhirResourceController extends BaseController {
 
   @httpGet('/:id')
   public async fetchFhirResource(@request() req: Request, @response() res: Response) {
-    logger.info('Running FhirResourceController::fetchFhirResource');
+    logger.info('Running FhirResourceController.fetchFhirResource');
     try {
       const { id: fhirResourceId } = req.params;
-      const find: IFindFhirResource = {id: fhirResourceId};
-      const fhirResource = await this.fhirResourceService.getOneFhirResource(find);
+      const find: IFindFhirResource = { id: fhirResourceId };
+      const fhirResource = await this.fhirResourceService.findOne(find);
       this.success(res, fhirResource, 'fhir resource successfully fetched');
     } catch (e: any) {
       logger.error(`Unable to fetch fhir resource with id - ${req?.params?.id} -`, e);
@@ -40,10 +40,10 @@ export class FhirResourceController extends BaseController {
 
   @httpPost('')
   public async createFhirResources(@request() req: Request, @response() res: Response) {
-    logger.info('Running FhirResourceController::createFhirResources');
+    logger.info('Running FhirResourceController.createFhirResources');
     try {
       const fhirResource: IFhirResource = req.body;
-      const resp = await this.fhirResourceService.saveFhirResources(fhirResource);
+      const resp = await this.fhirResourceService.create(fhirResource);
       this.success(res, resp, 'fhir resource successfully added');
     } catch (e: any) {
       logger.error(`Unable to create fhir resource -`, e);
@@ -53,7 +53,7 @@ export class FhirResourceController extends BaseController {
 
   @httpPost('/implementation-guide')
   public async attachImplementationGuide(@request() req: Request, @response() res: Response) {
-    logger.info('Running FhirResourceController::attachImplementationGuide');
+    logger.info('Running FhirResourceController.attachImplementationGuide');
     try {
       const fhirResourceImplementationGuide: IFhirResourceImplementationGuide = req.body;
       const resp = await this.fhirResourceService.attachImplementationGuide(fhirResourceImplementationGuide.fr_id, fhirResourceImplementationGuide.ig_id);
@@ -66,11 +66,11 @@ export class FhirResourceController extends BaseController {
 
   @httpPut('/:id')
   public async updateFhirResource(@request() req: Request, @response() res: Response) {
-    logger.info('Running FhirResourceController::updateFhirResource');
+    logger.info('Running FhirResourceController.update');
     try {
       const { id } = req.params;
       const fhirResource: IFhirResource = req.body;
-      const resp = await this.fhirResourceService.updateFhirResource(id, fhirResource);
+      const resp = await this.fhirResourceService.update(id, fhirResource);
       this.success(res, resp, 'fhir resource successfully updated');
     } catch (e: any) {
       logger.error(`Unable to fhir resource with id - ${req?.params?.id} -`, e);
@@ -80,7 +80,7 @@ export class FhirResourceController extends BaseController {
 
   @httpDelete('/implementation-guide')
   public async detachIG(@request() req: Request, @response() res: Response) {
-    logger.info('Running FhirResourceController::detachIG');
+    logger.info('Running FhirResourceController.detachIG');
     try {
       const fhirResourceImplementationGuide: IFhirResourceImplementationGuide = req.body;
       const resp = await this.fhirResourceService.detachIGFromFR(fhirResourceImplementationGuide.fr_id, fhirResourceImplementationGuide.ig_id);
@@ -93,10 +93,10 @@ export class FhirResourceController extends BaseController {
 
   @httpDelete('/:id')
   public async deleteFR(@request() req: Request, @response() res: Response) {
-    logger.info('Running FhirResourceController::deleteFR');
+    logger.info('Running FhirResourceController.deleteFR');
     try {
       const { id } = req.params;
-      const resp = await this.fhirResourceService.deleteFhirResource(id);
+      const resp = await this.fhirResourceService.delete(id);
       this.success(res, resp, 'fhir resource successfully updated');
     } catch (e: any) {
       logger.error(`Unable to detach fhir resource with id - ${req?.params?.id} - from implementation guide -`, e);

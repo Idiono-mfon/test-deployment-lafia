@@ -7,33 +7,31 @@ import { forWho, logger } from '../../../utils';
 import { Password } from '../../../utils/password';
 import { eventName, eventService } from '../../eventEmitter';
 import { BroadcastData } from '../../notifications';
-import { PatientService } from '../../patients';
-import { PractitionerService } from '../../practitioners';
+import { IPatientService } from '../../patients';
+import { IPractitionerService } from '../../practitioners';
 import { IUserService } from '../../users';
-import { RabbitMqSetup, successResponseType } from './rabbitMqSetup';
-
-const env = Env.all();
+import { IRabbitMqService, IRabbitMqSetup, successResponseType } from '../interfaces';
 
 @injectable()
-export class RabbitMqService {
+export class RabbitMqService implements IRabbitMqService {
   @inject(TYPES.PatientService)
-  private readonly patientService: PatientService;
+  private readonly patientService: IPatientService;
   @inject(TYPES.PractitionerService)
-  private readonly practitionerService: PractitionerService;
+  private readonly practitionerService: IPractitionerService;
   @inject(TYPES.UserService)
   private readonly userService: IUserService;
   @inject(TYPES.RabbitMqSetup)
-  private readonly rabbitMqSetup: RabbitMqSetup;
+  private readonly rabbitMqSetup: IRabbitMqSetup;
 
   private readonly pubQueue: string;
   private readonly subQueue: string;
 
   constructor() {
-    this.pubQueue = env.rmq_pub_queue;
-    this.subQueue = env.rmq_sub_queue;
+    this.pubQueue = Env.all().rmq_pub_queue;
+    this.subQueue = Env.all().rmq_sub_queue;
   }
 
-  public async rmqPublish(msg: any) {
+  public async rmqPublish(msg: any): Promise<void> {
     logger.info('Running RabbitMqService.rmqPublish');
     try {
       const { channel: rmqChannel } = await this.rabbitMqSetup.initRMQ();
@@ -49,7 +47,7 @@ export class RabbitMqService {
     }
   }
 
-  public async rmqSubscribe() {
+  public async rmqSubscribe(): Promise<void> {
     logger.info('Running RabbitMqService.rmqSubscribe');
 
     let rmqChannel: any;
@@ -94,78 +92,89 @@ export class RabbitMqService {
         logger.info(`[x] Received Data: ${msgString})`);
         logger.info(`[x] Received Date: ${new Date().toString()}`);
 
-        let { data, resource_type, resource_id, email } = msgJson;
+        const data = msgJson?.data;
+        const email = msgJson?.email;
+        const resource_id = msgJson?.resource_id;
+        let resource_type = msgJson?.resource_type;
+
         resource_type = resource_type?.toLowerCase();
 
-        if (resource_id && data) {
-          try {
-            await this.userService.create({
-              resource_id,
-              resource_type,
-              ...data,
-            });
-
-            return;
-          } catch (e: any) {
-            const rmqPubMsg = this.rabbitMqSetup.structureErrorData(e.message, resource_type);
-            await this.rmqPublish(JSON.stringify(rmqPubMsg));
-
-            return;
-          }
-        }
-
-        if (email && !_.isEmpty(data)) {
-          const { first_name, last_name, password, gender } = data;
-          const dataToUpdate: any = {};
-
-          if (gender) dataToUpdate.gender = gender;
-          if (last_name) dataToUpdate.last_name = last_name;
-          if (first_name) dataToUpdate.first_name = first_name;
-          if (password) dataToUpdate.password = Password.hash(password);
-
-          const existingUser = await this.userService.findOne({ email });
-
-          if (existingUser) {
-            await this.userService.update(existingUser?.resourceId!, dataToUpdate);
-          }
-        }
-
-        if (resource_type && !_.isEmpty(data)) {
-          let resource: IPatient | IPractitioner | any = {};
-
-          if (resource_type?.toLowerCase() === forWho.patient) {
-            try {
-              resource = await this.patientService.create(data);
-            } catch (e: any) {
-              const rmqPubMsg = this.rabbitMqSetup.structureErrorData(e.message, resource_type);
-              await this.rmqPublish(JSON.stringify(rmqPubMsg));
-
-              return;
-            }
-          }
-
-          if (resource_type?.toLowerCase() === forWho.practitioner) {
-            try {
-              resource = await this.practitionerService.create(data);
-            } catch (e: any) {
-              const rmqPubMsg = this.rabbitMqSetup.structureErrorData(e.message, resource_type);
-              await this.rmqPublish(JSON.stringify(rmqPubMsg));
-
-              return;
-            }
-          }
-
-          const rmqPubMsg = this.rabbitMqSetup.structureSuccessData(successResponseType.default, msgJson, 'Resource created successfully', resource?.user?.id);
-          await this.rmqPublish(JSON.stringify(rmqPubMsg));
-        } else {
-          const rmqPubMsg = this.rabbitMqSetup.structureErrorData('Unable to create resource: resource_type and data fields are required!');
-          await this.rmqPublish(JSON.stringify(rmqPubMsg));
-        }
+        await this.createUserFromERPNext(resource_id, data, resource_type);
+        await this.updateExistingUser(email, data);
+        await this.createPatientOrPractitionerFhirAccount(resource_type, data, msgJson);
       }
     });
   }
 
-  public handleEvents() {
+  private async createUserFromERPNext(resource_id: string, data: any, resource_type?: string) {
+    if (resource_id && data) {
+      try {
+        return await this.userService.create({
+          resource_id,
+          resource_type,
+          ...data,
+        });
+      } catch (e: any) {
+
+        const rmqPubMsg = this.rabbitMqSetup.structureErrorData(e.message, resource_type);
+        return this.rmqPublish(JSON.stringify(rmqPubMsg));
+      }
+    }
+  }
+
+  private async updateExistingUser(email: string, data: any) {
+    if (email && !_.isEmpty(data)) {
+      const { first_name, last_name, password, gender } = data;
+      const dataToUpdate: any = {};
+
+      if (gender) dataToUpdate.gender = gender?.toLowerCase();
+      if (last_name) dataToUpdate.last_name = last_name;
+      if (first_name) dataToUpdate.first_name = first_name;
+      if (password) dataToUpdate.password = Password.hash(password);
+
+      const existingUser = await this.userService.findOne({ email });
+
+      if (existingUser) {
+        await this.userService.update(existingUser?.id!, dataToUpdate);
+      }
+    }
+  }
+
+  private async createPatientOrPractitionerFhirAccount(resource_type: string, data: any, msgJson: any) {
+    if (resource_type && !_.isEmpty(data)) {
+      let resource: IPatient | IPractitioner | any = {};
+
+      if (resource_type?.toLowerCase() === forWho.patient) {
+        try {
+          resource = await this.patientService.create(data);
+        } catch (e: any) {
+          logger.error('Error creating patient from App.Lafia:', e);
+
+          const rmqPubMsg = this.rabbitMqSetup.structureErrorData(e.message, resource_type);
+          return this.rmqPublish(JSON.stringify(rmqPubMsg));
+        }
+      }
+
+      if (resource_type?.toLowerCase() === forWho.practitioner) {
+        try {
+          resource = await this.practitionerService.create(data);
+        } catch (e: any) {
+          logger.error('Error creating practitioner from App.Lafia:', e);
+
+          const rmqPubMsg = this.rabbitMqSetup.structureErrorData(e.message, resource_type);
+          return this.rmqPublish(JSON.stringify(rmqPubMsg));
+        }
+      }
+
+      const rmqPubMsg = this.rabbitMqSetup.structureSuccessData(successResponseType.default, msgJson, 'Resource created successfully', resource?.user?.id);
+      await this.rmqPublish(JSON.stringify(rmqPubMsg));
+    } else {
+      const rmqPubMsg = this.rabbitMqSetup.structureErrorData('Unable to create resource: resource_type and data fields are required!');
+      await this.rmqPublish(JSON.stringify(rmqPubMsg));
+    }
+  }
+
+  public handleEvents(): void {
     eventService
       .on(eventName.newPatient, async (patientId, data) => {
         const rmqPubMsg = this.rabbitMqSetup

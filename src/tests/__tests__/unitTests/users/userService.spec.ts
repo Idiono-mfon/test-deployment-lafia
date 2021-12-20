@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import container from '../../../../app/config/inversify.config';
+import { container } from '../../../../app/config';
 import TYPES from '../../../../app/config/types';
 import { IFhirServer, IJwtPayload, IUser } from '../../../../app/models';
 import {
@@ -9,7 +9,7 @@ import {
 import {
   IEmailService,
   IUserService,
-  TwilioService,
+  ITwilioService,
 } from '../../../../app/services';
 import { getE164Format } from '../../../../app/utils';
 import { TestTwilioRoomRepository, TestUserRepository, TestBaseRepository } from '../../../fixtures/repositories';
@@ -33,7 +33,7 @@ describe('User Service Unit Test', () => {
     // @ts-ignore
     container.rebind<DbAccess>(TYPES.TwilioRoomRepository).to(TestTwilioRoomRepository);
     // @ts-ignore
-    container.rebind<TwilioService>(TYPES.TwilioService).to(TestTwilioService);
+    container.rebind<ITwilioService>(TYPES.TwilioService).to(TestTwilioService);
     container.rebind<IEmailService>(TYPES.EmailService).to(TestEmailService);
     container.rebind<DbAccess>(TYPES.BaseRepository).to(TestBaseRepository);
     // @ts-ignore

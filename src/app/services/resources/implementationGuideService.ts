@@ -1,75 +1,82 @@
 import { inject, injectable } from 'inversify';
 import TYPES from '../../config/types';
-import { IFhirResource, IFindImplementationGuide, IImplementationGuide } from '../../models';
-import {
-  FhirResourceRepository,
-  ImplementationGuideRepository
-} from '../../repository';
 import { logger, NotFoundError } from '../../utils';
+import { IFhirResourceRepository, ImplementationGuideRepository } from '../../repository';
+import { IFhirResource, IFindImplementationGuide, IImplementationGuide } from '../../models';
+import { IImplementationGuideService } from './interfaces';
 
 @injectable()
-export class ImplementationGuideService {
+export class ImplementationGuideService implements IImplementationGuideService {
 
   @inject(TYPES.ImplementationGuideRepository)
   private readonly implementationGuideRepository: ImplementationGuideRepository;
 
   @inject(TYPES.FhirResourceRepository)
-  private readonly fhirResourceRepository: FhirResourceRepository;
+  private readonly fhirResourceRepository: IFhirResourceRepository;
 
-  // create
-  public async fetchImplementationGuide(): Promise<IFindImplementationGuide[]> {
-    logger.info('Running ImplementationGuideService.ImplementationGuideService');
-    return this.implementationGuideRepository.fetchImplementationGuide();
+  public async findAll(): Promise<IFindImplementationGuide[]> {
+    logger.info('Running ImplementationGuideService.findAll');
+
+    return this.implementationGuideRepository.findAll();
   }
 
-  public async saveImplementationGuide(data: IImplementationGuide): Promise<IImplementationGuide> {
-    logger.info('Running ImplementationGuideService.saveImplementationGuide');
-    return this.implementationGuideRepository.createImplementationGuide(data);
+  public async create(data: IImplementationGuide): Promise<IImplementationGuide> {
+    logger.info('Running ImplementationGuideService.create');
+
+    return this.implementationGuideRepository.create(data);
   }
 
-  public async getOneImplementationGuide(data: IFindImplementationGuide): Promise<IFindImplementationGuide> {
-    logger.info('Running ImplementationGuideService.getOneImplementationGuide');
-    return this.implementationGuideRepository.getOneImplementationGuide(data);
+  public async findOne(data: IFindImplementationGuide): Promise<IFindImplementationGuide | undefined> {
+    logger.info('Running ImplementationGuideService.findOne');
+    return this.implementationGuideRepository.findOne(data);
   }
 
-  // attach
   public async attachFhirResource(fhirResourceId: string, implementationGuideId: string): Promise<any> {
     logger.info('Running ImplementationGuideService.attachFhirResource');
-    const fhirResource: IImplementationGuide = await this.fhirResourceRepository.getOneFhirResource({id: fhirResourceId});
-    if ( !fhirResource ) {
-      throw new NotFoundError("Fhir resource not found");
+
+    const fhirResource: IFhirResource | undefined = await this.fhirResourceRepository.findOne({ id: fhirResourceId });
+
+    if (!fhirResource) {
+      throw new NotFoundError('Fhir resource not found');
     }
-    const implementationGuide: IImplementationGuide = await this.implementationGuideRepository.getOneImplementationGuide({id: implementationGuideId});
-    if ( !implementationGuide ) {
-      throw new NotFoundError("Implementation guide not found");
+
+    const implementationGuide: IImplementationGuide | undefined = await this.implementationGuideRepository.findOne({ id: implementationGuideId });
+
+    if (!implementationGuide) {
+      throw new NotFoundError('Implementation guide not found');
     }
+
     return this.implementationGuideRepository.attachFhirResource(implementationGuideId, fhirResourceId);
   }
 
-  // detach
-  public async detachFRFromIG(fr_id: string, ig_id: string) {
+  public async detachFRFromIG(fr_id: string, ig_id: string): Promise<any> {
     logger.info('Running ImplementationGuideService.detachFRFromIG');
-    const fhirResource: IFhirResource = await this.fhirResourceRepository.getOneFhirResource({id: fr_id});
-    if ( !fhirResource ) {
-      throw new NotFoundError("Fhir resource not found");
+
+    const fhirResource: IFhirResource | undefined = await this.fhirResourceRepository.findOne({ id: fr_id });
+
+    if (!fhirResource) {
+      throw new NotFoundError('Fhir resource not found');
     }
-    const implementationGuide: IImplementationGuide = await this.implementationGuideRepository.getOneImplementationGuide({id: ig_id});
-    if ( !implementationGuide ) {
-      throw new NotFoundError("Implementation guide not found");
+
+    const implementationGuide: IImplementationGuide | undefined = await this.implementationGuideRepository.findOne({ id: ig_id });
+
+    if (!implementationGuide) {
+      throw new NotFoundError('Implementation guide not found');
     }
+
     return this.implementationGuideRepository.detachFhirResource(ig_id, fr_id);
   }
 
-  // update
-  public async updateImplementationGuide(id: string, data: IImplementationGuide): Promise<IImplementationGuide> {
-    logger.info('Running ImplementationGuideService.updateImplementationGuide');
-    return this.implementationGuideRepository.updateImplementationGuide(id, data);
+  public async update(id: string, data: IImplementationGuide): Promise<IImplementationGuide> {
+    logger.info('Running ImplementationGuideService.update');
+
+    return this.implementationGuideRepository.update(id, data);
   }
 
-  // delete
-  public async deleteImplementationGuide(id: string): Promise<number> {
-    logger.info('Running ImplementationGuideService.deleteImplementationGuide');
-    return this.implementationGuideRepository.deleteImplementationGuide(id);
+  public async delete(id: string): Promise<number> {
+    logger.info('Running ImplementationGuideService.delete');
+
+    return this.implementationGuideRepository.delete(id);
   }
 
 }

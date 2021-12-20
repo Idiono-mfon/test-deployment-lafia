@@ -1,12 +1,10 @@
 import { JSONSchema } from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
-// import { ComponentModel } from './componentModel';
-import { ILangauge } from './interfaces';
-// import { LabelModel } from './labelModel';
+import { ILanguage } from './interfaces';
 import { LanguageValidation } from './validation';
 
-export class LanguageModel extends BaseModel implements ILangauge {
+export class LanguageModel extends BaseModel implements ILanguage {
   code: string;
   name: string;
 

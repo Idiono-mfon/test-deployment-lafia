@@ -1,10 +1,14 @@
 import { inject, injectable } from 'inversify';
 import jwt from 'jsonwebtoken';
 import { v4 as uuid } from 'uuid';
-import { Env, IEnv } from '../../config/env';
 import TYPES from '../../config/types';
-import { IFindUser, IJwtPayload, IUser } from '../../models';
+import { IUserService } from './interfaces';
+import { ITwilioService } from '../twilio';
+import { Env, IEnv } from '../../config/env';
+import { Password } from '../../utils/password';
 import { IUserRepository } from '../../repository';
+import { IComposeEmail, IEmailService } from '../email';
+import { IFhirServer, IFindUser, IJwtPayload, IUser } from '../../models';
 import {
   error,
   GenericResponseError,
@@ -14,11 +18,6 @@ import {
   throwError,
   Validations
 } from '../../utils';
-import { Password } from '../../utils/password';
-import { EmailService, IComposeEmail } from '../email';
-import { FhirServerService } from '../fhirServer';
-import { TwilioService } from '../twilio';
-import { IUserService } from './interfaces';
 
 @injectable()
 export class UserService implements IUserService {
@@ -26,13 +25,13 @@ export class UserService implements IUserService {
   private userRepository: IUserRepository;
 
   @inject(TYPES.EmailService)
-  private readonly emailService: EmailService;
+  private readonly emailService: IEmailService;
 
   @inject(TYPES.TwilioService)
-  private readonly twilioService: TwilioService;
+  private readonly twilioService: ITwilioService;
 
   @inject(TYPES.FhirServerService)
-  private readonly fhirServerService: FhirServerService;
+  private readonly fhirServerService: IFhirServer;
 
   private readonly env: IEnv;
 
@@ -117,12 +116,12 @@ export class UserService implements IUserService {
     logger.info('Running UserService.checkExistingUser');
 
     // Get User By Phone
-    let existingUser: IUser = await this.findOne(data);
+    let existingUser: IUser = await this.findOne({ phone: data?.phone });
 
-    // if (!existingUser) {
-    //   // Get User By Email
-    //   existingUser = await this.findOne({ email: data?.email });
-    // }
+    if (!existingUser) {
+      // Get User By Email
+      existingUser = await this.findOne({ email: data?.email });
+    }
 
     try {
 
@@ -163,13 +162,13 @@ export class UserService implements IUserService {
         throwError('Invalid credentials. User not found!', error.unauthorized);
       }
 
-      const isValidPassword = await Password.compare(password, user.password);
+      const isValidPassword = await Password.compare(password, user?.password!);
 
       if (!isValidPassword) {
         throwError('Invalid username or password', error.unauthorized);
       }
 
-      return user;
+      return user as IUser;
     } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }

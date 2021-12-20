@@ -2,13 +2,13 @@ import { inject, injectable } from 'inversify';
 import TYPES from '../../config/types';
 import { ITwilioRoom } from '../../models';
 import { DbAccess } from '../../repository';
+import { ITwilioRoomService } from './interfaces';
 import { InternalServerError, logger } from '../../utils';
 
 @injectable()
-export class TwilioRoomService {
+export class TwilioRoomService implements ITwilioRoomService {
   @inject(TYPES.TwilioRoomRepository)
   private readonly twilioRoomRepository: DbAccess;
-
 
   public async create(data: ITwilioRoom): Promise<ITwilioRoom> {
     logger.info('Running TwilioRoomService.create');

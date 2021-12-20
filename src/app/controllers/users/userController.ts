@@ -5,9 +5,9 @@ import {
 } from 'inversify-express-utils';
 import TYPES from '../../config/types';
 import { IUser } from '../../models';
-import { IUserService, TwilioService } from '../../services';
 import { HttpStatusCode, logger } from '../../utils';
 import { BaseController } from '../baseController';
+import { ITwilioService, IUserService } from '../../services';
 
 @controller('/users')
 export class UserController extends BaseController {
@@ -15,7 +15,7 @@ export class UserController extends BaseController {
   private userService: IUserService;
 
   @inject(TYPES.TwilioService)
-  private twilioService: TwilioService;
+  private twilioService: ITwilioService;
 
   @httpPost('/register')
   public async createUser(@request() req: Request, @response() res: Response) {

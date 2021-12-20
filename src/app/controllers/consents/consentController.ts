@@ -2,20 +2,21 @@ import { Request, Response } from 'express';
 import { inject } from 'inversify';
 import { controller, httpGet, httpPost, request, response } from 'inversify-express-utils';
 import TYPES from '../../config/types';
-import { FhirServerService, IUserService } from '../../services';
-import { error, logger, throwError } from '../../utils';
+import { IFhirServer } from '../../models';
+import { IUserService } from '../../services';
 import { BaseController } from '../baseController';
+import { error, logger, throwError } from '../../utils';
 
 @controller('/consents')
 export class ConsentController extends BaseController {
   @inject(TYPES.UserService)
   private readonly userService: IUserService;
   @inject(TYPES.FhirServerService)
-  private readonly fhirServerService: FhirServerService;
+  private readonly fhirServerService: IFhirServer;
 
   @httpPost('/accept')
   public async acceptConsent(@request() req: Request, @response() res: Response) {
-    logger.info('Running ConsentController::acceptConsent');
+    logger.info('Running ConsentController.acceptConsent');
     try {
       if (req.body?.resourceType !== 'Consent') {
         throwError('Invalid FHIR Consent Resource Received!', error.badRequest);
@@ -36,7 +37,7 @@ export class ConsentController extends BaseController {
 
   @httpGet('/:user_id')
   public async getAllConsent(@request() req: Request, @response() res: Response) {
-    logger.info('Running ConsentController::getAllConsent');
+    logger.info('Running ConsentController.getAllConsent');
     try {
       const { user_id } = req.params;
       let { resource_type } = req.query;

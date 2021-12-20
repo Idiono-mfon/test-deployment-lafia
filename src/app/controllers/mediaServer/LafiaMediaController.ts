@@ -2,15 +2,15 @@ import { Request, Response } from 'express';
 import { inject } from 'inversify';
 import { controller, httpDelete, httpGet, httpPost, request, response } from 'inversify-express-utils';
 import TYPES from '../../config/types';
-import { AuthMiddleware } from '../../middlewares';
+import { IAuthMiddleware } from '../../middlewares';
+import { IFhirServer } from '../../models';
 import {
-  TwilioRoomService,
-  FhirServerService,
-  LafiaMediaService,
-  TwilioService,
-  FileService,
+  eventName,
   eventService,
-  eventName
+  ILafiaMediaService,
+  ITwilioRoomService,
+  IFileService,
+  ITwilioService
 } from '../../services';
 import { GenericResponseError, HttpStatusCode, logger } from '../../utils';
 import { BaseController } from '../baseController';
@@ -18,17 +18,17 @@ import { BaseController } from '../baseController';
 @controller('/media')
 export class LafiaMediaController extends BaseController {
   @inject(TYPES.LafiaMediaService)
-  private readonly lafiaMediaService: LafiaMediaService;
+  private readonly lafiaMediaService: ILafiaMediaService;
   @inject(TYPES.AuthMiddleware)
-  private readonly auth: AuthMiddleware;
+  private readonly auth: IAuthMiddleware;
   @inject(TYPES.TwilioService)
-  private readonly twilioService: TwilioService;
+  private readonly twilioService: ITwilioService;
   @inject(TYPES.FhirServerService)
-  private readonly fhirServerService: FhirServerService;
+  private readonly fhirServerService: IFhirServer;
   @inject(TYPES.TwilioRoomService)
-  private readonly twilioRoomService: TwilioRoomService;
+  private readonly twilioRoomService: ITwilioRoomService;
   @inject(TYPES.FileService)
-  private readonly fileService: FileService;
+  private readonly fileService: IFileService;
 
   @httpPost('/broadcast', TYPES.AuthMiddleware)
   public async createBroadcast(@request() req: Request, @response() res: Response) {
@@ -189,7 +189,7 @@ export class LafiaMediaController extends BaseController {
     logger.info('Running LafiaMediaController.getRecordedStream');
     try {
       const { streamId } = req.params;
-      const broadcast = await this.lafiaMediaService.getOneVideoRecord({ streamId });
+      const broadcast = await this.lafiaMediaService.findOne({ streamId });
 
       this.success(res, broadcast, 'Recorded Video Retrieved successfully', HttpStatusCode.CREATED);
     } catch (e: any) {
@@ -203,7 +203,7 @@ export class LafiaMediaController extends BaseController {
     logger.info('Running LafiaMediaController.getAllRecordedStream');
     try {
       const { user } = res.locals;
-      const broadcast = await this.lafiaMediaService.getAllVideoRecords(user?.id!);
+      const broadcast = await this.lafiaMediaService.findAll(user?.id!);
 
       this.success(res, broadcast, 'Recorded Video Retrieved successfully', HttpStatusCode.OK);
     } catch (e: any) {
@@ -217,7 +217,7 @@ export class LafiaMediaController extends BaseController {
     logger.info('Running LafiaMediaController.getRecordedStreamUrl');
     try {
       const { id } = req.params;
-      const broadcast = await this.lafiaMediaService.deleteVideoRecord(id);
+      const broadcast = await this.lafiaMediaService.delete(id);
 
       this.success(res, broadcast, 'Recorded Video deleted successfully', HttpStatusCode.CREATED);
     } catch (e: any) {

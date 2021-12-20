@@ -12,12 +12,13 @@ import TYPES from '../../config/types';
 import { uploadFile } from '../../middlewares';
 import {
   IAttachment,
-  IPractitioner, IPractitionerWithToken
+  IPractitioner,
+  IPractitionerWithToken
 } from '../../models';
 import {
   eventName,
   eventService,
-  PractitionerService,
+  IPractitionerService,
 } from '../../services';
 import { HttpStatusCode, logger } from '../../utils';
 import { BaseController } from '../baseController';
@@ -25,7 +26,7 @@ import { BaseController } from '../baseController';
 @controller('/practitioners')
 export class PractitionerController extends BaseController {
   @inject(TYPES.PractitionerService)
-  private readonly practitionerService: PractitionerService;
+  private readonly practitionerService: IPractitionerService;
 
   @httpPut('/:id')
   public async updatePractitioner(@request() req: Request, @response() res: Response) {

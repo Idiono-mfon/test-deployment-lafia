@@ -17,11 +17,11 @@ import { PatientService } from '../patients';
 import { PractitionerService } from '../practitioners';
 import { TwilioService } from '../twilio';
 import { VideoBroadcastService } from '../videoRecords';
-import { IAcceptCare, INewBroadcast, INewCare, IOnlineUser } from './interfaces';
+import { IAcceptCare, INewBroadcast, INewCare, IOnlineUser, ISignallingServerService } from './interfaces';
 import { RedisStore } from './redisStore';
 
 @injectable()
-export class SignallingServerService {
+export class SignallingServerService implements ISignallingServerService {
   private io: any;
   private readonly env: IEnv;
   private readonly pubClient: any;
@@ -189,7 +189,7 @@ export class SignallingServerService {
           video_url: newCareBroadCast.videoUrl
         }
 
-        await this.videoBroadcastService.saveBroadcastVideo(vidBroadcast);
+        await this.videoBroadcastService.create(vidBroadcast);
       }
     });
   }
@@ -237,7 +237,7 @@ export class SignallingServerService {
 
       await this.redisStore.updateBroadcast(acceptCare);
 
-      const videoBroadcast = await this.videoBroadcastService.getOneVideoRecord({
+      const videoBroadcast = await this.videoBroadcastService.findOne({
         patient_id: existingCare.patientId,
         video_url: existingCare.videoUrl
       });

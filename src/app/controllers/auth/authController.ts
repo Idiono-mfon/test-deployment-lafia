@@ -1,27 +1,21 @@
 import { inject } from 'inversify';
-import {
-  controller,
-  httpDelete,
-  httpGet,
-  httpPost,
-  request,
-  response
-} from 'inversify-express-utils';
 import { Request, Response } from 'express';
 import TYPES from '../../config/types';
 import { passport } from '../../middlewares';
-import { AuthService } from '../../services';
-import { error, logger, throwError } from '../../utils';
+import { IAuthService } from '../../services';
 import { BaseController } from '../baseController';
+import { error, logger, throwError } from '../../utils';
+import { controller, httpDelete, httpGet, httpPost, request, response } from 'inversify-express-utils';
 
 @controller('')
 export class AuthController extends BaseController {
   @inject(TYPES.AuthService)
-  private authService: AuthService;
+  private authService: IAuthService;
 
   @httpPost('/auth/login')
   public async login(@request() req: Request, @response() res: Response): Promise<void> {
     logger.info('Running AuthController.login');
+
     try {
       // @ts-ignore
       const ip: string = req.headers['x-forwarded-for']?.split(',').shift() || req.socket?.remoteAddress;
@@ -59,13 +53,13 @@ export class AuthController extends BaseController {
     try {
       const state = req.query.state as string;
       const [stateValue,] = state?.split('?')!;
-      const existingConnection = await this.authService.getConnectionByFields({
+      const existingConnection = await this.authService.findOneConnection({
         patient_id: stateValue,
         connection_name: 'safhir',
       });
 
       if (existingConnection) {
-        await this.authService.updateConnection({
+        await this.authService.updateConnection(existingConnection.id!, {
             // @ts-ignore
             refresh_token: global.refreshToken,
             // @ts-ignore
@@ -115,7 +109,7 @@ export class AuthController extends BaseController {
 
   @httpDelete('/connections/:id')
   public async deleteConnection(@request() req: Request, @response() res: Response) {
-    logger.info('Running FhirServerController.deleteConnection');
+    logger.info('Running FhirServerController.delete');
     try {
       const { id } = req.params;
       const connections = await this.authService.deleteConnection(id);

@@ -2,33 +2,35 @@ import { injectable } from 'inversify';
 import nodemailer, { Transporter } from 'nodemailer';
 import { GenericResponseError, HttpStatusCode, logger } from '../../utils';
 import { Env } from '../../config/env';
-import { IEmailService } from './interfaces';
-
-const env = Env.all();
-
-const transporter: Transporter = nodemailer.createTransport({
-  pool: true,
-  host: 'mail.lafia.io',
-  port: 465,
-  secure: true, // use TLS
-  auth: {
-    user: env.email_address,
-    pass: `${env.email_password}`,
-  }
-});
+import { IComposeEmail, IEmailService } from './interfaces';
 
 @injectable()
 export class EmailService implements IEmailService {
+  private readonly transporter: Transporter;
+
+  constructor() {
+    this.transporter = nodemailer.createTransport({
+      pool: true,
+      host: 'mail.lafia.io',
+      port: 465,
+      secure: true, // use TLS
+      auth: {
+        user: Env.all().email_address,
+        pass: `${Env.all().email_password}`,
+      }
+    });
+  }
+
   public async sendEmail(data: IComposeEmail) {
     logger.info('Running EmailService::sendEmail')
     try {
       // verify connection configuration
-      await transporter.verify();
+      await this.transporter.verify();
 
       logger.info('Sending email to: ' + data.to);
       // Send the email
-      return await transporter.sendMail({
-        from: `'Lafia Team' <${env.email_address}>`,
+      return await this.transporter.sendMail({
+        from: `'Lafia Team' <${Env.all().email_address}>`,
         ...data
       });
     } catch (e: any) {
@@ -38,12 +40,4 @@ export class EmailService implements IEmailService {
       throw new GenericResponseError(e.message, e.code);
     }
   }
-}
-
-export interface IComposeEmail {
-  to: string;
-  from?: string;
-  subject: string;
-  html: string;
-  text?: string;
 }

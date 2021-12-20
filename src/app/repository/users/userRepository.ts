@@ -11,10 +11,13 @@ export class UserRepository extends BaseRepository implements IUserRepository {
     super(UserModel);
   }
 
-  public async getUserByEmailOrPhone(value: string): Promise<IUser> {
+  public async getUserByEmailOrPhone(value: string): Promise<IUser | undefined> {
     logger.info('Running UserRepository.getUserByEmailOrPhone');
     try {
-      return await UserModel.query().where('email', value).orWhere('phone', value).first();
+      return await UserModel.query()
+        .where('email', value)
+        .orWhere('phone', value)
+        .first();
     } catch (e: any) {
       throw new InternalServerError(e.message);
     }

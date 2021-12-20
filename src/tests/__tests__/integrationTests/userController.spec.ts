@@ -1,13 +1,13 @@
 import bcrypt from 'bcryptjs';
 import request from 'supertest';
 import faker from 'faker';
-import container from '../../../app/config/inversify.config';
+import { container } from '../../../app/config';
 import TYPES from '../../../app/config/types';
 import { UserController } from '../../../app/controllers';
 import { IFhirServer } from '../../../app/models';
 import { DbAccess } from '../../../app/repository';
 import { appServer } from '../../../app/server';
-import { IEmailService, TwilioService } from '../../../app/services';
+import { IEmailService, ITwilioService } from '../../../app/services';
 import { getE164Format } from '../../../app/utils';
 import { TestBaseRepository, TestUserRepository } from '../../fixtures/repositories';
 import { TestEmailService, TestFhirServerService, TestTwilioService } from '../../fixtures/services';
@@ -30,7 +30,7 @@ describe('User [Controller] Integration Test', () => {
     container.rebind<DbAccess>(TYPES.BaseRepository).to(TestBaseRepository);
     container.rebind<DbAccess>(TYPES.UserRepository).to(TestUserRepository);
     // @ts-ignore
-    container.rebind<TwilioService>(TYPES.TwilioService).to(TestTwilioService);
+    container.rebind<ITwilioService>(TYPES.TwilioService).to(TestTwilioService);
     container.rebind<IFhirServer>(TYPES.FhirServerService).to(TestFhirServerService);
     container.rebind<IEmailService>(TYPES.EmailService).to(TestEmailService);
 

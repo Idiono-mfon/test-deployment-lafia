@@ -2,18 +2,17 @@ import { inject, injectable } from 'inversify';
 import _ from 'lodash';
 import TYPES from '../../config/types';
 import { IPatient, IPractitioner } from '../../models';
-import { forWho, GenericResponseError, HttpStatusCode, logger } from '../../utils';
+import { ForWho, forWho, GenericResponseError, HttpStatusCode, logger } from '../../utils';
 import { IPatientService } from '../patients';
 import { IPractitionerService } from '../practitioners';
-import { IBroadcastStatus, IOnlineUser, IRoom, IRooms } from './interfaces';
+import { IBroadcastStatus, IOnlineUser, IRedisStore, IRoom, IRooms } from './interfaces';
 
 @injectable()
-export class RedisStore {
+export class RedisStore implements IRedisStore {
+  private redisClient: any;
   private readonly roomKey: string;
   private readonly onlineUsersKey: string;
   private readonly broadcastStatusKey: string;
-
-  private redisClient: any;
 
   @inject(TYPES.PatientService)
   private readonly patientService: IPatientService;
@@ -26,7 +25,7 @@ export class RedisStore {
     this.broadcastStatusKey = 'broadcastStatus';
   }
 
-  public configure(redisClient: any) {
+  public configure(redisClient: any): void {
     this.redisClient = redisClient;
   }
 
@@ -182,28 +181,8 @@ export class RedisStore {
           return onlineUser?.userId === existingUser.userId;
         });
       } else {
-        let username: string = '';
 
-        if (user?.resourceType === forWho.patient) {
-          try {
-            const patient: IPatient = await this.patientService.findById(user.userId);
-            // @ts-ignore
-            username = patient?.name[0]?.text;
-          } catch (e: any) {
-            console.log(e);
-          }
-        }
-
-        if (user?.resourceType === forWho.practitioner) {
-          try {
-            const practitioner: IPractitioner = await this.practitionerService.findById(user.userId);
-            // @ts-ignore
-            username = practitioner?.name[0]?.text;
-          } catch (e: any) {
-            console.log(e);
-          }
-
-        }
+        let username = await this.getUsernameOfUser(user, forWho);
 
         if (username) {
           user.username = username;
@@ -221,6 +200,32 @@ export class RedisStore {
     } catch (e: any) {
       throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  private async getUsernameOfUser(user: IOnlineUser, forWho: ForWho): Promise<string> {
+    let username: string = '';
+
+    if (user?.resourceType === forWho.patient) {
+      try {
+        const patient: IPatient = await this.patientService.findById(user.userId);
+        // @ts-ignore
+        username = patient?.name[0]?.text;
+      } catch (e: any) {
+        console.log(e);
+      }
+    }
+
+    if (user?.resourceType === forWho.practitioner) {
+      try {
+        const practitioner: IPractitioner = await this.practitionerService.findById(user.userId);
+        // @ts-ignore
+        username = practitioner?.name[0]?.text;
+      } catch (e: any) {
+        console.log(e);
+      }
+    }
+
+    return username;
   }
 
   public async getAllBroadcasts(): Promise<IBroadcastStatus[]> {
@@ -363,7 +368,7 @@ export class RedisStore {
       let room: string[] = [];
       for (let roomId in rooms) {
         if (id === roomId) {
-          room.concat(rooms[id]);
+          room = room.concat(rooms[id]);
           return room;
         }
       }

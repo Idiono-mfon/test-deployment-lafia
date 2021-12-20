@@ -1,29 +1,34 @@
 import { inject, injectable } from 'inversify';
-import twilio, { jwt } from 'twilio';
-import { Env } from '../../config/env';
+import twilio, { jwt, Twilio } from 'twilio';
+import { Env, IEnv } from '../../config/env';
 import TYPES from '../../config/types';
 import { ITwilioRoom } from '../../models';
 import { IUserRepository } from '../../repository';
+import { ITwilioRoomService } from '../videoRecords';
+import { ITwilioService, RoomParticipants, TwilioOTP, TwilioToken } from './interfaces';
 import { GenericResponseError, HttpStatusCode, logger } from '../../utils';
-import { TwilioRoomService } from '../videoRecords';
-
-const env = Env.all();
-const { AccessToken } = jwt;
-const { VideoGrant } = AccessToken;
-const twilioClient = twilio(
-  env.twilio_account_sid,
-  env.twilio_auth_token
-)
 
 @injectable()
-export class TwilioService {
+export class TwilioService implements ITwilioService {
+
+  private readonly env: IEnv;
+  private readonly twilioClient: Twilio;
 
   @inject(TYPES.UserRepository)
   private userRepository: IUserRepository;
   @inject(TYPES.TwilioRoomService)
-  private readonly twilioRoomService: TwilioRoomService;
+  private readonly twilioRoomService: ITwilioRoomService;
 
-  public async generateAccessToken(identity: string, roomId: string, newRoom = false): Promise<{ roomId: string, token: string }> {
+  constructor() {
+    this.env = Env.all();
+
+    this.twilioClient = twilio(
+      this.env.twilio_account_sid,
+      this.env.twilio_auth_token
+    );
+  }
+
+  public async generateAccessToken(identity: string, roomId: string, newRoom = false): Promise<TwilioToken> {
     logger.info('Running TwilioService.generateAccessToken');
     try {
 
@@ -31,20 +36,23 @@ export class TwilioService {
 
       if (newRoom) {
         try {
-          await TwilioService.createRoom(newRoomId);
+          await this.createRoom(newRoomId);
         } catch (e: any) {
           throw new GenericResponseError(e.message, HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
       }
+
+      const { AccessToken } = jwt;
+      const { VideoGrant } = AccessToken;
 
       const videoGrant = new VideoGrant({
         room: newRoomId
       });
 
       const token = new AccessToken(
-        env.twilio_account_sid,
-        env.twilio_api_key,
-        env.twilio_api_secret,
+        this.env.twilio_account_sid,
+        this.env.twilio_api_key,
+        this.env.twilio_api_secret,
       );
       token.identity = identity;
       token.addGrant(videoGrant);
@@ -59,10 +67,10 @@ export class TwilioService {
     }
   }
 
-  public static async createRoom(roomName: string): Promise<string> {
+  public async createRoom(roomName: string): Promise<string> {
     logger.info('Running TwilioService.createRoom');
     try {
-      const room = await twilioClient
+      const room = await this.twilioClient
         .video.rooms
         .create({
           uniqueName: roomName,
@@ -71,7 +79,7 @@ export class TwilioService {
 
       const roomSid = room?.sid;
 
-      await twilioClient.video.rooms(roomSid)
+      await this.twilioClient.video.rooms(roomSid)
         .recordingRules
         .update({ rules: [{ 'type': 'include', 'all': true }] });
 
@@ -85,7 +93,7 @@ export class TwilioService {
   public async closeRoomOnCallEnd(roomId: string): Promise<string> {
     logger.info('Running TwilioService.closeRoomOnCallEnd');
     try {
-      const room = await twilioClient
+      const room = await this.twilioClient
         .video.rooms(roomId)
         .update({ status: 'completed' });
 
@@ -95,10 +103,11 @@ export class TwilioService {
     }
   }
 
-  public async getParticipantsByRoomSid(roomSid: string) {
+  public async getParticipantsByRoomSid(roomSid: string): Promise<RoomParticipants> {
     logger.info('Running TwilioService.getParticipantsByRoomSid');
     try {
-      const room = await twilioClient.video.rooms(roomSid)
+      const room = await this.twilioClient.video
+        .rooms(roomSid)
         .fetch();
 
       const [, participants] = room?.uniqueName?.split(':');
@@ -114,7 +123,7 @@ export class TwilioService {
     logger.info('Running TwilioService.getVideoRecording');
     try {
       const uri = `https://video.twilio.com/v1/Recordings/${recordingSid}/Media`;
-      const twilioRecordResponse = await twilioClient.request({ method: 'GET', uri });
+      const twilioRecordResponse = await this.twilioClient.request({ method: 'GET', uri });
 
       return twilioRecordResponse?.body?.redirect_to;
     } catch (e: any) {
@@ -122,10 +131,10 @@ export class TwilioService {
     }
   }
 
-  public async composeRecordingMedia(roomId: string) {
+  public async composeRecordingMedia(roomId: string): Promise<string> {
     logger.info('Running TwilioService.composeRecordingMedia');
     try {
-      const composition = await twilioClient.video.compositions.create({
+      const composition = await this.twilioClient.video.compositions.create({
         roomSid: roomId,
         audioSources: '*',
         videoLayout: {
@@ -133,7 +142,7 @@ export class TwilioService {
             video_sources: ['*']
           }
         },
-        statusCallback: 'https://api.lafia.io/media/events',
+        statusCallback: this.env.twilio_composition_callback,
         format: 'mp4'
       })
 
@@ -143,7 +152,7 @@ export class TwilioService {
     }
   }
 
-  public async getVideoRecordingFile(compositionSid: string) {
+  public async getVideoRecordingFile(compositionSid: string): Promise<string> {
     logger.info('Running TwilioService.getVideoRecordingFile');
     try {
       const uri =
@@ -151,7 +160,7 @@ export class TwilioService {
         compositionSid +
         '/Media';
 
-      const compositionFileResponse = await twilioClient.request({ method: 'GET', uri })
+      const compositionFileResponse = await this.twilioClient.request({ method: 'GET', uri })
 
       return compositionFileResponse?.body?.redirect_to;
     } catch (e: any) {
@@ -159,16 +168,16 @@ export class TwilioService {
     }
   }
 
-  public async sendOTP(phone: string): Promise<any> {
+  public async sendOTP(phone: string): Promise<TwilioOTP> {
     logger.info('Running TwilioService.sendOTP');
 
-    const sid = env.twilio_verify_sid;
+    const sid = this.env.twilio_verify_sid;
     try {
-      const { to, channel, status, valid } = await twilioClient.verify
+      const { to, channel, status, valid } = await this.twilioClient.verify
         .services(sid)
         .verifications
         .create({ to: phone, channel: 'sms' });
-      //.then(verification => console.log(verification.status));
+
       return { to, channel, status, valid };
     } catch (e: any) {
       throw new GenericResponseError(e.message, e.status);
@@ -176,11 +185,11 @@ export class TwilioService {
 
   }
 
-  public async verifyOTP(phone: string, code: string): Promise<any> {
+  public async verifyOTP(phone: string, code: string): Promise<TwilioOTP> {
     logger.info('Running TwilioService.verifyOTP');
-    const sid = env.twilio_verify_sid;
+    const sid = this.env.twilio_verify_sid;
     try {
-      const { to, channel, status, valid } = await twilioClient.verify
+      const { to, channel, status, valid } = await this.twilioClient.verify
         .services(sid)
         .verificationChecks
         .create({ to: phone, code });
@@ -191,7 +200,7 @@ export class TwilioService {
     }
   }
 
-  public async triggerMediaComposition(twilioRoom: ITwilioRoom, event: any) {
+  public async triggerMediaComposition(twilioRoom: ITwilioRoom, event: any): Promise<void> {
     logger.info('Running TwilioService.triggerMediaComposition');
     if (!twilioRoom?.room_sid) {
       try {
