@@ -22,7 +22,7 @@ export class FirebaseService implements IFirebaseService {
   sendNotification(firebaseToken: string, notificationPayload: CallNotificationPayload): Promise<MessagingDevicesResponse>
   sendNotification(firebaseToken: string, notificationPayload: BroadcastNotificationPayload): Promise<MessagingDevicesResponse>
 
-  public async sendNotification(firebaseToken: string, notificationPayload: any): Promise<MessagingDevicesResponse> {
+  public async sendNotification(firebaseToken: string, notificationPayload: any): Promise<MessagingDevicesResponse | undefined> {
     logger.info('Running FirebaseService.sendNotification');
 
     let { title, body, user_image, user_name, type, notificationType, call_data, broadcast_data } = notificationPayload;
@@ -77,7 +77,15 @@ export class FirebaseService implements IFirebaseService {
 
     }
 
-    return firebase.messaging().sendToDevice(firebaseToken, payload, options);
+    if (!firebaseToken) {
+      return
+    }
+
+    const notificationResponse = firebase.messaging().sendToDevice(firebaseToken, payload, options);
+
+    logger.info(`Firebase notification sent successfully`);
+
+    return notificationResponse;
   }
 
   public async triggerNotification(): Promise<void> {
