@@ -332,8 +332,8 @@ export class SignallingServerService implements ISignallingServerService {
     logger.info(`EmitCallEvent Data: ${JSON.stringify(res)}`);
 
     const payload: CallNotificationPayload = {
-      user_image: reciever.userImage as string,
-      user_name: reciever.username as string,
+      user_image: reciever?.userImage as string,
+      user_name: reciever?.username as string,
       notificationType: 'call',
       call_data: res
     };

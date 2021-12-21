@@ -13,9 +13,7 @@ describe('Code System Service Unit Test', () => {
     // it without breaking other unit tests
     container.snapshot();
 
-    // @ts-ignore
     container.rebind<DbAccess>(TYPES.BaseRepository).to(TestBaseRepository);
-    // @ts-ignore
     container.rebind<DbAccess>(TYPES.CodeSystemRepository).to(TestCodeSystemRepository);
 
     testCodeSystemService = container.get<ICodeSystemService>(TYPES.CodeSystemService);

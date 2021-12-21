@@ -1,9 +1,10 @@
 import { Method } from 'axios';
 import { inject, injectable } from 'inversify';
-import { isEmpty } from 'lodash';
+import _, { isEmpty } from 'lodash';
 import TYPES from '../../../app/config/types';
 import { IFhirServer } from '../../../app/models';
 import { FhirResourceService } from '../../../app/services';
+import { GenericResponseError } from '../../../app/utils';
 
 @injectable()
 export class TestFhirServerService implements IFhirServer {
@@ -13,7 +14,7 @@ export class TestFhirServerService implements IFhirServer {
       'resourceType': 'Patient',
       'id': '11',
       'meta': {
-        'versionId': '2',
+        'versionId': '1',
         'lastUpdated': '2021-10-11T19:52:02.842+00:00',
         'source': '#JKw3YUbaY9TqjZkI'
       },
@@ -221,13 +222,19 @@ export class TestFhirServerService implements IFhirServer {
     const selectMethod = TestFhirServerService.chooseMethodFromConnectionName(connectionName);
 
     // @ts-ignore
-    return await this[selectMethod](resourceQuery, httpMethod, props);
+    return this[selectMethod](resourceQuery, httpMethod, props);
   }
 
   public async lafiaFhir(resourceQuery: string, httpMethod: Method, props?: FhirProperties): Promise<any> {
     const { data } = props!;
 
     if (httpMethod?.toLowerCase() === 'post') {
+      if (!data.resourceType) {
+        throw new GenericResponseError('Resource type is required', 400);
+      }
+
+      data.id = Math.random().toString().slice(2, 6);
+
       this.fhirResourceData.push(data);
 
       return {
@@ -236,55 +243,54 @@ export class TestFhirServerService implements IFhirServer {
       }
     }
 
-    if (httpMethod?.toLowerCase() === 'get' && resourceQuery.startsWith('/Patient/11')) {
-      const patient = this.fhirResourceData.find((patient: any) => {
-        if (patient.resourceType === 'Patient' && patient.id === '11') {
-          return patient;
-        }
+    if (httpMethod?.toLowerCase() === 'put') {
+      if (!data.resourceType) {
+        throw new GenericResponseError('Resource type is required', 400);
+      }
 
-        return null;
-      });
+      const resourceId = resourceQuery.split('/')[2];
+
+      const resource = this.fhirResourceData.find(resource => resource.id === resourceId);
+
+      if (!resource) {
+        throw new GenericResponseError('Resource with the provided id does not exist', 404);
+      }
+
+      const versionId = String(Number(resource.meta.versionId) + 1);
+
+      data.meta = resource.meta;
+      data.meta.versionId = versionId;
+      data.meta.lastUpdated = new Date();
+      data.id = resource.id;
+
+      _.remove(this.fhirResourceData, resource);
+
+      this.fhirResourceData.push(data);
+
 
       return {
-        data: patient,
+        data,
         status: 200
       }
     }
 
-    if (httpMethod?.toLowerCase() === 'get' && resourceQuery.startsWith('/Practitioner/22')) {
+    if (httpMethod?.toLowerCase() === 'get') {
+      const resourceId = resourceQuery.split('/')[2];
+      const resource = this.fhirResourceData.find(resource => resource.id === resourceId);
 
-      const practitioner = this.fhirResourceData.find((practitioner: any) => {
-        if (practitioner.resourceType === 'Practitioner' && practitioner.id === '22') {
-          return practitioner;
-        }
-
-        return null;
-      });
-
-      return {
-        data: practitioner,
-        status: 200
+      if (!resource) {
+        throw new GenericResponseError('Resource with the provided id does not exist', 404);
       }
-    }
-
-    if (httpMethod?.toLowerCase() === 'get' && resourceQuery.startsWith('/practitioner/33')) {
-      const practitioner = this.fhirResourceData.filter((practitioner: any) => {
-        if (practitioner.resourceType === 'Practitioner' && practitioner.id === '33') {
-          return practitioner;
-        }
-
-        return null;
-      });
 
       return {
-        data: practitioner,
+        data: resource,
         status: 200
       }
     }
   }
 
   public async saFhir(resourceQuery: string, httpMethod: Method, props?: FhirProperties): Promise<any> {
-    return await this.lafiaFhir(resourceQuery, httpMethod, props);
+    return this.lafiaFhir(resourceQuery, httpMethod, props);
   }
 
   public async fetchSampleResources(resourceName: string): Promise<any> {

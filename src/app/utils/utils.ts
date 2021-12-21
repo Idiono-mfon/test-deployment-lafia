@@ -15,6 +15,7 @@ import {
   throwError,
   GenericResponseError
 } from './errors';
+import { IUtilityService } from './interfaces';
 import { logger } from './loggerUtil';
 
 const { badRequest } = error;
@@ -40,7 +41,7 @@ const codeType: ICodeType = {
 };
 
 @injectable()
-class UtilityService {
+class UtilityService implements IUtilityService {
   @inject(TYPES.CodeSystemService)
   private readonly codeSystemService: ICodeSystemService;
 

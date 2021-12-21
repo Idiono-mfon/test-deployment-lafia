@@ -15,9 +15,7 @@ describe('CodeSystem [Controller] Integration Test', () => {
     // it without breaking other unit tests
     container.snapshot();
 
-    // @ts-ignore
     container.rebind<DbAccess>(TYPES.BaseRepository).to(TestBaseRepository);
-    // @ts-ignore
     container.rebind<DbAccess>(TYPES.CodeSystemRepository).to(TestCodeSystemRepository);
 
     codeSystemController = container.get<CodeSystemController>(TYPES.CodeSystemController);
