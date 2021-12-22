@@ -3,14 +3,14 @@ import { Readable } from 'stream';
 import request from 'supertest';
 import { container } from '../../../app/config';
 import TYPES from '../../../app/config/types';
-import { PatientController } from '../../../app/controllers';
+import { PractitionerController } from '../../../app/controllers';
 import { IFhirServer } from '../../../app/models';
 import { DbAccess, IUserRepository } from '../../../app/repository';
 import { appServer } from '../../../app/server';
 import { IS3Service } from '../../../app/services';
 import { getE164Format } from '../../../app/utils';
-import { TestBaseRepository, TestUserRepository, TestVideoBroadcastRepository } from '../../fixtures/repositories';
 import { TestFhirServerService, TestS3Service } from '../../fixtures/services';
+import { TestBaseRepository, TestUserRepository, TestVideoBroadcastRepository } from '../../fixtures/repositories';
 import { getE164FormatMockImpl } from '../../fixtures/utils';
 
 jest.mock('../../../app/utils/phone.util');
@@ -43,7 +43,7 @@ jest.mock('multer', () => {
 
 describe('User Service Unit Test', () => {
   const getE164FormatMock = getE164Format as jest.Mocked<any>;
-  let testPatientController: PatientController;
+  let testPractitionerController: PractitionerController;
   let app = appServer;
 
 
@@ -55,10 +55,11 @@ describe('User Service Unit Test', () => {
     container.rebind<IS3Service>(TYPES.EmailService).to(TestS3Service);
     container.rebind<DbAccess>(TYPES.BaseRepository).to(TestBaseRepository);
     container.rebind<DbAccess>(TYPES.VideoBroadcastRepository).to(TestVideoBroadcastRepository);
+    container.rebind<DbAccess>(TYPES.PractitionerVideoBroadcastRepository).to(TestVideoBroadcastRepository);
     container.rebind<IFhirServer>(TYPES.FhirServerService).to(TestFhirServerService);
     container.rebind<IUserRepository>(TYPES.UserRepository).to(TestUserRepository);
 
-    testPatientController = container.get<PatientController>(TYPES.PatientController);
+    testPractitionerController = container.get<PractitionerController>(TYPES.PractitionerController);
   });
 
   afterEach(() => {
@@ -78,17 +79,17 @@ describe('User Service Unit Test', () => {
     done();
   })
 
-  describe('Patient [Controller] Integration Test', () => {
-    describe('Patient Controller', () => {
+  describe('Practitioner [Controller] Integration Test', () => {
+    describe('Practitioner Controller', () => {
       it('should be defined', async () => {
-        expect(testPatientController).toBeDefined();
+        expect(testPractitionerController).toBeDefined();
       });
     });
 
-    describe('PUT /patients/:id', () => {
-      it('should update patient data', async () => {
+    describe('PUT /practitioners/:id', () => {
+      it('should update practitioner data', async () => {
         const dataToUpdate = {
-          'resourceType': 'Patient',
+          'resourceType': 'Practitioner',
           'id': '11',
           'text': {
             'status': 'generated',
@@ -123,7 +124,7 @@ describe('User Service Unit Test', () => {
         };
 
         const response = await request(app)
-          .put('/patients/11')
+          .put('/practitioners/22')
           .send(dataToUpdate);
 
         expect(response.status).toEqual(200);
@@ -167,7 +168,7 @@ describe('User Service Unit Test', () => {
         };
 
         const response = await request(app)
-          .put('/patients/11')
+          .put('/practitioners/22')
           .send(dataToUpdate);
 
         expect(response.status).toEqual(400);
@@ -176,18 +177,18 @@ describe('User Service Unit Test', () => {
       });
     });
 
-    describe('GET /patients/:id', () => {
-      it('should get patient data by ID', async () => {
+    describe('GET /practitioners/:id', () => {
+      it('should get practitioner data by ID', async () => {
         const response = await request(app)
-          .get('/patients/11');
+          .get('/practitioners/22');
 
         expect(response.status).toEqual(200);
         expect(response.body.data).toBeDefined();
       });
 
-      it('should throw error if the patient does not exist', async () => {
+      it('should throw error if the practitioner does not exist', async () => {
         const response = await request(app)
-          .get('/patients/49');
+          .get('/practitioners/49');
 
         expect(response.status).toEqual(404);
         expect(response.body.status).toEqual('error');
@@ -195,8 +196,8 @@ describe('User Service Unit Test', () => {
       });
     });
 
-    describe('POST /patients', () => {
-      it('should create new patient', async () => {
+    describe('POST /practitioners', () => {
+      it('should create new practitioner', async () => {
         const dataToCreate = {
           'first_name': 'Michael',
           'last_name': 'Nwankwo',
@@ -207,14 +208,14 @@ describe('User Service Unit Test', () => {
         };
 
         const response = await request(app)
-          .post('/patients')
+          .post('/practitioners')
           .send(dataToCreate);
 
         expect(response.status).toEqual(201);
 
         expect(response.body.data).toBeDefined();
         expect(response.body.status).toEqual('success');
-        expect(response.body.message).toEqual('Patient registration successful');
+        expect(response.body.message).toEqual('Practitioner registration successful');
 
         expect(response.body.data.user.id).toBeDefined();
         expect(response.body.data.user).toBeDefined();
@@ -223,7 +224,7 @@ describe('User Service Unit Test', () => {
         expect(response.body.data.user.name.text).toBe('Michael Nwankwo');
       });
 
-      it('should not create patient if email is missing', async () => {
+      it('should not create practitioner if email is missing', async () => {
         const dataToCreate = {
           'first_name': 'Michael',
           'last_name': 'Nwankwo',
@@ -233,7 +234,7 @@ describe('User Service Unit Test', () => {
         };
 
         const response = await request(app)
-          .post('/patients')
+          .post('/practitioners')
           .send(dataToCreate);
 
         expect(response.status).toEqual(400);
@@ -252,7 +253,7 @@ describe('User Service Unit Test', () => {
         };
 
         const response = await request(app)
-          .post('/patients')
+          .post('/practitioners')
           .send(dataToCreate);
 
         expect(response.status).toEqual(400);
@@ -273,7 +274,7 @@ describe('User Service Unit Test', () => {
         getE164FormatMock.mockReturnValue(getE164FormatMockImpl(dataToCreate.phone!));
 
         const response = await request(app)
-          .post('/patients')
+          .post('/practitioners')
           .send(dataToCreate);
 
         expect(response.status).toEqual(400);
@@ -282,12 +283,12 @@ describe('User Service Unit Test', () => {
       });
     });
 
-    describe('POST /patients/:id/attachments', () => {
-      it('should upload patient [image] attachment', async () => {
+    describe('POST /practitioners/:id/attachments', () => {
+      it('should upload practitioner [image] attachment', async () => {
         const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpveUB0ZXN0LmNvbSIsImlhdCI6MTYzOTcxMjQwNiwiYXVkIjoiMjIifQ.4jZ7c8smeGOUFgS-Sc2Kh6P9_AXAooi7a_vtPrge8KQ';
 
         const response = await request(app)
-          .post('/patients/11/attachments')
+          .post('/practitioners/22/attachments')
           .set('Authorization', `Bearer ${token}`);
 
         expect(response.status).toEqual(200);
@@ -303,7 +304,7 @@ describe('User Service Unit Test', () => {
 
       it('should fail if the user is not authenticated', async () => {
         const response = await request(app)
-          .post('/patients/11/attachments');
+          .post('/practitioners/22/attachments');
 
         expect(response.status).toEqual(401);
 
@@ -315,7 +316,7 @@ describe('User Service Unit Test', () => {
         const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpveUB0ZXN0LmNvbSIsImlhdCI6MTYzOTcxMjQwNiwiYXVkIjoiMjIifQ.4jZ7c8smeGOUFgS-Sc2Kh6P9_AXAooi7a_vtPrge8KQ';
 
         const response = await request(app)
-          .post('/patients/2123/attachments')
+          .post('/practitioners/2123/attachments')
           .set('Authorization', `Bearer ${token}`);
 
         expect(response.status).toEqual(404);
@@ -325,10 +326,10 @@ describe('User Service Unit Test', () => {
       });
     });
 
-    describe('POST /patients/:id/broadcast/videos', () => {
-      it('should get patient broadcasts', async () => {
+    describe('POST /practitioners/:id/broadcast/videos', () => {
+      it('should get practitioner broadcasts', async () => {
         const response = await request(app)
-          .get('/patients/11/broadcast/videos');
+          .get('/practitioners/22/broadcast/videos');
 
         expect(response.status).toEqual(200);
 
@@ -339,7 +340,7 @@ describe('User Service Unit Test', () => {
 
       it('should fail if the user is not found', async () => {
         const response = await request(app)
-          .get('/patients/2108/broadcast/videos');
+          .get('/practitioners/2108/broadcast/videos');
 
         expect(response.status).toEqual(404);
 

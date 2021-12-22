@@ -6,7 +6,7 @@ import {
   error,
   forWho,
   GenericResponseError,
-  InternalServerError, logger,
+  logger,
   NotFoundError,
   throwError,
   IUtilityService
@@ -53,7 +53,7 @@ export class PractitionerService implements IPractitionerService {
 
       return practitionerData;
     } catch (e: any) {
-      throw new InternalServerError(e.message);
+      throw new GenericResponseError(e.message, e.code);
     }
   }
 
@@ -77,7 +77,11 @@ export class PractitionerService implements IPractitionerService {
       birth_date: birthDate,
     } = data;
 
-    const existingUser: IUser = await this.userService.findOne({ email });
+    let existingUser: IUser = await this.userService.findOne({ email });
+
+    if (!existingUser && phone) {
+      existingUser = await this.userService.findOne({ phone });
+    }
 
     if (existingUser) {
       throwError('User already exists!', error.badRequest);
@@ -166,7 +170,7 @@ export class PractitionerService implements IPractitionerService {
       const practitioner: any = await this.findById(practitionerId);
 
       if (!practitioner) {
-        throwError('No User Record. Confirm the user id', error.notFound);
+        throwError('Resource with the provided id does not exist', error.notFound);
       }
 
       const fileLink = await this.s3Service.uploadFile(file);
@@ -191,15 +195,15 @@ export class PractitionerService implements IPractitionerService {
 
       return attachmentData;
     } catch (e: any) {
-      throw new InternalServerError(e.message);
+      throw new GenericResponseError(e.message, e.code);
     }
   }
 
   public async findAssignedPractitionerVideoBroadcast(practitionerId: string): Promise<any> {
     logger.info('Running PractitionerService.findAssignedPractitionerVideoBroadcast');
-    const practitioner = this.findById(practitionerId)
+    const practitioner = await this.findById(practitionerId)
     if (!practitioner) {
-      throw new NotFoundError('unknown practitioner');
+      throw new NotFoundError('Resource with the provided id does not exist');
     }
     return this.practitionerVideoBroadcastRepository.findById(practitionerId);
   }
