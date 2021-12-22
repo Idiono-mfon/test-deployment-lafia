@@ -30,13 +30,10 @@ describe('User Service Unit Test', () => {
     // it without breaking other unit tests
     container.snapshot();
 
-    // @ts-ignore
     container.rebind<DbAccess>(TYPES.TwilioRoomRepository).to(TestTwilioRoomRepository);
-    // @ts-ignore
     container.rebind<ITwilioService>(TYPES.TwilioService).to(TestTwilioService);
     container.rebind<IEmailService>(TYPES.EmailService).to(TestEmailService);
     container.rebind<DbAccess>(TYPES.BaseRepository).to(TestBaseRepository);
-    // @ts-ignore
     container.rebind<IFhirServer>(TYPES.FhirServerService).to(TestFhirServerService);
     container.rebind<IUserRepository>(TYPES.UserRepository).to(TestUserRepository);
 

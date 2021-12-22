@@ -25,7 +25,7 @@ export class BaseRepository implements DbAccess {
   public async findAll<T = any>(params?: T): Promise<any[]> {
     logger.info('BaseRepository.findAll');
 
-    return this.model.query().skipUndefined();
+    return this.model.query();
   }
 
   public async findOne<T = any>(obj: T): Promise<any> {
@@ -37,7 +37,7 @@ export class BaseRepository implements DbAccess {
   public async findMany<T = any>(obj: T): Promise<any[]> {
     logger.info('BaseRepository.findOne');
 
-    return this.model.query().where(obj).skipUndefined();
+    return this.model.query().where(obj);
   }
 
   public async findById(id: string): Promise<any> {

@@ -29,7 +29,6 @@ describe('User [Controller] Integration Test', () => {
 
     container.rebind<DbAccess>(TYPES.BaseRepository).to(TestBaseRepository);
     container.rebind<DbAccess>(TYPES.UserRepository).to(TestUserRepository);
-    // @ts-ignore
     container.rebind<ITwilioService>(TYPES.TwilioService).to(TestTwilioService);
     container.rebind<IFhirServer>(TYPES.FhirServerService).to(TestFhirServerService);
     container.rebind<IEmailService>(TYPES.EmailService).to(TestEmailService);

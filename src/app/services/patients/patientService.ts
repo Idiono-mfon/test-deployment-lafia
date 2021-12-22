@@ -6,21 +6,18 @@ import {
   forWho,
   GenericResponseError,
   getE164Format,
-  InternalServerError, IUtilityService, logger,
+  IUtilityService, logger,
   NotFoundError,
   throwError,
 } from '../../utils';
 import { IUserLoginParams } from '../auth';
 import { IS3Service } from '../aws';
-import { ICodeSystemService } from '../codeSystems';
 import { IUserService } from '../users';
 import { IVideoBroadcastService } from '../videoRecords';
 import { IPatientService } from './interfaces';
 
 @injectable()
 export class PatientService implements IPatientService {
-  @inject(TYPES.CodeSystemService)
-  private readonly codeSystemService: ICodeSystemService;
 
   @inject(TYPES.VideoBroadcastService)
   private readonly videoBroadcastService: IVideoBroadcastService;
@@ -65,8 +62,6 @@ export class PatientService implements IPatientService {
   public async create(data: IUser, ip?: string): Promise<IPatientWithToken> {
     logger.info('Running PatientService.create');
     try {
-      console.log('God is here');
-
       this.utilService.checkForRequiredFields(data);
 
       const {
@@ -82,7 +77,11 @@ export class PatientService implements IPatientService {
         phone = getE164Format(phone!, ip);
       }
 
-      const existingUser: IUser = await this.userService.findOne({ email });
+      let existingUser: IUser = await this.userService.findOne({ email });
+
+      if (!existingUser && phone) {
+        existingUser = await this.userService.findOne({ phone });
+      }
 
       if (existingUser) {
         throwError('User already exists!', error.badRequest);
@@ -146,6 +145,7 @@ export class PatientService implements IPatientService {
     logger.info('Running PatientService.login');
     try {
       const { user, token } = data;
+
       if (user.photo === null) {
         delete user.photo;
       }
@@ -169,7 +169,7 @@ export class PatientService implements IPatientService {
       const patient: any = await this.findById(patientId);
 
       if (!patient) {
-        throwError('No User Record. Confirm the user id', error.notFound);
+        throwError('Resource with the provided id does not exist', error.notFound);
       }
 
       const fileLink = await this.s3Service.uploadFile(file);
@@ -194,15 +194,16 @@ export class PatientService implements IPatientService {
 
       return attachmentData;
     } catch (e: any) {
-      throw new InternalServerError(e.message);
+      throw new GenericResponseError(e.message, e.code);
     }
   }
 
   public async findPatientVideoBroadcast(patientId: string) {
     logger.info('Running PatientService.findPatientVideoBroadcast');
-    const patient = this.findById(patientId)
+    const patient = await this.findById(patientId);
+
     if (!patient) {
-      throw new NotFoundError('unknown patient');
+      throw new NotFoundError('Resource with the provided id does not exist');
     }
     return this.videoBroadcastService.findAll(patientId);
   }

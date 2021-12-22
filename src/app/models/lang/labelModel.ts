@@ -1,9 +1,7 @@
 import { JSONSchema } from 'objection';
 import { Schema, Table } from '../../../database';
 import { BaseModel } from '../base';
-// import { ComponentModel } from './componentModel';
 import { ILabel } from './interfaces';
-// import { LanguageModel } from './languageModel';
 import { LabelValidation } from './validation';
 
 export class LabelModel extends BaseModel implements ILabel {
@@ -25,7 +23,7 @@ export class LabelModel extends BaseModel implements ILabel {
     return {
       components: {
         relation: BaseModel.HasManyRelation,
-        modelClass: './componentModel',
+        modelClass: '../lang/componentModel',
         join: {
           from: `${Schema.lafiaService}.${Table.labels}.id`,
           to: `${Schema.lafiaService}.${Table.components}.label_id`
@@ -33,7 +31,7 @@ export class LabelModel extends BaseModel implements ILabel {
       },
       languages: {
         relation: BaseModel.ManyToManyRelation,
-        modelClass: './languageModel',
+        modelClass: '../lang/languageModel',
         join: {
           from: `${Schema.lafiaService}.${Table.labels}.id`,
           through: {
