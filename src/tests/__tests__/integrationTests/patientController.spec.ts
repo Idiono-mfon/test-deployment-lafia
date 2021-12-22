@@ -13,6 +13,7 @@ import { TestBaseRepository, TestUserRepository } from '../../fixtures/repositor
 import { TestVideoBroadcastRepository } from '../../fixtures/repositories/videoBroadcastRepository';
 import { TestFhirServerService } from '../../fixtures/services';
 import { TestS3Service } from '../../fixtures/services/s3Service';
+import { getE164FormatMockImpl } from '../../fixtures/utils';
 
 jest.mock('../../../app/utils/phone.util');
 jest.mock('multer', () => {
@@ -242,7 +243,7 @@ describe('User Service Unit Test', () => {
         expect(response.body.message).toEqual('Email is required!');
       });
 
-      it('should throw error if user already exist', async () => {
+      it('should throw error if user email already exist', async () => {
         const dataToCreate = {
           'email': 'david@test.com',
           'first_name': 'David',
@@ -260,10 +261,31 @@ describe('User Service Unit Test', () => {
         expect(response.body.status).toEqual('error');
         expect(response.body.message).toEqual('User already exists!');
       });
+
+      it('should throw error if user phone already exist', async () => {
+        const dataToCreate = {
+          'email': 'david12@test.com',
+          'first_name': 'David',
+          'last_name': 'Test',
+          'gender': 'male',
+          'phone': '09082315532',
+          'password': 'Password1#'
+        };
+
+        getE164FormatMock.mockReturnValue(getE164FormatMockImpl(dataToCreate.phone!));
+
+        const response = await request(app)
+          .post('/patients')
+          .send(dataToCreate);
+
+        expect(response.status).toEqual(400);
+        expect(response.body.status).toEqual('error');
+        expect(response.body.message).toEqual('User already exists!');
+      });
     });
 
     describe('POST /patients/:id/attachments', () => {
-      it('should create new patient', async () => {
+      it('should upload patient [image] attachment', async () => {
         const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpveUB0ZXN0LmNvbSIsImlhdCI6MTYzOTcxMjQwNiwiYXVkIjoiMjIifQ.4jZ7c8smeGOUFgS-Sc2Kh6P9_AXAooi7a_vtPrge8KQ';
 
         const response = await request(app)
@@ -295,7 +317,7 @@ describe('User Service Unit Test', () => {
         const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpveUB0ZXN0LmNvbSIsImlhdCI6MTYzOTcxMjQwNiwiYXVkIjoiMjIifQ.4jZ7c8smeGOUFgS-Sc2Kh6P9_AXAooi7a_vtPrge8KQ';
 
         const response = await request(app)
-          .post('/patients/21/attachments')
+          .post('/patients/2123/attachments')
           .set('Authorization', `Bearer ${token}`);
 
         expect(response.status).toEqual(404);
