@@ -10,14 +10,14 @@ export class EmailService implements IEmailService {
 
   constructor() {
     this.transporter = nodemailer.createTransport({
-      pool: true,
-      host: 'mail.lafia.io',
-      port: 465,
-      secure: true, // use TLS
-      auth: {
-        user: Env.all().email_address,
-        pass: `${Env.all().email_password}`,
-      }
+        pool: true,
+        host: Env.all().email_host,
+        port: Env.all().email_port,
+        secure: false, // change back to true in prod // use TLS 
+        auth: {
+            user: Env.all().email_address,
+            pass: `${Env.all().email_password}`, 
+        }
     });
   }
 

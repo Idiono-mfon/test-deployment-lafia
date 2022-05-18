@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify';
 import Redis from 'ioredis';
 import { Server, Socket } from 'socket.io';
-import { createAdapter } from 'socket.io-redis';
+import { createAdapter } from '@socket.io/redis-adapter';
 import { v4 as uuid } from 'uuid';
 import { Env, IEnv } from '../../config/env';
 import TYPES from '../../config/types';
@@ -44,7 +44,12 @@ export class SignallingServerService implements ISignallingServerService {
 
     this.env = Env.all();
     this.pubClient = new Redis(
-      `rediss://${this.env.redis_username}:${this.env.redis_password}@${this.env.redis_host}:${this.env.redis_port}?allowUsernameInURI=true`
+      {
+        port: this.env.redis_port,
+        host: this.env.redis_host,
+        username: this.env.redis_username,
+        password: this.env.redis_password
+      }
     );
     this.subClient = this.pubClient.duplicate();
   }
@@ -81,7 +86,7 @@ export class SignallingServerService implements ISignallingServerService {
       },
       allowEIO3: true
     });
-    this.io.adapter(createAdapter({ pubClient: this.pubClient, subClient: this.subClient }));
+    this.io.adapter(createAdapter(this.pubClient, this.subClient));
   }
 
   private async listenForConnectionEvent(socket: Socket) {
@@ -95,6 +100,8 @@ export class SignallingServerService implements ISignallingServerService {
       socketId: socket?.id,
       deviceToken,
     } as IOnlineUser;
+
+    console.log(user); 
 
     if (user.userId && user.userId !== 'undefined') {
       await this.redisStore.saveOnlineUser(user);

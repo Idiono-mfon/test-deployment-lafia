@@ -205,6 +205,7 @@ export class PractitionerService implements IPractitionerService {
     if (!practitioner) {
       throw new NotFoundError('Resource with the provided id does not exist');
     }
-    return this.practitionerVideoBroadcastRepository.findById(practitionerId);
+    // return this.practitionerVideoBroadcastRepository.findById(practitionerId);
+    return this.practitionerVideoBroadcastRepository.findAll(practitionerId); 
   }
 }

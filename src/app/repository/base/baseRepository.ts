@@ -35,7 +35,7 @@ export class BaseRepository implements DbAccess {
   }
 
   public async findMany<T = any>(obj: T): Promise<any[]> {
-    logger.info('BaseRepository.findOne');
+    logger.info('BaseRepository.findMany');
 
     return this.model.query().where(obj);
   }

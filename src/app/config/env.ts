@@ -34,6 +34,8 @@ export interface IEnv {
   twilio_composition_callback: string;
   email_address: string;
   email_password: string;
+  email_host: string;
+  email_port: number;
   fhir_server_base_url: string;
   cloudinary_url: string;
   lafia_media_url: string;
@@ -88,6 +90,8 @@ const config: IEnv = {
   twilio_composition_callback: process.env.TWILIO_COMPOSITION_CALLBACK as string,
   email_address: process.env.EMAIL_ADDRESS as string,
   email_password: process.env.EMAIL_PASSWORD as string,
+  email_host: process.env.EMAIL_HOST as string,
+  email_port: Number(process.env.EMAIL_PORT),
   fhir_server_base_url: process.env.FHIR_SERVER_BASE_URL as string,
   cloudinary_url: process.env.CLOUDINARY_URL as string,
   lafia_media_url: process.env.LAFIA_MEDIA_URL as string,

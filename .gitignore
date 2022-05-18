@@ -3,6 +3,7 @@ dist/
 logs/
 coverage/
 .idea/
+.data/
 .env
 package-lock.json
 yarn.lock

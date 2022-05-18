@@ -87,6 +87,7 @@ export class PatientService implements IPatientService {
         throwError('User already exists!', error.badRequest);
       }
 
+      // creating the patient fhir resource
       const patientData: IPatient = {
         resourceType: 'Patient',
         id: phone,
@@ -148,6 +149,10 @@ export class PatientService implements IPatientService {
 
       if (user.photo === null) {
         delete user.photo;
+      }
+
+      if (user.phone === null) {
+        delete user.phone;
       }
 
       await this.userService.update(user.id!, { ...user, token });

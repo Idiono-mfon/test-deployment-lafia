@@ -130,7 +130,7 @@ export class AuthService implements IAuthService {
 
   public async getConnectionByPatientId(patient_id: string): Promise<IConnection[]> {
     logger.info('Running AuthService.getConnectionByPatientId');
-    return this.connectionRepository.findMany(patient_id);
+    return this.connectionRepository.findMany({patient_id});
   }
 
   public async updateConnection(id: string, data: IFindConnection): Promise<IConnection> {
