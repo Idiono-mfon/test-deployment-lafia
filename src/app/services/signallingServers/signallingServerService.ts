@@ -177,9 +177,10 @@ export class SignallingServerService implements ISignallingServerService {
       const newCareBroadCast = await this.redisStore
         .getBroadcastByVideoUrl(newBroadcast.videoUrl);
 
+      // emit socket event to practitioners' room
       SignallingServerService.emitNewCareEvent(socket, newCareBroadCast);
 
-      // Send kafka message to practitioner
+      // Send kafka message to practitioner # this is NOT kafka, but rather, node events
       eventService.emit(eventName.newBroadcast, newCareBroadCast);
 
       // Send firebase notification to all practitioners
@@ -196,6 +197,7 @@ export class SignallingServerService implements ISignallingServerService {
           video_url: newCareBroadCast.videoUrl
         }
 
+        // database
         await this.videoBroadcastService.create(vidBroadcast);
       }
     });
