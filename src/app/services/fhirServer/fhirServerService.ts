@@ -172,7 +172,7 @@ export class FhirServerService implements IFhirServer {
       return {
         status,
         headers,
-        data: responseData,
+        data: 'headers' in responseData ? responseData.data : responseData,
       };
     } catch (e: any) {
       delete e.response.headers['transfer-encoding'];
