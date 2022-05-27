@@ -58,7 +58,7 @@ export class PatientService implements IPatientService {
 
     return patient.data;
   }
-
+ 
   public async create(data: IUser, ip?: string): Promise<IPatientWithToken> {
     logger.info('Running PatientService.create');
     try {
@@ -117,7 +117,7 @@ export class PatientService implements IPatientService {
 
       const patientResponse = await this.fhirServerService.executeQuery('/Patient', 'POST', { data: patientData });
       const patient = patientResponse.data;
-      const token = this.userService.generateJwtToken({ email, id: patient.id });
+      const token = this.userService.generateJwtToken({ email, id: String(patient.id) });
       const userData: IFindUser = {
         token,
         resource_id: patient.id,

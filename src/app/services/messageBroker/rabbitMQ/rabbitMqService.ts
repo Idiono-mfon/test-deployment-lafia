@@ -93,20 +93,28 @@ export class RabbitMqService implements IRabbitMqService {
         logger.info(`[x] Received Date: ${new Date().toString()}`);
 
         const data = msgJson?.data;
-        const email = msgJson?.email;
+        const email = msgJson?.data.email;
         const resource_id = msgJson?.resource_id;
         let resource_type = msgJson?.resource_type;
 
         resource_type = resource_type?.toLowerCase();
 
+        const existingUser = await this.userService.findOne({ email });
+        if (existingUser){
+            await this.updateExistingUser(email, data);
+            return;
+        }
         await this.createUserFromERPNext(resource_id, data, resource_type);
-        await this.updateExistingUser(email, data);
-        await this.createPatientOrPractitionerFhirAccount(resource_type, data, msgJson);
+        
+        // await this.createUserFromERPNext(resource_id, data, resource_type);
+        // await this.updateExistingUser(email, data);
+        // await this.createPatientOrPractitionerFhirAccount(resource_type, data, msgJson);
       }
     });
   }
 
   private async createUserFromERPNext(resource_id: string, data: any, resource_type?: string) {
+    logger.info('Running RabbitMqService.createUserFromERPNext');
     if (resource_id && data) {
       try {
         return await this.userService.create({
@@ -123,6 +131,7 @@ export class RabbitMqService implements IRabbitMqService {
   }
 
   private async updateExistingUser(email: string, data: any) {
+    logger.info('Running RabbitMqService.updateExistingUser');
     if (email && !_.isEmpty(data)) {
       const { first_name, last_name, password, gender } = data;
       const dataToUpdate: any = {};
@@ -141,6 +150,7 @@ export class RabbitMqService implements IRabbitMqService {
   }
 
   private async createPatientOrPractitionerFhirAccount(resource_type: string, data: any, msgJson: any) {
+    logger.info('Running RabbitMqService.createPatientOrPractitionerFhirAccount');
     if (resource_type && !_.isEmpty(data)) {
       let resource: IPatient | IPractitioner | any = {};
 

@@ -12,9 +12,9 @@ class KnexFile {
       password: pg_password,
       database: pg_dbname,
       port: pg_port,
-      //   ssl: { // comment when running locally
-      //     rejectUnauthorized: false,
-      //   },
+        ssl: { // comment when running locally
+          rejectUnauthorized: false, 
+        },
     };
   }
 

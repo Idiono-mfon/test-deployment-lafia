@@ -171,7 +171,9 @@ export class SignallingServerService implements ISignallingServerService {
 
   private listenForNewVideoBroadcastEvent(socket: Socket) {
     logger.info('Running SignallingServerService.listenForNewVideoBroadcastEvent');
+    
     socket.on('newVideoBroadcast', async (newBroadcast: INewBroadcast) => {
+    //   logger.info('===NEW EVENT: newVideoBroadcast===');
       await this.redisStore.saveBroadcast(newBroadcast);
 
       const newCareBroadCast = await this.redisStore
@@ -180,7 +182,7 @@ export class SignallingServerService implements ISignallingServerService {
       // emit socket event to practitioners' room
       SignallingServerService.emitNewCareEvent(socket, newCareBroadCast);
 
-      // Send kafka message to practitioner # this is NOT kafka, but rather, node events
+      // Send kafka message to practitioner # this is NOT kafka, but rather, node events that gets listened to inside rabbitMqService.handleEvents()
       eventService.emit(eventName.newBroadcast, newCareBroadCast);
 
       // Send firebase notification to all practitioners
@@ -196,6 +198,8 @@ export class SignallingServerService implements ISignallingServerService {
           initiate_care: String(newCareBroadCast.initiateCare),
           video_url: newCareBroadCast.videoUrl
         }
+
+        console.log(vidBroadcast);
 
         // database
         await this.videoBroadcastService.create(vidBroadcast);
