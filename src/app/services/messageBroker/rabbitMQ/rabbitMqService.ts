@@ -115,8 +115,6 @@ export class RabbitMqService implements IRabbitMqService {
 
   private async createUserFromERPNext(resource_id: string, data: any, resource_type?: string) {
     logger.info('Running RabbitMqService.createUserFromERPNext');
-    console.log(resource_id);
-    console.log(data);
     if (resource_id && data) {
       try {
         return await this.userService.create({

@@ -170,6 +170,7 @@ export class SignallingServerService implements ISignallingServerService {
   }
 
   private listenForNewVideoBroadcastEvent(socket: Socket) {
+    // simply stores the video details to redis cache and db, and sends events to rabbitmq and practitioners' room
     logger.info('Running SignallingServerService.listenForNewVideoBroadcastEvent');
     
     socket.on('newVideoBroadcast', async (newBroadcast: INewBroadcast) => {
@@ -199,7 +200,7 @@ export class SignallingServerService implements ISignallingServerService {
           video_url: newCareBroadCast.videoUrl
         }
 
-        console.log(vidBroadcast);
+        // console.log(vidBroadcast);
 
         // database
         await this.videoBroadcastService.create(vidBroadcast);
@@ -239,8 +240,10 @@ export class SignallingServerService implements ISignallingServerService {
     socket.on('acceptCare', async (acceptCare: IAcceptCare, cb) => {
       const existingCare = await this.redisStore.getBroadcastByVideoUrl(acceptCare.videoUrl);
 
+      // console.log(existingCare);
+
       if (existingCare?.initiateCare) {
-        if (existingCare?.practitionerId !== acceptCare?.practitionerId) {
+        if (existingCare?.practitionerId !== undefined && existingCare?.practitionerId !== acceptCare?.practitionerId) {
           return cb({
             status: false,
             description: 'Care already initiated by another practitioner'

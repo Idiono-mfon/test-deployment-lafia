@@ -9,6 +9,9 @@ WORKDIR /home/lafia-service
 
 COPY package*.json ./
 
+ENV CPPFLAGS -I/usr/local/opt/openssl/include
+ENV LDFLAGS -L/usr/local/opt/openssl/lib
+
 RUN yarn
 
 COPY . .
