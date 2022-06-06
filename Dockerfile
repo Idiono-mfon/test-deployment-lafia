@@ -63,8 +63,6 @@ ENV CAPROVER_GIT_COMMIT_SHA=${CAPROVER_GIT_COMMIT_SHA}
 
 RUN yarn tsc
 
-RUN yarn mg:latest && yarn seed:run
-
 EXPOSE 9000
 
 CMD ["node", "dist/src/app/index.js"]
