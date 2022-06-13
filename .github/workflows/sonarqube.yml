@@ -8,10 +8,7 @@ on:
   push:
     branches:
       - dev-opstest
-  paths:
-      - 'config/**'
-      - 'Dockerfile'
-      - '.github/workflows/**'
+      
 jobs:
   build:
     name: Build 
