@@ -75,7 +75,7 @@ jobs:
         # name: Update SHA
         # run: echo $GITHUB_SHA > $GITHUB_WORKSPACE/site/_meta
 
-    name: Build container image
+    name: container image
     run: docker build -t lafia.dcr/lafia-service .
 
     name: Install doctl
