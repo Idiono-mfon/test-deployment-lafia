@@ -8,14 +8,19 @@ on:
   push:
     branches:
       - dev-opstest
+    paths:
+      - 'Dockerfile'
+      - '.github/workflows/**'
 jobs:
  build:
    runs-on: ubuntu-latest
    steps:
+   - name: Checkout master
+      uses: actions/checkout@dev-opstest
    - name: Install doctl
      uses: digitalocean/action-doctl@v2
      with:
-       token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+       token: ${{secrets.DIGITALOCEAN_ACCESS_TOKEN}}
       
    - name: Build container image
      run: docker build -t docker build -t registry.digitalocean.com/lafia-dcr/lafia-service .
