@@ -1,14 +1,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: python-example
+  name: lafia-service
   labels:
-    app: python-example
+    app: lafia-service
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
-      app: python-example
+      app: lafia-service
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -17,11 +17,11 @@ spec:
   template:
     metadata:
       labels:
-        app: python-example
+        app: lafia-service
     spec:
       containers:
-      - name: python-example
-        image: <IMAGE>
+      - name: lafia-service
+        image: registry.digitalocean.com/lafia-dcr/lafia-service
         ports:
         - containerPort: 80
         resources:
@@ -33,7 +33,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: python-example-service
+  name: lafia-service
 spec:
   type: LoadBalancer
   ports:
@@ -42,4 +42,4 @@ spec:
       port: 80
       targetPort: 80
   selector:
-    app: python-example
+    app: lafia-service
