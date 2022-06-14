@@ -9,86 +9,27 @@ on:
     branches:
       - dev-opstest
 jobs:
-  build:
-    # name: Build
-    runs-on: ubuntu-latest
-    # env:
-    #   TWILIO_ACCOUNT_SID: "${{ secrets.TWILIO_ACCOUNT_SID }}"
-    #   TWILIO_AUTH_TOKEN: "${{ secrets.TWILIO_AUTH_TOKEN }}"
-    #   TWILIO_API_KEY: "${{ secrets.TWILIO_API_KEY }}"
-    #   TWILIO_API_SECRET: "${{ secrets.TWILIO_API_SECRET }}"
-    #   TWILIO_VERIFY_SID: "${{ secrets.TWILIO_VERIFY_SID }}"
-    #   FIREBASE_DATABASE_URL: "${{ secrets.FIREBASE_DATABASE_URL }}"
-    #   FIREBASE_TYPE: "${{ secrets.FIREBASE_TYPE }}"
-    #   FIREBASE_PROJECT_ID: "${{ secrets.FIREBASE_PROJECT_ID }}"
-    #   FIREBASE_PRIVATE_KEY_ID: "${{ secrets.FIREBASE_PRIVATE_KEY_ID }}"
-    #   FIREBASE_PRIVATE_KEY: "${{ secrets.FIREBASE_PRIVATE_KEY }}"
-    #   FIREBASE_CLIENT_EMAIL: "${{ secrets.FIREBASE_CLIENT_EMAIL }}"
-    #   FIREBASE_CLIENT_ID: "${{ secrets.FIREBASE_CLIENT_ID }}"
-    #   FIREBASE_AUTH_URI: "${{ secrets.FIREBASE_AUTH_URI }}"
-    #   FIREBASE_TOKEN_URI: "${{ secrets.FIREBASE_TOKEN_URI }}"
-    #   FIREBASE_AUTH_PROVIDER_X509_CERT_URL: "${{ secrets.FIREBASE_AUTH_PROVIDER_X509_CERT_URL }}"
-    #   FIREBASE_CLIENT_X509_CERT_URL: "${{ secrets.FIREBASE_CLIENT_X509_CERT_URL }}"
-    #   AWS_ACCESS_KEY_ID: "${{ secrets.AWS_ACCESS_KEY_ID }}"
-    #   AWS_SECRET_ACCESS_KEY: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
-    #   AWS_REGION: "${{ secrets.AWS_REGION }}"
-    #   AWS_BUCKET: "${{ secrets.AWS_BUCKET }}"
-    #   AWS_CLOUDFRONT: "${{ secrets.AWS_CLOUDFRONT }}"
-    #   AWS_ACCOUNT_ID: "${{ secrets.AWS_ACCOUNT_ID }}"
-    #   REDIS_PORT: "${{ secrets.REDIS_PORT }}"
-    #   REDIS_HOST: "${{ secrets.REDIS_HOST }}"
-    #   REDIS_PASSWORD: "${{ secrets.REDIS_PASSWORD }}"
-    #   SAFHIR_AUTHORIZATION_URL: "${{ secrets.SAFHIR_AUTHORIZATION_URL }}"
-    #   SAFHIR_TOKEN_URL: "${{ secrets.SAFHIR_TOKEN_URL }}"
-    #   SAFHIR_CLIENT_ID: "${{ secrets.SAFHIR_CLIENT_ID }}"
-    #   SAFHIR_CLIENT_SECRET: "${{ secrets.SAFHIR_CLIENT_SECRET }}"
-    #   SAFHIR_BASE_URL: "${{ secrets.SAFHIR_BASE_URL }}"
-    #   SAFHIR_CALLBACK_URL: "${{ secrets.SAFHIR_CALLBACK_URL }}"
-    #   SAFHIR_SCOPE: "${{ secrets.SAFHIR_SCOPE }}"
-    #   KAFKA_CONNECTION: "${{ secrets.KAFKA_CONNECTION }}"
-    #   KAFKA_ERPNEXT_PRODUCER_TOPIC: "${{ secrets.KAFKA_ERPNEXT_PRODUCER_TOPIC }}"
-    #   KAFKA_CONSUMER_TOPICS: "${{ secrets.KAFKA_CONSUMER_TOPICS }}"
-    #   PORT: "${{ secrets.PORT }}"
-    #   NODE_ENV: "${{ secrets.NODE_ENV }}"
-    #   JWT_SECRETE_KEY: "${{ secrets.JWT_SECRETE_KEY }}"
-    steps:
-      # - uses: actions/checkout@v2
-      #   with:
-      #     fetch-depth: 0
-      # - uses: actions/setup-node@v2
-      #   with:
-      #     node-version: '14'
-      # - name: Install modules
-      #   run: yarn install --ignore-engines
-      # - name: Run Test
-      #   run: yarn test
-      # - env:
-      #     SONAR_HOST_URL: "${{ secrets.SONAR_HOST_URL }}"
-      #     SONAR_TOKEN: "${{ secrets.SONAR_TOKEN }}"
-      #   uses: sonarsource/sonarqube-scan-action@master
-      # - env:
-      #     SONAR_TOKEN: "${{ secrets.SONAR_TOKEN }}"
-      #   timeout-minutes: 550
-      #   uses: SonarSource/sonarqube-quality-gate-action@master
-
-      name: Install doctl
-      uses: digitalocean/action-doctl@v2
-      with:
-        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+ build:
+   runs-on: ubuntu-latest
+   steps:
+   - name: Install doctl
+     uses: digitalocean/action-doctl@v2
+     with:
+       token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
       
-      name: Build container image
-      run: docker build -t docker build -t registry.digitalocean.com/lafia-dcr/lafia-service .
+   - name: Build container image
+     run: docker build -t docker build -t registry.digitalocean.com/lafia-dcr/lafia-service .
 
-      name: Log in to DigitalOcean Container Registry with short-lived credentials
-      run: doctl registry login --expiry-seconds 600
+   - name: Log in to DigitalOcean Container Registry with short-lived credentials
+     run: doctl registry login --expiry-seconds 600
 
-      name: Tag Image
-      run:
-          docker tag lafia.dcr/lafia-service \
-          registry.digitalocean.com/lafia-dcr/lafia-service:${{github.event.input.version}}
+   - name: Tag Image
+     run:
+        docker tag lafia.dcr/lafia-service \
+        registry.digitalocean.com/lafia-dcr/lafia-service:${{github.event.input.version}}
 
-      name: Push image to DigitalOcean Container Registry
-      run: docker push registry.digitalocean.com/lafia-dcr/lafia-service:${{github.event.input.version}}
+   - name: Push image to DigitalOcean Container Registry
+     run: docker push registry.digitalocean.com/lafia-dcr/lafia-service:${{github.event.input.version}}
 
     # name: Update deployment file
     #   run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/asb/static-example:'${TAG}'|' $GITHUB_WORKSPACE/config/deployment.yml
