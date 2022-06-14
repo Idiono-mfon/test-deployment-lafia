@@ -82,24 +82,24 @@ jobs:
 #         name: checkout the repo
 #         uses: actions/checkout@v2
 
-        name: Build container image
-        run: docker build -t lafia.dcr/lafia-service .
+      name: Build container image
+      run: docker build -t lafia.dcr/lafia-service .
 
-        name: Install doctl
-        uses: digitalocean/action-doctl@v2
-        with:
-          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      name: Install doctl
+      uses: digitalocean/action-doctl@v2
+      with:
+        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
-        name: Log in to DigitalOcean Container Registry with short-lived credentials
-        run: doctl registry login --expiry-seconds 600
+      name: Log in to DigitalOcean Container Registry with short-lived credentials
+      run: doctl registry login --expiry-seconds 600
 
-        name: Tag Image
-        run:
-          docker tag lafia.dcr/lafia-service \
-          registry.digitalocean.com/lafia-dcr/lafia-service:${{github.event.input.version}}
+      name: Tag Image
+      run:
+        docker tag lafia.dcr/lafia-service \
+        registry.digitalocean.com/lafia-dcr/lafia-service:${{github.event.input.version}}
 
-        name: Push image to DigitalOcean Container Registry
-        run: docker push registry.digitalocean.com/lafia-dcr/lafia-service:${{github.event.input.version}}
+      name: Push image to DigitalOcean Container Registry
+      run: docker push registry.digitalocean.com/lafia-dcr/lafia-service:${{github.event.input.version}}
 
     # name: Update deployment file
     #   run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/asb/static-example:'${TAG}'|' $GITHUB_WORKSPACE/config/deployment.yml
