@@ -8,9 +8,9 @@ on:
   push:
     branches:
       - dev-opstest
-    paths:
-      - 'Dockerfile'
-      - '.github/workflows/**'
+    # paths:
+    #   - 'Dockerfile'
+    #   - '.github/workflows/**'
 jobs:
  build:
    runs-on: ubuntu-latest
