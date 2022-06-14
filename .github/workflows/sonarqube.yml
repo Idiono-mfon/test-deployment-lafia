@@ -21,7 +21,7 @@ jobs:
        token: ${{secrets.DIGITALOCEAN_ACCESS_TOKEN}}
       
    - name: Build container image
-     run: docker build -t docker build -t registry.digitalocean.com/lafia-dcr/lafia-service .
+     run: docker build -t registry.digitalocean.com/lafia-dcr/lafia-service .
 
    - name: Log in to DigitalOcean Container Registry with short-lived credentials
      run: doctl registry login --expiry-seconds 600
