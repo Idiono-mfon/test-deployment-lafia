@@ -8,10 +8,9 @@ on:
   push:
     branches:
       - dev-opstest
-
 jobs:
   build:
-    name: Build 
+    name: Build
     runs-on: ubuntu-latest
     env:
       TWILIO_ACCOUNT_SID: "${{ secrets.TWILIO_ACCOUNT_SID }}"
@@ -61,8 +60,8 @@ jobs:
           node-version: '14'
       - name: Install modules
         run: yarn install --ignore-engines
-      # - name: Run Test
-      #   run: yarn test
+      - name: Run Test
+        run: yarn test
       - env:
           SONAR_HOST_URL: "${{ secrets.SONAR_HOST_URL }}"
           SONAR_TOKEN: "${{ secrets.SONAR_TOKEN }}"
@@ -71,35 +70,25 @@ jobs:
           SONAR_TOKEN: "${{ secrets.SONAR_TOKEN }}"
         timeout-minutes: 550
         uses: SonarSource/sonarqube-quality-gate-action@master
-      
-        # name: Update SHA
-        # run: echo $GITHUB_SHA > $GITHUB_WORKSPACE/site/_meta
-# jobs:
-#   build and push:
-#     # name: Build container image
-#     runs-on: ubuntu-latest
-#     steps:
-#         name: checkout the repo
-#         uses: actions/checkout@v2
+        
+        name: Build container image
+        run: docker build -t lafia.dcr/lafia-service .
 
-      name: Build container image
-      run: docker build -t lafia.dcr/lafia-service .
+        name: Install doctl
+        uses: digitalocean/action-doctl@v2
+          with:
+            token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
-      name: Install doctl
-      uses: digitalocean/action-doctl@v2
-      with:
-        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+        name: Log in to DigitalOcean Container Registry with short-lived credentials
+        run: doctl registry login --expiry-seconds 600
 
-      name: Log in to DigitalOcean Container Registry with short-lived credentials
-      run: doctl registry login --expiry-seconds 600
+        name: Tag Image
+        run:
+          docker tag lafia.dcr/lafia-service \
+          registry.digitalocean.com/lafia-dcr/lafia-service:${{github.event.input.version}}
 
-      name: Tag Image
-      run:
-        docker tag lafia.dcr/lafia-service \
-        registry.digitalocean.com/lafia-dcr/lafia-service:${{github.event.input.version}}
-
-      name: Push image to DigitalOcean Container Registry
-      run: docker push registry.digitalocean.com/lafia-dcr/lafia-service:${{github.event.input.version}}
+        name: Push image to DigitalOcean Container Registry
+        run: docker push registry.digitalocean.com/lafia-dcr/lafia-service:${{github.event.input.version}}
 
     # name: Update deployment file
     #   run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/asb/static-example:'${TAG}'|' $GITHUB_WORKSPACE/config/deployment.yml
