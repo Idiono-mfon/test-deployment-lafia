@@ -9,7 +9,7 @@ on:
     branches:
       - dev-opstest
     paths:
-      - '/Dockerfile'
+      - '/lafia-service/Dockerfile'
       - '.github/workflows/**'
 jobs:
  build:
@@ -26,10 +26,10 @@ jobs:
    - name: Log in to DigitalOcean Container Registry with short-lived credentials
      run: doctl registry login --expiry-seconds 600
 
-   - name: Tag Image
-     run:
-        docker tag lafia.dcr/lafia-service \
-        registry.digitalocean.com/lafia-dcr/lafia-service:${{github.event.input.version}}
+  #  - name: Tag Image
+  #    run:
+  #       docker tag lafia.dcr/lafia-service \
+  #       registry.digitalocean.com/lafia-dcr/lafia-service:${{github.event.input.version}}
 
    - name: Push image to DigitalOcean Container Registry
      run: docker push registry.digitalocean.com/lafia-dcr/lafia-service:${{github.event.input.version}}
