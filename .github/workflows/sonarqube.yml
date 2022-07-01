@@ -51,7 +51,7 @@ jobs:
     #  run: "kubectl patch serviceaccount default -p '{\"imagePullSecrets\": [{\"name\": \"registry-<your-registry-name>`\"}]}'"
 
    - name: Deploy to DigitalOcean Kubernetes
-     run: kubectl apply -f $GITHUB_WORKSPACE/deployment.yml
+     run: kubectl apply -f ./lafia-service/deployment.yml
 
    - name: Verify deployment
      run: kubectl rollout status deployment/lafia-service
