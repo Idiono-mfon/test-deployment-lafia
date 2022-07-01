@@ -16,7 +16,7 @@ RUN yarn
 
 COPY . .
 
-Set env variables for captainRover
+# Set env variables for captainRover
 ARG PORT=${PORT}
 ARG NODE_ENV=${NODE_ENV}
 ARG POSTGRES_PORT=${POSTGRES_PORT}
