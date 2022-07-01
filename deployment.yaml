@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: lafia-service
-        image: registry.digitalocean.com/lafia-dcr/lafia-service
+        image: <IMAGE>
         ports:
         - containerPort: 80
         resources:
