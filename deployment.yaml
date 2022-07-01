@@ -21,14 +21,16 @@ spec:
     spec:
       containers:
       - name: lafia-service
-        image: registry.digitalocean.com/lafia-dcr/lafia-service
+        image: <IMAGE>
         ports:
         - containerPort: 80
         resources:
           requests:
-            cpu: 100m
+            cpu: 300M
+            memory: 100Mi
           limits:
-            cpu: 100m
+            cpu: 250m
+            memory: 100Mi
 ---
 apiVersion: v1
 kind: Service
