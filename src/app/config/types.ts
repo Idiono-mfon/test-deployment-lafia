@@ -44,6 +44,12 @@ const TYPES = {
   VideoBroadcastService: Symbol('VideoBroadcastService'),
   SignallingServerService: Symbol('SignallingServerService'),
   ImplementationGuideService: Symbol('ImplementationGuideService'),
+  EncounterService: Symbol('EncounterService'),
+  ClaimService: Symbol('ClaimService'),
+  AppointmentService: Symbol('AppointmentService'),
+  AppointmentResponseService: Symbol('AppointmentResponseService'),
+  CareTeamService: Symbol('CareTeamService'),
+  OrganizationService: Symbol('OrganizationService'),
 
   // repositories
   BaseRepository: Symbol('BaseRepository'),
@@ -61,6 +67,13 @@ const TYPES = {
   VideoBroadcastRepository: Symbol('VideoBroadcastRepository'),
   ImplementationGuideRepository: Symbol('ImplementationGuideRepository'),
   PractitionerVideoBroadcastRepository: Symbol('PractitionerVideoBroadcastRepository'),
+  EncounterRepository: Symbol('EncounterRepository'),
+  ClaimRepository: Symbol('ClaimRepository'),
+  AppointmentRepository: Symbol('AppointmentRepository'),
+  AppointmentResponseRepository: Symbol('AppointmentResponseRepository'),
+  CareTeamRepository: Symbol('CareTeamRepository'),
+  OrganizationRepository: Symbol('OrganizationRepository'),
+  
 
   // models
   ModelClass: Symbol('ModelClass'),
@@ -70,6 +83,8 @@ const TYPES = {
 
   // Utils
   TokenUtil: Symbol('TokenUtil'),
+  CsvImporter: Symbol('CsvImporter'),
+  FhirImporter: Symbol('FhirImporter'),
 
   // Server
   App: Symbol('App'),

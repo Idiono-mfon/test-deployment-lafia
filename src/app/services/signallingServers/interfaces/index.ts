@@ -15,6 +15,7 @@ export interface IBroadcastStatus {
   patientName: string;
   description: string;
   videoTime: string;
+  appointment_ref?: string;
 }
 
 export interface INewCare {

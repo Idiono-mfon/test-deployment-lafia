@@ -16,6 +16,12 @@ export * from './file';
 export * from './eventEmitter';
 export * from './signallingServers';
 export * from './notifications';
+export * from './encounters';
+export * from './claims';
+export * from './appointments';
+export * from './appointmentResponses';
+export * from './careTeams';
+export * from './organizations';
 
 // Export Service Container Module
 export * from './module.service';

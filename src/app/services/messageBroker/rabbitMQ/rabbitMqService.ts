@@ -2,15 +2,17 @@ import { inject, injectable } from 'inversify';
 import _ from 'lodash';
 import { Env } from '../../../config/env';
 import TYPES from '../../../config/types';
-import { IPatient, IPractitioner } from '../../../models';
-import { forWho, logger } from '../../../utils';
+import { IEncounter, IPatient, IPractitioner } from '../../../models';
+import { forWho, GenericResponseError, logger } from '../../../utils';
 import { Password } from '../../../utils/password';
 import { eventName, eventService } from '../../eventEmitter';
 import { BroadcastData } from '../../notifications';
 import { IPatientService } from '../../patients';
 import { IPractitionerService } from '../../practitioners';
 import { IUserService } from '../../users';
+import { IFhirResourceService } from '../../resources';
 import { IRabbitMqService, IRabbitMqSetup, successResponseType } from '../interfaces';
+import { IEncounterService } from '../../encounters';
 
 @injectable()
 export class RabbitMqService implements IRabbitMqService {
@@ -20,6 +22,10 @@ export class RabbitMqService implements IRabbitMqService {
   private readonly practitionerService: IPractitionerService;
   @inject(TYPES.UserService)
   private readonly userService: IUserService;
+  
+  @inject(TYPES.EncounterService)
+  private readonly encounterService: IEncounterService;
+
   @inject(TYPES.RabbitMqSetup)
   private readonly rabbitMqSetup: IRabbitMqSetup;
 
@@ -93,22 +99,30 @@ export class RabbitMqService implements IRabbitMqService {
         logger.info(`[x] Received Date: ${new Date().toString()}`);
 
         const data = msgJson?.data;
-        const email = msgJson?.data.email;
         const resource_id = msgJson?.resource_id;
         let resource_type = msgJson?.resource_type;
 
         resource_type = resource_type?.toLowerCase();
 
-        const existingUser = await this.userService.findOne({ email });
-        if (existingUser){
-            await this.updateExistingUser(email, data);
-            return;
+        if (resource_type === forWho.patient || resource_type === forWho.practitioner) {
+          const email = msgJson?.data.email;
+
+          const existingUser = await this.userService.findOne({ email });
+          if (existingUser){
+              await this.updateExistingUser(email, data);
+              return;
+          }
+          await this.createUserFromERPNext(resource_id, data, resource_type);
+          
+          // await this.createUserFromERPNext(resource_id, data, resource_type);
+          // await this.updateExistingUser(email, data);
+          // await this.createPatientOrPractitionerFhirAccount(resource_type, data, msgJson);
+
+          return;
         }
-        await this.createUserFromERPNext(resource_id, data, resource_type);
-        
-        // await this.createUserFromERPNext(resource_id, data, resource_type);
-        // await this.updateExistingUser(email, data);
-        // await this.createPatientOrPractitionerFhirAccount(resource_type, data, msgJson);
+
+        // await this.handleOtherResourcesFromERPNext(resource_type, data);
+
       }
     });
   }
@@ -142,6 +156,8 @@ export class RabbitMqService implements IRabbitMqService {
       if (password) dataToUpdate.password = Password.hash(password);
 
       const existingUser = await this.userService.findOne({ email });
+
+      logger.info("======" + dataToUpdate.password+"=====");
 
       if (existingUser) {
         await this.userService.update(existingUser?.id!, dataToUpdate);
@@ -220,5 +236,56 @@ export class RabbitMqService implements IRabbitMqService {
       .on(eventName.error, () => {
         logger.error('Error creating/publishing events');
       });
+  }
+
+  private async handleOtherResourcesFromERPNext(resource_type: string | any, data: any) {
+    logger.info('Running RabbitMqService.handleOtherResourcesFromERPNext');
+    if (resource_type && data) {
+      try {
+        return await this.storeOtherFhirResource(resource_type, data);
+      } catch (e: any) {
+        const rmqPubMsg = this.rabbitMqSetup.structureErrorData(e.message, resource_type);
+        return this.rmqPublish(JSON.stringify(rmqPubMsg));
+      }
+    }
+  }
+
+  public async storeOtherFhirResource(resource_type: string | any, data: any): Promise<any> {
+    logger.info('Running RabbitMqService.storeOtherFhirResource');
+
+    try {
+      let selectMethod = this.chooseMethodFromResourceType(resource_type);
+      // @ts-ignore
+      return await this[selectMethod](data);
+
+      // if (resource_type == resourceTypes.encounter) {
+      //   return await this.createEncounterfromERPNext(data);
+      // }
+
+    } catch (e: any) {
+      throw new GenericResponseError(e.message, e.code);
+    }
+
+  }
+
+  private chooseMethodFromResourceType(resourceType: string): string {
+    logger.info('Running RabbitMqService.chooseMethodFromResourceType');
+
+    let resource = resourceType.charAt(0).toUpperCase() + resourceType.slice(1);
+    return `create${resource}fromERPNext`;
+  }
+
+  public async createEncounterfromERPNext(data: any): Promise<any> {
+    try {
+      const encounterData: IEncounter = {
+        resource_type: data?.resourceType,
+        resource_id: data?.id,
+        subject: data?.subject.reference,
+        service_provider: data?.serviceProvider.reference,
+      };
+      return await this.encounterService.create(encounterData);
+    } catch (e: any) {
+      throw new GenericResponseError(e.message, e.code);
+    }
   }
 }

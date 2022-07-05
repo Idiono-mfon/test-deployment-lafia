@@ -55,4 +55,8 @@ export class Table {
   public static patient_contacts_contact_points = 'patient_contacts_contact_points';
   public static patient_contacts_codeable_concepts = 'patient_contacts_codeable_concepts';
   public static implementation_guide_fhir_resource: string = 'implementation_guide_fhir_resource';
+  public static claims: string = 'claims';
+  public static appointments: string = 'appointments';
+  public static appointment_responses: string = 'appointment_responses';
+  public static care_teams: string = 'care_teams';
 }

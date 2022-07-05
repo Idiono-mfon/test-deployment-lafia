@@ -16,13 +16,19 @@ import {
   IPatientWithToken
 } from '../../models';
 import { eventService, eventName, IPatientService } from '../../services';
-import { HttpStatusCode, logger } from '../../utils';
+import { HttpStatusCode, ICsvImporter, IFhirImporter, logger } from '../../utils';
 import { BaseController } from '../baseController';
 
 @controller('/patients')
 export class PatientController extends BaseController {
   @inject(TYPES.PatientService)
   private readonly patientService: IPatientService;
+
+  @inject(TYPES.FhirImporter)
+  private readonly myFhirImporter: IFhirImporter;
+
+  @inject(TYPES.CsvImporter)
+  private readonly myCsvImporter: ICsvImporter;
 
   @httpPut('/:id')
   public async updatePatient(@request() req: Request, @response() res: Response) {
@@ -106,5 +112,30 @@ export class PatientController extends BaseController {
       logger.error(`Error broadcasting patient video:`, e);
       this.error(res, e);
     }
+  }
+
+  @httpGet('/')
+  public async importer(@request() req: Request, @response() res: Response) {
+    logger.info('Running PatientController.importer');
+
+    try {
+      // FHIR
+      // const path = 'C:\\projects\\parallelscore\\synthea\\executable\\output_16-6-2022_staging\\fhir\\Kenneth671_Fadel536_be6346e2-fda6-4bf1-7af6-78ffc6998699.json';
+      // await this.myFhirImporter.uploadEncountersFhirData(path);
+      // await this.myFhirImporter.uploadClaimsFhirData(path);
+
+      // OR
+
+      // CSV
+      const path = 'C:\\projects\\parallelscore\\synthea\\executable\\output_16-6-2022_staging\\csv\\encounters.csv';
+      await this.myCsvImporter.uploadEncountersCsv(path);
+      // await this.myFhirImporter.uploadClaimsFhirData(path);
+      this.success(res, {}, 'Data upload successful', HttpStatusCode.CREATED);
+
+    } catch(e: any) {
+      logger.error(`Error uploading fhir data:`, e);
+      this.error(res, e);
+    }
+
   }
 }

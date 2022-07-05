@@ -2,12 +2,12 @@ import { inject, injectable } from 'inversify';
 import TYPES from '../../config/types';
 import { IFhirResource, IFindFhirResource, IImplementationGuide } from '../../models';
 import { IFhirResourceRepository, IImplementationGuideRepository } from '../../repository';
-import { logger, NotFoundError } from '../../utils';
+import { GenericResponseError, logger, NotFoundError, resourceTypes } from '../../utils';
 import { IFhirResourceService } from './interfaces';
 
 @injectable()
 export class FhirResourceService implements IFhirResourceService {
-
+  
   @inject(TYPES.FhirResourceRepository)
   private readonly fhirResourceRepository: IFhirResourceRepository;
 
@@ -75,5 +75,6 @@ export class FhirResourceService implements IFhirResourceService {
 
     return this.fhirResourceRepository.delete(id);
   }
+
 
 }

@@ -26,6 +26,7 @@ export interface IVideoBroadcast extends IBase {
   // initiateCare?: string;
   // videoUrl?: string;
   video_url?: string;
+  appointment_ref?: string;
 }
 
 export interface IFindVideoBroadcast extends IBase {

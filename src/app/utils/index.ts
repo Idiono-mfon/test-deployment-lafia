@@ -6,6 +6,8 @@ export * from './interfaces';
 export * from './loggerUtil';
 export * from './phone.util';
 export * from './validations';
+export * from './csvImporter';
+export * from './fhirImporter';
 
 // Export Utils Container Module
 export * from './module.utility';

@@ -31,13 +31,19 @@ const forWho: ForWho = {
   patient: 'patient',
   patientContact: 'patient_ref',
   practitioner: 'practitioner',
-
+  
 };
 const codeType: ICodeType = {
   language: 'language',
   relationship: 'relationship',
   qualification: 'qualification',
   maritalStatus: 'marital_status',
+};
+
+const resourceTypes = {
+  patient: 'patient',
+  practitioner: 'practitioner',
+  encounter: 'encounter',
 };
 
 @injectable()
@@ -311,6 +317,7 @@ class UtilityService implements IUtilityService {
 export {
   forWho,
   ForWho,
+  resourceTypes,
   codeType,
   UtilityService,
 };
