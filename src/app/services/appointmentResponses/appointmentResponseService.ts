@@ -56,6 +56,12 @@ export class AppointmentResponseService implements IAppointmentResponseService {
     }
   }
 
+  public async createFromERPNext(data: IAppointmentResponse): Promise<IAppointmentResponse> {
+    logger.info('Running AppointmentResponseService.createFromERPNext');
+    // create data in the db
+    return await this.appointmentResponseRepository.create<IAppointmentResponse>(data);
+  }
+
   public async create(data: IAppointmentResponse): Promise<IAppointmentResponse> {
     logger.info('Running AppointmentResponseService.create');
 
@@ -66,13 +72,13 @@ export class AppointmentResponseService implements IAppointmentResponseService {
       },
       actor: {
         reference: data.practitioner_participant
-      }, 
+      },
       participantStatus: data.participant_status
     };
 
     const appointmentResponseReturn = await this.fhirServerService.executeQuery(
-      '/AppointmentResponse', 
-      'POST', 
+      '/AppointmentResponse',
+      'POST',
       { data: appointmentResponseData }
     );
     const appointmentResponse = appointmentResponseReturn.data;

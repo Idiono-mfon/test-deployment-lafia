@@ -2,7 +2,7 @@ import { inject, injectable } from 'inversify';
 import _ from 'lodash';
 import { Env } from '../../../config/env';
 import TYPES from '../../../config/types';
-import { IEncounter, IPatient, IPractitioner } from '../../../models';
+import { IAppointment, IAppointmentResponse, ICareTeam, IClaim, IEncounter, IOrganization, IPatient, IPractitioner } from '../../../models';
 import { forWho, GenericResponseError, logger } from '../../../utils';
 import { Password } from '../../../utils/password';
 import { eventName, eventService } from '../../eventEmitter';
@@ -13,6 +13,11 @@ import { IUserService } from '../../users';
 import { IFhirResourceService } from '../../resources';
 import { IRabbitMqService, IRabbitMqSetup, successResponseType } from '../interfaces';
 import { IEncounterService } from '../../encounters';
+import { IOrganizationService } from '../../organizations';
+import { IClaimService } from '../../claims';
+import { IAppointmentService } from '../../appointments';
+import { IAppointmentResponseService } from '../../appointmentResponses';
+import { ICareTeamService } from '../../careTeams';
 
 @injectable()
 export class RabbitMqService implements IRabbitMqService {
@@ -25,6 +30,21 @@ export class RabbitMqService implements IRabbitMqService {
   
   @inject(TYPES.EncounterService)
   private readonly encounterService: IEncounterService;
+
+  @inject(TYPES.OrganizationService)
+  private readonly organizationService: IOrganizationService;
+
+  @inject(TYPES.ClaimService)
+  private readonly claimService: IClaimService;
+
+  @inject(TYPES.AppointmentService)
+  private readonly appointmentService: IAppointmentService;
+
+  @inject(TYPES.AppointmentResponseService)
+  private readonly appointmentResponseService: IAppointmentResponseService;
+
+  @inject(TYPES.CareTeamService)
+  private readonly careTeamService: ICareTeamService;
 
   @inject(TYPES.RabbitMqSetup)
   private readonly rabbitMqSetup: IRabbitMqSetup;
@@ -275,6 +295,20 @@ export class RabbitMqService implements IRabbitMqService {
     return `create${resource}fromERPNext`;
   }
 
+  public async createOrganizationfromERPNext(data: any): Promise<any> {
+    try {
+      const organizationData: IOrganization = {
+        resource_type: data?.resourceType,
+        resource_id: data?.id,
+        name: data?.name,
+        active: data?.active,
+      };
+      return await this.organizationService.createFromERPNext(organizationData);
+    } catch (e: any) {
+      throw new GenericResponseError(e.message, e.code);
+    }
+  }
+
   public async createEncounterfromERPNext(data: any): Promise<any> {
     try {
       const encounterData: IEncounter = {
@@ -283,9 +317,68 @@ export class RabbitMqService implements IRabbitMqService {
         subject: data?.subject.reference,
         service_provider: data?.serviceProvider.reference,
       };
-      return await this.encounterService.create(encounterData);
+      return await this.encounterService.createFromERPNext(encounterData);
     } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
+
+  public async createClaimfromERPNext(data: any): Promise<any> {
+    try {
+      const claimData: IClaim = {
+        resource_type: data?.resourceType,
+        resource_id: data?.id,
+        subject: data?.subject.reference,
+        status: data?.status,
+        provider: data?.provider.reference,
+        use: data?.use
+      };
+      return await this.claimService.createFromERPNext(claimData);
+    } catch (e: any) {
+      throw new GenericResponseError(e.message, e.code);
+    }
+  }
+
+  public async createAppointmentfromERPNext(data: any): Promise<any> {
+    try {
+      const appointmentData: IAppointment = {
+        resource_type: data?.resourceType,
+        resource_id: data?.id,
+        status: data?.status
+      };
+      return await this.appointmentService.createFromERPNext(appointmentData);
+    } catch (e: any) {
+      throw new GenericResponseError(e.message, e.code);
+    }
+  }
+
+  public async createAppointmentResponsefromERPNext(data: any): Promise<any> {
+    try {
+      const appointmentResponseData: IAppointmentResponse = {
+        resource_type: data?.resourceType,
+        resource_id: data?.id,
+        participant_status: data?.participantStatus,
+        appointment: data?.appointment.reference
+      };
+      return await this.appointmentResponseService.createFromERPNext(appointmentResponseData);
+    } catch (e: any) {
+      throw new GenericResponseError(e.message, e.code);
+    }
+  }
+
+  public async createCareTeamfromERPNext(data: any): Promise<any> {
+    try {
+      const careTeamData: ICareTeam = {
+        resource_type: data?.resourceType,
+        resource_id: data?.id,
+        name: data?.name,
+        subject: data?.subject.reference,
+        status: data?.status
+      };
+      return await this.careTeamService.createFromERPNext(careTeamData);
+    } catch (e: any) {
+      throw new GenericResponseError(e.message, e.code);
+    }
+  }
+
 }

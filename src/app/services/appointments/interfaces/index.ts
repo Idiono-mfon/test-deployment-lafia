@@ -6,4 +6,6 @@ export interface IAppointmentService {
 //   update(id: string, data: IAppointment): Promise<IFhirAppointment>;
 
   create(data: IAppointment): Promise<IAppointment>;
+
+  createFromERPNext(data: IAppointment): Promise<IAppointment>;
 }

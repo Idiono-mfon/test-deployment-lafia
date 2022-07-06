@@ -6,4 +6,6 @@ export interface IOrganizationService {
 //   update(id: string, data: IOrganization): Promise<IFhirOrganization>;
 
   create(data: IOrganization): Promise<IOrganization>;
+
+  createFromERPNext(data: IOrganization): Promise<IOrganization>;
 }

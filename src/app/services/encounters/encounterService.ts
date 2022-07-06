@@ -57,6 +57,17 @@ export class EncounterService implements IEncounterService {
     }
   }
 
+  public async createFromERPNext(data: IEncounter): Promise<IEncounter> {
+    logger.info('Running EncounterService.createFromERPNext');
+
+    try {
+      // create data in the db
+      return await this.encounterRepository.create<IEncounter>(data);
+    } catch (e: any) {
+      throw new GenericResponseError(e.message, e.code);
+    }
+  }
+
   public async create(data: IEncounter): Promise<IEncounter> {
     logger.info('Running EncounterService.create');
 

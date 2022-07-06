@@ -57,6 +57,18 @@ export class ClaimService implements IClaimService {
     }
   }
 
+  public async createFromERPNext(data: IClaim): Promise<IClaim> {
+    logger.info('Running ClaimService.createFromERPNext');
+
+    try {
+      // create data in the db
+      return await this.claimRepository.create<IClaim>(data);
+    } catch (e: any) {
+      throw new GenericResponseError(e.message, e.code);
+    }
+
+  }
+
   public async create(data: IClaim): Promise<IClaim> {
     logger.info('Running ClaimService.create');
 

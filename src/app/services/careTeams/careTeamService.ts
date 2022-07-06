@@ -86,5 +86,12 @@ export class CareTeamService implements ICareTeamService {
     });
   }
 
+  public async createFromERPNext(data: ICareTeam): Promise<ICareTeam> {
+    logger.info('Running CareTeamService.createFromERPNext');
+
+    // create data in the db
+    return await this.careTeamRepository.create<ICareTeam>(data);
+  }
+
 
 }

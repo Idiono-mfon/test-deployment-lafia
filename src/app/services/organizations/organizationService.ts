@@ -57,6 +57,13 @@ export class OrganizationService implements IOrganizationService {
     }
   }
 
+  public async createFromERPNext(data: IOrganization): Promise<IOrganization> {
+    logger.info('Running OrganizationService.createFromERPNext');
+
+    // create data in the db
+    return await this.organizationRepository.create<IOrganization>(data);
+  }
+
   public async create(data: IOrganization): Promise<IOrganization> {
     logger.info('Running OrganizationService.create');
 

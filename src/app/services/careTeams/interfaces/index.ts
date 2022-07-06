@@ -6,4 +6,5 @@ export interface ICareTeamService {
 //   update(id: string, data: ICareTeam): Promise<IFhirCareTeam>;
 
   create(data: ICareTeam): Promise<ICareTeam>;
+  createFromERPNext(data: ICareTeam): Promise<ICareTeam>;
 }

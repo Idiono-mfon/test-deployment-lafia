@@ -57,6 +57,14 @@ export class AppointmentService implements IAppointmentService {
     }
   }
 
+  public async createFromERPNext(data: IAppointment): Promise<IAppointment> {
+    logger.info('Running AppointmentService.createFromERPNext');
+
+    // create data in the db
+    return await this.appointmentRepository.create<IAppointment>(data);
+
+  }
+
   public async create(data: IAppointment): Promise<IAppointment> {
     logger.info('Running AppointmentService.create');
 
