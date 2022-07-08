@@ -23,7 +23,7 @@ spec:
       - name: lafia-service
         image: <IMAGE>
         ports:
-        - containerPort: 80
+        - containerPort: 9000
         resources:
           requests:
             cpu: 100m
@@ -40,7 +40,7 @@ spec:
   ports:
     - name: http
       protocol: TCP
-      port: 80
-      targetPort: 80
+      port: 9000
+      targetPort: 9000
   selector:
     app: lafia-service
