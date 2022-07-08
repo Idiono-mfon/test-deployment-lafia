@@ -127,8 +127,8 @@ export class PatientController extends BaseController {
       // OR
 
       // CSV
-      const path = 'C:\\projects\\parallelscore\\synthea\\executable\\output_16-6-2022_staging\\csv\\encounters.csv';
-      await this.myCsvImporter.uploadEncountersCsv(path);
+      // const path = 'C:\\projects\\parallelscore\\synthea\\executable\\output_16-6-2022_staging\\csv\\encounters.csv';
+      // await this.myCsvImporter.uploadEncountersCsv(path);
       // await this.myFhirImporter.uploadClaimsFhirData(path);
       this.success(res, {}, 'Data upload successful', HttpStatusCode.CREATED);
 
