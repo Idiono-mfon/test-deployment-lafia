@@ -1,10 +1,10 @@
 # name: Build Process
 on:
-  pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
+  # pull_request:
+  #   types:
+  #     - opened
+  #     - synchronize
+  #     - reopened
   push:
     branches:
       - dev-v2
