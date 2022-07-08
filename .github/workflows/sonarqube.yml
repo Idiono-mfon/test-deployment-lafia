@@ -7,7 +7,7 @@ on:
       - reopened
   push:
     branches:
-      - dev-opstest
+      - dev-v2
     paths:
       - 'Dockerfile'
       - '.github/workflows/**'
