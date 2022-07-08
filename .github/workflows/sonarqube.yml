@@ -12,6 +12,7 @@ on:
       - 'Dockerfile'
       - '.github/workflows/**'
       - 'deployment.yaml'
+
 jobs:
  build:
    runs-on: ubuntu-latest
