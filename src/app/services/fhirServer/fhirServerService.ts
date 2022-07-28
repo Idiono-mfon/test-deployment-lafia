@@ -89,7 +89,14 @@ export class FhirServerService implements IFhirServer {
       const entryResource = entry?.resource ? entry.resource : entry;
 
       if (date) {
-        const year = FhirServerService.extractYear(date);
+        let year: any;
+        if (typeof date === 'object') {
+          // handling cases where the resourceDateField is fhir Period type whose data is accessbile via resourceDateField.start
+          year = FhirServerService.extractYear(date.start);
+        }
+        else {
+          year = FhirServerService.extractYear(date);
+        }
 
         if (data.groupedEntries[year]) {
           // @ts-ignore
@@ -249,6 +256,7 @@ export class FhirServerService implements IFhirServer {
     const resourceDateFieldAndReference: IndexAccessor = {
       Procedure: ['performedDateTime', 'subject'],
       Condition: ['recordedDate', 'subject'],
+      Encounter: ['period', 'subject'],
       Observation: ['issued', 'subject'],
       DiagnosticReport: ['issued', 'subject'],
       MedicationDispense: ['whenHandedOver', 'subject'],
@@ -260,7 +268,7 @@ export class FhirServerService implements IFhirServer {
     }
 
     const resourceNames = [
-      'Procedure', 'Condition',
+      'Procedure', 'Condition', 'Encounter',
       'Observation', 'DiagnosticReport',
       'MedicationDispense', 'Medication',
       'Immunization', 'DocumentReference',
