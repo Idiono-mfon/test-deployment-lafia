@@ -41,8 +41,8 @@ class Server {
     await this.firebaseService.triggerNotification();
 
     // Message broker subscription and events
-    await this.rabbitMqService.rmqSubscribe();
-    this.rabbitMqService.handleEvents();
+    // await this.rabbitMqService.rmqSubscribe();
+    // this.rabbitMqService.handleEvents();
 
     // Signalling server
     this.signallingServerService.initialize(appServer);

@@ -29,12 +29,12 @@ export class EncounterService implements IEncounterService {
   @inject(TYPES.FhirServerService)
   private readonly fhirServerService: IFhirServer;
 
-  // public async findById(id: string): Promise<IFhirEncounter> {
-  //   logger.info('Running EncounterService.findById');
-  //   const encounter = await this.fhirServerService.executeQuery(`/Encounter/${id}`, 'GET');
+  public async findById(id: string): Promise<IFhirEncounter> {
+    logger.info('Running EncounterService.findById');
+    const encounter = await this.fhirServerService.executeQuery(`/Encounter/${id}`, 'GET');
 
-  //   return encounter.data;
-  // }
+    return encounter.data;
+  }
 
   public async update(id: string, data: IEncounter): Promise<IEncounter> {
     logger.info('Running EncounterService.update');

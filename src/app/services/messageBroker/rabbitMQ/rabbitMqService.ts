@@ -2,7 +2,7 @@ import { inject, injectable } from 'inversify';
 import _ from 'lodash';
 import { Env } from '../../../config/env';
 import TYPES from '../../../config/types';
-import { IAppointment, IAppointmentResponse, ICareTeam, IClaim, IEncounter, IOrganization, IPatient, IPractitioner } from '../../../models';
+import { IAppointment, IAppointmentResponse, ICareTeam, IClaim, IEncounter, IFhirServer, IOrganization, IPatient, IPractitioner } from '../../../models';
 import { forWho, GenericResponseError, logger } from '../../../utils';
 import { Password } from '../../../utils/password';
 import { eventName, eventService } from '../../eventEmitter';
@@ -48,6 +48,9 @@ export class RabbitMqService implements IRabbitMqService {
 
   @inject(TYPES.RabbitMqSetup)
   private readonly rabbitMqSetup: IRabbitMqSetup;
+
+  @inject(TYPES.FhirServerService)
+  private readonly fhirServerService: IFhirServer;
 
   private readonly pubQueue: string;
   private readonly subQueue: string;
@@ -141,7 +144,7 @@ export class RabbitMqService implements IRabbitMqService {
           return;
         }
 
-        // await this.handleOtherResourcesFromERPNext(resource_type, data);
+        await this.handleOtherResourcesFromERPNext(resource_type, data);
 
       }
     });
@@ -296,12 +299,22 @@ export class RabbitMqService implements IRabbitMqService {
   }
 
   public async createOrganizationfromERPNext(data: any): Promise<any> {
+    logger.info('Running RabbitMqService.createOrganizationfromERPNext');
+    // first fetch encounter from fhir server, then get the details to add to the db
+    const organizationResponse = await this.fhirServerService.executeQuery(
+      `Organization/${data?.id}`,
+      'GET',
+      { data: {} }
+    );
+    const organization = organizationResponse.data;
+    // console.log(organization);
+
     try {
       const organizationData: IOrganization = {
-        resource_type: data?.resourceType,
-        resource_id: data?.id,
-        name: data?.name,
-        active: data?.active,
+        resource_type: organization?.resourceType,
+        resource_id: organization?.id,
+        name: organization?.name,
+        active: organization?.active,
       };
       return await this.organizationService.createFromERPNext(organizationData);
     } catch (e: any) {
@@ -310,12 +323,26 @@ export class RabbitMqService implements IRabbitMqService {
   }
 
   public async createEncounterfromERPNext(data: any): Promise<any> {
+    logger.info('Running RabbitMqService.createEncounterfromERPNext');
+    // first fetch encounter from fhir server, then get the details to add to the db
+    console.log(data);
+    const encounterResponse = await this.fhirServerService.executeQuery(
+      `Encounter/${data?.id}`,
+      'GET',
+      { data: {} }
+    );
+    const encounter = encounterResponse.data;
+    // console.log(encounterResponse);
+    console.log(encounter);
+
     try {
       const encounterData: IEncounter = {
-        resource_type: data?.resourceType,
-        resource_id: data?.id,
-        subject: data?.subject.reference,
-        service_provider: data?.serviceProvider.reference,
+        resource_type: encounter?.resourceType,
+        resource_id: encounter?.id,
+        subject: encounter?.subject.reference,
+        service_provider: encounter?.serviceProvider.reference,
+        status: encounter.status,
+        participant: encounter?.participant[0].individual.reference,
       };
       return await this.encounterService.createFromERPNext(encounterData);
     } catch (e: any) {
