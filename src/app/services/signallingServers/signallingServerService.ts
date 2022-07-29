@@ -5,7 +5,7 @@ import { createAdapter } from '@socket.io/redis-adapter';
 import { v4 as uuid } from 'uuid';
 import { Env, IEnv } from '../../config/env';
 import TYPES from '../../config/types';
-import { IPractitionerVideoBroadcast, IVideoBroadcast } from '../../models';
+import { IAppointment, IPractitionerVideoBroadcast, IVideoBroadcast } from '../../models';
 import { forWho, logger } from '../../utils';
 import { eventName, eventService } from '../eventEmitter';
 import {
@@ -19,6 +19,7 @@ import { TwilioService } from '../twilio';
 import { VideoBroadcastService } from '../videoRecords';
 import { IAcceptCare, INewBroadcast, INewCare, IOnlineUser, ISignallingServerService } from './interfaces';
 import { RedisStore } from './redisStore';
+import { AppointmentService } from '../appointments';
 
 @injectable()
 export class SignallingServerService implements ISignallingServerService {
@@ -38,6 +39,8 @@ export class SignallingServerService implements ISignallingServerService {
   private readonly patientService: PatientService;
   @inject(TYPES.PractitionerService)
   private readonly practitionerService: PractitionerService;
+  @inject(TYPES.AppointmentService)
+  private readonly appointmentService: AppointmentService;
 
   constructor() {
     SignallingServerService.onlinePractitionerRoom = 'onlinePractitioners';
@@ -174,16 +177,26 @@ export class SignallingServerService implements ISignallingServerService {
     logger.info('Running SignallingServerService.listenForNewVideoBroadcastEvent');
     
     socket.on('newVideoBroadcast', async (newBroadcast: INewBroadcast) => {
-    //   logger.info('===NEW EVENT: newVideoBroadcast===');
+      // Create Appointment using AppointmentService
+      const vidAppointment:IAppointment = {
+        resource_type: 'Appointment',
+        patient_participant: `Patient/${newBroadcast.patientId}`,
+        description: `Video from patient: ${newBroadcast.patientName}`,
+        status: 'proposed'
+      };
+      const appointment: IAppointment = await this.appointmentService.create(vidAppointment);
+      
+      //   logger.info('===NEW EVENT: newVideoBroadcast===');
+      newBroadcast.appointment_ref = `Appointment/${appointment.id}`;
       await this.redisStore.saveBroadcast(newBroadcast);
 
       const newCareBroadCast = await this.redisStore
         .getBroadcastByVideoUrl(newBroadcast.videoUrl);
 
-      // emit socket event to practitioners' room
+      // emit socket event to practitioners' room for client to pick up
       SignallingServerService.emitNewCareEvent(socket, newCareBroadCast);
 
-      // Send kafka message to practitioner # this is NOT kafka, but rather, node events that gets listened to inside rabbitMqService.handleEvents()
+      // Send kafka message to practitioner # this is NOT kafka, but rather, node events that gets listened to inside rabbitMqService.handleEvents() which simply sends it to app.lafia
       eventService.emit(eventName.newBroadcast, newCareBroadCast);
 
       // Send firebase notification to all practitioners
@@ -197,7 +210,8 @@ export class SignallingServerService implements ISignallingServerService {
           patient_id: newCareBroadCast.patientId,
           description: newCareBroadCast.description,
           initiate_care: String(newCareBroadCast.initiateCare),
-          video_url: newCareBroadCast.videoUrl
+          video_url: newCareBroadCast.videoUrl,
+          appointment_ref: `Appointment/${appointment.id}`
         }
 
         // console.log(vidBroadcast);

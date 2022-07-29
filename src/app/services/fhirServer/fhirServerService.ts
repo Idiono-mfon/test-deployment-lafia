@@ -89,7 +89,14 @@ export class FhirServerService implements IFhirServer {
       const entryResource = entry?.resource ? entry.resource : entry;
 
       if (date) {
-        const year = FhirServerService.extractYear(date);
+        let year: any;
+        if (typeof date === 'object') {
+          // handling cases where the resourceDateField is fhir Period type whose data is accessbile via resourceDateField.start
+          year = FhirServerService.extractYear(date.start);
+        }
+        else {
+          year = FhirServerService.extractYear(date);
+        }
 
         if (data.groupedEntries[year]) {
           // @ts-ignore
@@ -157,8 +164,10 @@ export class FhirServerService implements IFhirServer {
 
   public async lafiaFhir(resourceQuery: string, httpMethod: Method, props?: FhirProperties): Promise<any> {
     logger.info('Running FhirServerService.lafiaFhir');
+    console.log(this.env.fhir_server_base_url, resourceQuery, httpMethod);
     try {
       const { data } = props!;
+      console.log(JSON.stringify(data));
       const { status, data: responseData, headers } = await this.axiosInstance({
         url: resourceQuery,
         baseURL: `${this.env.fhir_server_base_url}/`,
@@ -166,18 +175,21 @@ export class FhirServerService implements IFhirServer {
         data,
       });
 
+      console.log(status, responseData);
+
       delete headers['transfer-encoding'];
       headers['x-powered-by'] = 'LAFIA FHIR 5.4.0 REST Server (FHIR Server; FHIR 4.0.1/R4)';
 
       return {
-        status,
+        status: responseData.status,
         headers,
         data: 'headers' in responseData ? responseData.data : responseData,
       };
     } catch (e: any) {
       delete e.response.headers['transfer-encoding'];
       e.response.headers['x-powered-by'] = 'LAFIA FHIR 5.4.0 REST Server (FHIR Server; FHIR 4.0.1/R4)';
-      logger.error(`Could not fetch data from lafia`);
+      logger.error(`FhirServerService.lafiaFhir`);
+      logger.error(`$${e.message}`);
       throw new GenericResponseError(e.message, e.response);
     }
   }
@@ -244,6 +256,7 @@ export class FhirServerService implements IFhirServer {
     const resourceDateFieldAndReference: IndexAccessor = {
       Procedure: ['performedDateTime', 'subject'],
       Condition: ['recordedDate', 'subject'],
+      Encounter: ['period', 'subject'],
       Observation: ['issued', 'subject'],
       DiagnosticReport: ['issued', 'subject'],
       MedicationDispense: ['whenHandedOver', 'subject'],
@@ -255,7 +268,7 @@ export class FhirServerService implements IFhirServer {
     }
 
     const resourceNames = [
-      'Procedure', 'Condition',
+      'Procedure', 'Condition', 'Encounter',
       'Observation', 'DiagnosticReport',
       'MedicationDispense', 'Medication',
       'Immunization', 'DocumentReference',

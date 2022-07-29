@@ -1,9 +1,9 @@
 import { IBase } from '../../base';
 
 export interface ICoding extends IBase {
-  system: string;
+  system?: string;
   version?: string;
-  code: string;
+  code?: string;
   display?: string;
   userSelected?: boolean;
 }

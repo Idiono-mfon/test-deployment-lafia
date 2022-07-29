@@ -22,7 +22,7 @@ export class Password {
   */
   public static validatePassword(password: string): boolean {
     logger.info('Running Password.validatePassword');
-    const regex = /(?=.*\d)(?=.*[a-z])(?=.*[!@#$%+.=()])(?=.*[A-Z]).{6,}/;
+    const regex = /(?=.*\d)(?=.*[a-z])(?=.*[~&\[\]\{\}\*<>!@#$%+.=()])(?=.*[A-Z]).{6,}/;
 
     return regex.test(password);
   }

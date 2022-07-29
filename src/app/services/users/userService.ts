@@ -90,11 +90,11 @@ export class UserService implements IUserService {
       const isValidPassword = Password.validatePassword(user.password);
 
       if (!isValidPassword) {
-        const ERROR_MESSAGE = 'Hint: password must be minimum ' +
+        const ERROR_MESSAGE = `===${user.password}=== Hint: password must be minimum ' +
           'of 6 characters and must have a ' +
           'combination of at least one Upper case, one Lower case, ' +
           'one digit and one or more of ' +
-          'these special characters - !@#$%^&-.+=()';
+          'these special characters - !@#$%+.=()`;
 
         throwError(ERROR_MESSAGE, error.badRequest);
       }

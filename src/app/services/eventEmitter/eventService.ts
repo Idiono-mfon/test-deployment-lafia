@@ -15,5 +15,6 @@ export enum eventName {
   newMedia = 'newMedia',
   newPatient = 'newPatient',
   newPractitioner = 'newPractitioner',
+  newClaim = 'newClaim',
   error = 'error'
 }

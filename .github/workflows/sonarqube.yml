@@ -1,13 +1,13 @@
 # name: Build Process
 on:
-  pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
+  # pull_request:
+  #   types:
+  #     - opened
+  #     - synchronize
+  #     - reopened
   push:
     branches:
-      - dev-opstest
+      - dev-v2
     paths:
       - 'Dockerfile'
       - '.github/workflows/**'
