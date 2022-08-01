@@ -1,4 +1,4 @@
-# name: Build Process
+name: lafia-service-deployments-Build Process
 on:
   # pull_request:
   #   types:
@@ -8,10 +8,10 @@ on:
   push:
     branches:
       - dev-v2
-    paths:
-      - 'Dockerfile'
-      - '.github/workflows/**'
-      - 'deployment.yaml'
+#     paths:
+#       - 'Dockerfile'
+#       - '.github/workflows/**'
+#       - 'deployment.yaml'
 jobs:
  build:
    runs-on: ubuntu-latest
