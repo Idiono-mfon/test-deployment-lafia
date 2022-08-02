@@ -28,6 +28,9 @@ export class LafiaMediaService implements ILafiaMediaService {
         { name: Types.ObjectId() }
       );
 
+      console.log(axiosResponse);
+      console.log(axiosResponse?.data);
+
       const streamKey = axiosResponse?.data?.streamId;
 
       await this.videoRecordService.create({ streamId: streamKey, patient_id });
