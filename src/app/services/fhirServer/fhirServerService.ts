@@ -164,10 +164,10 @@ export class FhirServerService implements IFhirServer {
 
   public async lafiaFhir(resourceQuery: string, httpMethod: Method, props?: FhirProperties): Promise<any> {
     logger.info('Running FhirServerService.lafiaFhir');
-    console.log(this.env.fhir_server_base_url, resourceQuery, httpMethod);
+    // console.log(this.env.fhir_server_base_url, resourceQuery, httpMethod);
     try {
       const { data } = props!;
-      console.log(JSON.stringify(data));
+      // console.log(JSON.stringify(data));
       const { status, data: responseData, headers } = await this.axiosInstance({
         url: resourceQuery,
         baseURL: `${this.env.fhir_server_base_url}/`,
@@ -175,7 +175,7 @@ export class FhirServerService implements IFhirServer {
         data,
       });
 
-      console.log(status, responseData);
+      // console.log(status, responseData);
 
       delete headers['transfer-encoding'];
       headers['x-powered-by'] = 'LAFIA FHIR 5.4.0 REST Server (FHIR Server; FHIR 4.0.1/R4)';

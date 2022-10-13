@@ -1,3 +1,4 @@
+## Last updated: August 11, 2022
 name: lafia-service-deployments-Build Process
 on:
   # pull_request:
@@ -8,11 +9,7 @@ on:
   push:
     branches:
       - dev-v2
-      
-    # paths:
-    #   - 'Dockerfile'
-    #   - '.github/workflows/**'
-    #   - 'deployment.yaml'
+
 jobs:
   sonar_test:
     name: sonarqube
