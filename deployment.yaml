@@ -1,11 +1,25 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Service
 metadata:
+#   namespace: suresalama-space
   name: lafia-service
   labels:
     app: lafia-service
 spec:
-  replicas: 1
+#   type: LoadBalancer
+  ports:
+  - name: lafia-service-http
+    port: 80
+    targetPort: 9500
+  selector:
+    app: lafia-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+#   namespace: suresalama-space
+  name: lafia-service
+spec:
   selector:
     matchLabels:
       app: lafia-service
@@ -13,7 +27,7 @@ spec:
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 1
-  minReadySeconds: 5
+    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -25,22 +39,31 @@ spec:
         ports:
         - containerPort: 9500
         resources:
-          requests:
-            cpu: 100m
-          limits:
+          limits: 
+            # memory: "512Mi"
             cpu: 200m
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: lafia-service
-spec:
-  type: LoadBalancer
-  ports:
-    - name: http
-      protocol: TCP
-      port: 9500
-      targetPort: 9500
-  selector:
-    app: lafia-service
+        livenessProbe:
+          failureThreshold: 3
+          initialDelaySeconds: 120
+          periodSeconds: 30
+          successThreshold: 1
+          tcpSocket:
+            port: 9500
+          timeoutSeconds: 30
+        readinessProbe:
+          failureThreshold: 3
+          initialDelaySeconds: 90
+          periodSeconds: 30
+          successThreshold: 1
+          tcpSocket:
+            port: 9500
+          timeoutSeconds: 30
+        imagePullPolicy: Always
+      #   volumeMounts:
+      #   - name: config-volume
+      #     mountPath: /secrets/config
+      #     readOnly: true
+      # volumes:
+      # - name: config-volume
+      #   configMap:
+      #     name: suresalama-cm
