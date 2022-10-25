@@ -9,7 +9,7 @@ spec:
 #   type: LoadBalancer
   ports:
   - name: lafia-service-http
-    port: 80
+    port: 9500
     targetPort: 9500
   selector:
     app: lafia-service
@@ -20,6 +20,7 @@ metadata:
 #   namespace: suresalama-space
   name: lafia-service
 spec:
+  replicas: 2
   selector:
     matchLabels:
       app: lafia-service
