@@ -1,5 +1,6 @@
 export interface IEmailService {
   sendEmail(data: IComposeEmail): Promise<any>;
+  emailOTPMsg(data: string): string;
 }
 
 export interface IComposeEmail {

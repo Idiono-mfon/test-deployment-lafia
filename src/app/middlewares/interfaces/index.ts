@@ -11,5 +11,18 @@ export interface IAuthMiddleware {
 export interface CastJWTDecodedType {
   email: string;
   iat?: number;
-  aud: string
+  aud: string;
+}
+
+export interface IValidationResult {
+  object: string;
+  name: string;
+  statusCode: number;
+  details: [
+    {
+      property: string;
+      name: string;
+      message: string;
+    }
+  ];
 }

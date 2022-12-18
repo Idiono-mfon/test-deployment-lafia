@@ -19,3 +19,11 @@ export interface IFindConnection extends IBase {
   refreshToken?: string;
   connectionName?: string;
 }
+
+export interface ICreateAccount {
+  isEmail: boolean;
+  email: string;
+  phone: string;
+  password: string;
+  confirmPassword: string;
+}

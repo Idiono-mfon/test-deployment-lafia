@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
 import { inject } from 'inversify';
-import {
-  controller, httpGet, httpPost, httpPut, request, response
-} from 'inversify-express-utils';
+import { controller, httpGet, httpPost, httpPut, request, response } from 'inversify-express-utils';
 import TYPES from '../../config/types';
 import { IUser } from '../../models';
 import { HttpStatusCode, logger } from '../../utils';
 import { BaseController } from '../baseController';
 import { ITwilioService, IUserService } from '../../services';
+import { validationMiddleware } from '../../middlewares/validation.middleware';
+import { CreateAccountDto } from '../auth/dto';
 
 @controller('/users')
 export class UserController extends BaseController {
@@ -20,7 +20,7 @@ export class UserController extends BaseController {
   @httpPost('/register')
   public async createUser(@request() req: Request, @response() res: Response) {
     logger.info('Running UserController.create');
-    const user: IUser = req.body
+    const user: IUser = req.body;
     try {
       const newUser = await this.userService.create(user);
 
@@ -31,12 +31,13 @@ export class UserController extends BaseController {
     }
   }
 
-  @httpPost('/validate')
+  @httpPost('/validate', validationMiddleware(CreateAccountDto))
   public async validateUser(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController.validate');
+    logger.info('Running UserController.validate1');
     try {
-      // @ts-ignore
-      const ip: string = req.headers['x-forwarded-for']?.split(',').shift() || req.socket?.remoteAddress;
+      //@ts-ignore
+      const ip: string = //@ts-ignore
+        req.headers['x-forwarded-for']?.split(',').shift() || req.socket?.remoteAddress;
 
       const newUser = await this.userService.validate(req.body, ip);
 
@@ -153,7 +154,6 @@ export class UserController extends BaseController {
     try {
       await this.userService.checkExistingUser(req.body);
 
-
       this.success(res, {}, 'User does not exist');
     } catch (e: any) {
       logger.error(`Unable to check for existing user`, e);
@@ -173,5 +173,4 @@ export class UserController extends BaseController {
       this.error(res, e);
     }
   }
-
 }

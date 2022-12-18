@@ -8,7 +8,7 @@ import { Env, IEnv } from '../../config/env';
 import { Password } from '../../utils/password';
 import { IUserRepository } from '../../repository';
 import { IComposeEmail, IEmailService } from '../email';
-import { IFhirServer, IFindUser, IJwtPayload, IUser } from '../../models';
+import { IFhirServer, IFindUser, IJwtPayload, IUser, ICreateAccount } from '../../models';
 import {
   error,
   GenericResponseError,
@@ -16,7 +16,9 @@ import {
   HttpStatusCode,
   logger,
   throwError,
-  Validations
+  Validations,
+  random6Digits,
+  OTPExpiryTime,
 } from '../../utils';
 
 @injectable()
@@ -43,31 +45,69 @@ export class UserService implements IUserService {
     return this.userRepository.findOne<IFindUser>(data);
   }
 
-  public async validate(data: IUser, ip?: string): Promise<boolean> {
+  public async validate(data: ICreateAccount, ip?: string): Promise<boolean> {
     logger.info('Running UserService.validate');
 
-    const user: IUser = data;
+    const { isEmail, email, phone: phoneNos, password } = data;
+
     try {
-      // find user by email
-      let emailUser = await this.userRepository.findOne<IFindUser>({ email: user.email });
+      if (isEmail) {
+        // find user by email
+        let emailUser = await this.userRepository.findOne<IFindUser>({ email });
 
-      if (emailUser) {
-        const ERROR_MESSAGE = 'a user with this email already exist';
-        throwError(ERROR_MESSAGE, error.badRequest);
+        if (emailUser) {
+          const ERROR_MESSAGE = 'a user with this email already exist';
+          throwError(ERROR_MESSAGE, error.badRequest);
+        }
+        const OTPCode = random6Digits();
+
+        // Send the new password details to the user
+        const emailMessage = this.emailService.emailOTPMsg(OTPCode);
+
+        const composedEmail: IComposeEmail = {
+          html: emailMessage,
+          to: email,
+          subject: 'Send Verification code',
+        };
+
+        await this.emailService.sendEmail(composedEmail);
+
+        // Save user OTP record temporarily for latter verification purpose;
+        const user: IUser = {
+          email,
+          first_name: `${email}_test_first_name`,
+          last_name: `${email}_test_last_name`,
+          password,
+          otp_code: OTPCode,
+          otp_code_expiration: OTPExpiryTime(),
+        };
+
+        await this.userRepository.create<IUser>(user);
+      } else {
+        const phone = getE164Format(phoneNos!, ip);
+
+        // find user by phone number
+        let phoneUser = await this.userRepository.findOne<IFindUser>({ phone });
+
+        if (phoneUser) {
+          const ERROR_MESSAGE = 'a user with this phone already exist';
+          throwError(ERROR_MESSAGE, error.badRequest);
+        }
+
+        await this.twilioService.sendOTP(phone);
+
+        // Save user OTP record temporarily for latter verification purpose;
+        const user: IUser = {
+          email: `${phone}@test.com`,
+          first_name: `${phone}_test_first_name`,
+          last_name: `${phone}_test_last_name`,
+          password,
+          phone,
+          otp_code_expiration: OTPExpiryTime(),
+        };
+
+        await this.userRepository.create<IUser>(user);
       }
-
-
-      user.phone = getE164Format(user.phone!, ip);
-
-      // find user by phone number
-      let phoneUser = await this.userRepository.findOne<IFindUser>({ phone: user.phone! });
-
-      if (phoneUser) {
-        const ERROR_MESSAGE = 'a user with this phone already exist';
-        throwError(ERROR_MESSAGE, error.badRequest);
-      }
-
-      await this.twilioService.sendOTP(user.phone);
 
       return true;
     } catch (e: any) {
@@ -124,7 +164,6 @@ export class UserService implements IUserService {
     }
 
     try {
-
       if (existingUser) {
         let userFhirData: any = await this.fhirServerService.executeQuery(
           `/Patient/${existingUser.resourceId}`,
@@ -134,11 +173,9 @@ export class UserService implements IUserService {
         throw new GenericResponseError('Patient already exists', {
           status: HttpStatusCode.CONFLICT,
           data: userFhirData.data,
-          headers: userFhirData.headers
+          headers: userFhirData.headers,
         });
-
       }
-
     } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
@@ -208,7 +245,11 @@ export class UserService implements IUserService {
     }
   }
 
-  public async changePassword(id: string, oldPassword: string, newPassword: string): Promise<IUser> {
+  public async changePassword(
+    id: string,
+    oldPassword: string,
+    newPassword: string
+  ): Promise<IUser> {
     logger.info('Running UserService.changePassword');
 
     try {
@@ -220,7 +261,8 @@ export class UserService implements IUserService {
 
       const isNewPasswordValid = Password.validatePassword(newPassword);
       if (!isNewPasswordValid) {
-        const ERROR_MESSAGE = 'Hint: new password must be minimum ' +
+        const ERROR_MESSAGE =
+          'Hint: new password must be minimum ' +
           'of 6 characters and must have a ' +
           'combination of at least one Upper case, one Lower case, ' +
           'one digit and one or more of ' +
@@ -279,13 +321,13 @@ export class UserService implements IUserService {
         <br />
         <p>Thank you</p>
         <p>Lafia Team (support@lafia.io)</p>
-      `
+      `;
 
       const composedEmail: IComposeEmail = {
         html: emailMessage,
         to: email,
-        subject: 'Reset Password'
-      }
+        subject: 'Reset Password',
+      };
 
       await this.emailService.sendEmail(composedEmail);
     } catch (e: any) {

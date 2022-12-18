@@ -73,14 +73,12 @@ const TYPES = {
   AppointmentResponseRepository: Symbol('AppointmentResponseRepository'),
   CareTeamRepository: Symbol('CareTeamRepository'),
   OrganizationRepository: Symbol('OrganizationRepository'),
-  
 
   // models
   ModelClass: Symbol('ModelClass'),
 
   // middlewares
   AuthMiddleware: Symbol('AuthMiddleware'),
-
   // Utils
   TokenUtil: Symbol('TokenUtil'),
   CsvImporter: Symbol('CsvImporter'),

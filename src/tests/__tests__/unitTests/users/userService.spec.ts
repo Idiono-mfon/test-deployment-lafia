@@ -1,19 +1,20 @@
 import bcrypt from 'bcryptjs';
 import { container } from '../../../../app/config';
 import TYPES from '../../../../app/config/types';
-import { IFhirServer, IJwtPayload, IUser } from '../../../../app/models';
-import {
-  DbAccess,
-  IUserRepository,
-} from '../../../../app/repository';
-import {
-  IEmailService,
-  IUserService,
-  ITwilioService,
-} from '../../../../app/services';
+import { IFhirServer, IJwtPayload, IUser, ICreateAccount } from '../../../../app/models';
+import { DbAccess, IUserRepository } from '../../../../app/repository';
+import { IEmailService, IUserService, ITwilioService } from '../../../../app/services';
 import { getE164Format } from '../../../../app/utils';
-import { TestTwilioRoomRepository, TestUserRepository, TestBaseRepository } from '../../../fixtures/repositories';
-import { TestEmailService, TestFhirServerService, TestTwilioService } from '../../../fixtures/services';
+import {
+  TestTwilioRoomRepository,
+  TestUserRepository,
+  TestBaseRepository,
+} from '../../../fixtures/repositories';
+import {
+  TestEmailService,
+  TestFhirServerService,
+  TestTwilioService,
+} from '../../../fixtures/services';
 import { getE164FormatMockImpl } from '../../../fixtures/utils';
 
 jest.mock('bcryptjs');
@@ -42,7 +43,6 @@ describe('User Service Unit Test', () => {
   });
 
   afterEach(() => {
-
     // Restore to last snapshot so each unit test
     // takes a clean copy of the application container
     container.restore();
@@ -59,15 +59,14 @@ describe('User Service Unit Test', () => {
 
   afterAll((done) => {
     done();
-  })
+  });
 
   it('should be defined', () => {
-
     expect(testUserService).toBeDefined();
   });
 
   it('should create a new user', async () => {
-    bcryptMock.hash.mockResolvedValueOnce('1S896xPD#$')
+    bcryptMock.hash.mockResolvedValueOnce('1S896xPD#$');
 
     const userData: IUser = {
       email: 'test@example.com',
@@ -79,9 +78,8 @@ describe('User Service Unit Test', () => {
       password: 'Asdc#21dB0',
       phone: '09087235321',
       resource_id: '52',
-      resource_type: 'patient'
-
-    }
+      resource_type: 'patient',
+    };
 
     const newUser = await testUserService.create(userData);
 
@@ -89,7 +87,7 @@ describe('User Service Unit Test', () => {
   });
 
   it('should not create a new user if email is invalid', async () => {
-    bcryptMock.hash.mockResolvedValueOnce('1S896xPD#$')
+    bcryptMock.hash.mockResolvedValueOnce('1S896xPD#$');
 
     const userData: IUser = {
       email: 'test@example',
@@ -101,9 +99,8 @@ describe('User Service Unit Test', () => {
       password: 'Asdc#21dB0',
       phone: '09087235321',
       resource_id: '52',
-      resource_type: 'patient'
-
-    }
+      resource_type: 'patient',
+    };
 
     try {
       await testUserService.create(userData);
@@ -114,7 +111,7 @@ describe('User Service Unit Test', () => {
   });
 
   it('should not create a user if password is less than 6 characters', async () => {
-    bcryptMock.hash.mockResolvedValueOnce('1S896xPD#$')
+    bcryptMock.hash.mockResolvedValueOnce('1S896xPD#$');
 
     const userData: IUser = {
       email: 'test@example.com',
@@ -126,59 +123,68 @@ describe('User Service Unit Test', () => {
       password: 'Asdc#',
       phone: '09087235321',
       resource_id: '52',
-      resource_type: 'patient'
-
-    }
+      resource_type: 'patient',
+    };
 
     try {
       await testUserService.create(userData);
     } catch (e: any) {
-      const errorMessage = 'Hint: password must be minimum of 6 characters and must have a combination of at least one Upper case, one Lower case, one digit and one or more of these special characters - !@#$%^&-.+=()';
+      const errorMessage =
+        'Hint: password must be minimum of 6 characters and must have a combination of at least one Upper case, one Lower case, one digit and one or more of these special characters - !@#$%^&-.+=()';
       expect(e.message).toEqual(errorMessage);
     }
   });
 
   it('should validate a user ', async () => {
+    // const userData: IUser = {
+    //   email: 'test1@example.com',
+    //   first_name: 'Test',
+    //   gender: 'male',
+    //   has_verified_email: false,
+    //   has_verified_phone: false,
+    //   last_name: 'User',
+    //   password: 'Asdc#21dB0',
+    //   phone: '+2349080005321',
+    //   resource_id: '52',
+    //   resource_type: 'patient',
+    // };
 
-
-    const userData: IUser = {
+    const userData: ICreateAccount = {
       email: 'test1@example.com',
-      first_name: 'Test',
-      gender: 'male',
-      has_verified_email: false,
-      has_verified_phone: false,
-      last_name: 'User',
-      password: 'Asdc#21dB0',
       phone: '+2349080005321',
-      resource_id: '52',
-      resource_type: 'patient'
-
-    }
+      password: 'Asdc#21dB0',
+      confirmPassword: 'Asdc#21dB0',
+      isEmail: false,
+    };
 
     getE164FormatMock.mockReturnValue(getE164FormatMockImpl(userData.phone!));
 
     const isValidUser = await testUserService.validate(userData);
 
     expect(isValidUser).toBeTruthy();
-
   });
 
   it('should fail validation if user email already exists ', async () => {
+    // const userData: IUser = {
+    //   email: 'david@test.com',
+    //   first_name: 'Test',
+    //   gender: 'male',
+    //   has_verified_email: false,
+    //   has_verified_phone: false,
+    //   last_name: 'User',
+    //   password: 'Asdc#21dB0',
+    //   phone: '+2349080005321',
+    //   resource_id: '52',
+    //   resource_type: 'patient',
+    // };
 
-
-    const userData: IUser = {
-      email: 'david@test.com',
-      first_name: 'Test',
-      gender: 'male',
-      has_verified_email: false,
-      has_verified_phone: false,
-      last_name: 'User',
-      password: 'Asdc#21dB0',
+    const userData: ICreateAccount = {
+      email: 'test1@example.com',
       phone: '+2349080005321',
-      resource_id: '52',
-      resource_type: 'patient'
-
-    }
+      password: 'Asdc#21dB0',
+      confirmPassword: 'Asdc#21dB0',
+      isEmail: true,
+    };
 
     getE164FormatMock.mockReturnValue(getE164FormatMockImpl(userData.phone!));
 
@@ -189,25 +195,29 @@ describe('User Service Unit Test', () => {
 
       expect(e.message).toBe(errorMessage);
     }
-
   });
 
   it('should fail validation if user phone already exists ', async () => {
+    // const userData: IUser = {
+    //   email: 'david23@test1.com',
+    //   first_name: 'Test',
+    //   gender: 'male',
+    //   has_verified_email: false,
+    //   has_verified_phone: false,
+    //   last_name: 'User',
+    //   password: 'Asdc#21dB0',
+    //   phone: '09082315532',
+    //   resource_id: '52',
+    //   resource_type: 'patient',
+    // };
 
-
-    const userData: IUser = {
-      email: 'david23@test1.com',
-      first_name: 'Test',
-      gender: 'male',
-      has_verified_email: false,
-      has_verified_phone: false,
-      last_name: 'User',
+    const userData: ICreateAccount = {
+      email: 'test1@example.com',
+      phone: '+2349080005321',
       password: 'Asdc#21dB0',
-      phone: '09082315532',
-      resource_id: '52',
-      resource_type: 'patient'
-
-    }
+      confirmPassword: 'Asdc#21dB0',
+      isEmail: false,
+    };
 
     getE164FormatMock.mockReturnValue(getE164FormatMockImpl(userData.phone!));
 
@@ -218,7 +228,6 @@ describe('User Service Unit Test', () => {
 
       expect(e.message).toBe(errorMessage);
     }
-
   });
 
   it('should get one user', async () => {
@@ -283,7 +292,6 @@ describe('User Service Unit Test', () => {
   });
 
   it('should log a user out', async () => {
-
     const loggedOutUser = await testUserService.logout('e456432b-8335-4a07-a1a5-34f860e2f33f');
 
     expect(loggedOutUser).toBeDefined();
@@ -295,7 +303,7 @@ describe('User Service Unit Test', () => {
     const userData: IJwtPayload = {
       id: '22',
       email: 'joy@test.com',
-    }
+    };
     const token = testUserService.generateJwtToken(userData);
 
     expect(token).toBeDefined();
@@ -304,7 +312,7 @@ describe('User Service Unit Test', () => {
   it('should throw error generating JWT token if id is not provided', async () => {
     const userData: IJwtPayload | any = {
       email: 'joy@test.com',
-    }
+    };
 
     try {
       testUserService.generateJwtToken(userData);
@@ -315,7 +323,8 @@ describe('User Service Unit Test', () => {
   });
 
   it('should decode JWT token', async () => {
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpveUB0ZXN0LmNvbSIsImlhdCI6MTYzOTcxMjQwNiwiYXVkIjoiMjIifQ.4jZ7c8smeGOUFgS-Sc2Kh6P9_AXAooi7a_vtPrge8KQ';
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpveUB0ZXN0LmNvbSIsImlhdCI6MTYzOTcxMjQwNiwiYXVkIjoiMjIifQ.4jZ7c8smeGOUFgS-Sc2Kh6P9_AXAooi7a_vtPrge8KQ';
     const decodedToken: IJwtPayload | any = testUserService.decodeJwtToken(token);
 
     expect(decodedToken).toBeDefined();
@@ -324,7 +333,8 @@ describe('User Service Unit Test', () => {
   });
 
   it('should throw error while decoding JWT token', async () => {
-    const wrongToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.RODj4OzgVPibzheJS2XdD6G3T6XXgEvwtaUfQhh5tYY';
+    const wrongToken =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.RODj4OzgVPibzheJS2XdD6G3T6XXgEvwtaUfQhh5tYY';
 
     try {
       testUserService.decodeJwtToken(wrongToken);
@@ -332,7 +342,6 @@ describe('User Service Unit Test', () => {
       expect(e.message).toBeTruthy();
       expect(e.code).toBeTruthy();
     }
-
   });
 
   it('should update user password', async () => {
@@ -376,7 +385,8 @@ describe('User Service Unit Test', () => {
     try {
       await testUserService.changePassword(id, oldPassword, newPassword);
     } catch (e: any) {
-      const errorMessage = 'Hint: new password must be minimum ' +
+      const errorMessage =
+        'Hint: new password must be minimum ' +
         'of 6 characters and must have a ' +
         'combination of at least one Upper case, one Lower case, ' +
         'one digit and one or more of ' +
@@ -430,7 +440,7 @@ describe('User Service Unit Test', () => {
       email: 'user@updated.com',
       phone: '08140835726',
       gender: 'male',
-    }
+    };
     const user = await testUserService.update('e59d4aee-3f4e-461a-9057-ba4677d9b057', updateData);
 
     expect(user.email).toBe('user@updated.com');
@@ -445,7 +455,6 @@ describe('User Service Unit Test', () => {
 
       expect(e.message).toBeDefined();
       expect(e.message).toEqual(errorMessage);
-
     }
   });
 

@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import { Types } from 'mongoose';
+import { v4 as uuid } from 'uuid';
 import { inject, injectable } from 'inversify';
 import { Env, IEnv } from '../../config/env';
 import { IFindVideoRecord, IVideoRecord } from '../../models';
@@ -10,7 +10,6 @@ import { ILafiaMediaService, IStream } from './interfaces';
 
 @injectable()
 export class LafiaMediaService implements ILafiaMediaService {
-
   @inject(TYPES.VideoRecordService)
   private readonly videoRecordService: VideoRecordService;
 
@@ -23,9 +22,10 @@ export class LafiaMediaService implements ILafiaMediaService {
   public async createBroadcast(patient_id: string): Promise<IStream> {
     logger.info('Running LafiaMediaService.createBroadcast');
     try {
+      const name = uuid().replace(/-/g, '');
       const axiosResponse: AxiosResponse = await axios.post(
         `${this.env.lafia_media_url}/rest/v2/broadcasts/create`,
-        { name: Types.ObjectId() }
+        { name }
       );
 
       console.log(axiosResponse);
@@ -66,7 +66,7 @@ export class LafiaMediaService implements ILafiaMediaService {
       if (videoRecord) {
         await this.update(videoRecord?.id!, {
           vodId: event?.vodId,
-          stream_url: streamUrl
+          stream_url: streamUrl,
         });
       }
     }

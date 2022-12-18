@@ -8,6 +8,7 @@ export * from './phone.util';
 export * from './validations';
 export * from './csvImporter';
 export * from './fhirImporter';
+export * from './helpersUtil';
 
 // Export Utils Container Module
 export * from './module.utility';

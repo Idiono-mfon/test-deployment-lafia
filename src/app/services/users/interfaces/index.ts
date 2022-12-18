@@ -1,11 +1,11 @@
-import { IFindUser, IJwtPayload, IUser } from '../../../models';
+import { IFindUser, IJwtPayload, IUser, ICreateAccount } from '../../../models';
 
 export interface IUserService {
   findOne(query: IFindUser): Promise<IUser>;
 
   create(data: IUser): Promise<IUser>;
 
-  validate(data: IUser, ip?: string): Promise<boolean>;
+  validate(data: ICreateAccount, ip?: string): Promise<boolean>;
 
   update(id: string, data: IFindUser): Promise<IFindUser>;
 

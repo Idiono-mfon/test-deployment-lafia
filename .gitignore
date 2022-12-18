@@ -6,3 +6,4 @@ coverage/
 .data/
 package-lock.json
 yarn.lock
+docker-compose-db.yaml
