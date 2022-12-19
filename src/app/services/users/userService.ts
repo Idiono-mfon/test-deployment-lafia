@@ -3,12 +3,20 @@ import jwt from 'jsonwebtoken';
 import { v4 as uuid } from 'uuid';
 import TYPES from '../../config/types';
 import { IUserService } from './interfaces';
-import { ITwilioService } from '../twilio';
+import { ITwilioService, TwilioOTP } from '../twilio';
 import { Env, IEnv } from '../../config/env';
 import { Password } from '../../utils/password';
 import { IUserRepository } from '../../repository';
 import { IComposeEmail, IEmailService } from '../email';
-import { IFhirServer, IFindUser, IJwtPayload, IUser, ICreateAccount } from '../../models';
+import {
+  IFhirServer,
+  IFindUser,
+  IJwtPayload,
+  IUser,
+  ICreateAccount,
+  IVerifyOTP,
+  IValidateUser,
+} from '../../models';
 import {
   error,
   GenericResponseError,
@@ -19,6 +27,7 @@ import {
   Validations,
   random6Digits,
   OTPExpiryTime,
+  OTPIsValid,
 } from '../../utils';
 
 @injectable()
@@ -45,20 +54,39 @@ export class UserService implements IUserService {
     return this.userRepository.findOne<IFindUser>(data);
   }
 
-  public async validate(data: ICreateAccount, ip?: string): Promise<boolean> {
+  public async validate(data: ICreateAccount, ip?: string): Promise<IValidateUser> {
     logger.info('Running UserService.validate');
 
     const { isEmail, email, phone: phoneNos, password } = data;
 
+    const userPassword = await Password.hash(password);
+
     try {
       if (isEmail) {
         // find user by email
-        let emailUser = await this.userRepository.findOne<IFindUser>({ email });
+        let emailUser: IFindUser = await this.userRepository.findOne<IFindUser>({ email });
 
-        if (emailUser) {
-          const ERROR_MESSAGE = 'a user with this email already exist';
+        const isValidOtp = OTPIsValid(emailUser?.otpCodeExpiration as Date);
+
+        if (emailUser && !emailUser?.otpCode && !emailUser?.otp_code_expiration) {
+          // User is verified
+          const ERROR_MESSAGE = 'a user with this email already exists';
           throwError(ERROR_MESSAGE, error.badRequest);
         }
+
+        if (emailUser && emailUser.otpCode && isValidOtp) {
+          //System already generated an OTP code for User
+          // @TODO: Update here latter to inform user about the previous OTP code
+          return { status: true, message: "OTP previously sent to user's email address" };
+          // throwError("Verification code previously sent to user's email address", error.badRequest);
+        }
+
+        if (emailUser && emailUser.otpCode && !isValidOtp) {
+          //User Created OTP code which is currently invalid
+          // Delete previous credential and continue
+          await this.userRepository.delete(emailUser.id as string);
+        }
+
         const OTPCode = random6Digits();
 
         // Send the new password details to the user
@@ -77,7 +105,7 @@ export class UserService implements IUserService {
           email,
           first_name: `${email}_test_first_name`,
           last_name: `${email}_test_last_name`,
-          password,
+          password: userPassword,
           otp_code: OTPCode,
           otp_code_expiration: OTPExpiryTime(),
         };
@@ -101,7 +129,7 @@ export class UserService implements IUserService {
           email: `${phone}@test.com`,
           first_name: `${phone}_test_first_name`,
           last_name: `${phone}_test_last_name`,
-          password,
+          password: userPassword,
           phone,
           otp_code_expiration: OTPExpiryTime(),
         };
@@ -109,10 +137,60 @@ export class UserService implements IUserService {
         await this.userRepository.create<IUser>(user);
       }
 
-      return true;
+      return { status: true, message: 'User created' };
     } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
+  }
+
+  public async verifyOTP(data: IVerifyOTP): Promise<TwilioOTP> {
+    logger.info('Running UserService.verifyOTP');
+
+    const { phone, code, from_email, email } = data;
+
+    if (!from_email) {
+      // code was sent to user's phone numbers
+      const user: IUser = await this.findOne({ phone });
+
+      if (!user) {
+        throwError("user doesn't exists.", error.badRequest);
+      }
+
+      if (user.hasVerifiedPhone) {
+        throwError('Phone number is already verified', error.badRequest);
+      }
+
+      // Delete dummy User
+      await this.userRepository.delete(user?.id as string);
+
+      // Verify using TwilioService
+      const verify = await this.twilioService.verifyOTP(phone, code);
+
+      return verify;
+    }
+
+    const user = await this.findOne({ email });
+
+    if (!user) {
+      throwError("user doesn't exists.", error.badRequest);
+    }
+
+    if (user.hasVerifiedEmail) {
+      throwError('email is already verified', error.badRequest);
+    }
+
+    if (!OTPIsValid(user.otpCodeExpiration as Date)) {
+      throwError('Verification code has expired. Please try again!!', error.badRequest);
+    }
+
+    if (user.otpCode !== code.trim()) {
+      throwError('Invalid verification code!!!', error.badRequest);
+    }
+
+    // Delete dummy User
+    await this.userRepository.delete(user.id as string);
+
+    return { to: email, channel: 'email', status: 'approved', valid: true };
   }
 
   public async create(user: IUser): Promise<IUser> {

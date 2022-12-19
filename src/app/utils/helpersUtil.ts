@@ -12,5 +12,5 @@ export const OTPExpiryTime = (): Date => {
 };
 
 export const OTPIsValid = (time: Date): boolean => {
-  return Date.now() > new Date(time).getTime();
+  return Date.now() < new Date(time).getTime();
 };

@@ -17,6 +17,8 @@ export interface IUser extends IBase {
   token?: string;
   otp_code?: string;
   otp_code_expiration?: Date;
+  otpCode?: string;
+  otpCodeExpiration?: Date;
   phone?: string;
   photo?: string;
   provider?: string;
@@ -50,6 +52,8 @@ export interface IFindUser extends IBase {
   has_verified_email?: boolean;
   otp_code?: string;
   otp_code_expiration?: Date;
+  otpCode?: string;
+  otpCodeExpiration?: Date;
 }
 
 export interface IJwtPayload {
@@ -62,4 +66,9 @@ export interface IJwtPayload {
 
 export interface IUserPhoto extends IBase {
   photo?: string;
+}
+
+export interface IValidateUser {
+  status: boolean;
+  message: string;
 }

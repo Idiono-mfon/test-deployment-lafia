@@ -1,11 +1,21 @@
-import { IFindUser, IJwtPayload, IUser, ICreateAccount } from '../../../models';
+import {
+  IFindUser,
+  IJwtPayload,
+  IUser,
+  ICreateAccount,
+  IVerifyOTP,
+  IValidateUser,
+} from '../../../models';
+import { TwilioOTP } from '../../twilio';
 
 export interface IUserService {
   findOne(query: IFindUser): Promise<IUser>;
 
   create(data: IUser): Promise<IUser>;
 
-  validate(data: ICreateAccount, ip?: string): Promise<boolean>;
+  validate(data: ICreateAccount, ip?: string): Promise<IValidateUser>;
+
+  verifyOTP(data: IVerifyOTP): Promise<TwilioOTP>;
 
   update(id: string, data: IFindUser): Promise<IFindUser>;
 

@@ -7,7 +7,7 @@ import { HttpStatusCode, logger } from '../../utils';
 import { BaseController } from '../baseController';
 import { ITwilioService, IUserService } from '../../services';
 import { validationMiddleware } from '../../middlewares/validation.middleware';
-import { CreateAccountDto } from '../auth/dto';
+import { CreateAccountDto, VerifyOTPDto } from '../auth/dto';
 
 @controller('/users')
 export class UserController extends BaseController {
@@ -39,9 +39,9 @@ export class UserController extends BaseController {
       const ip: string = //@ts-ignore
         req.headers['x-forwarded-for']?.split(',').shift() || req.socket?.remoteAddress;
 
-      const newUser = await this.userService.validate(req.body, ip);
+      const validationRes = await this.userService.validate(req.body, ip);
 
-      this.success(res, newUser, 'User created', HttpStatusCode.CREATED);
+      this.success(res, validationRes.status, validationRes.message, HttpStatusCode.CREATED);
     } catch (e: any) {
       logger.error(`Unable to validate user -`, e);
       this.error(res, e);
@@ -135,12 +135,12 @@ export class UserController extends BaseController {
     }
   }
 
-  @httpPost('/otp/verify')
+  @httpPost('/otp/verify', validationMiddleware(VerifyOTPDto))
   public async verifyOtp(@request() req: Request, @response() res: Response) {
     logger.info('Running UserController.verifyOtp');
     try {
-      const { phone, code } = req.body;
-      const verify = await this.twilioService.verifyOTP(phone, code);
+      const verify = await this.userService.verifyOTP(req.body);
+
       this.success(res, verify, 'OTP verification checked');
     } catch (e: any) {
       logger.error(`Unable to verify user's OTP`, e);

@@ -9,16 +9,26 @@ export class EmailService implements IEmailService {
   private readonly transporter: Transporter;
 
   constructor() {
+    // Test configuration with gmail service
     this.transporter = nodemailer.createTransport({
-      pool: true,
-      host: Env.all().email_host,
-      port: Env.all().email_port,
-      secure: false, // change back to true in prod // use TLS
+      service: 'gmail',
       auth: {
         user: Env.all().email_address,
         pass: `${Env.all().email_password}`,
       },
     });
+
+    /**Previous Development Setup for email */
+    // this.transporter = nodemailer.createTransport({
+    //   pool: true,
+    //   host: Env.all().email_host,
+    //   port: Env.all().email_port,
+    //   secure: false, // change back to true in prod // use TLS
+    //   auth: {
+    //     user: Env.all().email_address,
+    //     pass: `${Env.all().email_password}`,
+    //   },
+    // });
   }
 
   public async sendEmail(data: IComposeEmail) {

@@ -27,3 +27,23 @@ export interface ICreateAccount {
   password: string;
   confirmPassword: string;
 }
+
+export interface ICreateAccountDto {
+  isEmail: boolean;
+  password: string;
+  confirmPassword: string;
+  emailOrPhone: string;
+}
+
+export interface IVerifyOTP {
+  from_email: boolean;
+  code: string;
+  email: string;
+  phone: string;
+}
+
+export interface IVerifyOTPDto {
+  from_email: boolean;
+  code: string;
+  emailOrPhone: string;
+}

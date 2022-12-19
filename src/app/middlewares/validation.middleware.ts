@@ -7,14 +7,13 @@ import { IValidationResult } from './interfaces';
 export const validationMiddleware = (dtoClass: any) => {
   logger.info('Running ValidationMiddleware.handler');
   return async function (req: Request, res: Response, next: NextFunction) {
-    if (req?.body?.emailOrPhone) {
-      // Only works for creatingAccountDto
-      const { emailOrPhone, ...others } = req.body;
-      req.body = { ...others, email: emailOrPhone, phone: emailOrPhone };
-    }
-    const output: any = plainToInstance(dtoClass, req.body);
-
     try {
+      if (req?.body?.emailOrPhone) {
+        // Only works for creatingAccountDto
+        const { emailOrPhone, ...others } = req.body;
+        req.body = { ...others, email: emailOrPhone, phone: emailOrPhone };
+      }
+      const output: any = plainToInstance(dtoClass, req.body);
       const errors = await validate(output, {
         skipMissingProperties: true,
         whitelist: true,
