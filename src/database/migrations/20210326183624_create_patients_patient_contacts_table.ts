@@ -4,44 +4,52 @@ import { Table } from '../table';
 
 // noinspection JSUnusedGlobalSymbols
 export async function up(knex: Knex): Promise<void> {
-  return knex
-    .transaction(async (trx: Knex.Transaction) => trx.schema
+  return knex.transaction(async (trx: Knex.Transaction) =>
+    trx.schema
       .createSchemaIfNotExists(Schema.lafiaService)
-      .then(() => trx.schema.hasTable(Table.patients_patient_contacts)
-        .then((tableExists: boolean) => {
+      .then(() =>
+        trx.schema.hasTable(Table.patients_patient_contacts).then((tableExists: boolean) => {
           if (!tableExists) {
             return trx.schema
               .withSchema(Schema.lafiaService)
-              .createTable(Table.patients_patient_contacts, (tableBuilder: Knex.CreateTableBuilder) => {
-                tableBuilder
-                  .uuid('id')
-                  .unique()
-                  .notNullable()
-                  .defaultTo(knex.raw('gen_random_uuid()'))
-                  .primary({ constraintName: `${Table.patients_patient_contacts}_id` });
-                tableBuilder
-                  .uuid('patient_id');
-                tableBuilder
-                  .uuid('patient_contact_id');
-                tableBuilder
-                  .timestamps(true, true);
+              .createTable(
+                Table.patients_patient_contacts,
+                (tableBuilder: Knex.CreateTableBuilder) => {
+                  tableBuilder
+                    .uuid('id')
+                    .unique()
+                    .notNullable()
+                    .defaultTo(knex.raw('gen_random_uuid()'))
+                    .primary({ constraintName: `${Table.patients_patient_contacts}_id` });
+                  tableBuilder.uuid('patient_id');
+                  tableBuilder.uuid('patient_contact_id');
+                  tableBuilder.timestamps(true, true);
 
-                // Set foreign key
-                tableBuilder
-                  .foreign('patient_id')
-                  .references('id')
-                  .inTable(`${Schema.lafiaService}.${Table.patients}`);
-                tableBuilder
-                  .foreign('patient_contact_id')
-                  .references('id')
-                  .inTable(`${Schema.lafiaService}.${Table.patient_contacts}`);
-              });
+                  // Set foreign key
+                  tableBuilder
+                    .foreign('patient_id')
+                    .references('id')
+                    .inTable(`${Schema.lafiaService}.${Table.patients}`)
+                    .onDelete('CASCADE')
+                    .onUpdate('CASCADE');
+                  tableBuilder
+                    .foreign('patient_contact_id')
+                    .references('id')
+                    .inTable(`${Schema.lafiaService}.${Table.patient_contacts}`)
+                    .onDelete('CASCADE')
+                    .onUpdate('CASCADE');
+                }
+              );
           }
-        }))
-      .catch((e) => console.error('MIGRATION_ERROR', e)));
+        })
+      )
+      .catch((e) => console.error('MIGRATION_ERROR', e))
+  );
 }
 
 // noinspection JSUnusedGlobalSymbols
 export async function down(knex: Knex): Promise<void> {
-  return knex.schema.withSchema(Schema.lafiaService).dropTableIfExists(Table.patients_patient_contacts);
+  return knex.schema
+    .withSchema(Schema.lafiaService)
+    .dropTableIfExists(Table.patients_patient_contacts);
 }

@@ -7,11 +7,16 @@ import TYPES from '../../config/types';
 import { Env, IEnv } from '../../config/env';
 import { FhirResourceService } from '../resources';
 import { GenericResponseError, logger } from '../../utils';
-import { AggregatedData, FetchProps, FhirProperties, IFhirServer, IndexAccessor } from '../../models';
+import {
+  AggregatedData,
+  FetchProps,
+  FhirProperties,
+  IFhirServer,
+  IndexAccessor,
+} from '../../models';
 
 @injectable()
 export class FhirServerService implements IFhirServer {
-
   private readonly env: IEnv;
   private readonly httpsAgent: Agent;
   private readonly axiosInstance: AxiosInstance;
@@ -40,14 +45,14 @@ export class FhirServerService implements IFhirServer {
   private static chooseMethodFromConnectionName(connectionName = 'lafia'): string {
     logger.info('Running FhirServerService.chooseMethodFromConnectionName');
     let [part1, part2] = connectionName.toLowerCase().split('fhir');
-    let others = ''
+    let others = '';
 
     if (part2) {
       others = part2[0].toUpperCase();
       others += part2.substring(1);
     }
 
-    return `${part1}Fhir${others}`
+    return `${part1}Fhir${others}`;
   }
 
   private static extractYear(date: string) {
@@ -65,25 +70,25 @@ export class FhirServerService implements IFhirServer {
         resourceData.data = await this.fetchSampleResources(resourceQuery);
       } else {
         // @ts-ignore
-        resourceData = await this[selectMethod](
-          resourceQuery,
-          'GET',
-          { token }
-        );
+        resourceData = await this[selectMethod](resourceQuery, 'GET', { token });
       }
 
       return resourceData.data;
     } catch (e: any) {
-      const [resourceName,] = resourceQuery.split('?');
+      const [resourceName] = resourceQuery.split('?');
       data.failed.push({ resourceName, message: e.message });
     }
   }
 
-  private static groupResource(resourceData: any, data: AggregatedData, resourceDateField: string, resourceName: string) {
+  private static groupResource(
+    resourceData: any,
+    data: AggregatedData,
+    resourceDateField: string,
+    resourceName: string
+  ) {
     logger.info('Running FhirServerService.groupResource');
 
     for (let entry of resourceData?.entry) {
-
       const date = entry.resource ? entry.resource[resourceDateField] : entry[resourceDateField];
 
       const entryResource = entry?.resource ? entry.resource : entry;
@@ -93,8 +98,7 @@ export class FhirServerService implements IFhirServer {
         if (typeof date === 'object') {
           // handling cases where the resourceDateField is fhir Period type whose data is accessbile via resourceDateField.start
           year = FhirServerService.extractYear(date.start);
-        }
-        else {
+        } else {
           year = FhirServerService.extractYear(date);
         }
 
@@ -116,10 +120,8 @@ export class FhirServerService implements IFhirServer {
     const resourceByDates: IndexAccessor | any = {};
 
     for (let year in data.groupedEntries) {
-
-      const resourceEntries: IndexAccessor = {}
+      const resourceEntries: IndexAccessor = {};
       for (const entry of data.groupedEntries[year]) {
-
         if (resourceEntries[entry.resourceName]) {
           resourceEntries[entry.resourceName].push(entry.resourceValue);
         } else {
@@ -137,7 +139,7 @@ export class FhirServerService implements IFhirServer {
     if (!isEmpty(resourceByDates)) data.grouped = [resourceByDates];
 
     const grouped: any = [];
-    const groupedData = data.grouped[0]
+    const groupedData = data.grouped[0];
     let groupedYear: IndexAccessor = {};
 
     this.organizeDataInYears(groupedData, groupedYear, grouped);
@@ -145,7 +147,11 @@ export class FhirServerService implements IFhirServer {
     data.grouped = grouped;
   }
 
-  public async executeQuery(resourceQuery: string, httpMethod: Method, props: FhirProperties = {}): Promise<any> {
+  public async executeQuery(
+    resourceQuery: string,
+    httpMethod: Method,
+    props: FhirProperties = {}
+  ): Promise<any> {
     logger.info('Running FhirServerService.executeQuery');
     try {
       let { connectionName } = props!;
@@ -156,13 +162,16 @@ export class FhirServerService implements IFhirServer {
 
       // @ts-ignore
       return await this[selectMethod](resourceQuery, httpMethod, props);
-
     } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
 
-  public async lafiaFhir(resourceQuery: string, httpMethod: Method, props?: FhirProperties): Promise<any> {
+  public async lafiaFhir(
+    resourceQuery: string,
+    httpMethod: Method,
+    props?: FhirProperties
+  ): Promise<any> {
     logger.info('Running FhirServerService.lafiaFhir');
     // console.log(this.env.fhir_server_base_url, resourceQuery, httpMethod);
     try {
@@ -175,7 +184,7 @@ export class FhirServerService implements IFhirServer {
         data,
       });
 
-      // console.log(status, responseData);
+      console.log(status, responseData, headers);
 
       delete headers['transfer-encoding'];
       headers['x-powered-by'] = 'LAFIA FHIR 5.4.0 REST Server (FHIR Server; FHIR 4.0.1/R4)';
@@ -187,14 +196,19 @@ export class FhirServerService implements IFhirServer {
       };
     } catch (e: any) {
       delete e.response.headers['transfer-encoding'];
-      e.response.headers['x-powered-by'] = 'LAFIA FHIR 5.4.0 REST Server (FHIR Server; FHIR 4.0.1/R4)';
+      e.response.headers['x-powered-by'] =
+        'LAFIA FHIR 5.4.0 REST Server (FHIR Server; FHIR 4.0.1/R4)';
       logger.error(`FhirServerService.lafiaFhir`);
       logger.error(`$${e.message}`);
       throw new GenericResponseError(e.message, e.response);
     }
   }
 
-  public async saFhir(resourceQuery: string, httpMethod: Method, props?: FhirProperties): Promise<any> {
+  public async saFhir(
+    resourceQuery: string,
+    httpMethod: Method,
+    props?: FhirProperties
+  ): Promise<any> {
     logger.info('Running FhirServerService.saFhir');
     try {
       let { data, token, ig } = props!;
@@ -206,7 +220,7 @@ export class FhirServerService implements IFhirServer {
         method: httpMethod,
         baseURL: `${this.env.safhir_base_url}/${ig}/`,
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         data,
       });
@@ -214,7 +228,7 @@ export class FhirServerService implements IFhirServer {
       return {
         status,
         data: responseData,
-        headers: { 'Content-Type': 'application/fhir+json' }
+        headers: { 'Content-Type': 'application/fhir+json' },
       };
     } catch (e: any) {
       logger.error(`Could not fetch data from safhir`);
@@ -226,7 +240,9 @@ export class FhirServerService implements IFhirServer {
   public async fetchSampleResources(resourceName: string): Promise<any> {
     logger.info('Running FhirServerService.fetchSampleResources');
     try {
-      const fhirSampleResources = await this.fhirResourceService.findOne({ slug: resourceName.toLocaleLowerCase() });
+      const fhirSampleResources = await this.fhirResourceService.findOne({
+        slug: resourceName.toLocaleLowerCase(),
+      });
 
       return fhirSampleResources?.examples;
     } catch (e: any) {
@@ -244,10 +260,13 @@ export class FhirServerService implements IFhirServer {
       groupedEntries: {},
       ungroupedEntries: [],
       failed: [],
-    }
+    };
 
     let fetchSampleResource = false;
-    if (connectionName?.toLowerCase() === 'test' || connectionName?.toLocaleLowerCase() === 'sample') {
+    if (
+      connectionName?.toLowerCase() === 'test' ||
+      connectionName?.toLocaleLowerCase() === 'sample'
+    ) {
       fetchSampleResource = true;
     }
 
@@ -265,24 +284,38 @@ export class FhirServerService implements IFhirServer {
       DocumentReference: ['date', 'subject'],
       AllergyIntolerance: ['recordedDate', 'patient'],
       MedicationRequest: ['authoredOn', 'subject'],
-    }
+    };
 
     const resourceNames = [
-      'Procedure', 'Condition', 'Encounter',
-      'Observation', 'DiagnosticReport',
-      'MedicationDispense', 'Medication',
-      'Immunization', 'DocumentReference',
-      'AllergyIntolerance', 'MedicationRequest'
+      'Procedure',
+      'Condition',
+      'Encounter',
+      'Observation',
+      'DiagnosticReport',
+      'MedicationDispense',
+      'Medication',
+      'Immunization',
+      'DocumentReference',
+      'AllergyIntolerance',
+      'MedicationRequest',
     ];
 
     for (let resourceName of resourceNames) {
       const [resourceDateField, resourceReference] = resourceDateFieldAndReference[resourceName];
       const searchParam = resourceReference ? `${resourceReference}=Patient/${patient_id}` : '';
 
-      let resourceQuery = !connectionName || connectionName?.toLocaleLowerCase() === 'lafia' ?
-        `${resourceName}?${searchParam}` : `${resourceName}`;
+      let resourceQuery =
+        !connectionName || connectionName?.toLocaleLowerCase() === 'lafia'
+          ? `${resourceName}?${searchParam}`
+          : `${resourceName}`;
 
-      const resourceData = await this.fetchResource({ resourceQuery, selectMethod, token, fetchSampleResource, data });
+      const resourceData = await this.fetchResource({
+        resourceQuery,
+        selectMethod,
+        token,
+        fetchSampleResource,
+        data,
+      });
 
       if (resourceData?.entry) {
         FhirServerService.groupResource(resourceData, data, resourceDateField, resourceName);
@@ -300,11 +333,14 @@ export class FhirServerService implements IFhirServer {
       failed: data.failed,
       ungrouped: data.ungrouped,
       grouped: data.grouped || [],
-    }
-
+    };
   }
 
-  private static organizeDataInYears(groupedData: IndexAccessor, groupedYear: IndexAccessor, grouped: any) {
+  private static organizeDataInYears(
+    groupedData: IndexAccessor,
+    groupedYear: IndexAccessor,
+    grouped: any
+  ) {
     logger.info('Running FhirServerService.organizeDataInYears');
     for (let year in groupedData) {
       groupedYear[year] = [];
@@ -312,13 +348,13 @@ export class FhirServerService implements IFhirServer {
         for (let resourceName in data) {
           groupedYear[year].push({
             resourceName,
-            resourceValue: data[resourceName]
+            resourceValue: data[resourceName],
           });
         }
       }
 
       grouped.push({ year, data: groupedYear[year] });
-      groupedYear = {}
+      groupedYear = {};
     }
   }
 }

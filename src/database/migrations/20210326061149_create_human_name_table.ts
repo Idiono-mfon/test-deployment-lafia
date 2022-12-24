@@ -4,11 +4,11 @@ import { Table } from '../table';
 
 // noinspection JSUnusedGlobalSymbols
 export async function up(knex: Knex): Promise<void> {
-  return knex
-    .transaction(async (trx: Knex.Transaction) => trx.schema
+  return knex.transaction(async (trx: Knex.Transaction) =>
+    trx.schema
       .createSchemaIfNotExists(Schema.lafiaService)
-      .then(() => trx.schema.hasTable(Table.human_names)
-        .then((tableExists: boolean) => {
+      .then(() =>
+        trx.schema.hasTable(Table.human_names).then((tableExists: boolean) => {
           if (!tableExists) {
             return trx.schema
               .withSchema(Schema.lafiaService)
@@ -20,39 +20,40 @@ export async function up(knex: Knex): Promise<void> {
                   .defaultTo(knex.raw('gen_random_uuid()'))
                   .primary({ constraintName: `${Table.human_names}_id` });
                 tableBuilder
-                  .enum('use', ['usual', 'official', 'temp', 'nickname', 'anonymous', 'old', 'maiden'])
+                  .enum('use', [
+                    'usual',
+                    'official',
+                    'temp',
+                    'nickname',
+                    'anonymous',
+                    'old',
+                    'maiden',
+                  ])
                   .notNullable();
-                tableBuilder
-                  .string('text');
-                tableBuilder
-                  .string('family')
-                  .comment('surname');
+                tableBuilder.string('text');
+                tableBuilder.string('family').comment('surname');
                 tableBuilder
                   .json('given')
                   .defaultTo(JSON.stringify([]))
                   .comment('first name, last name, other name');
-                tableBuilder
-                  .json('prefix')
-                  .defaultTo([]);
-                tableBuilder
-                  .json('suffix')
-                  .defaultTo([]);
-                tableBuilder
-                  .uuid('period_id')
-                  .comment('period')
-                  .unique();
-                tableBuilder
-                  .timestamps(true, true);
+                tableBuilder.json('prefix').defaultTo([]);
+                tableBuilder.json('suffix').defaultTo([]);
+                tableBuilder.uuid('period_id').comment('period').unique();
+                tableBuilder.timestamps(true, true);
 
                 // Set foreign key
                 tableBuilder
                   .foreign('period_id')
                   .references('id')
-                  .inTable(`${Schema.lafiaService}.${Table.periods}`);
+                  .inTable(`${Schema.lafiaService}.${Table.periods}`)
+                  .onDelete('CASCADE')
+                  .onUpdate('CASCADE');
               });
           }
-        }))
-      .catch((e) => console.error('MIGRATION_ERROR', e)));
+        })
+      )
+      .catch((e) => console.error('MIGRATION_ERROR', e))
+  );
 }
 
 // noinspection JSUnusedGlobalSymbols

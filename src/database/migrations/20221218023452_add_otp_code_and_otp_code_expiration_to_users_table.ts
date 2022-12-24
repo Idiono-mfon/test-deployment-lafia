@@ -17,8 +17,8 @@ export async function up(knex: Knex): Promise<void> {
 export async function down(knex: Knex): Promise<void> {
   return knex.schema
     .withSchema(Schema.lafiaService)
-    .table(Table.languages, (tableBuilder: Knex.TableBuilder) => {
+    .table(Table.users, (tableBuilder: Knex.TableBuilder) => {
       tableBuilder.dropColumn('otp_code');
-      tableBuilder.dateTime('otp_code_expiration');
+      tableBuilder.dropColumn('otp_code_expiration');
     });
 }

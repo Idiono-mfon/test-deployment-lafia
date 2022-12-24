@@ -59,9 +59,9 @@ export class EmailService implements IEmailService {
                 
                 <p style="font-size:15px;"> Thank for signing up for Lafia</p> 
                   
-                <p style="font-size:15px">Your verification code is: <span style="font-size:20px; font-weight:bold">${otp}</span>.</p>
+                <p style="font-size:15px">Your one-time verification code is: <span style="font-size:20px; font-weight:bold">${otp}</span>.</p>
                 
-                <p style="font-size:15px">If you have any questions, send us an email to <b>support@lafia.io<b></p>
+                <p style="font-size:15px">If you think this email was sent incorrectly, or have any further questions, send us an email at <b>support@lafia.io<b></p>
                 
                 <p style="font-size:15px">We’re glad you’re here!</p>
                 

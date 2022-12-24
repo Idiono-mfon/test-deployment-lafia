@@ -4,11 +4,11 @@ import { Table } from '../table';
 
 // noinspection JSUnusedGlobalSymbols
 export async function up(knex: Knex): Promise<void> {
-  return knex
-    .transaction(async (trx: Knex.Transaction) => trx.schema
+  return knex.transaction(async (trx: Knex.Transaction) =>
+    trx.schema
       .createSchemaIfNotExists(Schema.lafiaService)
-      .then(() => trx.schema.hasTable(Table.patients_references)
-        .then((tableExists: boolean) => {
+      .then(() =>
+        trx.schema.hasTable(Table.patients_references).then((tableExists: boolean) => {
           if (!tableExists) {
             return trx.schema
               .withSchema(Schema.lafiaService)
@@ -19,26 +19,29 @@ export async function up(knex: Knex): Promise<void> {
                   .notNullable()
                   .defaultTo(knex.raw('gen_random_uuid()'))
                   .primary({ constraintName: `${Table.patients_references}_id` });
-                tableBuilder
-                  .uuid('patient_id');
-                tableBuilder
-                  .uuid('reference_id');
-                tableBuilder
-                  .timestamps(true, true);
+                tableBuilder.uuid('patient_id');
+                tableBuilder.uuid('reference_id');
+                tableBuilder.timestamps(true, true);
 
                 // Set foreign key
                 tableBuilder
                   .foreign('patient_id')
                   .references('id')
-                  .inTable(`${Schema.lafiaService}.${Table.patients}`);
+                  .inTable(`${Schema.lafiaService}.${Table.patients}`)
+                  .onDelete('CASCADE')
+                  .onUpdate('CASCADE');
                 tableBuilder
                   .foreign('reference_id')
                   .references('id')
-                  .inTable(`${Schema.lafiaService}.${Table.references}`);
+                  .inTable(`${Schema.lafiaService}.${Table.references}`)
+                  .onDelete('CASCADE')
+                  .onUpdate('CASCADE');
               });
           }
-        }))
-      .catch((e) => console.error('MIGRATION_ERROR', e)));
+        })
+      )
+      .catch((e) => console.error('MIGRATION_ERROR', e))
+  );
 }
 
 // noinspection JSUnusedGlobalSymbols

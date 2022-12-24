@@ -4,7 +4,7 @@ export class Table {
   public static codings = 'codings';
   public static periods = 'periods';
   public static patients = 'patients';
-  public static labels: string = 'labels'
+  public static labels: string = 'labels';
   public static references = 'references';
   public static narratives = 'narratives';
   public static encounters = 'encounters';
@@ -22,12 +22,12 @@ export class Table {
   public static contact_points = 'contact_points';
   public static qualifications = 'qualifications';
   public static connections: string = 'connections';
-  public static twilio_rooms: string = 'twilio_rooms'
+  public static twilio_rooms: string = 'twilio_rooms';
   public static patients_address = 'patients_address';
   public static video_broadcasts = 'video_broadcasts';
   public static patient_contacts = 'patient_contacts';
   public static codeable_concepts = 'codeable_concepts';
-  public static language_label:string = 'language_label';
+  public static language_label: string = 'language_label';
   public static fhir_resources: string = 'fhir_resources';
   public static patients_references = 'patients_references';
   public static patients_attachments = 'patients_attachments';
@@ -59,4 +59,6 @@ export class Table {
   public static appointments: string = 'appointments';
   public static appointment_responses: string = 'appointment_responses';
   public static care_teams: string = 'care_teams';
+  public static value_sets: string = 'value_sets';
+  public static value_set_concepts: string = 'value_set_concepts';
 }

@@ -8,30 +8,29 @@ export async function up(knex: Knex): Promise<void> {
     trx.schema
       .createSchemaIfNotExists(Schema.lafiaService)
       .then(() =>
-        trx.schema.hasTable(Table.references).then((tableExists: boolean) => {
+        trx.schema.hasTable(Table.value_set_concepts).then((tableExists: boolean) => {
           if (!tableExists) {
             return trx.schema
               .withSchema(Schema.lafiaService)
-              .createTable(Table.references, (tableBuilder: Knex.CreateTableBuilder) => {
+              .createTable(Table.value_set_concepts, (tableBuilder: Knex.CreateTableBuilder) => {
                 tableBuilder
                   .uuid('id')
                   .unique()
                   .notNullable()
                   .defaultTo(knex.raw('gen_random_uuid()'))
-                  .primary({ constraintName: `${Table.references}_id` });
-                tableBuilder.string('reference');
-                tableBuilder.string('type').notNullable();
-                tableBuilder.uuid('identifier_id').comment('identifier');
-                tableBuilder.string('display');
-                tableBuilder.timestamps(true, true);
-
-                // Set foreign key
+                  .primary({ constraintName: `${Table.value_set_concepts}_id` });
+                tableBuilder.string('code').notNullable().defaultTo('');
+                tableBuilder.string('display').notNullable().defaultTo('');
+                tableBuilder.string('system').defaultTo('');
+                tableBuilder.string('version').defaultTo('');
+                tableBuilder.uuid('value_set_id').notNullable();
                 tableBuilder
-                  .foreign('identifier_id')
+                  .foreign('value_set_id')
                   .references('id')
-                  .inTable(`${Schema.lafiaService}.${Table.identifiers}`)
+                  .inTable(`${Schema.lafiaService}.${Table.value_sets}`)
                   .onDelete('CASCADE')
                   .onUpdate('CASCADE');
+                tableBuilder.timestamps(true, true);
               });
           }
         })
@@ -42,5 +41,5 @@ export async function up(knex: Knex): Promise<void> {
 
 // noinspection JSUnusedGlobalSymbols
 export async function down(knex: Knex): Promise<void> {
-  return knex.schema.withSchema(Schema.lafiaService).dropTableIfExists(Table.references);
+  return knex.schema.withSchema(Schema.lafiaService).dropTableIfExists(Table.value_set_concepts);
 }

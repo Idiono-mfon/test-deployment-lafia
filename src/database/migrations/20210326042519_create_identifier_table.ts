@@ -4,11 +4,11 @@ import { Table } from '../table';
 
 // noinspection JSUnusedGlobalSymbols
 export async function up(knex: Knex): Promise<void> {
-  return knex
-    .transaction(async (trx: Knex.Transaction) => trx.schema
+  return knex.transaction(async (trx: Knex.Transaction) =>
+    trx.schema
       .createSchemaIfNotExists(Schema.lafiaService)
-      .then(() => trx.schema.hasTable(Table.identifiers)
-        .then((tableExists: boolean) => {
+      .then(() =>
+        trx.schema.hasTable(Table.identifiers).then((tableExists: boolean) => {
           if (!tableExists) {
             return trx.schema
               .withSchema(Schema.lafiaService)
@@ -22,34 +22,31 @@ export async function up(knex: Knex): Promise<void> {
                 tableBuilder
                   .enum('use', ['usual', 'official', 'temp', 'secondary', 'old'])
                   .notNullable();
-                tableBuilder
-                  .uuid('codeable_concept_id')
-                  .comment('type');
-                tableBuilder
-                  .string('system');
-                tableBuilder
-                  .string('value')
-                  .unique();
-                tableBuilder
-                  .uuid('period_id')
-                  .comment('period')
-                  .unique();
-                tableBuilder
-                  .timestamps(true, true);
+                tableBuilder.uuid('codeable_concept_id').comment('type');
+                tableBuilder.string('system');
+                tableBuilder.string('value').unique();
+                tableBuilder.uuid('period_id').comment('period').unique();
+                tableBuilder.timestamps(true, true);
 
                 // Set foreign key
                 tableBuilder
                   .foreign('codeable_concept_id')
                   .references('id')
-                  .inTable(`${Schema.lafiaService}.${Table.codeable_concepts}`);
+                  .inTable(`${Schema.lafiaService}.${Table.codeable_concepts}`)
+                  .onDelete('CASCADE')
+                  .onUpdate('CASCADE');
                 tableBuilder
                   .foreign('period_id')
                   .references('id')
-                  .inTable(`${Schema.lafiaService}.${Table.periods}`);
+                  .inTable(`${Schema.lafiaService}.${Table.periods}`)
+                  .onDelete('CASCADE')
+                  .onUpdate('CASCADE');
               });
           }
-        }))
-      .catch((e) => console.error('MIGRATION_ERROR', e)));
+        })
+      )
+      .catch((e) => console.error('MIGRATION_ERROR', e))
+  );
 }
 
 // noinspection JSUnusedGlobalSymbols
