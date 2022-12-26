@@ -1,4 +1,5 @@
 import { IBase } from '../../base';
+import { IValueSetComposeIncludeConcept } from '../../../models';
 
 export interface IValueSetConcept extends IBase {
   code?: string;
@@ -11,5 +12,5 @@ export interface IValueSetConcept extends IBase {
 export interface IValueSetConceptCreateDto {
   value_set_id: string;
   system: string;
-  concepts: [{ code: string; display: string }];
+  concepts: IValueSetComposeIncludeConcept[];
 }

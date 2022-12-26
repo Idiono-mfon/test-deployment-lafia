@@ -22,6 +22,8 @@ export * from './appointments';
 export * from './appointmentResponses';
 export * from './careTeams';
 export * from './organizations';
+export * from './valueSetConcepts';
+export * from './valueSets';
 
 // Export Service Container Module
 export * from './module.service';

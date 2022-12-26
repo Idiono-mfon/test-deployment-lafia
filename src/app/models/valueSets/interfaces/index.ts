@@ -47,7 +47,7 @@ export interface IUsageContext {
   value: IUsageContextValue;
 }
 
-interface IValueSetComposeInclueConceptDesignation {
+export interface IValueSetComposeInclueConceptDesignation {
   language?: string;
   use?: ICoding;
   value: string;
