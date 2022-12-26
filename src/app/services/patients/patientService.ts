@@ -1,12 +1,22 @@
 import { inject, injectable } from 'inversify';
 import TYPES from '../../config/types';
-import { IAttachment, IFhirServer, IFindUser, IPatient, IPatientWithToken, IUser } from '../../models';
+import {
+  IAttachment,
+  IFhirServer,
+  IFindUser,
+  IPatient,
+  IPatientWithToken,
+  IUser,
+  ContactPointSystem,
+  ContactPointUseValues,
+} from '../../models';
 import {
   error,
   forWho,
   GenericResponseError,
   getE164Format,
-  IUtilityService, logger,
+  IUtilityService,
+  logger,
   NotFoundError,
   throwError,
 } from '../../utils';
@@ -18,7 +28,6 @@ import { IPatientService } from './interfaces';
 
 @injectable()
 export class PatientService implements IPatientService {
-
   @inject(TYPES.VideoBroadcastService)
   private readonly videoBroadcastService: IVideoBroadcastService;
 
@@ -37,12 +46,9 @@ export class PatientService implements IPatientService {
   public async update(id: string, data: any): Promise<IPatient> {
     logger.info('Running PatientService.update');
     try {
-
-      const { data: patientUpdatedData } = await this.fhirServerService.executeQuery(
-        `/Patient/${id}`,
-        'PUT',
-        { data }
-      );
+      const {
+        data: patientUpdatedData,
+      } = await this.fhirServerService.executeQuery(`/Patient/${id}`, 'PUT', { data });
 
       logger.info(`Successfully updated patient data with an id - ${id}`);
 
@@ -58,18 +64,13 @@ export class PatientService implements IPatientService {
 
     return patient.data;
   }
- 
+
   public async create(data: IUser, ip?: string): Promise<IPatientWithToken> {
     logger.info('Running PatientService.create');
     try {
       this.utilService.checkForRequiredFields(data);
 
-      const {
-        gender,
-        first_name,
-        last_name,
-        email
-      } = data;
+      const { gender, first_name, last_name, email } = data;
 
       let { phone } = data;
 
@@ -97,32 +98,34 @@ export class PatientService implements IPatientService {
           use: 'official',
           text: `${first_name} ${last_name}`,
           family: last_name,
-          given: [first_name]
+          given: [first_name],
         },
         telecom: [
           {
-            system: 'email',
-            use: 'home',
+            system: ContactPointSystem.email,
+            use: ContactPointUseValues.home,
             rank: 0,
-            value: email
+            value: email,
           },
           {
-            system: 'phone',
-            use: 'mobile',
+            system: ContactPointSystem.phone,
+            use: ContactPointUseValues.mobile,
             rank: 0,
-            value: phone
-          }
+            value: phone,
+          },
         ],
       };
 
-      const patientResponse = await this.fhirServerService.executeQuery('/Patient', 'POST', { data: patientData });
+      const patientResponse = await this.fhirServerService.executeQuery('/Patient', 'POST', {
+        data: patientData,
+      });
       const patient = patientResponse.data;
       const token = this.userService.generateJwtToken({ email, id: String(patient.id) });
       const userData: IFindUser = {
         token,
         resource_id: patient.id,
         resource_type: forWho.patient,
-      }
+      };
 
       data.hasVerifiedPhone = true;
 
@@ -136,7 +139,7 @@ export class PatientService implements IPatientService {
       return {
         user: patient,
         auth_token: token,
-      }
+      };
     } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
@@ -168,7 +171,10 @@ export class PatientService implements IPatientService {
     }
   }
 
-  public async uploadAttachment(patientId: string, file: Express.Multer.File): Promise<IAttachment> {
+  public async uploadAttachment(
+    patientId: string,
+    file: Express.Multer.File
+  ): Promise<IAttachment> {
     logger.info('Running PatientService.uploadAttachment');
     try {
       const patient: any = await this.findById(patientId);
@@ -179,11 +185,7 @@ export class PatientService implements IPatientService {
 
       const fileLink = await this.s3Service.uploadFile(file);
 
-      const {
-        size,
-        originalname,
-        mimetype,
-      } = file;
+      const { size, originalname, mimetype } = file;
 
       const attachmentData: IAttachment = {
         contentType: mimetype,
@@ -212,5 +214,4 @@ export class PatientService implements IPatientService {
     }
     return this.videoBroadcastService.findAll(patientId);
   }
-
 }

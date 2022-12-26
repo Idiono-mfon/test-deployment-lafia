@@ -45,6 +45,8 @@ export * from './referencesIdentifiers';
 export * from './users';
 export * from './fhirServer';
 export * from './videoRecords';
+export * from './valueSets';
+export * from './valueSetConcepts';
 export * from './auth';
 export * from './resources';
 export * from './lang';

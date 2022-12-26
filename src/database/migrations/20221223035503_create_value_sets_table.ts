@@ -32,6 +32,8 @@ export async function up(knex: Knex): Promise<void> {
                 tableBuilder.string('title').notNullable();
                 tableBuilder.boolean('experimental').defaultTo(false);
                 tableBuilder.string('publisher').notNullable().defaultTo('');
+                tableBuilder.string('description').notNullable().defaultTo('');
+                tableBuilder.string('copyright').notNullable().defaultTo('');
 
                 tableBuilder
                   .enum('status', [

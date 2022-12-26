@@ -11,6 +11,8 @@ export * from './organizations';
 export * from './careTeams';
 export * from './appointments';
 export * from './appointmentResponses';
+export * from './valueSets';
+export * from './valueSetConcepts';
 
 // Export Repository Container Module
 export * from './module.repository';

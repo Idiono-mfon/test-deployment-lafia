@@ -50,6 +50,8 @@ const TYPES = {
   AppointmentResponseService: Symbol('AppointmentResponseService'),
   CareTeamService: Symbol('CareTeamService'),
   OrganizationService: Symbol('OrganizationService'),
+  ValueSetService: Symbol('ValueSetService'),
+  ValueSetConceptService: Symbol('ValueSetConceptService'),
 
   // repositories
   BaseRepository: Symbol('BaseRepository'),
@@ -73,6 +75,8 @@ const TYPES = {
   AppointmentResponseRepository: Symbol('AppointmentResponseRepository'),
   CareTeamRepository: Symbol('CareTeamRepository'),
   OrganizationRepository: Symbol('OrganizationRepository'),
+  ValueSetRepository: Symbol('ValueSetRepository'),
+  ValueSetConceptRepository: Symbol('ValueSetConceptRepository'),
 
   // models
   ModelClass: Symbol('ModelClass'),

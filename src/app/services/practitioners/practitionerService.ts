@@ -1,6 +1,14 @@
 import { inject, injectable } from 'inversify';
 import TYPES from '../../config/types';
-import { IAttachment, IFhirServer, IFindUser, IPractitioner, IUser } from '../../models';
+import {
+  IAttachment,
+  IFhirServer,
+  IFindUser,
+  IPractitioner,
+  IUser,
+  ContactPointSystem,
+  ContactPointUseValues,
+} from '../../models';
 import { DbAccess } from '../../repository';
 import {
   error,
@@ -9,7 +17,7 @@ import {
   logger,
   NotFoundError,
   throwError,
-  IUtilityService
+  IUtilityService,
 } from '../../utils';
 import { IUserLoginParams } from '../auth';
 import { IS3Service } from '../aws';
@@ -43,11 +51,9 @@ export class PractitionerService implements IPractitionerService {
   public async update(id: string, data: any): Promise<IPractitioner> {
     logger.info('Running PractitionerService.update');
     try {
-      const { data: practitionerData } = await this.fhirServerService.executeQuery(
-        `/Practitioner/${id}`,
-        'PUT',
-        { data }
-      );
+      const {
+        data: practitionerData,
+      } = await this.fhirServerService.executeQuery(`/Practitioner/${id}`, 'PUT', { data });
 
       logger.info(`Successfully updated practitioner data with an id - ${id}`);
 
@@ -68,14 +74,7 @@ export class PractitionerService implements IPractitionerService {
     logger.info('Running PractitionerService.create');
     this.utilService.checkForRequiredFields(data);
 
-    const {
-      gender,
-      first_name,
-      last_name,
-      email,
-      phone,
-      birth_date: birthDate,
-    } = data;
+    const { gender, first_name, last_name, email, phone, birth_date: birthDate } = data;
 
     let existingUser: IUser = await this.userService.findOne({ email });
 
@@ -97,21 +96,21 @@ export class PractitionerService implements IPractitionerService {
         use: 'official',
         text: `${first_name} ${last_name}`,
         family: last_name,
-        given: [first_name]
+        given: [first_name],
       },
       telecom: [
         {
-          system: 'email',
-          use: 'home',
+          system: ContactPointSystem.email,
+          use: ContactPointUseValues.home,
           rank: 0,
-          value: email
+          value: email,
         },
         {
-          system: 'phone',
-          use: 'mobile',
+          system: ContactPointSystem.phone,
+          use: ContactPointUseValues.mobile,
           rank: 0,
-          value: phone
-        }
+          value: phone,
+        },
       ],
     };
 
@@ -127,11 +126,11 @@ export class PractitionerService implements IPractitionerService {
       token,
       resource_id: practitioner.id,
       resource_type: forWho.practitioner,
-    }
+    };
 
     await this.userService.create({
       ...data,
-      ...userData
+      ...userData,
     });
 
     logger.info(`A new practitioner with id - ${practitioner.id} - has been created`);
@@ -139,7 +138,7 @@ export class PractitionerService implements IPractitionerService {
     return {
       user: practitioner,
       auth_token: token,
-    }
+    };
   }
 
   public async login(data: IUserLoginParams): Promise<any> {
@@ -164,7 +163,10 @@ export class PractitionerService implements IPractitionerService {
     }
   }
 
-  public async uploadAttachment(practitionerId: string, file: Express.Multer.File): Promise<IAttachment> {
+  public async uploadAttachment(
+    practitionerId: string,
+    file: Express.Multer.File
+  ): Promise<IAttachment> {
     logger.info('Running PractitionerService.uploadAttachment');
     try {
       const practitioner: any = await this.findById(practitionerId);
@@ -175,11 +177,7 @@ export class PractitionerService implements IPractitionerService {
 
       const fileLink = await this.s3Service.uploadFile(file);
 
-      const {
-        size,
-        originalname,
-        mimetype,
-      } = file;
+      const { size, originalname, mimetype } = file;
 
       const attachmentData: IAttachment = {
         contentType: mimetype,
@@ -201,11 +199,11 @@ export class PractitionerService implements IPractitionerService {
 
   public async findAssignedPractitionerVideoBroadcast(practitionerId: string): Promise<any> {
     logger.info('Running PractitionerService.findAssignedPractitionerVideoBroadcast');
-    const practitioner = await this.findById(practitionerId)
+    const practitioner = await this.findById(practitionerId);
     if (!practitioner) {
       throw new NotFoundError('Resource with the provided id does not exist');
     }
     // return this.practitionerVideoBroadcastRepository.findById(practitionerId);
-    return this.practitionerVideoBroadcastRepository.findAll(practitionerId); 
+    return this.practitionerVideoBroadcastRepository.findAll(practitionerId);
   }
 }

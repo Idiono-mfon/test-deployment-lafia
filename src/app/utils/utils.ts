@@ -4,17 +4,19 @@ import TYPES from '../config/types';
 import {
   IAddress,
   ICodeableConcept,
-  IHumanName, IPeriod,
-  ICodeSystem, ICodeType,
-  ICoding, IContactPoint,
-  IQualification, IReference,
+  IHumanName,
+  IPeriod,
+  ICodeSystem,
+  ICodeType,
+  ICoding,
+  IContactPoint,
+  IQualification,
+  IReference,
+  ContactPointSystem,
+  ContactPointUseValues,
 } from '../models';
 import { ICodeSystemService } from '../services';
-import {
-  error,
-  throwError,
-  GenericResponseError
-} from './errors';
+import { error, throwError, GenericResponseError } from './errors';
 import { IUtilityService } from './interfaces';
 import { logger } from './loggerUtil';
 
@@ -24,14 +26,12 @@ interface ForWho {
   patient: string;
   patientContact: string;
   practitioner: string;
-
 }
 
 const forWho: ForWho = {
   patient: 'patient',
   patientContact: 'patient_ref',
   practitioner: 'practitioner',
-  
 };
 const codeType: ICodeType = {
   language: 'language',
@@ -56,10 +56,7 @@ class UtilityService implements IUtilityService {
 
     const dateOfBirth: any = data[`${forWho}_date_of_birth`];
     try {
-      if (!dateOfBirth &&
-        (forWho === 'patient' ||
-          forWho === 'practitioner')
-      ) {
+      if (!dateOfBirth && (forWho === 'patient' || forWho === 'practitioner')) {
         throwError('Provide a valid value for dateOfBirth', badRequest);
       }
 
@@ -96,17 +93,15 @@ class UtilityService implements IUtilityService {
         throwError('date_of_birth is required', badRequest);
       }
 
-      const nameExtract = _.pick(data,
-        [
-          firstName,
-          lastName,
-          otherName,
-          nameSince,
-          namePrefix,
-          nameUse,
-          dob
-        ]
-      );
+      const nameExtract = _.pick(data, [
+        firstName,
+        lastName,
+        otherName,
+        nameSince,
+        namePrefix,
+        nameUse,
+        dob,
+      ]);
 
       const givenName = [nameExtract[firstName]];
 
@@ -114,8 +109,8 @@ class UtilityService implements IUtilityService {
         givenName.push(nameExtract[otherName]);
       }
 
-      const fullName = nameExtract[firstName] + ' ' +
-        nameExtract[lastName] + ' ' + nameExtract[otherName];
+      const fullName =
+        nameExtract[firstName] + ' ' + nameExtract[lastName] + ' ' + nameExtract[otherName];
 
       return {
         use: nameExtract[nameUse] ?? DEFAULT_NAME_USE,
@@ -124,10 +119,10 @@ class UtilityService implements IUtilityService {
         given: givenName,
         prefix: [nameExtract[namePrefix]],
         period: {
-          start: nameExtract[nameSince] ?
-            new Date(nameExtract[nameSince]) :
-            new Date(nameExtract[dob]),
-        }
+          start: nameExtract[nameSince]
+            ? new Date(nameExtract[nameSince])
+            : new Date(nameExtract[dob]),
+        },
       };
     } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
@@ -146,19 +141,22 @@ class UtilityService implements IUtilityService {
     const addressSince = `${forWho}_address_since`;
     const address = `${forWho}_address`;
 
-    const addressExtract = _.pick(data,
-      [
-        country, city, state, address,
-        postalCode, addressType,
-        addressUse, addressSince
-      ]
-    );
+    const addressExtract = _.pick(data, [
+      country,
+      city,
+      state,
+      address,
+      postalCode,
+      addressType,
+      addressUse,
+      addressSince,
+    ]);
 
     let period: IPeriod | any;
 
     if (addressExtract[addressSince]) {
       period = {
-        start: new Date(addressExtract[addressSince])
+        start: new Date(addressExtract[addressSince]),
       };
     }
 
@@ -170,7 +168,7 @@ class UtilityService implements IUtilityService {
       postalCode: addressExtract[postalCode],
       country: addressExtract[country],
       text: addressExtract[address],
-      period
+      period,
     };
   }
 
@@ -189,14 +187,18 @@ class UtilityService implements IUtilityService {
       return {
         code: systemCode,
         system,
-        display
+        display,
       };
     } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
   }
 
-  public async extractCodeableConcept(data: any, forWho: string, codeType: string): Promise<ICodeableConcept> {
+  public async extractCodeableConcept(
+    data: any,
+    forWho: string,
+    codeType: string
+  ): Promise<ICodeableConcept> {
     logger.info('Running UtilityService.extractCodeableConcept');
 
     try {
@@ -243,16 +245,16 @@ class UtilityService implements IUtilityService {
 
       return [
         {
-          system: 'phone',
-          use: use ?? 'mobile',
+          system: ContactPointSystem.phone,
+          use: use ?? ContactPointUseValues.mobile,
           rank: 1,
-          value: phone
+          value: phone,
         },
         {
-          system: 'email',
+          system: ContactPointSystem.email,
           use: use ?? 'home',
           rank: 0,
-          value: email
+          value: email,
         },
       ];
     } catch (e: any) {
@@ -264,7 +266,11 @@ class UtilityService implements IUtilityService {
     logger.info('Running UtilityService.getContact');
 
     try {
-      const relationship: ICodeableConcept = await this.extractCodeableConcept(data, forWho, codeType.relationship);
+      const relationship: ICodeableConcept = await this.extractCodeableConcept(
+        data,
+        forWho,
+        codeType.relationship
+      );
       const name: IHumanName = this.extractName(data, forWho);
       const telecom: IContactPoint[] = this.extractContactPoint(data, forWho);
       const address: IAddress = this.extractAddress(data, forWho);
@@ -291,22 +297,29 @@ class UtilityService implements IUtilityService {
     };
   }
 
-  public async getQualification(data: any, forWho: string, codeType: string): Promise<IQualification> {
+  public async getQualification(
+    data: any,
+    forWho: string,
+    codeType: string
+  ): Promise<IQualification> {
     logger.info('Running UtilityService.getQualification');
 
     try {
       const code: ICodeableConcept = await this.extractCodeableConcept(data, forWho, codeType);
       const date = data[`${forWho}_qualification_issued_date`];
       const issueDate = new Date(date);
-      const issuer: IReference = this.getReference(_.capitalize(forWho), data[`${forWho}_qualification_issuer`]);
+      const issuer: IReference = this.getReference(
+        _.capitalize(forWho),
+        data[`${forWho}_qualification_issuer`]
+      );
       const period: IPeriod = {
-        start: issueDate
+        start: issueDate,
       };
 
       return {
         code,
         issuer,
-        period
+        period,
       };
     } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
@@ -314,10 +327,4 @@ class UtilityService implements IUtilityService {
   }
 }
 
-export {
-  forWho,
-  ForWho,
-  resourceTypes,
-  codeType,
-  UtilityService,
-};
+export { forWho, ForWho, resourceTypes, codeType, UtilityService };
