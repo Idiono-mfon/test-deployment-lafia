@@ -41,7 +41,7 @@ export class CreateValueSetDto implements IValueSetCreateDto {
 
   @IsOptional()
   @IsBoolean()
-  immutable: boolean = true; //Add optional values
+  immutable: boolean = false; //Add optional value
 
   @IsOptional()
   @IsBoolean()
@@ -146,11 +146,6 @@ export class CreateValueSetConceptDto implements IValueSetConceptCreateDto {
   @IsString()
   @IsNotEmpty()
   system: string;
-
-  @IsDefined()
-  @IsNotEmpty()
-  @IsEnum(ValueSetStatus)
-  status: ValueSetStatus;
 
   @IsDefined()
   @IsArray()

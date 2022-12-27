@@ -16,6 +16,7 @@ const TYPES = {
   PractitionerController: Symbol('PractitionerController'),
   FhirResourceController: Symbol('FhirResourceController'),
   ImplementationGuideController: Symbol('ImplementationGuideController'),
+  ValueSetController: Symbol('ValueSetController'),
 
   // service
   S3Service: Symbol('S3Service'),

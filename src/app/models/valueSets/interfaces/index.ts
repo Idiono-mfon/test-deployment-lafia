@@ -12,7 +12,7 @@ import { IReference } from '../../references';
 
 export interface IContactDetail {
   name?: string;
-  telecom?: [IContactPoint];
+  telecom?: IContactPoint[];
 }
 
 export interface IQuantity {
@@ -68,16 +68,16 @@ export interface IValueSetComposeIncludeFilter {
 export interface IValueSetComposeInclude {
   system?: string;
   version?: string;
-  concept?: [IValueSetComposeIncludeConcept];
-  filter?: [IValueSetComposeIncludeFilter];
-  valueSet?: [string];
+  concept?: IValueSetComposeIncludeConcept[];
+  filter?: IValueSetComposeIncludeFilter[];
+  valueSet?: string[];
 }
 
 export interface IValueSetCompose {
   lockedDate?: Date | string;
   inactive?: boolean;
-  include: [IValueSetComposeInclude];
-  exclude?: [IValueSetComposeInclude];
+  include: IValueSetComposeInclude[];
+  exclude?: IValueSetComposeInclude[];
 }
 
 export interface IValueSetExpansionParamater {
@@ -100,8 +100,8 @@ export interface IValueSetExpansionContains {
   version?: string;
   code?: string;
   display?: string;
-  designation?: [IValueSetComposeInclueConceptDesignation];
-  contains?: [IValueSetExpansionContains];
+  designation?: IValueSetComposeInclueConceptDesignation[];
+  contains?: IValueSetExpansionContains[];
 }
 
 export interface IValueSetExpansion {
@@ -109,13 +109,15 @@ export interface IValueSetExpansion {
   timestamp?: Date | string;
   total?: number;
   offset?: number;
-  parameter?: [IValueSetExpansionParamater];
-  contains?: [IValueSetExpansionContains];
+  parameter?: IValueSetExpansionParamater[];
+  contains?: IValueSetExpansionContains[];
 }
 
 export interface IValueSet extends IBase {
   resource_type?: string;
   resource_id?: string;
+  resourceId?: string;
+  resourceType?: string;
   name?: string;
   title?: string;
   status?: ValueSetStatus;
@@ -139,7 +141,7 @@ export interface IFhirValueSet extends IBase {
   publisher?: string;
   contact?: IContactDetail[];
   description?: string;
-  useContext?: [IUsageContext];
+  useContext?: IUsageContext[];
   jurisdiction?: ICodeableConcept;
   immutable?: boolean;
   purpose?: string;

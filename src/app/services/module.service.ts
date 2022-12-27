@@ -18,13 +18,13 @@ import {
   IRedisStore,
   ISignallingServerService,
   RedisStore,
-  SignallingServerService
+  SignallingServerService,
 } from './signallingServers';
 import {
   FhirResourceService,
   ImplementationGuideService,
   IFhirResourceService,
-  IImplementationGuideService
+  IImplementationGuideService,
 } from './resources';
 import {
   ITwilioRoomService,
@@ -32,7 +32,7 @@ import {
   IVideoRecordService,
   TwilioRoomService,
   VideoBroadcastService,
-  VideoRecordService
+  VideoRecordService,
 } from './videoRecords';
 import { IRabbitMqService, IRabbitMqSetup, RabbitMqService, RabbitMqSetup } from './messageBroker';
 import { EncounterService, IEncounterService } from './encounters';
@@ -41,6 +41,8 @@ import { AppointmentService, IAppointmentService } from './appointments';
 import { AppointmentResponseService, IAppointmentResponseService } from './appointmentResponses';
 import { CareTeamService, ICareTeamService } from './careTeams';
 import { IOrganizationService, OrganizationService } from './organizations';
+import { ValueSetConceptService, IValueSetConceptService } from './valueSetConcepts';
+import { ValueSetService, IValueSetService } from './valueSets';
 
 export const serviceModule = new ContainerModule((bind) => {
   bind<IS3Service>(TYPES.S3Service).to(S3Service);
@@ -64,11 +66,17 @@ export const serviceModule = new ContainerModule((bind) => {
   bind<IPractitionerService>(TYPES.PractitionerService).to(PractitionerService);
   bind<IVideoBroadcastService>(TYPES.VideoBroadcastService).to(VideoBroadcastService);
   bind<ISignallingServerService>(TYPES.SignallingServerService).to(SignallingServerService);
-  bind<IImplementationGuideService>(TYPES.ImplementationGuideService).to(ImplementationGuideService);
+  bind<IImplementationGuideService>(TYPES.ImplementationGuideService).to(
+    ImplementationGuideService
+  );
   bind<IEncounterService>(TYPES.EncounterService).to(EncounterService);
   bind<IClaimService>(TYPES.ClaimService).to(ClaimService);
   bind<IAppointmentService>(TYPES.AppointmentService).to(AppointmentService);
-  bind<IAppointmentResponseService>(TYPES.AppointmentResponseService).to(AppointmentResponseService);
+  bind<IAppointmentResponseService>(TYPES.AppointmentResponseService).to(
+    AppointmentResponseService
+  );
   bind<ICareTeamService>(TYPES.CareTeamService).to(CareTeamService);
   bind<IOrganizationService>(TYPES.OrganizationService).to(OrganizationService);
+  bind<IValueSetService>(TYPES.ValueSetService).to(ValueSetService);
+  bind<IValueSetConceptService>(TYPES.ValueSetConceptService).to(ValueSetConceptService);
 });

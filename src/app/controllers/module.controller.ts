@@ -11,6 +11,7 @@ import { PractitionerController } from './practitioners';
 import { LafiaMediaController, LafiaVideoController } from './mediaServer';
 import { ComponentController, LabelController, LanguageController } from './lang';
 import { FhirResourceController, ImplementationGuideController } from './resources';
+import { ValueSetController } from './valueSets';
 
 export const controllerModule = new ContainerModule((bind) => {
   bind<AuthController>(TYPES.AuthController).to(AuthController);
@@ -27,5 +28,9 @@ export const controllerModule = new ContainerModule((bind) => {
   bind<FhirServerController>(TYPES.FhirServerController).to(FhirServerController);
   bind<PractitionerController>(TYPES.PractitionerController).to(PractitionerController);
   bind<FhirResourceController>(TYPES.FhirResourceController).to(FhirResourceController);
-  bind<ImplementationGuideController>(TYPES.ImplementationGuideController).to(ImplementationGuideController);
+  bind<ImplementationGuideController>(TYPES.ImplementationGuideController).to(
+    ImplementationGuideController
+  );
+  bind<FhirResourceController>(TYPES.FhirResourceController).to(FhirResourceController);
+  bind<ValueSetController>(TYPES.ValueSetController).to(ValueSetController);
 });

@@ -9,7 +9,7 @@ import { validationMiddleware } from '../../middlewares/validation.middleware';
 import { CreateValueSetDto, CreateValueSetConceptDto } from './dto';
 
 @controller('/valuesets')
-export class EncounterController extends BaseController {
+export class ValueSetController extends BaseController {
   @inject(TYPES.ValueSetService)
   private readonly valueSetService: IValueSetService;
 

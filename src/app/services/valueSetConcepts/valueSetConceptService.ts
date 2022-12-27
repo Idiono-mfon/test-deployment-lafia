@@ -66,12 +66,17 @@ export class ValueSetConceptService implements IValueSetConceptService {
       }
 
       const fhirValueSetData: any = await this.fhirServerService.executeQuery(
-        `${FhirResource.ValueSet}/${valueSet.resource_id}`,
+        `${FhirResource.ValueSet}/${valueSet.resourceId}`,
         FhirResourceMethods.GET
       );
 
       const fhirValueSet: IFhirValueSet = fhirValueSetData.data;
 
+      // Update Resource URL
+
+      fhirValueSet.url = `${this.env.fhir_server_base_url}/${FhirResource.ValueSet}/${valueSet.resourceId}`;
+
+      // Update Concepts
       fhirValueSet.compose = {
         include: [
           {
@@ -83,10 +88,12 @@ export class ValueSetConceptService implements IValueSetConceptService {
 
       // Update ValueSet Record on FHIR
       await this.fhirServerService.executeQuery(
-        `/${FhirResource.ValueSet}/${valueSet.resource_id}`,
+        `${FhirResource.ValueSet}/${valueSet.resourceId}`,
         FhirResourceMethods.PUT,
-        fhirValueSet
+        { data: fhirValueSet }
       );
+
+      // Create Record on Db
 
       const valueSetConcepts: IValueSetConcept[] = data.concepts.map((concept) => {
         return { ...concept, value_set_id: data.value_set_id, system: data.system };

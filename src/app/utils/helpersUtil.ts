@@ -14,3 +14,7 @@ export const OTPExpiryTime = (): Date => {
 export const OTPIsValid = (time: Date): boolean => {
   return Date.now() < new Date(time).getTime();
 };
+
+export const cleanUIID = (data: string): string => {
+  return data.replace(/-/g, '');
+};

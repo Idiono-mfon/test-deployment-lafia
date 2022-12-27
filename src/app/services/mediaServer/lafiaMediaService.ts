@@ -3,7 +3,7 @@ import { v4 as uuid } from 'uuid';
 import { inject, injectable } from 'inversify';
 import { Env, IEnv } from '../../config/env';
 import { IFindVideoRecord, IVideoRecord } from '../../models';
-import { GenericResponseError, logger } from '../../utils';
+import { GenericResponseError, logger, cleanUIID } from '../../utils';
 import TYPES from '../../config/types';
 import { VideoRecordService } from '../videoRecords';
 import { ILafiaMediaService, IStream } from './interfaces';
@@ -22,7 +22,7 @@ export class LafiaMediaService implements ILafiaMediaService {
   public async createBroadcast(patient_id: string): Promise<IStream> {
     logger.info('Running LafiaMediaService.createBroadcast');
     try {
-      const name = uuid().replace(/-/g, '');
+      const name = cleanUIID(uuid());
       const axiosResponse: AxiosResponse = await axios.post(
         `${this.env.lafia_media_url}/rest/v2/broadcasts/create`,
         { name }

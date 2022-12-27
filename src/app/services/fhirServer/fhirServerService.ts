@@ -176,7 +176,6 @@ export class FhirServerService implements IFhirServer {
     // console.log(this.env.fhir_server_base_url, resourceQuery, httpMethod);
     try {
       const { data } = props!;
-      // console.log(JSON.stringify(data));
       const { status, data: responseData, headers } = await this.axiosInstance({
         url: resourceQuery,
         baseURL: `${this.env.fhir_server_base_url}/`,

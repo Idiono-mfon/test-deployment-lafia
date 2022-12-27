@@ -8,27 +8,32 @@ import {
   FhirResourceRepository,
   IFhirResourceRepository,
   IImplementationGuideRepository,
-  ImplementationGuideRepository
+  ImplementationGuideRepository,
 } from './resources';
 import {
   ComponentRepository,
   LabelRepository,
   LanguageRepository,
   ILabelRepository,
-  ILanguageRepository
+  ILanguageRepository,
 } from './lang';
 import {
   PractitionerVideoBroadcastRepository,
   TwilioRoomRepository,
   VideoBroadcastRepository,
-  VideoRecordRepository
+  VideoRecordRepository,
 } from './videoRecords';
 import { EncounterRepository, IEncounterRepository } from './encounters';
 import { ClaimRepository, IClaimRepository } from './claims';
 import { CareTeamRepository, ICareTeamRepository } from './careTeams';
 import { IOrganizationRepository, OrganizationRepository } from './organizations';
-import { AppointmentResponseRepository, IAppointmentResponseRepository } from './appointmentResponses';
+import {
+  AppointmentResponseRepository,
+  IAppointmentResponseRepository,
+} from './appointmentResponses';
 import { AppointmentRepository, IAppointmentRepository } from './appointments';
+import { ValueSetRepository, IValueSetRepository } from './valueSets';
+import { ValueSetConceptRepository, IValueSetConceptRepository } from './valueSetConcepts';
 
 export const repositoryModule = new ContainerModule((bind) => {
   bind<DbAccess>(TYPES.BaseRepository).to(BaseRepository);
@@ -42,12 +47,20 @@ export const repositoryModule = new ContainerModule((bind) => {
   bind<ILanguageRepository>(TYPES.LanguageRepository).to(LanguageRepository);
   bind<DbAccess>(TYPES.VideoBroadcastRepository).to(VideoBroadcastRepository);
   bind<IFhirResourceRepository>(TYPES.FhirResourceRepository).to(FhirResourceRepository);
-  bind<IImplementationGuideRepository>(TYPES.ImplementationGuideRepository).to(ImplementationGuideRepository);
-  bind<DbAccess>(TYPES.PractitionerVideoBroadcastRepository).to(PractitionerVideoBroadcastRepository);
+  bind<IImplementationGuideRepository>(TYPES.ImplementationGuideRepository).to(
+    ImplementationGuideRepository
+  );
+  bind<DbAccess>(TYPES.PractitionerVideoBroadcastRepository).to(
+    PractitionerVideoBroadcastRepository
+  );
   bind<IEncounterRepository>(TYPES.EncounterRepository).to(EncounterRepository);
   bind<IClaimRepository>(TYPES.ClaimRepository).to(ClaimRepository);
   bind<ICareTeamRepository>(TYPES.CareTeamRepository).to(CareTeamRepository);
   bind<IOrganizationRepository>(TYPES.OrganizationRepository).to(OrganizationRepository);
   bind<IAppointmentRepository>(TYPES.AppointmentRepository).to(AppointmentRepository);
-  bind<IAppointmentResponseRepository>(TYPES.AppointmentResponseRepository).to(AppointmentResponseRepository);
+  bind<IAppointmentResponseRepository>(TYPES.AppointmentResponseRepository).to(
+    AppointmentResponseRepository
+  );
+  bind<IValueSetRepository>(TYPES.ValueSetRepository).to(ValueSetRepository);
+  bind<IValueSetConceptRepository>(TYPES.ValueSetConceptRepository).to(ValueSetConceptRepository);
 });

@@ -7,7 +7,7 @@ export const ValueSetValidation: JSONSchema = {
   properties: {
     resourceId: { type: 'string' },
     resourceType: { type: 'string' },
-    status: { type: 'boolean' },
+    status: { type: 'string' },
     name: { type: 'string' },
     title: { type: 'string' },
     experimental: { type: 'boolean' },

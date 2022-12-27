@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify';
-// import { v4 as uuid } from 'uuid';
+import { v4 as uuid } from 'uuid';
 import TYPES from '../../config/types';
 import { IValueSetService } from './interfaces';
 import { Env, IEnv } from '../../config/env';
@@ -13,7 +13,7 @@ import {
   ContactPointSystem,
   ContactPointUseValues,
 } from '../../models';
-import { GenericResponseError, logger, throwError } from '../../utils';
+import { GenericResponseError, logger, throwError, cleanUIID } from '../../utils';
 import { FhirResource, FhirResourceMethods } from '../fhirServer';
 
 @injectable()
@@ -73,6 +73,8 @@ export class ValueSetService implements IValueSetService {
 
       const last_changed = new Date().toISOString();
 
+      const publisherLafia = 'LAFHIR Project team';
+
       let contacts: IContactDetail[] | undefined;
 
       const lafiaContact: IContactDetail = {
@@ -80,7 +82,7 @@ export class ValueSetService implements IValueSetService {
           {
             use: ContactPointUseValues.work,
             system: ContactPointSystem.url,
-            value: 'https://fhir.staging.lafia.io/fhir',
+            value: this.env.fhir_server_base_url,
           },
         ],
       };
@@ -124,10 +126,12 @@ export class ValueSetService implements IValueSetService {
       const valueSetData: IFhirValueSet = {
         date: last_changed,
         resourceType: FhirResource.ValueSet,
+        url: `${this.env.fhir_server_base_url}/${FhirResource.ValueSet}/${cleanUIID(uuid())}`,
         name: data.name,
         title: data.title,
         status: data.status,
         experimental: data.experimental,
+        immutable: data.immutable,
         contact: data.publisherIsLafia ? [lafiaContact] : contacts ?? [lafiaContact],
         description: data.description || '',
         copyright: data.copyright || '',
@@ -147,12 +151,14 @@ export class ValueSetService implements IValueSetService {
         publisherEmail,
         publisherPhone,
         publisherUrl,
+        immutable,
         ...others
       } = data;
 
       return await this.valueSetRepository.create<IValueSet>({
         resource_id: valueSet.id,
         ...others,
+        publisher: data.publisherIsLafia ? publisherLafia : publisherName,
         last_changed,
       });
     } catch (e: any) {
