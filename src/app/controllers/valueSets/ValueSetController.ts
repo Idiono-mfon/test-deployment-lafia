@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { inject } from 'inversify';
 import { controller, httpGet, httpPut, httpPost, response, request } from 'inversify-express-utils';
 import TYPES from '../../config/types';
-import { IValueSetConceptService, IValueSetService } from '../../services';
+import { IValueSetConceptService, IValueSetService, LafiaValueSet } from '../../services';
 import { HttpStatusCode, logger } from '../../utils';
 import { BaseController } from '../baseController';
 import { validationMiddleware } from '../../middlewares/validation.middleware';
@@ -38,6 +38,25 @@ export class ValueSetController extends BaseController {
       this.success(res, true, 'ValueSet concepts added', HttpStatusCode.CREATED);
     } catch (e: any) {
       logger.error(`Unable to add ValueSet concepts -`, e);
+      this.error(res, e);
+    }
+  }
+
+  @httpGet('/care-types')
+  public async getUserPhoto(@request() req: Request, @response() res: Response) {
+    logger.info('Running UserController.getUserPhoto');
+    try {
+      /**
+       * Care types / Care interests are represented as clinical/medical Specialty
+       *
+       * */
+      const concepts = await this.valueSetService.findCustomValueSetConcepts({
+        name: LafiaValueSet.SNOMEDCTClinicalAndMedicalSpecialty,
+      });
+
+      this.success(res, concepts, 'Care types/interests fetched', HttpStatusCode.OK);
+    } catch (e: any) {
+      logger.error(`Unable to get user photo -`, e);
       this.error(res, e);
     }
   }

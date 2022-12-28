@@ -1,4 +1,9 @@
-import { IValueSet, IFhirValueSet, IValueSetCreateDto } from '../../../models';
+import {
+  IValueSet,
+  IFhirValueSet,
+  IValueSetCreateDto,
+  IValueSetComposeIncludeConcept,
+} from '../../../models';
 
 export interface IValueSetService {
   findOne(query: IValueSet): Promise<IValueSet>;
@@ -10,4 +15,6 @@ export interface IValueSetService {
   findOnFhir(query: IValueSet): Promise<IFhirValueSet>;
 
   exists(query: string): Promise<boolean>;
+
+  findCustomValueSetConcepts(query: IValueSet): Promise<IValueSetComposeIncludeConcept[]>;
 }

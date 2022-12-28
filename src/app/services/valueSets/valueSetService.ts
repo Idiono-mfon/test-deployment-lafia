@@ -12,8 +12,9 @@ import {
   IContactDetail,
   ContactPointSystem,
   ContactPointUseValues,
+  IValueSetComposeIncludeConcept,
 } from '../../models';
-import { GenericResponseError, logger, throwError, cleanUIID } from '../../utils';
+import { GenericResponseError, logger, throwError, cleanUIID, error } from '../../utils';
 import { FhirResource, FhirResourceMethods } from '../fhirServer';
 
 @injectable()
@@ -44,7 +45,7 @@ export class ValueSetService implements IValueSetService {
     try {
       logger.info('Running ValueSetService.findOnFhir');
       const valueSet = await this.fhirServerService.executeQuery(
-        `/ValueSet/${data.resource_id}`,
+        `/ValueSet/${data.resourceId}`,
         'GET'
       );
       return valueSet.data;
@@ -164,5 +165,25 @@ export class ValueSetService implements IValueSetService {
     } catch (e: any) {
       throw new GenericResponseError(e.message, e.code);
     }
+  }
+
+  public async findCustomValueSetConcepts(
+    data: IValueSet
+  ): Promise<IValueSetComposeIncludeConcept[]> {
+    logger.info('Running ValueSetService.findCustomValueSetConcepts');
+
+    const valueSet = await this.findOne(data);
+
+    if (!valueSet) {
+      throwError('Invalid Valueset Identifier. Valueset not found!', error.badRequest);
+    }
+
+    const valueSetOnFHIR = await this.findOnFhir(valueSet);
+
+    if (!valueSetOnFHIR) {
+      throwError('Invalid Valueset Identifier. Valueset not found!', error.badRequest);
+    }
+
+    return valueSetOnFHIR.compose?.include[0].concept as IValueSetComposeIncludeConcept[];
   }
 }
