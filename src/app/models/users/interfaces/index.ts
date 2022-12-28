@@ -6,12 +6,15 @@ export interface IUser extends IBase {
   resource_id?: string;
   resourceType?: string;
   resourceId?: string;
-  email: string;
+  email?: string;
   password: string;
   firstName?: string;
   lastName?: string;
   first_name: string;
   last_name: string;
+  birth_date?: Date | string;
+  care_type?: string;
+  country?: string;
   gender?: string;
   password_reset_token?: string;
   token?: string;
@@ -40,6 +43,9 @@ export interface IFindUser extends IBase {
   lastName?: string;
   first_name?: string;
   last_name?: string;
+  birth_date?: Date | string;
+  care_type?: string;
+  country?: string;
   gender?: string;
   password_reset_token?: string;
   token?: string;
@@ -58,7 +64,8 @@ export interface IFindUser extends IBase {
 
 export interface IJwtPayload {
   id: string | any;
-  email: string;
+  email?: string;
+  phone?: string;
   aud?: string;
   iat?: string;
   exp?: string;

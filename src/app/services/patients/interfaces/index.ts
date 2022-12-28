@@ -1,4 +1,10 @@
-import { IAttachment, IPatient, IPatientWithToken, IUser } from '../../../models';
+import {
+  IAttachment,
+  IPatient,
+  IPatientWithToken,
+  IUser,
+  ICreatePatientDto,
+} from '../../../models';
 import { IUserLoginParams } from '../../auth';
 
 export interface IPatientService {
@@ -6,7 +12,7 @@ export interface IPatientService {
 
   update(id: string, data: IPatient): Promise<IPatient>;
 
-  create(data: IUser, ip?: string): Promise<IPatientWithToken>;
+  create(data: ICreatePatientDto, ip?: string): Promise<IPatientWithToken>;
 
   login(data: IUserLoginParams): Promise<IPatient>;
 

@@ -10,6 +10,7 @@ import { IContactPoint } from '../../contactPoints';
 import { ICommunication } from '../../communications';
 import { IPatientContact } from '../../patientContacts';
 import { ICodeableConcept } from '../../codeableConcepts';
+import { Gender } from '../enums';
 
 export interface IPatient extends IBase {
   resourceType?: string;
@@ -40,4 +41,18 @@ export interface IPatient extends IBase {
 export interface IPatientWithToken {
   user: IPatient;
   auth_token: string;
+}
+
+export interface ICreatePatientDto {
+  first_name: string;
+  last_name: string;
+  birth_date: Date | string;
+  gender: Gender;
+  country: string;
+  care_type: string;
+  email: string;
+  phone: string;
+  password: string;
+  isEmail: boolean;
+  emailOrPhone?: string;
 }

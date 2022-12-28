@@ -9,6 +9,7 @@ export * from './validations';
 export * from './csvImporter';
 export * from './fhirImporter';
 export * from './helpersUtil';
+export * from './password';
 
 // Export Utils Container Module
 export * from './module.utility';

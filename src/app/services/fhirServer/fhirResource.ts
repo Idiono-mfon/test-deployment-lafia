@@ -1,5 +1,6 @@
 export class FhirResource {
   public static ValueSet = 'ValueSet';
+  public static Patient = 'Patient';
 }
 
 export class FhirResourceMethods {

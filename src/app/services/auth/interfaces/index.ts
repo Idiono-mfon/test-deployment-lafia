@@ -1,6 +1,6 @@
 import { Agent } from 'https';
 import OAuth2Strategy from 'passport-oauth2';
-import { IConnection, IFindConnection, IUser } from '../../../models';
+import { IConnection, IFindConnection, IUser, IUserLoginDto } from '../../../models';
 
 export interface ILogin {
   email: string;
@@ -9,7 +9,7 @@ export interface ILogin {
 
 export interface IUserLoginParams {
   user: IUser;
-  token: string
+  token: string;
 }
 
 export interface IConnectionCredentials {
@@ -22,7 +22,8 @@ export interface IConnectionCredentials {
 }
 
 export interface IAuthService {
-  login(email: string, password: string, ip?: string): Promise<any>;
+  login(data: IUserLoginDto, ip?: string): Promise<any>;
+  // login(email: string, password: string, ip?: string): Promise<any>;
 
   getHttpsAgent(): Agent;
 

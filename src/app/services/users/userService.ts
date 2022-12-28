@@ -5,7 +5,6 @@ import TYPES from '../../config/types';
 import { IUserService } from './interfaces';
 import { ITwilioService, TwilioOTP } from '../twilio';
 import { Env, IEnv } from '../../config/env';
-import { Password } from '../../utils/password';
 import { IUserRepository } from '../../repository';
 import { IComposeEmail, IEmailService } from '../email';
 import {
@@ -28,6 +27,7 @@ import {
   random6Digits,
   OTPExpiryTime,
   OTPIsValid,
+  Password,
 } from '../../utils';
 
 @injectable()
@@ -197,28 +197,29 @@ export class UserService implements IUserService {
     logger.info('Running UserService.create');
 
     try {
+      /**Validation logic is uncoupled from service logic of email/phone fields */
       // Validate Email
-      const isValidEmail = Validations.validateEmail(user.email);
+      // const isValidEmail = Validations.validateEmail(user.email as string);
 
-      if (!isValidEmail) {
-        throwError('Email is not valid', error.badRequest);
-      }
+      // if (!isValidEmail) {
+      //   throwError('Email is not valid', error.badRequest);
+      // }
 
       // Validate password
-      const isValidPassword = Password.validatePassword(user.password);
+      // const isValidPassword = Password.validatePassword(user.password);
 
-      if (!isValidPassword) {
-        const ERROR_MESSAGE = `===${user.password}=== Hint: password must be minimum ' +
-          'of 6 characters and must have a ' +
-          'combination of at least one Upper case, one Lower case, ' +
-          'one digit and one or more of ' +
-          'these special characters - !@#$%+.=()`;
+      // if (!isValidPassword) {
+      //   const ERROR_MESSAGE = `===${user.password}=== Hint: password must be minimum ' +
+      //     'of 6 characters and must have a ' +
+      //     'combination of at least one Upper case, one Lower case, ' +
+      //     'one digit and one or more of ' +
+      //     'these special characters - !@#$%+.=()`;
 
-        throwError(ERROR_MESSAGE, error.badRequest);
-      }
+      //   throwError(ERROR_MESSAGE, error.badRequest);
+      // }
 
       // Hash user password
-      user.password = await Password.hash(user.password);
+      // user.password = await Password.hash(user.password);
 
       const data = {
         id: uuid(),

@@ -32,7 +32,7 @@ export interface ICreateAccountDto {
   isEmail: boolean;
   password: string;
   confirmPassword: string;
-  emailOrPhone: string;
+  emailOrPhone?: string;
 }
 
 export interface IVerifyOTP {
@@ -45,5 +45,15 @@ export interface IVerifyOTP {
 export interface IVerifyOTPDto {
   from_email: boolean;
   code: string;
-  emailOrPhone: string;
+  emailOrPhone?: string;
+  email: string;
+  phone: string;
+}
+
+export interface IUserLoginDto {
+  isEmail: boolean;
+  email: string;
+  phone: string;
+  password: string;
+  emailOrPhone?: string;
 }

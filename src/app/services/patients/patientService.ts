@@ -9,6 +9,7 @@ import {
   IUser,
   ContactPointSystem,
   ContactPointUseValues,
+  ICreatePatientDto,
 } from '../../models';
 import {
   error,
@@ -19,12 +20,15 @@ import {
   logger,
   NotFoundError,
   throwError,
+  Password,
 } from '../../utils';
+
 import { IUserLoginParams } from '../auth';
 import { IS3Service } from '../aws';
 import { IUserService } from '../users';
 import { IVideoBroadcastService } from '../videoRecords';
 import { IPatientService } from './interfaces';
+import { FhirResource, FhirResourceMethods } from '../fhirServer';
 
 @injectable()
 export class PatientService implements IPatientService {
@@ -46,9 +50,13 @@ export class PatientService implements IPatientService {
   public async update(id: string, data: any): Promise<IPatient> {
     logger.info('Running PatientService.update');
     try {
-      const {
-        data: patientUpdatedData,
-      } = await this.fhirServerService.executeQuery(`/Patient/${id}`, 'PUT', { data });
+      const { data: patientUpdatedData } = await this.fhirServerService.executeQuery(
+        `/${FhirResource.Patient}/${id}`,
+        FhirResourceMethods.PUT,
+        {
+          data,
+        }
+      );
 
       logger.info(`Successfully updated patient data with an id - ${id}`);
 
@@ -60,28 +68,44 @@ export class PatientService implements IPatientService {
 
   public async findById(id: string): Promise<IPatient> {
     logger.info('Running PatientService.findById');
-    const patient = await this.fhirServerService.executeQuery(`/Patient/${id}`, 'GET');
+    const patient = await this.fhirServerService.executeQuery(
+      `/${FhirResource.Patient}/${id}`,
+      FhirResourceMethods.GET
+    );
 
     return patient.data;
   }
 
-  public async create(data: IUser, ip?: string): Promise<IPatientWithToken> {
+  public async create(data: ICreatePatientDto, ip?: string): Promise<IPatientWithToken> {
     logger.info('Running PatientService.create');
     try {
       this.utilService.checkForRequiredFields(data);
 
-      const { gender, first_name, last_name, email } = data;
+      const { gender, first_name, last_name, birth_date, care_type, country } = data;
 
-      let { phone } = data;
+      let { phone, email } = data;
 
-      if (phone) {
+      let existingUser: Partial<IUser> = {};
+
+      let uniqueUserParam: Partial<IUser> = {};
+
+      let has_verified_phone: boolean = false;
+      let has_verified_email: boolean = false;
+
+      if (data.isEmail) {
+        existingUser = await this.userService.findOne({ email });
+        // Email Address verified
+        has_verified_email = true;
+
+        uniqueUserParam = { email };
+      } else {
         phone = getE164Format(phone!, ip);
-      }
-
-      let existingUser: IUser = await this.userService.findOne({ email });
-
-      if (!existingUser && phone) {
         existingUser = await this.userService.findOne({ phone });
+        // Phone Nos Address verified
+        has_verified_phone = true;
+        //test email added to bypass database not-nullable constraint on email field
+        email = `${phone}@lafia-patient.com`;
+        uniqueUserParam = { phone, email };
       }
 
       if (existingUser) {
@@ -116,21 +140,45 @@ export class PatientService implements IPatientService {
         ],
       };
 
-      const patientResponse = await this.fhirServerService.executeQuery('/Patient', 'POST', {
-        data: patientData,
-      });
+      const patientResponse = await this.fhirServerService.executeQuery(
+        `/${FhirResource.Patient}`,
+        FhirResourceMethods.POST,
+        {
+          data: patientData,
+        }
+      );
       const patient = patientResponse.data;
-      const token = this.userService.generateJwtToken({ email, id: String(patient.id) });
+
+      const tokenPayload = data.isEmail
+        ? { email, id: String(patient.id) }
+        : { phone, id: String(patient.id) };
+
+      // const token = this.userService.generateJwtToken({ email, id: String(patient.id) });
+
+      const token = this.userService.generateJwtToken(tokenPayload);
+
       const userData: IFindUser = {
         token,
         resource_id: patient.id,
         resource_type: forWho.patient,
       };
 
-      data.hasVerifiedPhone = true;
+      // data.hasVerifiedPhone = true;
+
+      // Hash user password
+      const userPassword = await Password.hash(data.password);
 
       await this.userService.create({
-        ...data,
+        ...uniqueUserParam,
+        has_verified_email,
+        has_verified_phone,
+        password: userPassword,
+        gender,
+        first_name,
+        last_name,
+        birth_date,
+        care_type,
+        country,
         ...userData,
       });
 
@@ -161,8 +209,8 @@ export class PatientService implements IPatientService {
       await this.userService.update(user.id!, { ...user, token });
 
       const { data: patientData } = await this.fhirServerService.executeQuery(
-        `/Patient/${user.resourceId}`,
-        'GET'
+        `/${FhirResource.Patient}/${user.resourceId}`,
+        FhirResourceMethods.GET
       );
 
       return patientData;

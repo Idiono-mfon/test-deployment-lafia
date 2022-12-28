@@ -9,9 +9,16 @@ import { IUserService } from '../users';
 import { DbAccess } from '../../repository';
 import { IPatientService } from '../patients';
 import { IPractitionerService } from '../practitioners';
-import { IConnection, IFindConnection, IUser } from '../../models';
+import { IConnection, IFindConnection, IUser, IUserLoginDto } from '../../models';
 import { IAuthService, IConnectionCredentials } from './interfaces';
-import { error, forWho, GenericResponseError, getE164Format, logger, throwError } from '../../utils';
+import {
+  error,
+  forWho,
+  GenericResponseError,
+  getE164Format,
+  logger,
+  throwError,
+} from '../../utils';
 
 @injectable()
 export class AuthService implements IAuthService {
@@ -24,17 +31,36 @@ export class AuthService implements IAuthService {
   @inject(TYPES.ConnectionRepository)
   private connectionRepository: DbAccess;
 
-  public async login(email: string, password: string, ip?: string): Promise<any> {
+  public async login(data: IUserLoginDto, ip?: string): Promise<any> {
     logger.info('Running AuthService.login');
     try {
+      let loggedInUser: IUser;
 
-      if (_.isNumber(email)) {
-        email = getE164Format(email, ip);
+      const { email, isEmail, password } = data;
+
+      let { phone } = data;
+
+      // if (_.isNumber(email)) {
+      //   isPhone = true;
+      //   email = getE164Format(email, ip);
+      // }
+
+      if (!isEmail) {
+        phone = getE164Format(phone, ip);
+        loggedInUser = await this.userService.login(phone, password);
+      } else {
+        loggedInUser = await this.userService.login(email, password);
       }
 
-      const loggedInUser: IUser = await this.userService.login(email, password);
+      // const loggedInUser: IUser = await this.userService.login(email, password);
 
-      const token = this.userService.generateJwtToken({ email, id: loggedInUser.resourceId });
+      const tokenPayload = isEmail
+        ? { email, id: loggedInUser.resourceId }
+        : { phone, id: loggedInUser.resourceId };
+
+      const token = this.userService.generateJwtToken(tokenPayload);
+      // const token = this.userService.generateJwtToken({ email, id: loggedInUser.resourceId });
+
       let loggedInUserData: any;
 
       if (loggedInUser.photo === null) {
@@ -55,8 +81,8 @@ export class AuthService implements IAuthService {
 
       return {
         user: loggedInUserData,
-        auth_token: token
-      }
+        auth_token: token,
+      };
     } catch (e: any) {
       throw new GenericResponseError(e.toString(), e.code);
     }
@@ -86,14 +112,15 @@ export class AuthService implements IAuthService {
       callbackURL: env[`${connectionName}_callback_url`],
       authorizationURL: env[`${connectionName}_authorization_url`],
       tokenURL: env[`${connectionName}_token_url`],
-      scope: env[`${connectionName}_scope`]
-    }
+      scope: env[`${connectionName}_scope`],
+    };
   }
 
   public getStrategy(connectionName: string): OAuth2Strategy {
     logger.info('Running AuthService.getStrategy');
     const credentials = this.getConnectionCredentials(connectionName);
-    const strategy = new OAuth2Strategy(credentials,
+    const strategy = new OAuth2Strategy(
+      credentials,
       (accessToken: string, refreshToken: string, profile: any, cb: any) => {
         // @ts-ignore
         global.accessToken = accessToken;
@@ -130,7 +157,7 @@ export class AuthService implements IAuthService {
 
   public async getConnectionByPatientId(patient_id: string): Promise<IConnection[]> {
     logger.info('Running AuthService.getConnectionByPatientId');
-    return this.connectionRepository.findMany({patient_id});
+    return this.connectionRepository.findMany({ patient_id });
   }
 
   public async updateConnection(id: string, data: IFindConnection): Promise<IConnection> {

@@ -15,6 +15,9 @@ export class UserModel extends BaseModel implements IUser {
   password!: IUser['password'];
   password_reset_token!: IUser['password_reset_token'];
   gender!: IUser['gender'];
+  care_type!: IUser['care_type'];
+  birth_date!: IUser['birth_date'];
+  country!: IUser['country'];
   token!: IUser['token'];
 
   static get tableName() {

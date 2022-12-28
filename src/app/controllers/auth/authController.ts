@@ -5,23 +5,32 @@ import { passport } from '../../middlewares';
 import { IAuthService } from '../../services';
 import { BaseController } from '../baseController';
 import { error, logger, throwError } from '../../utils';
-import { controller, httpDelete, httpGet, httpPost, request, response } from 'inversify-express-utils';
-
+import {
+  controller,
+  httpDelete,
+  httpGet,
+  httpPost,
+  request,
+  response,
+} from 'inversify-express-utils';
+import { validationMiddleware } from '../../middlewares/validation.middleware';
+import { UserLoginDto } from './dto';
 @controller('')
 export class AuthController extends BaseController {
   @inject(TYPES.AuthService)
   private authService: IAuthService;
 
-  @httpPost('/auth/login')
+  @httpPost('/auth/login', validationMiddleware(UserLoginDto))
   public async login(@request() req: Request, @response() res: Response): Promise<void> {
     logger.info('Running AuthController.login');
 
     try {
       // @ts-ignore
-      const ip: string = req.headers['x-forwarded-for']?.split(',').shift() || req.socket?.remoteAddress;
+      const ip: string = // @ts-ignore
+        req.headers['x-forwarded-for']?.split(',').shift() || req.socket?.remoteAddress;
 
-      const { email, password } = req.body;
-      const userData = await this.authService.login(email, password, ip);
+      // const { email, password } = req.body;
+      const userData = await this.authService.login(req.body, ip);
 
       this.success(res, userData, 'Login Successful');
     } catch (e: any) {
@@ -47,12 +56,15 @@ export class AuthController extends BaseController {
     }
   }
 
-  @httpGet('/safhir', passport.authenticate('oauth2', { failureRedirect: `https://app.lafia.io/safhir?status=error` }))
+  @httpGet(
+    '/safhir',
+    passport.authenticate('oauth2', { failureRedirect: `https://app.lafia.io/safhir?status=error` })
+  )
   public async getSaFHirToken(@request() req: Request, @response() res: Response) {
     logger.info('Running FhirServerController.getSaFHirToken');
     try {
       const state = req.query.state as string;
-      const [stateValue,] = state?.split('?')!;
+      const [stateValue] = state?.split('?')!;
       const existingConnection = await this.authService.findOneConnection({
         patient_id: stateValue,
         connection_name: 'safhir',
@@ -60,13 +72,12 @@ export class AuthController extends BaseController {
 
       if (existingConnection) {
         await this.authService.updateConnection(existingConnection.id!, {
-            // @ts-ignore
-            refresh_token: global.refreshToken,
-            // @ts-ignore
-            access_token: global.accessToken,
-            ...existingConnection
-          }
-        );
+          // @ts-ignore
+          refresh_token: global.refreshToken,
+          // @ts-ignore
+          access_token: global.accessToken,
+          ...existingConnection,
+        });
       } else {
         await this.authService.addConnection({
           connection_name: 'safhir',

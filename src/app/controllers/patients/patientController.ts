@@ -1,23 +1,14 @@
 import { Request, Response } from 'express';
 import { inject } from 'inversify';
-import {
-  controller,
-  httpGet,
-  httpPut,
-  httpPost,
-  response,
-  request,
-} from 'inversify-express-utils';
+import { controller, httpGet, httpPut, httpPost, response, request } from 'inversify-express-utils';
 import TYPES from '../../config/types';
 import { uploadFile } from '../../middlewares';
-import {
-  IAttachment,
-  IPatient,
-  IPatientWithToken
-} from '../../models';
+import { IAttachment, IPatient, IPatientWithToken } from '../../models';
 import { eventService, eventName, IPatientService } from '../../services';
 import { HttpStatusCode, ICsvImporter, IFhirImporter, logger } from '../../utils';
 import { BaseController } from '../baseController';
+import { validationMiddleware } from '../../middlewares/validation.middleware';
+import { CreatePatientDto } from './dto';
 
 @controller('/patients')
 export class PatientController extends BaseController {
@@ -37,7 +28,10 @@ export class PatientController extends BaseController {
       const { id: patientId } = req.params;
       const patientData: IPatient = req.body;
 
-      const patient = await this.patientService.update(patientId, { id: patientId, ...patientData });
+      const patient = await this.patientService.update(patientId, {
+        id: patientId,
+        ...patientData,
+      });
 
       this.success(res, patient, 'Patient profile successfully updated');
     } catch (e: any) {
@@ -60,19 +54,20 @@ export class PatientController extends BaseController {
     }
   }
 
-  @httpPost('/')
+  @httpPost('/', validationMiddleware(CreatePatientDto))
   public async createPatient(@request() req: Request, @response() res: Response) {
     logger.info('Running PatientController.create');
     try {
       const patientData: any = { ...req.body, provider: 'lafia' };
       // @ts-ignore
-      const ip: string = req.headers['x-forwarded-for']?.split(',').shift() || req.socket?.remoteAddress;
+      const ip: string = // @ts-ignore
+        req.headers['x-forwarded-for']?.split(',').shift() || req.socket?.remoteAddress;
 
       const patient: IPatientWithToken = await this.patientService.create(patientData, ip);
 
       const responseData = {
         data: patientData,
-        resource_type: patient?.user?.resourceType as string
+        resource_type: patient?.user?.resourceType as string,
       };
 
       // Raise new patient event
@@ -131,11 +126,9 @@ export class PatientController extends BaseController {
       // await this.myCsvImporter.uploadEncountersCsv(path);
       // await this.myFhirImporter.uploadClaimsFhirData(path);
       this.success(res, {}, 'Data upload successful', HttpStatusCode.CREATED);
-
-    } catch(e: any) {
+    } catch (e: any) {
       logger.error(`Error uploading fhir data:`, e);
       this.error(res, e);
     }
-
   }
 }
