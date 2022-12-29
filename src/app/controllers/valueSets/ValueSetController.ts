@@ -5,7 +5,7 @@ import TYPES from '../../config/types';
 import { IValueSetConceptService, IValueSetService, LafiaValueSet } from '../../services';
 import { HttpStatusCode, logger } from '../../utils';
 import { BaseController } from '../baseController';
-import { validationMiddleware } from '../../middlewares/validation.middleware';
+import { validationMiddleware } from '../../middlewares';
 import { CreateValueSetDto, CreateValueSetConceptDto } from './dto';
 
 @controller('/valuesets')

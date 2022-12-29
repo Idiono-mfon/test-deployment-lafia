@@ -1,7 +1,7 @@
 import { inject } from 'inversify';
 import { Request, Response } from 'express';
 import TYPES from '../../config/types';
-import { passport } from '../../middlewares';
+import { passport, validationMiddleware } from '../../middlewares';
 import { IAuthService } from '../../services';
 import { BaseController } from '../baseController';
 import { error, logger, throwError } from '../../utils';
@@ -13,7 +13,6 @@ import {
   request,
   response,
 } from 'inversify-express-utils';
-import { validationMiddleware } from '../../middlewares/validation.middleware';
 import { UserLoginDto } from './dto';
 @controller('')
 export class AuthController extends BaseController {

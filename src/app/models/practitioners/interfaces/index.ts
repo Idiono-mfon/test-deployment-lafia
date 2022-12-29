@@ -7,6 +7,7 @@ import { IHumanName } from '../../humanNames';
 import { IIdentifier } from '../../identifiers';
 import { INarrative } from '../../narratives';
 import { IQualification } from '../../qualifications';
+import { ICreatePatientDto } from '../../patients';
 
 export interface IPractitioner extends IBase {
   resourceType?: string;
@@ -30,3 +31,22 @@ export interface IPractitionerWithToken {
   user: IPractitioner;
   auth_token: string;
 }
+
+export interface ICreatePractitionerDto extends ICreatePatientDto {
+  medical_specialty: string;
+  ip?: string;
+}
+
+// export interface ICreatePatientDto {
+//   first_name: string;
+//   last_name: string;
+//   birth_date: Date | string;
+//   gender: Gender;
+//   country: string;
+//   care_type?: string;
+//   email: string;
+//   phone: string;
+//   password: string;
+//   isEmail: boolean;
+//   emailOrPhone?: string;
+// }

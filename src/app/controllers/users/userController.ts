@@ -6,7 +6,7 @@ import { IUser } from '../../models';
 import { HttpStatusCode, logger } from '../../utils';
 import { BaseController } from '../baseController';
 import { ITwilioService, IUserService } from '../../services';
-import { validationMiddleware } from '../../middlewares/validation.middleware';
+import { validationMiddleware } from '../../middlewares';
 import { CreateAccountDto, VerifyOTPDto } from '../auth/dto';
 
 @controller('/users')

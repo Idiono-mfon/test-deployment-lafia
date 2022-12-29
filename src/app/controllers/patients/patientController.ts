@@ -2,12 +2,11 @@ import { Request, Response } from 'express';
 import { inject } from 'inversify';
 import { controller, httpGet, httpPut, httpPost, response, request } from 'inversify-express-utils';
 import TYPES from '../../config/types';
-import { uploadFile } from '../../middlewares';
+import { uploadFile, validationMiddleware } from '../../middlewares';
 import { IAttachment, IPatient, IPatientWithToken } from '../../models';
 import { eventService, eventName, IPatientService } from '../../services';
 import { HttpStatusCode, ICsvImporter, IFhirImporter, logger } from '../../utils';
 import { BaseController } from '../baseController';
-import { validationMiddleware } from '../../middlewares/validation.middleware';
 import { CreatePatientDto } from './dto';
 
 @controller('/patients')

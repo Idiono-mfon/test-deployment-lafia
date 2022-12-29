@@ -81,9 +81,9 @@ export class PatientService implements IPatientService {
     try {
       this.utilService.checkForRequiredFields(data);
 
-      const { gender, first_name, last_name, birth_date, care_type, country } = data;
+      const { gender, first_name, last_name, birth_date } = data;
 
-      let { phone, email } = data;
+      let { phone, email, isEmail, password, emailOrPhone, ...others } = data;
 
       let existingUser: Partial<IUser> = {};
 
@@ -92,20 +92,20 @@ export class PatientService implements IPatientService {
       let has_verified_phone: boolean = false;
       let has_verified_email: boolean = false;
 
-      if (data.isEmail) {
+      if (isEmail) {
         existingUser = await this.userService.findOne({ email });
         // Email Address verified
         has_verified_email = true;
 
-        uniqueUserParam = { email };
+        uniqueUserParam = { email, has_verified_email };
       } else {
         phone = getE164Format(phone!, ip);
         existingUser = await this.userService.findOne({ phone });
-        // Phone Nos Address verified
+        // Phone Nos verified
         has_verified_phone = true;
         //test email added to bypass database not-nullable constraint on email field
         email = `${phone}@lafia-patient.com`;
-        uniqueUserParam = { phone, email };
+        uniqueUserParam = { phone, email, has_verified_phone };
       }
 
       if (existingUser) {
@@ -118,6 +118,7 @@ export class PatientService implements IPatientService {
         id: phone,
         active: true,
         gender: gender?.toLowerCase()!,
+        birthDate: birth_date,
         name: {
           use: 'official',
           text: `${first_name} ${last_name}`,
@@ -163,22 +164,13 @@ export class PatientService implements IPatientService {
         resource_type: forWho.patient,
       };
 
-      // data.hasVerifiedPhone = true;
-
       // Hash user password
       const userPassword = await Password.hash(data.password);
 
       await this.userService.create({
         ...uniqueUserParam,
-        has_verified_email,
-        has_verified_phone,
         password: userPassword,
-        gender,
-        first_name,
-        last_name,
-        birth_date,
-        care_type,
-        country,
+        ...others,
         ...userData,
       });
 

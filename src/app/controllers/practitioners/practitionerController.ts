@@ -1,27 +1,13 @@
 import { Request, Response } from 'express';
 import { inject } from 'inversify';
-import {
-  controller,
-  httpGet,
-  httpPost,
-  httpPut,
-  request,
-  response
-} from 'inversify-express-utils';
+import { controller, httpGet, httpPost, httpPut, request, response } from 'inversify-express-utils';
 import TYPES from '../../config/types';
-import { uploadFile } from '../../middlewares';
-import {
-  IAttachment,
-  IPractitioner,
-  IPractitionerWithToken
-} from '../../models';
-import {
-  eventName,
-  eventService,
-  IPractitionerService,
-} from '../../services';
+import { uploadFile, validationMiddleware } from '../../middlewares';
+import { IAttachment, IPractitioner, IPractitionerWithToken } from '../../models';
+import { eventName, eventService, IPractitionerService } from '../../services';
 import { HttpStatusCode, logger } from '../../utils';
 import { BaseController } from '../baseController';
+import { CreatePractitionerDto } from './dto';
 
 @controller('/practitioners')
 export class PractitionerController extends BaseController {
@@ -35,7 +21,10 @@ export class PractitionerController extends BaseController {
       const { id: practitionerId } = req.params;
       const practitionerData: IPractitioner = req.body;
 
-      const practitioner = await this.practitionerService.update(practitionerId, { id: practitionerId, ...practitionerData });
+      const practitioner = await this.practitionerService.update(practitionerId, {
+        id: practitionerId,
+        ...practitionerData,
+      });
 
       this.success(res, practitioner, 'Practitioner profile successfully updated');
     } catch (e: any) {
@@ -58,21 +47,32 @@ export class PractitionerController extends BaseController {
     }
   }
 
-  @httpPost('')
+  @httpPost('', validationMiddleware(CreatePractitionerDto))
   public async createPractitioner(@request() req: Request, @response() res: Response) {
     logger.info('Running PractitionerController.create');
     try {
-      const practitionerData: any = { ...req.body, provider: 'lafia' };
-      const practitioner: IPractitionerWithToken = await this.practitionerService.create(practitionerData);
+      const ip: string = // @ts-ignore
+        req.headers['x-forwarded-for']?.split(',').shift() || req.socket?.remoteAddress;
+
+      const practitionerData: any = { ...req.body, provider: 'lafia', ip };
+
+      const practitioner: IPractitionerWithToken = await this.practitionerService.create(
+        practitionerData
+      );
       const responseData = {
         data: practitionerData,
-        resource_type: practitioner?.user?.resourceType as string
+        resource_type: practitioner?.user?.resourceType as string,
       };
 
       // Raise new practitioner event
       eventService.emit(eventName.newPractitioner, practitioner?.user?.id, responseData);
 
-      this.success(res, practitioner, 'Practitioner registration successful', HttpStatusCode.CREATED);
+      this.success(
+        res,
+        practitioner,
+        'Practitioner registration successful',
+        HttpStatusCode.CREATED
+      );
     } catch (e: any) {
       logger.error(`Error creating practitioner:`, e);
       this.error(res, e);
@@ -84,7 +84,10 @@ export class PractitionerController extends BaseController {
     logger.info('Running PractitionerController.uploadAttachment');
     try {
       const { id: practitionerId } = req.params;
-      const attachment: IAttachment = await this.practitionerService.uploadAttachment(practitionerId, req?.file!);
+      const attachment: IAttachment = await this.practitionerService.uploadAttachment(
+        practitionerId,
+        req?.file!
+      );
 
       this.success(res, attachment, 'Request completed successfully');
     } catch (e: any) {
@@ -98,7 +101,9 @@ export class PractitionerController extends BaseController {
     logger.info('Running PractitionerController.broadcastVideos');
     try {
       const { id: practitionerId } = req.params;
-      const vid = await this.practitionerService.findAssignedPractitionerVideoBroadcast(practitionerId);
+      const vid = await this.practitionerService.findAssignedPractitionerVideoBroadcast(
+        practitionerId
+      );
       this.success(res, vid, 'Request completed successfully');
     } catch (e: any) {
       logger.error(`Error broadcasting video:`, e);

@@ -8,6 +8,8 @@ import {
   IUser,
   ContactPointSystem,
   ContactPointUseValues,
+  ICreatePractitionerDto,
+  IPatientWithToken,
 } from '../../models';
 import { DbAccess } from '../../repository';
 import {
@@ -18,12 +20,15 @@ import {
   NotFoundError,
   throwError,
   IUtilityService,
+  getE164Format,
+  Password,
 } from '../../utils';
 import { IUserLoginParams } from '../auth';
 import { IS3Service } from '../aws';
 import { ICodeSystemService } from '../codeSystems';
 import { IUserService } from '../users';
 import { IPractitionerService } from './interfaces';
+import { FhirResource, FhirResourceMethods } from '../fhirServer';
 
 @injectable()
 export class PractitionerService implements IPractitionerService {
@@ -51,9 +56,13 @@ export class PractitionerService implements IPractitionerService {
   public async update(id: string, data: any): Promise<IPractitioner> {
     logger.info('Running PractitionerService.update');
     try {
-      const {
-        data: practitionerData,
-      } = await this.fhirServerService.executeQuery(`/Practitioner/${id}`, 'PUT', { data });
+      const { data: practitionerData } = await this.fhirServerService.executeQuery(
+        `/${FhirResource.Practitioner}/${id}`,
+        FhirResourceMethods.PUT,
+        {
+          data,
+        }
+      );
 
       logger.info(`Successfully updated practitioner data with an id - ${id}`);
 
@@ -65,21 +74,43 @@ export class PractitionerService implements IPractitionerService {
 
   public async findById(id: string): Promise<IPractitioner> {
     logger.info('Running PractitionerService.findById');
-    const practitioner = await this.fhirServerService.executeQuery(`/Practitioner/${id}`, 'GET');
+    const practitioner = await this.fhirServerService.executeQuery(
+      `/${FhirResource.Practitioner}/${id}`,
+      FhirResourceMethods.GET
+    );
 
     return practitioner.data;
   }
 
-  public async create(data: any): Promise<any> {
+  public async create(data: ICreatePractitionerDto): Promise<IPatientWithToken> {
     logger.info('Running PractitionerService.create');
     this.utilService.checkForRequiredFields(data);
 
-    const { gender, first_name, last_name, email, phone, birth_date: birthDate } = data;
+    const { gender, first_name, last_name, birth_date: birthDate } = data;
 
-    let existingUser: IUser = await this.userService.findOne({ email });
+    let { phone, email, isEmail, ip, emailOrPhone, password, ...others } = data;
 
-    if (!existingUser && phone) {
+    let existingUser: Partial<IUser> = {};
+
+    let uniqueUserParam: Partial<IUser> = {};
+
+    let has_verified_phone: boolean = false;
+    let has_verified_email: boolean = false;
+
+    if (isEmail) {
+      existingUser = await this.userService.findOne({ email });
+      // Email Address verified
+      has_verified_email = true;
+
+      uniqueUserParam = { email, has_verified_email };
+    } else {
+      phone = getE164Format(phone!, ip);
       existingUser = await this.userService.findOne({ phone });
+      // Phone Nos verified
+      has_verified_phone = true;
+      //test email added to bypass database not-nullable constraint on email field
+      email = `${phone}@lafia-practitioner.com`;
+      uniqueUserParam = { phone, email, has_verified_phone };
     }
 
     if (existingUser) {
@@ -115,21 +146,31 @@ export class PractitionerService implements IPractitionerService {
     };
 
     const practitionerResponse = await this.fhirServerService.executeQuery(
-      '/Practitioner',
-      'POST',
+      `/${FhirResource.Practitioner}`,
+      FhirResourceMethods.POST,
       { data: practitionerData }
     );
     const practitioner = practitionerResponse.data;
-    const token = this.userService.generateJwtToken({ email, id: practitioner.id });
+
+    const tokenPayload = data.isEmail
+      ? { email, id: String(practitioner.id) }
+      : { phone, id: String(practitioner.id) };
+
+    // const token = this.userService.generateJwtToken({ email, id: practitioner.id });
+    const token = this.userService.generateJwtToken(tokenPayload);
+
     const userData: IFindUser = {
-      email,
       token,
       resource_id: practitioner.id,
       resource_type: forWho.practitioner,
     };
 
+    const userPassword = await Password.hash(data.password);
+
     await this.userService.create({
-      ...data,
+      ...uniqueUserParam,
+      ...others,
+      password: userPassword,
       ...userData,
     });
 
@@ -153,8 +194,8 @@ export class PractitionerService implements IPractitionerService {
       await this.userService.update(user.id!, { ...user, token });
 
       const { data: practitionerData } = await this.fhirServerService.executeQuery(
-        `/Practitioner/${user.resourceId}`,
-        'GET'
+        `/${FhirResource.Practitioner}/${user.resourceId}`,
+        FhirResourceMethods.GET
       );
 
       return practitionerData;

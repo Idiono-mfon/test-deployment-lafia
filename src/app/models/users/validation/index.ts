@@ -14,6 +14,7 @@ export const UserValidation: JSONSchema = {
     gender: { type: 'string' },
     password: { type: 'string' },
     care_type: { type: 'string' },
+    medical_specialty: { type: 'string' },
     birth_date: { type: 'string' },
     country: { type: 'string' },
     password_reset_token: { type: 'string' },

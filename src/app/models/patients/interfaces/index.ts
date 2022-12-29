@@ -49,7 +49,7 @@ export interface ICreatePatientDto {
   birth_date: Date | string;
   gender: Gender;
   country: string;
-  care_type: string;
+  care_type?: string;
   email: string;
   phone: string;
   password: string;
