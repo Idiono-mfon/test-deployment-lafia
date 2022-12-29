@@ -1,4 +1,5 @@
 export * from './address';
+export * from './agreement';
 export * from './appointments';
 export * from './appointmentResponses';
 export * from './attachments';

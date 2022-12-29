@@ -37,30 +37,3 @@ export class ValueSetModel extends BaseModel implements IValueSet {
     };
   }
 }
-
-// ValueSetDTO
-
-// name
-// title
-// status: string
-// experimental: boolean
-// immutable: boolean
-// description: string;
-// copyright: string
-// publisherName:; string;
-// publisherEmail: string;
-// publisherUrl: string;
-// PublisherPhone: string;
-// publisherIsLafia: boolean
-// hasConcept (boolean)
-
-// ValueSetConceptDTO
-
-// system: string;
-// version: string;
-// concepts: ArrayOfObject
-// ValueSetId: string;
-
-// [
-// {code: '0', display: 'testt'}
-// ]

@@ -12,6 +12,7 @@ import { LafiaMediaController, LafiaVideoController } from './mediaServer';
 import { ComponentController, LabelController, LanguageController } from './lang';
 import { FhirResourceController, ImplementationGuideController } from './resources';
 import { ValueSetController } from './valueSets';
+import { AgreementController } from './agreements';
 
 export const controllerModule = new ContainerModule((bind) => {
   bind<AuthController>(TYPES.AuthController).to(AuthController);
@@ -33,4 +34,5 @@ export const controllerModule = new ContainerModule((bind) => {
   );
   bind<FhirResourceController>(TYPES.FhirResourceController).to(FhirResourceController);
   bind<ValueSetController>(TYPES.ValueSetController).to(ValueSetController);
+  bind<AgreementController>(TYPES.AgreementController).to(AgreementController);
 });

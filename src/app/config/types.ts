@@ -1,6 +1,7 @@
 const TYPES = {
   // controllers
   AuthController: Symbol('AuthController'),
+  AgreementController: Symbol('AgreementController'),
   UserController: Symbol('UserController'),
   BaseController: Symbol('BaseController'),
   LabelController: Symbol('LabelController'),
@@ -24,6 +25,7 @@ const TYPES = {
   RedisStore: Symbol('RedisStore'),
   UserService: Symbol('UserService'),
   AuthService: Symbol('AuthService'),
+  AgreementService: Symbol('AgreementService'),
   FileService: Symbol('FileService'),
   EmailService: Symbol('EmailService'),
   KafkaService: Symbol('KafkaService'),
@@ -78,6 +80,7 @@ const TYPES = {
   OrganizationRepository: Symbol('OrganizationRepository'),
   ValueSetRepository: Symbol('ValueSetRepository'),
   ValueSetConceptRepository: Symbol('ValueSetConceptRepository'),
+  AgreementRepository: Symbol('AgreementRepository'),
 
   // models
   ModelClass: Symbol('ModelClass'),

@@ -1,6 +1,7 @@
 export class Table {
   public static users = 'users';
   public static address = 'address';
+  public static agreements = 'agreements';
   public static codings = 'codings';
   public static periods = 'periods';
   public static patients = 'patients';

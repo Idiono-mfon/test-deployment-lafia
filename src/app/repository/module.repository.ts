@@ -34,6 +34,7 @@ import {
 import { AppointmentRepository, IAppointmentRepository } from './appointments';
 import { ValueSetRepository, IValueSetRepository } from './valueSets';
 import { ValueSetConceptRepository, IValueSetConceptRepository } from './valueSetConcepts';
+import { IAgreementRepository, AgreementRepository } from './agreements';
 
 export const repositoryModule = new ContainerModule((bind) => {
   bind<DbAccess>(TYPES.BaseRepository).to(BaseRepository);
@@ -63,4 +64,5 @@ export const repositoryModule = new ContainerModule((bind) => {
   );
   bind<IValueSetRepository>(TYPES.ValueSetRepository).to(ValueSetRepository);
   bind<IValueSetConceptRepository>(TYPES.ValueSetConceptRepository).to(ValueSetConceptRepository);
+  bind<IAgreementRepository>(TYPES.AgreementRepository).to(AgreementRepository);
 });

@@ -43,6 +43,7 @@ import { CareTeamService, ICareTeamService } from './careTeams';
 import { IOrganizationService, OrganizationService } from './organizations';
 import { ValueSetConceptService, IValueSetConceptService } from './valueSetConcepts';
 import { ValueSetService, IValueSetService } from './valueSets';
+import { AgreementService, IAgreementService } from './agreements';
 
 export const serviceModule = new ContainerModule((bind) => {
   bind<IS3Service>(TYPES.S3Service).to(S3Service);
@@ -79,4 +80,5 @@ export const serviceModule = new ContainerModule((bind) => {
   bind<IOrganizationService>(TYPES.OrganizationService).to(OrganizationService);
   bind<IValueSetService>(TYPES.ValueSetService).to(ValueSetService);
   bind<IValueSetConceptService>(TYPES.ValueSetConceptService).to(ValueSetConceptService);
+  bind<IAgreementService>(TYPES.AgreementService).to(AgreementService);
 });

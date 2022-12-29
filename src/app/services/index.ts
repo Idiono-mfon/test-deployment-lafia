@@ -1,4 +1,5 @@
 export * from './auth';
+export * from './agreements';
 export * from './users';
 export * from './patients';
 export * from './practitioners';
