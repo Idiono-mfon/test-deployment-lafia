@@ -55,7 +55,7 @@ export class PatientController extends BaseController {
 
   @httpPost('/', validationMiddleware(CreatePatientDto))
   public async createPatient(@request() req: Request, @response() res: Response) {
-    logger.info('Running PatientController.create');
+    logger.info('Running PatientController.createPatient');
     try {
       const patientData: any = { ...req.body, provider: 'lafia' };
       // @ts-ignore
@@ -127,6 +127,82 @@ export class PatientController extends BaseController {
       this.success(res, {}, 'Data upload successful', HttpStatusCode.CREATED);
     } catch (e: any) {
       logger.error(`Error uploading fhir data:`, e);
+      this.error(res, e);
+    }
+  }
+
+  @httpPut(':id/profile')
+  public async updatePatientProfile(@request() req: Request, @response() res: Response) {
+    logger.info('Running PatientController.updatePatientProfile');
+    try {
+      const { id: patientId } = req.params;
+      const patientData: IPatient = req.body;
+
+      const patient = await this.patientService.update(patientId, {
+        id: patientId,
+        ...patientData,
+      });
+
+      this.success(res, patient, 'Patient profile successfully updated');
+    } catch (e: any) {
+      logger.error(`Error updating patient data:`, e);
+      this.error(res, e);
+    }
+  }
+
+  @httpPut('/:id/residential-address')
+  public async updatePatientResidentialAddress(@request() req: Request, @response() res: Response) {
+    logger.info('Running PatientController.updatePatientResidentialAddress');
+    try {
+      const { id: patientId } = req.params;
+      const patientData: IPatient = req.body;
+
+      const patient = await this.patientService.update(patientId, {
+        id: patientId,
+        ...patientData,
+      });
+
+      this.success(res, patient, 'Patient profile successfully updated');
+    } catch (e: any) {
+      logger.error(`Error updating patient data:`, e);
+      this.error(res, e);
+    }
+  }
+
+  @httpPut('/:id/contact-info')
+  public async updatePatientContactInfo(@request() req: Request, @response() res: Response) {
+    logger.info('Running PatientController.updatePatientContactInfo');
+    try {
+      const { id: patientId } = req.params;
+      const patientData: IPatient = req.body;
+
+      const patient = await this.patientService.update(patientId, {
+        id: patientId,
+        ...patientData,
+      });
+
+      this.success(res, patient, 'Patient profile successfully updated');
+    } catch (e: any) {
+      logger.error(`Error updating patient data:`, e);
+      this.error(res, e);
+    }
+  }
+
+  @httpPut('/:id/contact-address')
+  public async updatePatientContactAddress(@request() req: Request, @response() res: Response) {
+    logger.info('Running PatientController.updatePatientContactAddress');
+    try {
+      const { id: patientId } = req.params;
+      const patientData: IPatient = req.body;
+
+      const patient = await this.patientService.update(patientId, {
+        id: patientId,
+        ...patientData,
+      });
+
+      this.success(res, patient, 'Patient profile successfully updated');
+    } catch (e: any) {
+      logger.error(`Error updating patient data:`, e);
       this.error(res, e);
     }
   }

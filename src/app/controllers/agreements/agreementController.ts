@@ -28,7 +28,7 @@ export class AgreementController extends BaseController {
 
   @httpGet('/service-agreements')
   public async termsAndConditions(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController.getUserPhoto');
+    logger.info('Running AgreementController.termsAndConditions');
     try {
       const agreement = await this.agreementService.findOne({
         name: LafiaAgreementNames.termsAndConditions,
@@ -46,7 +46,7 @@ export class AgreementController extends BaseController {
 
   @httpPut('/:id', validationMiddleware(UpdateAgreementDto))
   public async updateAgreement(@request() req: Request, @response() res: Response) {
-    logger.info('Running UserController.update');
+    logger.info('Running AgreementController.updateAgreement');
     try {
       const { id } = req.params;
 

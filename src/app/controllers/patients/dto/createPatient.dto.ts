@@ -84,3 +84,29 @@ export class CreatePatientDto implements ICreatePatientDto {
 
   /**Custom Validation fields End Here */
 }
+
+const result = {
+  resourceType: 'Parameters',
+  parameter: [
+    {
+      name: 'operation',
+      part: [
+        {
+          name: 'type',
+          valueCode: 'replace',
+        },
+        {
+          name: 'path',
+          valueString: 'Patient.identifier',
+        },
+        {
+          name: 'value',
+          valueIdentifier: {
+            system: 'http://new-system',
+            value: '0001',
+          },
+        },
+      ],
+    },
+  ],
+};
